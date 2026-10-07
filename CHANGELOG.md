@@ -1,0 +1,24 @@
+# Changelog
+
+## Unreleased
+
+TokenPlan starts from OpenUsage v0.7.14 (MIT, © Robin Ebers) and diverges as follows.
+
+### Rebrand and independence
+- New name, bundle identifiers (`com.onevalar.tokenplan`), icon, menu-bar mark, log/support folders and CLI (`tokenplan`).
+- Update feed and release pipeline now point at this repository; no upstream endpoints remain.
+- Anonymous analytics, daily-activity ping and crash reporting (PostHog) removed entirely, along with the dependency.
+
+### Security
+- The local HTTP API moved to port 6757, no longer sends permissive CORS headers, and refuses requests that carry an `Origin` header or a non-loopback `Host` (closes browser/DNS-rebinding reads).
+
+### New
+- Interface languages: English, 简体中文, 繁體中文, 日本語, 한국어 (Settings → General → Language).
+- Refresh interval is user-configurable (1, 2, 5, 10, 15, 30 or 60 minutes).
+- New providers: DeepSeek, Kimi/Moonshot, SiliconFlow, MiniMax (Coding Plan); Z.ai now also works with mainland 智谱 BigModel keys. CNY (¥) balances are supported.
+- Provider errors and warnings are shown inside the provider card, not only in a tooltip.
+- The empty dashboard offers an "Open Customize" button.
+
+### Changed
+- Footer reads "Next refresh in …" (it counts down data refreshes, not app updates).
+- Meters are announced by VoiceOver as "<metric>, <reading>".

@@ -1,28 +1,71 @@
 // swift-tools-version: 6.2
-
 import PackageDescription
 
 let package = Package(
-    name: "AIBalanceMonitor",
+    name: "OpenUsage",
     platforms: [
-        .macOS(.v14)
+        .macOS(.v15)
     ],
     products: [
-        .executable(
-            name: "AIBalanceMonitor",
-            targets: ["AIBalanceMonitor"]
-        )
+        .executable(name: "TokenPlan", targets: ["OpenUsageApp"]),
+        .executable(name: "tokenplan-cli", targets: ["OpenUsageCLI"])
+    ],
+    dependencies: [
+        // The de-facto standard recorder + global hotkey for Mac apps (System Settings-style field).
+        .package(url: "https://github.com/sindresorhus/KeyboardShortcuts", from: "3.0.1"),
+        // In-app auto-updates (appcast + EdDSA-signed downloads). 2.9.4 fixes the update window opening
+        // behind other apps for menu-bar (dockless) apps (sparkle-project/Sparkle#2889).
+        .package(url: "https://github.com/sparkle-project/Sparkle", from: "2.9.4")
     ],
     targets: [
-        .executableTarget(
-            name: "AIBalanceMonitor",
+        .target(
+            name: "OpenUsage",
+            dependencies: [
+                .product(name: "KeyboardShortcuts", package: "KeyboardShortcuts"),
+                .product(name: "Sparkle", package: "Sparkle")
+            ],
+            path: "Sources/OpenUsage",
             resources: [
-                .process("Resources")
+                .copy("Resources/ProviderIcons"),
+                .copy("Resources/pricing_supplement.json"),
+                .copy("Resources/pricing_litellm_snapshot.json"),
+                .copy("Resources/pricing_models_dev_snapshot.json")
+            ],
+            swiftSettings: [
+                .swiftLanguageMode(.v6)
+            ]
+        ),
+        .executableTarget(
+            name: "OpenUsageApp",
+            dependencies: ["OpenUsage"],
+            path: "Sources/OpenUsageApp",
+            swiftSettings: [
+                .swiftLanguageMode(.v6)
+            ]
+        ),
+        .executableTarget(
+            name: "OpenUsageCLI",
+            dependencies: ["OpenUsage"],
+            path: "Sources/OpenUsageCLI",
+            swiftSettings: [
+                .swiftLanguageMode(.v6)
             ]
         ),
         .testTarget(
-            name: "AIBalanceMonitorTests",
-            dependencies: ["AIBalanceMonitor"]
+            name: "OpenUsageTests",
+            dependencies: ["OpenUsage"],
+            path: "Tests/OpenUsageTests",
+            swiftSettings: [
+                .swiftLanguageMode(.v6)
+            ]
+        ),
+        .testTarget(
+            name: "OpenUsageCLITests",
+            dependencies: ["OpenUsageCLI"],
+            path: "Tests/OpenUsageCLITests",
+            swiftSettings: [
+                .swiftLanguageMode(.v6)
+            ]
         )
     ]
 )

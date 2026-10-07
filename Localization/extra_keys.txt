@@ -1,0 +1,103 @@
+# Strings that are assembled or looked up at runtime (so the source scan can't see them as literals).
+# One English key per line; keep in step with Formatters / WidgetData / provider notes.
+Resets soon
+Resets %@
+Limit in %@
+Limit %@
+Limit soon
+Reset expires in %@
+Reset expires %@
+Reset expires soon
+Resets in %@
+%@ left
+%@ used
+%@ spent
+%@ purchased
+%@ available
+%@ credits
+%@ requests
+%@ searches
+%@ tokens
+limit
+purchased
+credits
+requests
+searches
+available
+plan
+resets
+tokens
+Status
+Console
+Dashboard
+API Keys
+Usage
+Top Up
+Billing
+Activity
+Credits
+Outdated
+Refresh failed
+Codex logs
+ and 
+, and 
+Cash
+Vouchers
+Topped Up
+Gift
+Granted
+Balance
+Daily quota
+Weekly quota
+Extra usage balance
+Total usage
+Grok Bot usage
+Extra usage spent
+Weekly limit
+Claude Weekly
+Gemini Pro
+Gemini Weekly
+Free tier
+Pay as you go
+Cursor request-based usage data unavailable. Try again later.
+Enterprise usage data unavailable. Try again later.
+Team request-based usage data unavailable. Try again later.
+From your Cursor usage export
+From your Claude usage history (estimated)
+From your Claude usage history and pi (estimated)
+From your Codex logs (estimated)
+From your Grok logs (estimated)
+From your Antigravity conversations (estimated)
+From your OpenCode logs
+Last 30 days
+Unattributed
+Other
+Unknown
+Personal
+Organization
+This Mac
+just now
+%lldm ago
+%lldh ago
+%lldd ago
+%lldd %lldh
+%lldh %lldm
+%lldh
+%lldm
+today at %@
+tomorrow at %@
+%1$@ at %2$@
+dollars
+MTok
+thousand
+million
+billion
+Based on the MIT-licensed OpenUsage project by Robin Ebers
+Open source on
+Rate Limit Resets
+Rate limit resets
+Expiring soon
+Reset credits expire in more than 7 days
+A reset credit expires within 7 days
+A reset credit expires within 48 hours
+No usage data

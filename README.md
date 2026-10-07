@@ -1,175 +1,68 @@
-# AI Plan Monitor
+# TokenPlan
 
-<img width="2044" height="1472" alt="image" src="https://github.com/user-attachments/assets/9cd87cc2-b914-4669-896c-24aabbc2eb55" />
+Track your AI subscriptions and API balances from the macOS menu bar.
 
-一个面向 macOS 的菜单栏应用，用来统一监控 AI 官方订阅额度、模型使用窗口、第三方中转余额和本地桌面端账号状态。
+TokenPlan shows how much of your AI plans you've used — session and weekly limits, credits, balances and spend — in one popover, and can pin your most important numbers straight into the menu bar. It runs fully on your Mac: credentials stay local, nothing is sent to any analytics or crash-reporting service.
 
-[下载最新版本](https://github.com/Four-JJJJ/AI-Plan-Monitoring/releases/latest) · [安装说明](docs/DOWNLOAD.md) · [支持的服务](docs/PROVIDERS.md) · [English](docs/README.en.md)
+**Interface languages:** English · 简体中文 · 繁體中文 · 日本語 · 한국어 (Settings → General → Language, or follow macOS).
 
-## 更新说明
+> TokenPlan is a fork of the MIT-licensed [OpenUsage](https://github.com/robinebers/openusage) by Robin Ebers, with its own name, icon, update feed and a different feature set. It is not affiliated with or endorsed by the OpenUsage project. See [LICENSE](LICENSE).
 
-### V0.2.0
+## Supported services
 
-1. 增加了 onboard 流程，首次安装初始化流程更顺畅、易用。
-2. 优化若干体验项。
-3. 修复一些问题。
-4. Codex蹬完了，等回复额度继续更新。
+**Subscriptions and coding plans** (read from credentials already on your Mac)
 
-## 这是什么
+- **[Claude](docs/providers/claude.md)** — session, weekly, extra usage, rate-limit resets, local spend
+- **[Codex](docs/providers/codex.md)** — session, weekly, credits, rate-limit resets, local spend
+- **[Cursor](docs/providers/cursor.md)** — plan usage, on-demand, requests, spend
+- **[Antigravity](docs/providers/antigravity.md)**, **[Copilot](docs/providers/copilot.md)**, **[Devin](docs/providers/devin.md)**, **[Grok](docs/providers/grok.md)**, **[Ollama](docs/providers/ollama.md)**, **[OpenCode](docs/providers/opencode.md)**
 
-AI Plan Monitor 解决的是一个很实际的问题：现在 AI 服务的额度信息非常分散。
+**API keys you paste in** (Customize → provider → API Key, or an environment variable)
 
-- 官方服务各自有不同的配额页面和重置规则
-- 第三方中转站点经常需要自己研究 Cookie、Bearer、用户 ID、GroupId、组织 ID
-- 本地桌面端工具的使用量很多时候又不在公开网页里
+- **[DeepSeek 深度求索](docs/providers/deepseek.md)** — account balance (CNY/USD), topped-up vs. granted
+- **[Kimi / Moonshot 月之暗面](docs/providers/moonshot.md)** — available balance, cash, vouchers (`api.moonshot.cn` and `api.moonshot.ai`)
+- **[SiliconFlow 硅基流动](docs/providers/siliconflow.md)** — total, topped-up and gift balance (CNY)
+- **[MiniMax](docs/providers/minimax.md)** — Coding Plan session and weekly quota
+- **[Z.ai / 智谱 GLM](docs/providers/zai.md)** — session, weekly, web-search quotas (`api.z.ai` and `open.bigmodel.cn`)
+- **[OpenRouter](docs/providers/openrouter.md)** — credits, balance, period spend
 
-这个项目把这些信息统一收回到一个 macOS 菜单栏应用里，让你不用来回打开多个后台页面，就能快速知道：
+## Features
 
-- 哪个官方模型额度快用完了
-- 5 小时窗口、周额度、月额度什么时候重置
-- 哪个第三方中转站点余额不足
-- 哪个账号登录态过期了
-- Codex 当前激活的是哪一个本地账号
+- **Menu bar pins.** Pin metrics to the menu bar (up to 2 per provider) as compact text or mini bars.
+- **Dashboard popover.** Provider-grouped meters with live reset countdowns and pace indicators. Click a usage or reset value to flip its display everywhere; right-click a row for more.
+- **Clear errors.** When a service can't be read (not logged in, key rejected…) the reason is written in its card, not only in a hover tooltip.
+- **Configurable refresh.** Choose 1 – 60 minutes in Settings → General → Refresh Interval.
+- **Customize.** Turn providers and metrics on or off, pick Always Visible vs. On Demand rows, drag to reorder.
+- **Global shortcut**, **notifications** when a limit runs low, **iCloud sync** of usage history across Macs (optional).
+- **[One-shot CLI](docs/cli.md)** (`tokenplan`) and **[local HTTP API](docs/local-http-api.md)** on `127.0.0.1:6757` — loopback-only, and closed to web pages.
+- **[Proxy support](docs/proxy.md)** via `~/.tokenplan/config.json`.
 
-## 适合谁
+## Privacy
 
-- 同时使用多个官方 AI 服务的人
-- 依赖多个第三方中转站点的人
-- 需要频繁切换 Codex 本地账号的人
-- 希望把 AI 额度和余额监控常驻在菜单栏的人
+No analytics, no crash reports, no accounts. TokenPlan only talks to the services you enable (using the credentials on your Mac) and downloads public model-price lists. Details in [Privacy](docs/privacy.md).
 
-## 项目优势
+## Requirements
 
-### 1. 官方服务和第三方中转统一监控
+- macOS 15 (Sequoia) or later; Apple Silicon or Intel.
 
-不是只做单一官方产品，也不是只做 OpenAI 风格余额页，而是把两类来源放到一个应用里统一展示。
+## Building
 
-目前已覆盖的官方来源包括：
-- Codex
-- Claude
-- Gemini
-- GitHub Copilot
-- Cursor
-- Windsurf
-- Kimi
-- Amp
-- Z.ai
-- JetBrains AI
-- Kiro
-
-### 2. 第三方站点配置做了模板化
-
-已验证的中转站点不需要用户自己理解接口路径、字段映射、JSONPath 这些底层配置，而是直接按模板填写必要内容。
-
-目前内置了这些模板：
-- `open.ailinyu.de`
-- `platform.moonshot.cn`
-- `platform.xiaomimimo.com`
-- `platform.minimaxi.com`
-- `hongmacc.com`
-- `platform.deepseek.com`
-- `dragoncode.codes`
-- 通用 New API 兼容站点
-
-### 3. 更适合真实使用场景的凭证策略
-
-除了手动保存 Token / Cookie，第三方站点还支持：
-- 手动优先
-- 浏览器优先
-- 仅浏览器
-
-这意味着对于容易过期的站点，用户不一定要一直手动重贴凭证，浏览器登录态可以作为兜底来源。
-
-### 4. 错误提示更接近用户语言
-
-项目不会把大多数问题都压成一个笼统的失败提示，而是尽量区分：
-- 鉴权过期
-- 被限流
-- 接口路径不匹配
-- 网络不可达
-
-对于第三方站点，这一点尤其重要，因为它能明显降低“看不懂报错”的成本。
-
-### 5. Codex 本地多账号切换
-
-这是项目里很有特色的一块能力。
-
-支持：
-- 自动识别和记住本机当前 Codex `auth.json`
-- 导入多个本地 Codex 账号
-- 在菜单栏里直接切换本地 Codex 桌面端账号
-- 保留未激活账号的额度窗口和倒计时
-
-如果你需要在多个 Codex 账号之间来回切换，这一块会非常实用。
-
-## 核心功能
-
-- 每个 provider 可单独启用或关闭
-- 每个 provider 可设置低额度阈值
-- 可将某个 provider 固定到状态栏显示
-- 支持低额度提醒
-- 支持鉴权失效提醒
-- 支持连续失败提醒
-- 支持开机自启动
-- 支持菜单栏实时查看剩余额度和重置时间
-- 支持第三方站点模板化配置
-- 支持 Codex 多账号导入与切换
-
-## 安装方式
-
-1. 从 [Releases](https://github.com/Four-JJJJ/AI-Plan-Monitoring/releases/latest) 下载最新的 `AI Plan Monitor.dmg`
-2. 打开 DMG
-3. 将 `AI Plan Monitor.app` 拖到 `Applications`
-4. 第一次打开时，右键应用并选择“打开”
-5. 如果被系统拦截，到“系统设置 -> 隐私与安全性”里选择“仍要打开”
-
-完整步骤见：[安装说明](docs/DOWNLOAD.md)
-
-## 安全说明
-
-- 用户在设置中手动保存的凭证默认存放在 macOS Keychain
-- 旧版 `AIBalanceMonitor` 的钥匙串条目会迁移到新的 `AI Plan Monitor`
-- 应用配置保存在 `~/Library/Application Support/AIBalanceMonitor`
-- 对于支持的第三方站点，应用可以在浏览器优先模式下读取浏览器登录态作为兜底
-
-## 从源码运行
-
-要求：
-- macOS 14+
-- Xcode / Swift 6 工具链
-
-本地运行：
-
-```bash
-swift run
+```sh
+swift build                      # debug build
+swift test                       # run the test suite
+./script/build_and_run.sh        # build, sign and launch the dev app from dist/ (no install)
 ```
 
-本地打包通用 DMG：
+Translations live in `script/l10n/*.py`; after editing them run `script/generate_localizations.py` to regenerate `Localization/*.lproj`. The app icon is drawn by `script/make_icon.py`.
 
-```bash
-./scripts/package_dmg.sh
-```
+## Documentation
 
-## 分发说明
+Behavior docs are in [docs/](docs/README.md): [dashboard](docs/dashboard.md), [menu bar](docs/menu-bar.md), [settings](docs/settings.md), [refreshing](docs/refreshing.md), [updates](docs/updates.md), one page per provider. For developers: [architecture](docs/architecture.md), [adding a provider](docs/adding-a-provider.md), [localization](docs/localization.md), [debugging](docs/debugging.md), and [AGENTS.md](AGENTS.md) for conventions.
 
-- 当前公开版本通过 GitHub Releases 分发，不走 App Store
-- 对于未公证或 ad-hoc 签名的构建，第一次启动可能需要右键打开
-- 打包脚本已经支持 Developer ID 签名和 notarization，只要提供 Apple 分发凭证即可接入正式公证流程
+## Releasing
 
-## 后续方向
+Pushing a `v*` tag builds, signs, notarizes and publishes a release and its Sparkle appcast (`.github/workflows/release.yml`). One-time setup: the repository secrets `APPLE_CERTIFICATE`, `APPLE_CERTIFICATE_PASSWORD`, `APPLE_ID`, `APPLE_PASSWORD`, `APPLE_TEAM_ID`, `SPARKLE_PUBLIC_KEY`, `SPARKLE_PRIVATE_KEY` (a matching EdDSA pair from Sparkle's `generate_keys`), and, if you use iCloud sync, `APPLE_DEVELOPER_ID_ICLOUD_PROFILE`. The appcast is served from GitHub Pages (`https://onevalar.github.io/token-plan/appcast.xml`); until a signed release exists the Updates section stays hidden. See [Updates](docs/updates.md) and [iCloud Sync](docs/icloud-sync.md#development-and-release-setup).
 
-- 更多已验证的第三方站点模板
-- 更完善的 release 自动化
-- 更丰富的 provider 诊断能力
-- 更适合普通用户的首次安装体验
+## License
 
-## 参考项目与致谢
-
-以下开源项目在我们设计与实现过程中提供了重要参考，感谢这些项目作者与贡献者：
-
-- [openusage](https://github.com/robinebers/openusage) - 使用量聚合与展示思路参考。
-- [cc-switch](https://github.com/farion1231/cc-switch) - 多模型切换代理与用量查询思路参考。
-
-## 许可证
-
-MIT，详见 [LICENSE](LICENSE)。
+[MIT](LICENSE) — original work © Robin Ebers, modifications © onevalar.
