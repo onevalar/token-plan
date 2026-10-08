@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType><TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable><ImplicitUsings>enable</ImplicitUsings>
+    <ApplicationManifest>app.manifest</ApplicationManifest><ApplicationIcon>../assets/TokenPlan.ico</ApplicationIcon><RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../TokenPlan.Core/TokenPlan.Core.csproj" />
+    <PackageReference Include="Avalonia.Desktop" Version="12.1.3" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="12.1.3" />
+    <PackageReference Include="Avalonia.Themes.Simple" Version="12.1.3" />
+    <!-- The optional build statistics task must never be imported into this repository. -->
+    <PackageReference Include="Avalonia.BuildServices" Version="11.3.2" ExcludeAssets="all" PrivateAssets="all" />
+    <EmbeddedResource Include="../../../Localization/en.lproj/Localizable.strings" LogicalName="TokenPlan.en.lproj.Localizable.strings" />
+    <EmbeddedResource Include="../../../Localization/zh-Hans.lproj/Localizable.strings" LogicalName="TokenPlan.zh-Hans.lproj.Localizable.strings" />
+    <EmbeddedResource Include="../../../Localization/zh-Hant.lproj/Localizable.strings" LogicalName="TokenPlan.zh-Hant.lproj.Localizable.strings" />
+    <EmbeddedResource Include="../../../Localization/ja.lproj/Localizable.strings" LogicalName="TokenPlan.ja.lproj.Localizable.strings" />
+    <EmbeddedResource Include="../../../Localization/ko.lproj/Localizable.strings" LogicalName="TokenPlan.ko.lproj.Localizable.strings" />
+    <EmbeddedResource Include="../../../Sources/OpenUsage/Resources/ProviderIcons/claude.svg" LogicalName="TokenPlan.Icons.claude.svg" />
+    <EmbeddedResource Include="../../../Sources/OpenUsage/Resources/ProviderIcons/codex.svg" LogicalName="TokenPlan.Icons.codex.svg" />
+    <EmbeddedResource Include="../../../Sources/OpenUsage/Resources/ProviderIcons/cursor.svg" LogicalName="TokenPlan.Icons.cursor.svg" />
+    <EmbeddedResource Include="../../../assets/AppIcon-1024.png" LogicalName="TokenPlan.AppIcon.png" />
+  </ItemGroup>
+</Project>

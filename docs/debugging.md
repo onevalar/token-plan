@@ -18,6 +18,10 @@ The script builds a signed app bundle under `dist/` and launches it in place —
 own settings and keychain and never disturbs a released TokenPlan. It ships no update feed, so it never
 checks for updates — test updates with a real signed, notarized release build.
 
+The local build script limits Swift compilation to two jobs. The dashboard opens on a fresh install;
+opening an already running app from Finder brings the dashboard back, including when startup is still
+finishing. Login-item startup otherwise stays in the menu bar.
+
 ## Stream logs
 
 To watch the app's logs live while you reproduce an issue:

@@ -45,6 +45,11 @@ No analytics, no crash reports, no accounts. TokenPlan only talks to the service
 
 - macOS 15 (Sequoia) or later; Apple Silicon or Intel.
 
+An additional [Windows/Linux desktop preview](docs/desktop-clients.md) is available in
+`platforms/desktop`. It currently supports Claude/Codex/Cursor account limits, provider enablement,
+local quota history, Codex device-log token trends with 7/30-day filters, and five-language settings;
+it does not yet have the macOS app's full provider and feature coverage.
+
 ## Building
 
 ```sh

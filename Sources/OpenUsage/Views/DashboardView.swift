@@ -62,7 +62,7 @@ struct DashboardView: View {
     private static let footerHorizontalPadding: CGFloat = outerPadding
     private static let reorderSpace = "popoverReorderSpace"
     /// One width across both densities — switching density shouldn't move the popover's left edge.
-    private static let popoverWidth: CGFloat = 320
+    private static let popoverWidth: CGFloat = PanelHeightController.panelWidth
     /// Fixed height of the Customize / Settings back nav bar — the bar pins itself to exactly this height.
     private static let topBarHeight: CGFloat = 44
 
@@ -80,6 +80,7 @@ struct DashboardView: View {
             // and scroll content all sit on it; separation from the footer comes from the native soft
             // scroll-edge fade (not a distinct bar).
             .background(PopoverSurface())
+            .tint(Theme.accent)
             // Drive the host panel's height on SwiftUI's clock. At the body root, OUTSIDE `modeBody`'s
             // `.animation(nil, value: layout.screenSlideID)`, so the height rides the active spring (the
             // slide's, during a switch) instead of being snapped.

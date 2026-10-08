@@ -227,6 +227,8 @@ struct WidgetRowView: View {
         if data.hasMeterStyleToggle, let onToggleMeterStyle {
             Button(action: onToggleMeterStyle) {
                 Text(data.headline)
+                    .font(.system(size: density.labelPointSize + 2, weight: .semibold, design: .rounded))
+                    .monospacedDigit()
                     .foregroundStyle(.primary)
                     .contentTransition(.numericText())
             }
@@ -234,6 +236,8 @@ struct WidgetRowView: View {
             .hoverTooltip(data.meterStyleTooltip)
         } else {
             Text(data.headline)
+                .font(.system(size: density.labelPointSize + 2, weight: .semibold, design: .rounded))
+                .monospacedDigit()
                 .foregroundStyle(.primary)
                 .contentTransition(.numericText())
         }

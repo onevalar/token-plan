@@ -45,7 +45,7 @@ SIGN_ENTITLEMENTS="$ROOT_DIR/script/TokenPlan.local.entitlements.plist"
 pkill -x "$TARGET_NAME" >/dev/null 2>&1 || true
 
 echo "==> swift build ($CONFIG)"
-swift build -c "$CONFIG"
+swift build -c "$CONFIG" -j 2
 BUILD_DIR="$(swift build -c "$CONFIG" --show-bin-path)"
 BUILD_BINARY="$BUILD_DIR/$TARGET_NAME"
 BUILD_CLI_BINARY="$BUILD_DIR/tokenplan-cli"

@@ -6,6 +6,7 @@ public final class AppDelegate: NSObject, NSApplicationDelegate {
     private var statusItemController: StatusItemController?
     private var singleInstanceLock: SingleInstanceLock.Token?
     private let updater = UpdaterController()
+    private var pendingReopen = false
 
     public override init() {
         super.init()
@@ -81,8 +82,22 @@ public final class AppDelegate: NSObject, NSApplicationDelegate {
         let container = await AppContainer(isFreshInstall: isFreshInstall)
         self.container = container
         statusItemController = StatusItemController(container: container, updater: updater)
+        if isFreshInstall || pendingReopen {
+            pendingReopen = false
+            statusItemController?.showPopover()
+        }
         // Starts background update checks (release build only; dormant under preview/`swift run`).
         updater.start()
+    }
+
+    public func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+        if let statusItemController {
+            statusItemController.showPopover()
+        } else {
+            // Environment capture and provider initialization can still be running at reopen time.
+            pendingReopen = true
+        }
+        return false
     }
 
 }

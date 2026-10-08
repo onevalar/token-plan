@@ -101,3 +101,87 @@ Reset credits expire in more than 7 days
 A reset credit expires within 7 days
 A reset credit expires within 48 hours
 No usage data
+
+# Windows / Linux desktop client keys.
+Overview
+AI Usage
+Your account limits, together in one place.
+Stop
+Interface review uses example data. No accounts are connected.
+Connected Providers
+Waiting for the first update…
+Remaining
+Resets
+Updated
+Last Successful Update
+Follow System
+Refresh Every Five Minutes
+Preferences could not be read. Changes can be saved again in Settings.
+Preferences could not be saved. Check the app data folder permissions.
+Sign in with the Codex CLI, then refresh.
+Sign in with Claude Code, then refresh.
+Your session has expired. Sign in with the CLI again.
+Rate limited. Wait before refreshing again.
+The provider could not return usage. Try again later.
+The connection timed out. Try again later.
+Cannot reach the provider. Check your connection.
+Usage or login data could not be read. Sign in again.
+Available Usage
+Reads existing logins on this device. Credentials are never copied or synced.
+Claude and Codex use CLI logins. Cursor uses its desktop login. Sign in again in the corresponding app if a session expires.
+This desktop preview does not yet include spending history, tray integration, iCloud sync or automatic updates.
+Sign in with the Cursor desktop app, then refresh.
+Your Cursor session has expired. Sign in with Cursor again.
+Cursor login could not be read. Open Cursor and sign in again.
+Cursor Models
+Other Models
+Providers
+History
+Choose which accounts appear in your overview and refresh automatically.
+Enabled
+Connected
+Needs Attention
+Example Data
+Disabling a provider stops its requests. Its existing login remains unchanged.
+Local quota readings from the last 30 days. The most recent successful reading per hour is kept.
+Last 7 Days
+Last 30 Days
+Date Range
+All Providers
+No readings in this range. Successful refreshes will appear here.
+No providers are enabled.
+Manage Providers
+Usage history could not be read. New readings will start a fresh history.
+Usage history could not be saved. Check the app data folder permissions.
+Token Usage
+Codex CLI logs on this device. Includes logs from different sign-ins, not the current account's complete usage.
+Enable Codex in Providers to read its local token logs.
+Reading local token logs…
+Local token totals are incomplete. Refresh again to continue scanning.
+Local token logs could not be read. Try refreshing again.
+No recorded token usage was found in the local logs.
+Input
+Output
+Cache Read
+Other Reported Tokens
+Daily Details
+More Metrics
+Some local token logs were skipped or could not be read. Totals may be incomplete.
+
+Claude Code logs on this device. Includes logs from different sign-ins, not the current account's complete usage.
+Enable Claude or Codex in Providers to read local token logs.
+Cache Write
+Show TokenPlan
+Keep Running When Window Closes
+Use the tray menu to reopen TokenPlan, refresh usage or quit. Enable background mode only if your desktop displays the tray icon.
+This desktop preview does not yet include spending history, iCloud sync or automatic updates.
+Quit
+From the signed-in Cursor account's usage export. Only reported token counts are included.
+Enable a provider to view token history.
+Loading Cursor token history…
+No reported token usage was found in the Cursor export.
+Some Cursor export rows were invalid. Totals may be incomplete.
+Cursor token history needs a valid desktop session. Sign in with Cursor again.
+Cursor token history could not be loaded. Try refreshing again.
+Cursor token export is too large to load. View the full history in Cursor.
+Cursor login changed during refresh. Refresh again for the current account.
