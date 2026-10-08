@@ -37,6 +37,10 @@ TokenPlan shows how much of your AI plans you've used — session and weekly lim
 - **[One-shot CLI](docs/cli.md)** (`tokenplan`) and **[local HTTP API](docs/local-http-api.md)** on `127.0.0.1:6757` — loopback-only, and closed to web pages.
 - **[Proxy support](docs/proxy.md)** via `~/.tokenplan/config.json`.
 
+## Windows and Linux
+
+Early desktop clients (Claude, Codex and Cursor quotas and token history) are built from `platforms/desktop`. Each tagged release carries `TokenPlan-Setup-<version>.exe` (Windows, per-user, no admin rights) and `tokenplan_<version>_amd64.deb` (Debian/Ubuntu) on the Releases page — see [Windows and Linux clients](docs/desktop-clients.md#installers). They are not code-signed yet.
+
 ## Privacy
 
 No analytics, no crash reports, no accounts. TokenPlan only talks to the services you enable (using the credentials on your Mac) and downloads public model-price lists. Details in [Privacy](docs/privacy.md).

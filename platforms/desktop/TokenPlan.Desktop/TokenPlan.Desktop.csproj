@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <OutputType>WinExe</OutputType><TargetFramework>net10.0</TargetFramework>
+    <Version>0.1.0</Version><Product>TokenPlan</Product><Company>onevalar</Company><Copyright>MIT License. Based on OpenUsage by Robin Ebers.</Copyright><OutputType>WinExe</OutputType><TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable><ImplicitUsings>enable</ImplicitUsings>
     <ApplicationManifest>app.manifest</ApplicationManifest><ApplicationIcon>../assets/TokenPlan.ico</ApplicationIcon><RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
   </PropertyGroup>

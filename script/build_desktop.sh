@@ -8,6 +8,8 @@ export MSBUILDDISABLENODEREUSE=1
 MODE="${1:-build}"
 PROJECT="TokenPlan.Desktop/TokenPlan.Desktop.csproj"
 OPTIONS=(-m:2 /nodeReuse:false /p:UseSharedCompilation=false)
+# TOKENPLAN_VERSION (e.g. 0.1.0 or 0.1.0-beta.1) stamps the published assemblies; default comes from the .csproj.
+[ -n "${TOKENPLAN_VERSION:-}" ] && OPTIONS+=("/p:Version=${TOKENPLAN_VERSION}")
 case "$MODE" in
   build)
     "$SDK" restore "$PROJECT" --disable-parallel --configfile NuGet.Config

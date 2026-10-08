@@ -19,6 +19,10 @@ TokenPlan starts from OpenUsage v0.7.14 (MIT, © Robin Ebers) and diverges as fo
 - Provider errors and warnings are shown inside the provider card, not only in a tooltip.
 - The empty dashboard offers an "Open Customize" button.
 
+### Windows and Linux
+- Installers: `TokenPlan-Setup-<version>.exe` (per-user, Start menu shortcut, uninstall entry, no admin rights) and `tokenplan_<version>_amd64.deb` (application-menu entry, icons, `apt remove`).
+- A GitHub Actions workflow builds both on every `v*` tag and attaches them to the release.
+
 ### Changed
 - Footer reads "Next refresh in …" (it counts down data refreshes, not app updates).
 - Meters are announced by VoiceOver as "<metric>, <reading>".

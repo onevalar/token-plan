@@ -112,6 +112,44 @@ build-statistics package is excluded from the project entirely. There is no runt
 English, simplified/traditional Chinese, Japanese and Korean reuse `Localization/` and the existing
 `script/l10n/part*.py` source tables. Add translations there and run `script/generate_localizations.py`.
 
+## Installers
+
+`script/build_desktop_installers.sh [version]` (default `0.1.0`) publishes both clients and writes to `dist/installers/`:
+
+- `TokenPlan-Setup-<version>.exe` — Windows x64, built with NSIS (`platforms/desktop/installer/TokenPlan.nsi`, driven by
+  `script/package_windows_installer.py`). It installs **per user** into `%LOCALAPPDATA%\Programs\TokenPlan`, asks for no
+  administrator rights, adds a Start menu shortcut with the app icon and an entry in *Settings → Apps → Installed apps*, and
+  writes its own uninstaller. The installer shows in English, Simplified/Traditional Chinese, Japanese or Korean, following
+  the Windows display language. Installing over an older version replaces it; a running TokenPlan is closed first.
+  `/S` installs silently and `/D=<folder>` chooses the folder (for scripted tests).
+- `tokenplan_<version>_amd64.deb` — Debian/Ubuntu x64, assembled by `script/package_linux_deb.py` without needing `dpkg`.
+  It installs the app to `/opt/tokenplan`, a `tokenplan` command in `/usr/bin`, an application-menu entry (localized
+  names) and hicolor icons. It depends on the usual X11, fontconfig, ICU and OpenSSL libraries, which `apt` pulls in.
+- `SHA256SUMS.txt` — checksums of both files.
+
+Uninstalling removes only what the installer put there. Preferences, history and logs (`TokenPlan/desktop` under
+`%LOCALAPPDATA%` on Windows, `~/.local/share` on Linux) are kept; delete that folder for a clean slate.
+
+The builds need `makensis` (NSIS 3.x; it cross-builds the Windows installer on macOS and Linux) and a .NET SDK. The
+installers are **not code-signed**: Windows SmartScreen will ask for confirmation, and `apt` may note the file has no
+repository signature.
+
+### Automatic builds
+
+`.github/workflows/desktop-release.yml` runs on every pushed `v*` tag: it runs the desktop tests, builds both installers
+and attaches them with `SHA256SUMS.txt` to that tag's GitHub Release (creating a pre-release for tags such as
+`v0.1.0-beta.1`). It shares the tag with the macOS release workflow; whichever finishes first creates the release and
+the other adds its files. Run it by hand from the Actions tab (*Desktop installers → Run workflow*) to get the same files
+as a 14-day artifact without publishing anything.
+
+### Installing for a test
+
+Windows: double-click the `.exe`; if SmartScreen appears choose *More info → Run anyway*. Start it from the Start menu.
+Remove it in *Settings → Apps*.
+
+Ubuntu/Debian: `sudo apt install ./tokenplan_0.1.0_amd64.deb`, then open TokenPlan from the application menu (or run
+`tokenplan`). Remove with `sudo apt remove tokenplan`. The tray icon needs a desktop that shows status-notifier icons.
+
 ## Build and verify
 
 Install a .NET 10 SDK. `global.json` selects 10.0.401 or a newer patch. An isolated SDK can be selected
@@ -127,8 +165,8 @@ script/build_desktop.sh publish linux-x64
 
 Publish outputs go to `dist/desktop/<runtime>` and include their .NET runtime. Start
 `TokenPlan.Desktop.exe` on Windows or `TokenPlan.Desktop` on Linux. Linux needs the desktop system's
-X11/XWayland, fontconfig and graphics libraries supported by Avalonia. Packages are development
-previews, unsigned and not installed or distributed automatically.
+X11/XWayland, fontconfig and graphics libraries supported by Avalonia. Those folders are development
+previews, unsigned; use the installers above to hand a build to a tester.
 
 For local interface review, run the built app with `--fixture` (or `TOKENPLAN_INTERFACE_REVIEW=1` in a test launcher). This clearly labels example data,
 makes no provider requests, and uses a separate temporary preferences directory. It is not evidence of

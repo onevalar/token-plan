@@ -1,0 +1,98 @@
+name: Desktop installers
+
+# Builds the Windows installer (TokenPlan-Setup-<version>.exe) and the Debian/Ubuntu package
+# (tokenplan_<version>_amd64.deb) and attaches them, with SHA256SUMS.txt, to the GitHub Release.
+#
+#   git tag v0.1.0 && git push origin v0.1.0      # same tag that ships the macOS app
+#
+# A tag with a pre-release suffix (v0.1.0-beta.1) creates a pre-release. To try the pipeline without a
+# tag, run this workflow manually (Actions → Desktop installers → Run workflow): it builds the same
+# files and keeps them as a downloadable run artifact for 14 days; nothing is published.
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to stamp on a test build (e.g. 0.1.0). Not published."
+        required: true
+        default: "0.1.0"
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: desktop-installers-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  installers:
+    name: Build installers
+    runs-on: ubuntu-latest
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: "1"
+      DOTNET_NOLOGO: "1"
+      AVALONIA_TELEMETRY_OPTOUT: "1"
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-dotnet@v5
+        with:
+          global-json-file: platforms/desktop/global.json
+
+      # makensis cross-builds the Windows installer on Linux; the .deb is assembled by a Python script.
+      - name: Install NSIS
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends nsis
+
+      - name: Resolve version
+        id: meta
+        env:
+          EVENT: ${{ github.event_name }}
+          REF_NAME: ${{ github.ref_name }}
+          INPUT_VERSION: ${{ inputs.version }}
+        run: |
+          if [ "$EVENT" = "push" ]; then raw="$REF_NAME"; else raw="$INPUT_VERSION"; fi
+          version="${raw#v}"
+          if ! printf '%s' "$version" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+([-.][0-9A-Za-z.]+)?$'; then
+            echo "::error::'$raw' is not a version like 0.1.0 or 0.1.0-beta.1"; exit 1
+          fi
+          prerelease=false
+          case "$version" in *-*) prerelease=true ;; esac
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "prerelease=$prerelease" >> "$GITHUB_OUTPUT"
+
+      - name: Test the desktop client
+        run: script/build_desktop.sh test
+
+      - name: Build installers
+        run: script/build_desktop_installers.sh "${{ steps.meta.outputs.version }}"
+
+      - name: Keep installers as a run artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: TokenPlan-desktop-installers-${{ steps.meta.outputs.version }}
+          path: dist/installers/*
+          if-no-files-found: error
+          retention-days: 14
+
+      # The macOS release workflow publishes the same tag; whichever job gets there first creates the
+      # release and the other just attaches its files.
+      - name: Attach installers to the GitHub Release
+        if: github.event_name == 'push'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+          VERSION: ${{ steps.meta.outputs.version }}
+          PRERELEASE: ${{ steps.meta.outputs.prerelease }}
+        run: |
+          flags=()
+          [ "$PRERELEASE" = "true" ] && flags+=(--prerelease)
+          if ! gh release view "$TAG" >/dev/null 2>&1; then
+            gh release create "$TAG" --verify-tag --title "TokenPlan $VERSION" "${flags[@]}" \
+              --notes "TokenPlan $VERSION. Windows: TokenPlan-Setup-$VERSION.exe (per-user installer, no administrator rights). Linux: tokenplan_${VERSION}_amd64.deb (Debian/Ubuntu x64). Verify downloads with SHA256SUMS.txt. The installers are not code-signed yet, so Windows SmartScreen may ask for confirmation." \
+              || gh release view "$TAG" >/dev/null
+          fi
+          gh release upload "$TAG" dist/installers/* --clobber
