@@ -1,18 +1,32 @@
 # Settings
 
-Settings lives inside the popover — there is no separate window. Open it from the footer's **Options** menu, with ⌘, while the popover is showing, or by right-clicking the menu bar icon and choosing Settings. The dashboard slides over to the Settings screen, which carries a back button in its top-left corner. Go back with that button, the ⌘, shortcut, or Esc (Esc always backs out to the dashboard first — pressing it again closes the popover).
+Settings lives inside the popover — there is no separate window. Open it from the overview's **…** menu, with ⌘, while the popover is showing, or by right-clicking the menu bar icon and choosing Settings. One plain top-left Back button and Esc return one level at a time; ⌘, returns to the dashboard. There is no right-hand reset/navigation lookalike.
+
+The main Settings page contains **Services & Subscriptions**, **Usage Display** with a live preview, and **General**, including Language. Secondary pages are **Usage History**, **Appearance & Menu Bar**, **Notifications & Sync**, and **Privacy & Advanced**. Usage History holds cross-provider totals that no longer appear on the overview.
+
+**Services & Subscriptions** lets you enable services and open each subscription's connection, optional note, metric placement, menu-bar pins, and supported API-key controls. It explains how existing provider logins are detected; it is not a TokenPlan login screen. A restart detects supported additional logins without resetting display preferences. See [Dashboard](dashboard.md#subscription-details-and-configuration).
+
+## Usage Display
+
+| Setting | Options | What it does |
+|---|---|---|
+| Show Usage As | Used / Left | Whether the percentage and bar mean used or remaining. Readings show just `48%` or `52%`; screen readers retain the meaning. |
+| Reset Times | Countdown / Exact time | Hourglass + `3h 25m`, or calendar + exact time. Countdown units stay `d/h/m` in every language. |
+
+The preview updates immediately when you change either choice. Overview numbers and times are display-only, not hidden global setting buttons.
 
 ## General
 
 | Setting | Options | What it does |
 |---|---|---|
-| Show Total Spend | on/off | Whether the cross-provider [Total Spend](dashboard.md#total-spend) card shows at the top of the dashboard. On by default; the card appears whenever at least one enabled provider tracks spend (Claude, Codex, Cursor, Grok, OpenCode). |
 | Refresh Interval | 1 / 2 / 5 / 10 / 15 / 30 minutes, 1 hour | How often provider data is re-fetched in the background (default 5 minutes). Applies immediately. |
 | Language | System Default / English / 简体中文 / 繁體中文 / 日本語 / 한국어 | The interface language. Takes effect after a restart; Settings offers a **Restart Now** button. See [Localization](localization.md). |
 | Launch at Login | on/off | Registers the app as a login item (the system's login-item registry is the source of truth). |
 | Global Shortcut | record a shortcut | Global shortcut that toggles the popover from anywhere. Click the field and press a combo; the ⓧ clears it and disables the shortcut. |
 
 ## iCloud Sync
+
+Under **Notifications & Sync**.
 
 **Sync Across Macs** is off by default. Turning it on shares normalized TokenPlan history through the
 app's private iCloud container and combines machine-local tokens and spend across Macs signed into the
@@ -22,24 +36,22 @@ time; it also reports unavailable iCloud, loading, write, and malformed-file sta
 
 ## Appearance
 
+Under **Appearance & Menu Bar**.
+
 | Setting | Options | What it does |
 |---|---|---|
 | Icon Style | Text / Bars | How starred metrics render in the menu bar. See [Menu bar](menu-bar.md). |
 | Theme | System / Light / Dark | App-wide appearance override for the popover. |
 | Density | Default / Compact | Default breathes; Compact is a real information-dense mode — text steps down one size, rows and provider sections pull together, and Customize / Settings rows tighten with them. In both, consecutive one-line metrics (Today / Yesterday / …) pull together; Compact pulls harder. |
 | Reduce Animations | Off / On | Off by default. On removes transitions, motion effects, and continuous decorative animation throughout the popover. The app also honors the macOS Reduce Motion accessibility setting. |
-| Time Format | Auto / 12-hour / 24-hour | How exact times read (e.g. "Resets today at 6:38 PM" vs "18:38"). Auto follows the system. |
+| Time Format | Auto / 12-hour / 24-hour | How exact times read (e.g. `6:38 PM` vs `18:38`). Auto follows the system. |
 | Increase Transparency | Off / On | Off (default) keeps the popover a solid panel. On makes it translucent so your desktop shows through, while keeping the numbers and Options control legible with adaptive surfaces. It pauses automatically when you have the macOS **Reduce Transparency** or **Increase Contrast** accessibility setting turned on (a note explains why), so it never works against those preferences. |
 
-## Usage Display
-
-| Setting | Options | What it does |
-|---|---|---|
-| Show Usage As | Used / Left | Whether bounded metrics read "48% used" or "52% left" — same toggle as clicking a headline. |
-| Reset Times | Countdown / Exact time | "Resets in 3h 25m" vs "Resets today at 6:38 PM" — same toggle as clicking a reset label. |
-| Always Show Pacing | Off / On | Off (default) shows pacing only when a metric is close to or over its limit. On surfaces it on every metric with a reset window: on-track rows gain their projection ("~33% left at reset") and an even-pace tick marking where steady use would put you right now. Metrics without a reset window have no pace to show, and a metric with nothing used yet stays plain until something has been spent. |
+The old Show Total Spend and Always Show Pacing toggles are removed. History is available on its own page; bars no longer show pace ticks or projections. Their colors reflect actual remaining quota. Pace-based notification choices below remain independent.
 
 ## Notifications
+
+Under **Notifications & Sync**.
 
 TokenPlan can alert you with a macOS notification when a metric runs low or its pace gets worse, so you don't have to keep the popover open to catch a quota creeping toward its limit. Alerts work while the app runs in the menu bar, even with the popover closed.
 
@@ -54,6 +66,8 @@ Alerts fire on a new crossing or pace worsening, then stay deduplicated while th
 All three alerts default off. The first time you turn one on, TokenPlan asks for notification permission; if you decline (or turn notifications off for TokenPlan in System Settings later), a warning mark appears on the Notifications header and an "Open System Settings" button shows under the toggles so you can re-enable them. A notification's title is the alert name, its subtitle names the provider and metric, and its body is the plain-language verdict. Tapping an alert opens the popover on the dashboard.
 
 ## Privacy
+
+Under **Privacy & Advanced**, alongside the command-line tool, logging, reset, and update controls.
 
 | Setting | Options | What it does |
 |---|---|---|
@@ -72,7 +86,7 @@ See [Logging](logging.md) for the full behavior: subsystem tags, the file size c
 
 **Reset All Settings…** restores every setting on this screen to its default — appearance, usage display, notifications, privacy, log level, refresh interval, the global shortcut (cleared), Launch at Login (turned off), iCloud sync (turned off), and the update preferences (stable channel, automatic checks on) — and also resets all customization, exactly like Customize's Reset All: default layout, order, and menu-bar stars, with providers turned back on for the tools you have installed. The reset cannot be undone.
 
-Not touched: provider logins and API keys, cached usage data, and your language choice. Turning iCloud sync off as part of the reset works exactly like flipping its toggle off: this Mac's synced history is removed from the shared iCloud data, and your other Macs keep their own.
+Not touched: provider logins and API keys, cached usage data, subscription notes, and your language choice. Turning iCloud sync off as part of the reset works exactly like flipping its toggle off: this Mac's synced history is removed from the shared iCloud data, and your other Macs keep their own.
 
 ## Updates
 
@@ -89,7 +103,7 @@ See [Updates](updates.md) for the dashboard banner, channels, and signature veri
 
 ## Version
 
-The app version shows in the popover footer.
+The app version shows in the Settings footer.
 
 Your settings carry across updates — layout, stars, preferences, and the menu-bar shortcut all stay put. When an update changes how a setting is stored, the app upgrades it in place on launch, stepping through any in-between versions if you skipped a few. Nothing is reset. (Earlier betas wiped all settings on every update; that no longer happens.)
 

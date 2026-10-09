@@ -106,6 +106,10 @@ final class CodexSwapAccountTests: XCTestCase {
         }
         let fresh = layout()
         XCTAssertTrue(Set(ids).isSubset(of: Set(fresh.displayGroups.map { $0.provider.id })))
+        let service = try XCTUnwrap(fresh.displayServices.first { $0.id == "codex" })
+        XCTAssertEqual(service.provider.displayName, "Codex")
+        XCTAssertEqual(service.accounts.map(\.id), ids, "Grouping preserves distinct cards and their saved order")
+        XCTAssertEqual(fresh.displayServices.filter { $0.id == "codex" }.count, 1)
         for id in ids {
             XCTAssertTrue(fresh.pinnedMetricIDs.contains(id + ".weekly"))
             XCTAssertTrue(fresh.expandedMetricIDs.contains(id + ".spark"))

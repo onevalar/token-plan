@@ -147,7 +147,7 @@ final class OpenCodeProviderTests: XCTestCase {
         XCTAssertEqual(data.used, 0)
         XCTAssertEqual(data.resetsAt, activeReset)
         XCTAssertFalse(data.isFreshSessionWindow(now: fixedNow))
-        XCTAssertEqual(data.boundedTrailingText(now: fixedNow)?.hasPrefix("Resets in"), true)
+        XCTAssertEqual(data.boundedTrailingText(now: fixedNow), "5h")
     }
 
     func testUntouchedSessionRendersNotStartedThroughProviderAndStore() async throws {

@@ -41,11 +41,12 @@ final class ResetDisplayTests: XCTestCase {
         XCTAssertTrue(data.hasResetLabel())
 
         data.resetDisplayMode = .relative
-        XCTAssertEqual(data.boundedTrailingText()?.hasPrefix("Resets in "), true)
+        XCTAssertEqual(data.boundedTrailingText(), "4d 17h")
         XCTAssertEqual(data.resetTooltip()?.hasPrefix("Resets "), true)         // opposite = absolute
 
         data.resetDisplayMode = .absolute
-        XCTAssertEqual(data.boundedTrailingText()?.hasPrefix("Resets "), true)
+        XCTAssertFalse(data.boundedTrailingText()!.contains("Resets"))
+        XCTAssertTrue(data.boundedTrailingText()!.contains(" · "))
         XCTAssertEqual(data.resetTooltip()?.hasPrefix("Resets in "), true)      // opposite = relative
     }
 
@@ -61,11 +62,9 @@ final class ResetDisplayTests: XCTestCase {
         XCTAssertFalse(data.hasResetLabel(now: now))
         XCTAssertEqual(data.resetTooltip(now: now), WidgetData.freshSessionTooltip)
 
-        data.alwaysShowPacing = true
         let state = data.meterState(now: now)
         XCTAssertEqual(state, .level(.normal))
         XCTAssertNil(state.tooltip)
-        XCTAssertNil(data.paceTick(for: state, now: now))
     }
 
     @MainActor
@@ -107,7 +106,7 @@ final class ResetDisplayTests: XCTestCase {
 
         XCTAssertFalse(data.isFreshSessionWindow(now: now))
         XCTAssertTrue(data.hasResetLabel(now: now))
-        XCTAssertEqual(data.boundedTrailingText(now: now)?.hasPrefix("Resets in"), true)
+        XCTAssertEqual(data.boundedTrailingText(now: now), "2h")
 
         // A genuinely fresh session carries no reset date — that is this signal's "Not started" state.
         data.resetsAt = nil
@@ -124,7 +123,7 @@ final class ResetDisplayTests: XCTestCase {
         data.resetsAt = now.addingTimeInterval(period / 2)
 
         XCTAssertFalse(data.isFreshSessionWindow(now: now))
-        XCTAssertEqual(data.boundedTrailingText(now: now)?.hasPrefix("Resets"), true)
+        XCTAssertEqual(data.boundedTrailingText(now: now), "3d 12h")
     }
 
     func testExpiryTooltipSingleCreditFollowsTimeSetting() {
@@ -317,5 +316,24 @@ final class ResetDisplayTests: XCTestCase {
         XCTAssertFalse(data.hasResetLabel())        // no resetsAt → not a clickable reset
         XCTAssertNil(data.resetTooltip())
         XCTAssertEqual(data.boundedTrailingText(), "$20 limit") // falls back to limit context, unflipped
+    }
+
+    func testOverviewNamesCycleWithoutInventingDeadlineAndPreservesModelScope() {
+        let now = Date(timeIntervalSince1970: 1_800_000_000)
+        var data = WidgetData(title: "Weekly", icon: .providerMark("claude"), kind: .percent, used: 18, limit: 100)
+        data.periodDurationMs = MetricPeriod.weekMs
+        XCTAssertEqual(data.overviewTitle, "1w")
+        XCTAssertNil(data.boundedTrailingText(now: now), "A cadence is not a known deadline")
+        data = WidgetData(title: "Sonnet", icon: .providerMark("claude"), kind: .percent, used: 18, limit: 100)
+        data.periodDurationMs = MetricPeriod.weekMs
+        XCTAssertEqual(data.overviewTitle, "Sonnet · 1w")
+        data.resetsAt = now.addingTimeInterval(121)
+        XCTAssertEqual(data.boundedTrailingText(now: now), "3m")
+        data.resetsAt = now.addingTimeInterval(1)
+        XCTAssertEqual(data.boundedTrailingText(now: now), "1m")
+        data.resetsAt = now
+        XCTAssertEqual(data.boundedTrailingText(now: now), "soon", "An elapsed snapshot is not proof of restored quota")
+        data.hasData = false
+        XCTAssertEqual(data.boundedTrailingText(now: now), "No data")
     }
 }

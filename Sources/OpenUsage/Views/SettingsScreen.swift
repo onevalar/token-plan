@@ -17,11 +17,7 @@ struct SettingsScreen: View {
 
     @State private var launchAtLogin = LaunchAtLoginSetting()
     @State private var commandLineTool = CommandLineToolInstaller()
-    @AppStorage(TotalSpendSetting.key) private var showTotalSpend = true
-    @AppStorage(AppearanceSetting.key) private var appearance = AppearanceSetting.system
-    @AppStorage(TimeFormatSetting.key) private var timeFormat = TimeFormatSetting.auto
     @AppStorage(DensitySetting.key) private var density = DensitySetting.regular
-    @AppStorage(ReduceAnimationsSetting.key) private var reduceAnimations = ReduceAnimationsSetting.fallback
     @AppStorage(LogLevelSetting.key) private var logLevel = LogLevelSetting.fallback
     @AppStorage(LanguageSetting.key) private var language = LanguageSetting.fallback
     @AppStorage(RefreshSetting.key) private var refreshMinutes = RefreshSetting.defaultMinutes
@@ -57,26 +53,58 @@ struct SettingsScreen: View {
     private var content: some View {
         // Same section rhythm as the dashboard and Customize (all read the density setting).
         VStack(alignment: .leading, spacing: density.sectionSpacing) {
-            generalSection
-            ICloudSyncSettingsSection(sync: container.iCloudSync)
-            appearanceSection
-            usageDisplaySection
-            notificationsSection
-            privacySection
-            commandLineSection
-            advancedSection
-            updatesSection
-            // Mirror of the Customize cross-link — the layout controls live on the other screen.
-            ScreenCrossLinkRow(
-                systemImage: "slider.horizontal.3",
-                title: "Customize",
-                subtitle: "Choose what's visible and where",
-                destination: .customize
-            )
+            if let page = layout.settingsPage {
+                switch page {
+                case .history:
+                    if layout.hasSpendCapableProvider {
+                        TotalSpendCard()
+                    } else {
+                        Text("Enable a service with usage history to see totals here.")
+                            .font(.subheadline).foregroundStyle(.secondary)
+                            .frame(maxWidth: .infinity).padding(.vertical, 24)
+                    }
+                case .appearance: SettingsAppearanceSection()
+                case .notifications:
+                    notificationsSection
+                    ICloudSyncSettingsSection(sync: container.iCloudSync)
+                case .advanced:
+                    privacySection
+                    commandLineSection
+                    advancedSection
+                    updatesSection
+                }
+            } else {
+                ScreenCrossLinkRow(
+                    systemImage: "rectangle.stack",
+                    title: "Services & Subscriptions",
+                    subtitle: "Manage services, logins and metrics",
+                    destination: .customize
+                )
+                usageDisplaySection
+                generalSection
+                section("More") {
+                    ForEach(SettingsPage.allCases, id: \.self) { page in
+                        Button {
+                            withAnimation(Motion.spring) { layout.settingsPage = page }
+                        } label: {
+                            HStack {
+                                Text(page.title)
+                                Spacer(minLength: 8)
+                                Image(systemName: "chevron.right").foregroundStyle(.secondary)
+                            }
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, density.controlRowPadding)
+                            .contentShape(Rectangle())
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+            }
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 12)
         .task { await refreshNotificationsAuth() }
+        .onChange(of: layout.settingsPage) { _, _ in scrollPosition.scrollTo(edge: .top) }
         .onChange(of: layout.screen) { _, screen in
             if screen == .settings {
                 scrollPosition.scrollTo(edge: .top)
@@ -97,12 +125,6 @@ struct SettingsScreen: View {
 
     private var generalSection: some View {
         section("General") {
-            // The dashboard's cross-provider Total Spend card; at least one enabled spend-capable
-            // provider must exist, so this toggle can't conjure it up alone.
-            row("Show Total Spend") {
-                Toggle("", isOn: $showTotalSpend)
-                    .settingsSwitchStyle()
-            }
             // How often provider data is re-fetched in the background (and the cache's freshness window).
             row("Refresh Interval") {
                 picker(
@@ -149,70 +171,6 @@ struct SettingsScreen: View {
         }
     }
 
-    private var appearanceSection: some View {
-        @Bindable var layout = container.layout
-        @Bindable var transparency = container.transparency
-        return section("Appearance") {
-            row("Icon Style") {
-                picker($layout.menuBarStyle, options: MenuBarStyle.allCases, label: \.label)
-            }
-            row("Theme") {
-                picker($appearance, options: AppearanceSetting.allCases, label: \.label)
-                    // NSApp-level so the popover panel restyles too (it ignores preferredColorScheme).
-                    .onChange(of: appearance) {
-                        AppearanceSetting.applyCurrent()
-                    }
-            }
-            row("Density") {
-                picker($density, options: DensitySetting.allCases, label: \.label)
-            }
-            row("Reduce Animations") {
-                Toggle("", isOn: $reduceAnimations)
-                    .settingsSwitchStyle()
-            }
-            row("Time Format") {
-                picker($timeFormat, options: TimeFormatSetting.allCases, label: \.label)
-            }
-            // Translucent popover the proper way (behind-window vibrancy, text stays legible). It
-            // yields to the system accessibility settings, and to the party easter egg while that's
-            // running (the egg drives the look) — either way, see the paused notice below.
-            row("Increase Transparency") {
-                Toggle("", isOn: $transparency.increaseTransparency)
-                    .settingsSwitchStyle()
-                    // Party mode owns the look while it's active, so disable (dim) the toggle to show
-                    // it has no effect right now — its stored value resumes once the egg is exited.
-                    .disabled(transparency.secretCodeActive)
-            }
-            // Egg first: while Party runs it overrides the toggle regardless of the system flags, so
-            // its notice takes precedence over the accessibility one.
-            if transparency.secretCodeActive {
-                inlineNotice("Party mode is on, so this stays paused.")
-            } else if transparency.isPaused {
-                inlineNotice("macOS Reduce Transparency or Increase Contrast is on, so this stays paused.")
-            }
-            // Both rows surface only after the secret code has been entered. Party Mode is the egg's
-            // own switch: turning it off (like re-typing the code) exits the egg and hides both rows,
-            // dropping back to the base state. Drunk Mode escalates the readable party into the woozy,
-            // barely-readable state and back — turning it off stays in the party (4 → 3), while turning
-            // Party Mode off from there clears Drunk Mode too (4 → base).
-            if transparency.secretCodeActive {
-                row("Party Mode") {
-                    Toggle("", isOn: $transparency.partyModeActive)
-                        .settingsSwitchStyle()
-                }
-                row("Drunk Mode") {
-                    Toggle("", isOn: $transparency.drunkMode)
-                        .settingsSwitchStyle()
-                }
-                // The egg yields to the accessibility flags too: when one is on the panel stays
-                // opaque, so explain why the party looks normal rather than leaving it a mystery.
-                if transparency.partyPaused {
-                    inlineNotice("macOS Reduce Transparency or Increase Contrast is on, so the party stays paused.")
-                }
-            }
-        }
-    }
-
     private var usageDisplaySection: some View {
         @Bindable var store = container.dataStore
         return section("Usage Display") {
@@ -222,14 +180,19 @@ struct SettingsScreen: View {
             row("Reset Times") {
                 picker($store.resetDisplayMode, options: ResetDisplayMode.allCases, label: \.label)
             }
-            // Off (default) leaves pacing on yellow and red only. On also surfaces projection
-            // and the even-pace tick on blue rows.
-            row("Always Show Pacing") {
-                Toggle("", isOn: $store.alwaysShowPacing)
-                    .settingsSwitchStyle()
-                    .hoverTooltip("Show how you're pacing on every metric, not just ones near their limit")
-            }
+            Text("Preview").font(.caption).foregroundStyle(.secondary)
+                .frame(maxWidth: .infinity, alignment: .leading).padding(.horizontal, 12)
+            WidgetRowView(data: displayPreview)
         }
+    }
+
+    private var displayPreview: WidgetData {
+        var data = WidgetData(title: tr("Session"), icon: .providerMark("claude"), kind: .percent, used: 18, limit: 100)
+        data.periodDurationMs = MetricPeriod.sessionMs
+        data.resetsAt = Date().addingTimeInterval(2 * 3600 + 35 * 60)
+        data.displayMode = container.dataStore.meterStyle
+        data.resetDisplayMode = container.dataStore.resetDisplayMode
+        return data
     }
 
     private var privacySection: some View {
@@ -489,9 +452,7 @@ struct SettingsScreen: View {
 
     // MARK: - Section / row scaffolding
 
-    /// A caption header over a rounded card of rows — the Customize block shape. The header is
-    /// inset 8pt so it aligns with the rows' content, matching how Customize lines its provider
-    /// headers up with the card rows.
+    /// Caption header over a rounded card, matching the subscription settings.
     private func section(
         _ title: LocalizedStringKey,
         @ViewBuilder rows: () -> some View
@@ -514,7 +475,7 @@ struct SettingsScreen: View {
         HStack(spacing: 10) {
             Text(label)
             Spacer(minLength: 8)
-            control()
+            control().accessibilityLabel(label)
         }
         .padding(.horizontal, 12)
         .padding(.vertical, density.controlRowPadding)

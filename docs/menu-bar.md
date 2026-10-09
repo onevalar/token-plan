@@ -29,4 +29,4 @@ Detection rides the system's own "an app is capturing the screen" signal — the
 
 ## What the strip shows
 
-The strip only renders real data. A starred metric with nothing fetched yet is skipped; a provider whose stars all lack data disappears entirely (icon included). When nothing has data, the strip falls back to the app icon. Stars follow your Customize order — Always Visible metrics first, then On Demand ones. A metric can be starred whether it's Always Visible or On Demand.
+The strip only renders real data. A starred metric with nothing fetched yet is skipped; a provider whose stars all lack data disappears entirely (icon included). When nothing has data, the strip falls back to the app icon. Stars follow your saved metric order and placement. A metric can be starred whether it appears in the overview or only in subscription details.

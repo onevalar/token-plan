@@ -25,10 +25,6 @@ struct WidgetData: Hashable {
     var displayMode: WidgetDisplayMode = .used
     /// Global relative/absolute reset display, stamped by `WidgetDataStore` (like `displayMode`).
     var resetDisplayMode: ResetDisplayMode = .relative
-    /// Global "always show pacing" opt-in, stamped by `WidgetDataStore` (like `displayMode`). When on,
-    /// the blue/healthy row also shows the even-pace tick and its projection copy. Yellow and red rows
-    /// always show the tick when a reset window exists; this toggle only adds it on blue.
-    var alwaysShowPacing: Bool = false
     var resetsAt: Date?
     /// Zero or more future expiry instants surfaced in the row's hover tooltip (Codex rate-limit-reset
     /// credits — one entry per still-available credit). Empty for every other row. Kept as raw `Date`s so
@@ -142,8 +138,7 @@ struct WidgetData: Hashable {
         case normal, warning, critical
     }
 
-    /// The meter's full visual state, derived once (`meterState(now:)`) so the bar color, the
-    /// tick (`paceTick(for:)`), and the label-line warning copy can never contradict each other.
+    /// Pace assessment used by quota notifications, separate from the UI's actual-quota color.
     /// Precedence, highest first: no data → spent → live pace verdict → absolute level bands.
     enum MeterState: Hashable {
         /// No real metric backs the tile — gray, empty track, no copy.
@@ -278,6 +273,14 @@ struct WidgetData: Hashable {
         return trf(displayMode == .remaining ? "%@ left" : "%@ used", valueText)
     }
 
+    /// Short cycle labels never erase model-specific scopes such as Sonnet or Spark.
+    var overviewTitle: String {
+        guard isBounded, let periodDurationMs,
+              let period = Formatters.periodLabel(milliseconds: periodDurationMs) else { return title }
+        if [tr("Session"), tr("Weekly"), tr("Daily"), tr("Monthly")].contains(title) { return period }
+        return "\(title) · \(period)"
+    }
+
     /// Subtitle under the bounded headline (reset timing or limit context).
     var boundedSubtitle: String? {
         if let subtitleOverride {
@@ -286,11 +289,8 @@ struct WidgetData: Hashable {
         if let resetLabel {
             return resetLabel
         }
-        // Any cycle-based metric (e.g. requests) shows its reset cadence when no exact reset date exists.
-        if let periodDurationMs,
-           let duration = Formatters.compactDuration(TimeInterval(periodDurationMs) / 1000) {
-            return trf("Resets in %@", duration)
-        }
+        // A period is a cadence, not a known deadline. The overview names the cycle on the left;
+        // without a reset date, never manufacture a countdown from the full period length.
         switch kind {
         case .percent:
             return nil
@@ -483,8 +483,8 @@ extension WidgetData {
         return (limit, resetsAt, TimeInterval(periodDurationMs) / 1000)
     }
 
-    /// The meter's full visual state for `now` — the single source the row's color, amber tick,
-    /// and warning copy all read from, so they can't drift apart. Precedence, highest first:
+    /// Pace assessment for notification triggers. The UI uses `quotaSeverity` instead.
+    /// Precedence, highest first:
     ///
     /// 1. **No data** → gray, empty.
     /// 2. **Spent** → red + "Limit reached", whenever the remainder rounds to zero at the
@@ -497,8 +497,7 @@ extension WidgetData {
     ///    used, red once 10% or less is left, rounded to the whole percent the headline shows.
     ///
     /// Every band keys off the share *used*, never the displayed fraction, so the color and copy
-    /// don't flip with the Used/Left toggle. The even-pace tick (`paceTick(for:)`) is independent:
-    /// yellow and red always show it when a reset window exists; blue only with "always show pacing".
+    /// don't flip with the Used/Left toggle.
     func meterState(now: Date = Date()) -> MeterState {
         guard hasData, let limit, limit > 0 else { return hasData ? .level(.normal) : .noData }
         if roundedAtDisplayPrecision(limit - used) <= 0 { return .spent }
@@ -548,37 +547,22 @@ extension WidgetData {
         return .level(.normal)
     }
 
-    /// Even-pace tick position on the bar (0...1), or `nil` when hidden. Always the elapsed fraction
-    /// of the reset window, framed like the fill (Used view → share used at an even burn; Left view →
-    /// share remaining). Yellow and red pace states always show it; blue `healthy` only when
-    /// `alwaysShowPacing` is on. Spent, no-data, and rows without a reset window never show a tick.
-    func paceTick(for state: MeterState, now: Date = Date()) -> Double? {
-        switch state {
-        case .spent, .noData, .level: return nil
-        case .healthy: guard alwaysShowPacing else { return nil }
-        case .closeToLimit, .runningOut: break
-        }
-        guard let ctx = paceContext else { return nil }
-        let windowStart = ctx.resetsAt.addingTimeInterval(-ctx.period)
-        let elapsed = now.timeIntervalSince(windowStart)
-        guard elapsed >= Pace.minimumElapsed(periodDuration: ctx.period), now < ctx.resetsAt else { return nil }
-        let elapsedFraction = min(max(elapsed / ctx.period, 0), 1)
-        return displayMode == .remaining ? 1 - elapsedFraction : elapsedFraction
+    /// Actual quota bands, independent of reset timing, consumption speed and display preference.
+    var quotaSeverity: MeterSeverity? {
+        guard hasData, let limit, limit > 0 else { return nil }
+        return absoluteLevelState(used: used, limit: limit).severity
     }
 
-    /// Trailing text on the bounded primary row, reset-display-mode aware. Priority mirrors
-    /// `boundedSubtitle`, but a concrete reset honors `resetDisplayMode` (relative ⟷ absolute).
+    /// Verb-less reset text for the overview's hourglass/calendar, honoring the display preference.
     /// Claude and Antigravity session rows show "Not started" while the rolling window has not begun.
     func boundedTrailingText(now: Date = Date()) -> String? {
         guard hasData else { return Self.noDataSubtitle }
         if let subtitleOverride { return subtitleOverride }
         if isFreshSessionWindow(now: now) { return tr("Not started") }
         if let resetsAt {
-            return resetDisplayMode == .absolute
-                ? Formatters.resetAbsoluteLabel(at: resetsAt, now: now)
-                : Formatters.resetRelativeLabel(until: resetsAt, now: now)
+            return Formatters.compactDeadline(at: resetsAt, mode: resetDisplayMode, now: now)
         }
-        return boundedSubtitle // period cadence / dollar limit / count suffix — nothing to flip
+        return boundedSubtitle
     }
 
     /// Session meters only (Claude/Antigravity/OpenCode): a "Not started" state for the current window

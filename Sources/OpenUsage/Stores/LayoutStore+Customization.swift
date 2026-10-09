@@ -49,6 +49,13 @@ extension LayoutStore {
         orderedProviderIDs().compactMap { registry.provider(id: $0) }
     }
 
+    /// History lives in details; enabled reset credits always show in the overview. Hide still wins.
+    private func isAlwaysShownMetric(_ id: String) -> Bool {
+        guard let sample = registry.descriptor(id: id)?.sample else { return false }
+        if sample.isChart || sample.isUsagePeriod { return false }
+        return sample.showsResetExpiries || !expandedMetricIDs.contains(id)
+    }
+
     /// Enabled (and provider-enabled) widgets grouped by provider, in the user's provider order, each
     /// provider's metrics kept in the provider's custom metric order. Drives the grouped dashboard list; providers with
     /// no visible metric are dropped so the dashboard only shows groups that have something to show.
@@ -62,15 +69,33 @@ extension LayoutStore {
             )
             let widgets = metricOrder(for: provider.id).compactMap { widgetsByDescriptor[$0] }
             guard !widgets.isEmpty else { return nil }
-            let alwaysShown = widgets.filter { !expandedMetricIDs.contains($0.descriptorID) }
-            let expanded = widgets.filter { expandedMetricIDs.contains($0.descriptorID) }
-            // A provider whose only enabled metrics are all marked expanded would otherwise render an
-            // empty card with a caret — promote them to always-shown so the card always has rows.
+            let alwaysShown = widgets.filter { isAlwaysShownMetric($0.descriptorID) }
+            let expanded = widgets.filter { !isAlwaysShownMetric($0.descriptorID) }
+            // Promote quota/balance rows when all are set to Details, never history. A history-only
+            // service keeps its heading as an entry into details, without a blank overview card.
             if alwaysShown.isEmpty {
-                return ProviderGroup(provider: provider, alwaysShownWidgets: expanded, expandedWidgets: [])
+                let promoted = expanded.filter {
+                    let sample = registry.descriptor(id: $0.descriptorID)!.sample
+                    return !sample.isChart && !sample.isUsagePeriod
+                }
+                return ProviderGroup(provider: provider, alwaysShownWidgets: promoted,
+                                     expandedWidgets: expanded.filter { !promoted.contains($0) })
             }
             return ProviderGroup(provider: provider, alwaysShownWidgets: alwaysShown, expandedWidgets: expanded)
         }
+    }
+
+    var displayServices: [ProviderServiceGroup] {
+        var services: [ProviderServiceGroup] = []
+        for group in displayGroups {
+            let family = ProviderAccountID.family(of: group.id)
+            if let index = services.firstIndex(where: { $0.id == family }) {
+                services[index].accounts.append(group)
+            } else {
+                services.append(ProviderServiceGroup(id: family, accounts: [group]))
+            }
+        }
+        return services
     }
 
     /// Every enabled provider with *all* the metrics it supports, in its saved metric order. Enabled and
@@ -82,8 +107,8 @@ extension LayoutStore {
             guard !metrics.isEmpty else { return nil }
             return ProviderMetrics(
                 provider: provider,
-                alwaysShownMetrics: metrics.filter { !expandedMetricIDs.contains($0.id) },
-                expandedMetrics: metrics.filter { expandedMetricIDs.contains($0.id) }
+                alwaysShownMetrics: metrics.filter { isAlwaysShownMetric($0.id) },
+                expandedMetrics: metrics.filter { !isAlwaysShownMetric($0.id) }
             )
         }
     }
@@ -118,8 +143,8 @@ extension LayoutStore {
         guard !metrics.isEmpty else { return nil }
         return ProviderMetrics(
             provider: provider,
-            alwaysShownMetrics: metrics.filter { !expandedMetricIDs.contains($0.id) },
-            expandedMetrics: metrics.filter { expandedMetricIDs.contains($0.id) }
+            alwaysShownMetrics: metrics.filter { isAlwaysShownMetric($0.id) },
+            expandedMetrics: metrics.filter { !isAlwaysShownMetric($0.id) }
         )
     }
 

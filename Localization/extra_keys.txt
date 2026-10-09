@@ -92,8 +92,6 @@ MTok
 thousand
 million
 billion
-Based on the MIT-licensed OpenUsage project by Robin Ebers
-Open source on
 Rate Limit Resets
 Rate limit resets
 Expiring soon

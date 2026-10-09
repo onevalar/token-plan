@@ -11,7 +11,6 @@ final class CopilotProvider: ProviderRuntime {
         displayName: "Copilot",
         icon: .providerMark("copilot"),
         links: [
-            .init(label: "Status", url: "https://www.githubstatus.com/"),
             .init(label: "Dashboard", url: "https://github.com/settings/billing")
         ]
     )

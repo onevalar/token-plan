@@ -19,7 +19,7 @@ When Antigravity reports your subscription tier (such as `Pro` or `Ultra`), Toke
 
 Gemini Pro and Gemini Flash are one pool: using either model drains the same quota, so TokenPlan shows one meter per window instead of separate Pro and Flash meters. That pair is named Session and Weekly to match the other providers' rows. Every non-Gemini model shares the second pool, shown under the Claude name (like Codex's Spark pair). The quota API reports fractions, while token usage and estimated spend come separately from local conversation databases.
 
-While a pool's rolling 5-hour window has no usage yet, that meter reads **Not started** on the trailing label instead of a reset countdown; hover explains that the session begins after your first message. The weekly meters always show a normal reset countdown.
+While a pool's rolling 5-hour window has no usage yet, that meter reads **Not started** instead of a reset countdown. The session begins after your first message. The weekly meters show a countdown when the provider reports a reset time.
 
 ## Where credentials come from
 
@@ -32,7 +32,7 @@ If neither is available you'll see *Start Antigravity or run `agy` and try again
 
 ## Spend and usage history
 
-TokenPlan reads generation token counts, including the fixed system prompt, from every `~/.gemini/antigravity*/conversations` store (the `agy` CLI, the Antigravity IDE, the Antigravity 2.0 app, and ACP sessions) and estimates their API-equivalent cost using the shared [model pricing](../pricing.md). Today, Yesterday, and Last 30 Days contribute to the Total Spend card alongside the other providers. These are estimates, not charges from your Antigravity subscription, and conversation data never leaves your Mac. Previously scanned conversations are reused on refresh, so only new generation records need to be read.
+TokenPlan reads generation token counts, including the fixed system prompt, from every `~/.gemini/antigravity*/conversations` store (the `agy` CLI, the Antigravity IDE, the Antigravity 2.0 app, and ACP sessions) and estimates their API-equivalent cost using the shared [model pricing](../pricing.md). Today, Yesterday, and Last 30 Days contribute to **Settings → Usage History** alongside the other providers; Antigravity's own history appears in subscription details. These are estimates, not charges from your Antigravity subscription, and conversation data never leaves your Mac. Previously scanned conversations are reused on refresh, so only new generation records need to be read.
 
 When the model picker is on its default, Antigravity logs a placeholder ID (`gemini-default`, `gemini-pro-default`) and records the model that actually served the turn as a display label such as "Gemini 3.1 Pro (High)". TokenPlan prices those turns by that label, falling back to the placeholder ID when the label has no known rate (`gemini-pro-default` prices as Gemini 3.1 Pro). Anything that still cannot be priced remains visible in the unknown-models warning.
 

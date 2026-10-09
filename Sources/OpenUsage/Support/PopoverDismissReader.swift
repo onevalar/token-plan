@@ -26,6 +26,8 @@ struct PopoverKeyReader: NSViewRepresentable {
     /// menu's Settings item carries ⌘, only as a *label*: while that menu is open the item handles
     /// it, while it's closed this monitor does, so they never both fire.
     var onSettings: @MainActor () -> Bool = { false }
+    /// Refresh from any popover screen, without requiring a footer button.
+    var onRefresh: @MainActor () -> Bool = { false }
     /// Called on plain ⌘Z (undo). Rides this monitor — same reasons as Esc/Return: a hidden SwiftUI
     /// shortcut only fires when the popover is the key window, which the panel isn't always for. By the
     /// time this runs the monitor has already confirmed the panel owns the keystroke and no text field is
@@ -38,6 +40,7 @@ struct PopoverKeyReader: NSViewRepresentable {
         view.onEscape = onEscape
         view.onReturn = onReturn
         view.onSettings = onSettings
+        view.onRefresh = onRefresh
         view.onUndo = onUndo
         return view
     }
@@ -47,6 +50,7 @@ struct PopoverKeyReader: NSViewRepresentable {
         view.onEscape = onEscape
         view.onReturn = onReturn
         view.onSettings = onSettings
+        view.onRefresh = onRefresh
         view.onUndo = onUndo
     }
 
@@ -67,12 +71,14 @@ struct PopoverKeyReader: NSViewRepresentable {
         var onEscape: (@MainActor () -> Bool)?
         var onReturn: (@MainActor () -> Bool)?
         var onSettings: (@MainActor () -> Bool)?
+        var onRefresh: (@MainActor () -> Bool)?
         var onUndo: (@MainActor () -> Bool)?
         private var monitor: Any?
         private static let escapeKeyCode: UInt16 = 53
         private static let returnKeyCode: UInt16 = 36
         private static let commaKeyCode: UInt16 = 43
         private static let zKeyCode: UInt16 = 6
+        private static let rKeyCode: UInt16 = 15
 
         override func viewDidMoveToWindow() {
             super.viewDidMoveToWindow()
@@ -86,12 +92,14 @@ struct PopoverKeyReader: NSViewRepresentable {
                 guard keyCode == MonitorView.escapeKeyCode
                     || keyCode == MonitorView.returnKeyCode
                     || keyCode == MonitorView.commaKeyCode
+                    || keyCode == MonitorView.rKeyCode
                     || keyCode == MonitorView.zKeyCode else {
                     return event
                 }
                 let isReturn = keyCode == MonitorView.returnKeyCode
                 let isComma = keyCode == MonitorView.commaKeyCode
                 let isUndo = keyCode == MonitorView.zKeyCode
+                let isRefresh = keyCode == MonitorView.rKeyCode
                 // Only bare Return navigates; ⌘⏎, ⌥⏎, etc. belong to other controls.
                 if isReturn,
                    !event.modifierFlags.intersection([.command, .option, .control, .shift]).isEmpty {
@@ -103,7 +111,7 @@ struct PopoverKeyReader: NSViewRepresentable {
                     return event
                 }
                 // Only plain ⌘Z undoes; a bare z (typing) or ⇧⌘Z (redo) belong elsewhere.
-                if isUndo,
+                if isUndo || isRefresh,
                    event.modifierFlags.intersection([.command, .option, .control, .shift]) != [.command] {
                     return event
                 }
@@ -126,6 +134,9 @@ struct PopoverKeyReader: NSViewRepresentable {
                     }
                     if isComma {
                         return self.onSettings?() ?? false
+                    }
+                    if isRefresh {
+                        return self.onRefresh?() ?? false
                     }
                     if isUndo {
                         return self.onUndo?() ?? false

@@ -19,6 +19,19 @@ enum PopoverScreen: Hashable, Sendable {
     }
 }
 
+enum SettingsPage: CaseIterable, Hashable {
+    case history, appearance, notifications, advanced
+
+    var title: String {
+        switch self {
+        case .history: tr("Usage History")
+        case .appearance: tr("Appearance & Menu Bar")
+        case .notifications: tr("Notifications & Sync")
+        case .advanced: tr("Privacy & Advanced")
+        }
+    }
+}
+
 /// In-popover navigation: which screen is showing, the master/detail route inside Customize, and the
 /// horizontal screen-switch slide bookkeeping. Split out of `LayoutStore` (which owns the *layout* —
 /// enabled widgets, order, pins) so screen routing is its own concern; `LayoutStore` forwards its
@@ -37,10 +50,15 @@ final class PopoverNavigationStore {
             // DashboardView reads these on its very next render to slide in from the screen being left.
             screenSlideFrom = oldValue
             screenSlideID += 1
+            if screen == .customize {
+                customizeReturnScreen = oldValue
+                openedDashboardDetail = oldValue == .dashboard && customizeProviderID != nil
+            }
             // Leaving Customize drops the L2 detail selection so reopening Customize shows the list,
             // never a stranded detail screen. The popover-closed reset sets `screen = .dashboard`, so
             // this also covers close/reopen.
             if screen != .customize { customizeProviderID = nil }
+            if screen != .settings { settingsPage = nil }
         }
     }
     /// Supports DashboardView's horizontal screen-switch slide: the screen being left, plus a counter
@@ -57,4 +75,24 @@ final class PopoverNavigationStore {
     /// shows that provider's metric sections and API key. UI-only (not persisted): cleared when leaving
     /// Customize (see `screen`'s didSet) and on popover close.
     var customizeProviderID: String?
+    var settingsPage: SettingsPage?
+    private var customizeReturnScreen = PopoverScreen.dashboard
+    private var openedDashboardDetail = false
+
+    /// Return to the actual entry point, including Settings subpages and direct plan details.
+    @discardableResult
+    func goBack() -> Bool {
+        switch screen {
+        case .dashboard: return false
+        case .settings:
+            if settingsPage != nil { settingsPage = nil } else { screen = .dashboard }
+        case .customize:
+            if customizeProviderID != nil, !openedDashboardDetail {
+                customizeProviderID = nil
+            } else {
+                screen = customizeReturnScreen
+            }
+        }
+        return true
+    }
 }

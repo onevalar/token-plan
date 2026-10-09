@@ -35,6 +35,12 @@ final class LayoutStore {
         get { navigation.customizeProviderID }
         set { navigation.customizeProviderID = newValue }
     }
+    var settingsPage: SettingsPage? {
+        get { navigation.settingsPage }
+        set { navigation.settingsPage = newValue }
+    }
+    @discardableResult
+    func goBack() -> Bool { navigation.goBack() }
     /// Placed widget being drag-reordered (transient). `PlacedWidget.id`, never persisted.
     var draggingID: UUID?
     /// Persisted provider display order (provider IDs). Drives both the dashboard groups and the
@@ -49,22 +55,13 @@ final class LayoutStore {
     /// `canPin` to at most `maxPinsPerProvider` per provider (the strip stacks a provider's values in pairs).
     private(set) var pinnedMetricIDs: Set<String>
 
-    /// Descriptor ids that sit below the per-provider "Shown on expand" divider: the dashboard hides
-    /// them behind a caret until the user taps it, and Customize lists them under the divider.
+    /// Descriptor ids configured for Details rather than the overview.
     /// Membership only — the sequence within each section follows the provider's metric order, like
     /// pins. A metric keeps its membership while disabled, so re-enabling restores its section.
     var expandedMetricIDs: Set<String>
 
-    /// Provider IDs whose dashboard cards are currently opened with their expanded metrics visible.
-    /// Unlike hover and drag state, this is a user preference: if someone likes Codex open, it should
-    /// stay open across popover closes and app restarts.
-    private(set) var expandedProviderIDs: Set<String>
-
-    /// The three transient popover pills, each an auto-clearing `TransientNotice` (was three copy-pasted
-    /// value+trigger+clearTask machines). The public `pinLimitNotice`/`shareConfirmation`/
-    /// `customizationNotice` surface below forwards to these, so call sites are unchanged.
+    /// Auto-clearing customization feedback, shared by the overview and configuration pages.
     private let pinNotice = TransientNotice<String?>(clearedValue: nil, timeout: .seconds(3))
-    private let shareNotice = TransientNotice<Bool>(clearedValue: false, timeout: .seconds(2.5))
     private let customizeNotice = TransientNotice<CustomizationNoticeContent?>(clearedValue: nil, timeout: .seconds(2.5))
 
     /// Transient explanation for a denied pin attempt; the popover footer renders it in place of the pin
@@ -72,11 +69,6 @@ final class LayoutStore {
     var pinLimitNotice: String? { pinNotice.value }
     /// Bumped on every denied pin click so the footer notice plays its deny shake each time.
     var pinNoticeShakeTrigger: Int { pinNotice.trigger }
-
-    /// Transient "Copied to clipboard" confirmation for the floating pill above the footer.
-    var shareConfirmation: Bool { shareNotice.value }
-    /// Bumped on every successful share so the pill replays its pop-in even on a repeat copy.
-    var shareConfirmationTrigger: Int { shareNotice.trigger }
 
     /// Transient in-Customize notice (e.g. "Starred for menu bar", or the orange cap denial).
     var customizationNotice: String? { customizeNotice.value?.message }
@@ -143,7 +135,6 @@ final class LayoutStore {
         metricOrderByProvider = initial.metricOrderByProvider
         pinnedMetricIDs = initial.pinnedMetricIDs
         expandedMetricIDs = initial.expandedMetricIDs
-        expandedProviderIDs = initial.expandedProviderIDs
         defaultExpandedOnEnableIDs = initial.defaultExpandedOnEnableIDs
         menuBarStyle = initial.menuBarStyle
 
@@ -151,23 +142,6 @@ final class LayoutStore {
         if initial.shouldPersistExpanded { persistExpanded() }
         if let seededDefaults = initial.seededDefaultsToPersist { persistSeededDefaults(seededDefaults) }
         syncPlacedOrder(persistChanges: initial.shouldPersistPlaced)
-    }
-
-    func isProviderExpanded(_ providerID: String) -> Bool {
-        expandedProviderIDs.contains(providerID)
-    }
-
-    @discardableResult
-    func setProviderExpanded(_ expanded: Bool, for providerID: String) -> Bool {
-        guard registry.provider(id: providerID) != nil else { return false }
-        guard expandedProviderIDs.contains(providerID) != expanded else { return false }
-        if expanded {
-            expandedProviderIDs.insert(providerID)
-        } else {
-            expandedProviderIDs.remove(providerID)
-        }
-        persistExpandedProviders()
-        return true
     }
 
     // MARK: - Customize mutations
@@ -239,8 +213,6 @@ final class LayoutStore {
     }
 
     /// Restore every undoable field from a snapshot and persist the result. Called by `undo()`.
-    /// Provider card expand/collapse (`expandedProviderIDs`) is deliberately excluded: it's transient
-    /// view state, not a layout edit, so undo must not rewind caret toggles done between steps.
     private func restore(_ snapshot: LayoutSnapshot) {
         cancelDrag()
         placed = snapshot.placed
@@ -296,20 +268,6 @@ final class LayoutStore {
         pinNotice.present(reason)
     }
 
-    /// Record a successful "Share Screenshot" copy so the floating "Copied to clipboard" pill can
-    /// confirm it. Shown for a couple of seconds then cleared — the success-side counterpart to
-    /// `notePinDenied`'s transient denial notice, with the same lifecycle.
-    func presentShareConfirmation() {
-        shareNotice.present(true)
-    }
-
-    /// Clear any showing "Copied to clipboard" confirmation and cancel its auto-clear task. Called when
-    /// the popover closes so a pill mid-countdown can't reappear stale on the next open — the timer is
-    /// otherwise the only clearer, and the layout store outlives the popover.
-    func clearShareConfirmation() {
-        shareNotice.clear()
-    }
-
     /// Show a transient in-Customize pill (the floating confirmation above the Customize content).
     /// `tone` picks the green success style or the orange denial style. Auto-clears after a couple of
     /// seconds; also cleared on popover close via `clearCustomizationNotice`.
@@ -354,10 +312,6 @@ final class LayoutStore {
         persistence.saveExpandOnEnable(defaultExpandedOnEnableIDs)
     }
 
-    private func persistExpandedProviders() {
-        persistence.saveExpandedProviders(expandedProviderIDs)
-    }
-
     // MARK: - Mutations
 
     func add(_ descriptorID: String) {
@@ -393,8 +347,6 @@ final class LayoutStore {
         defaultExpandedOnEnableIDs = []
         persistExpanded()
         persistExpandOnEnable()
-        expandedProviderIDs = []
-        persistExpandedProviders()
         persistSeededDefaults(Set(LayoutOrdering.knownMetricIDs(defaultMetricIDs, registry: registry)))
         persist()
     }
@@ -438,11 +390,6 @@ final class LayoutStore {
         defaultExpandedOnEnableIDs.subtract(owned)
         persistExpanded()
         persistExpandOnEnable()
-
-        // Default is a collapsed card.
-        if expandedProviderIDs.remove(providerID) != nil {
-            persistExpandedProviders()
-        }
 
         syncPlacedOrder() // persists `placed`
     }

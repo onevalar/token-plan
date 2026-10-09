@@ -13,18 +13,35 @@ struct CustomizeProviderListView: View {
     let frameStore: ReorderFrameStore
 
     @State private var activeProviderID: String?
+    @State private var isPresentingResetConfirm = false
     @AppStorage(DensitySetting.key) private var density = DensitySetting.regular
 
     private var orderedRows: [ProviderRow] { layout.customizeProviderRows }
 
     var body: some View {
         VStack(alignment: .leading, spacing: density.sectionSpacing) {
+            Text("Uses your provider login. No TokenPlan sign-in is needed.")
+                .font(.caption).foregroundStyle(.secondary).padding(.horizontal, 8)
+            ProviderLoginHelpView().padding(12).cardSurface()
             VStack(spacing: 0) {
                 ForEach(orderedRows) { row in
                     providerRow(row)
                 }
             }
             .cardSurface()
+            Button("Restore All Defaults…") { isPresentingResetConfirm = true }
+                .buttonStyle(.plain).foregroundStyle(.secondary).padding(.horizontal, 8)
+                .alert("Restore All Defaults?", isPresented: $isPresentingResetConfirm) {
+                    Button("Restore", role: .destructive) {
+                        withAnimation(Motion.spring) {
+                            layout.resetToDefault()
+                            container.reseedEnabledProviders()
+                        }
+                    }
+                    Button("Cancel", role: .cancel) {}
+                } message: {
+                    Text("Restores service visibility, metric order and menu-bar selections to their defaults. Connection details and notes are unchanged.")
+                }
             // App behavior/appearance options live on the other screen; catch users who came here
             // hunting for them once they've scanned past the provider list.
             ScreenCrossLinkRow(
@@ -35,6 +52,8 @@ struct CustomizeProviderListView: View {
             )
         }
         .animation(Motion.spring, value: orderedRows.map(\.id))
+        .onChange(of: layout.customizeProviderID) { _, _ in isPresentingResetConfirm = false }
+        .onChange(of: layout.screen) { _, _ in isPresentingResetConfirm = false }
     }
 
     private func providerRow(_ row: ProviderRow) -> some View {

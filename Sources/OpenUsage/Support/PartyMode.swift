@@ -1,8 +1,7 @@
 import SwiftUI
 
 /// True inside the readable "party" easter-egg mode, so leaf views (meter bars, provider marks) can
-/// join the party while staying legible. Default `false` everywhere — the windowless ShareCard export
-/// and every normal surface never opt in. (The unreadable "drunk" escalation does not set this; it just
+/// join the party while staying legible. Normal surfaces never opt in. (The unreadable "drunk" escalation does not set this; it just
 /// blurs everything.)
 private struct PopoverPartyModeKey: EnvironmentKey {
     static let defaultValue = false
@@ -19,7 +18,7 @@ extension EnvironmentValues {
 /// **mount** their `TimelineView(.animation)` clocks only while the popover is visible and motion is
 /// allowed, and drop to a static frame otherwise. A closed popover or reduced-motion preference with
 /// the egg still active therefore runs no display link and spends no animation work. Default `false`,
-/// so the windowless ShareCard export and any non-popover host never mount the loops. Seeded from
+/// so any non-popover host never mounts the loops. Seeded from
 /// `PopoverTransparencyStore.popoverShown`, which `StatusItemController` flips at its
 /// `showPanel`/`hidePanel` chokepoints.
 ///

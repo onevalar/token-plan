@@ -9,16 +9,35 @@ struct DashboardContentView: View {
     let reorderSpaceName: String
     let horizontalPadding: CGFloat
     let bottomGap: CGFloat
+    let onRefresh: () -> Void
 
     @Binding var reorderLift: ReorderLift?
     @Binding var scrollPosition: ScrollPosition
 
     @AppStorage(DensitySetting.key) private var density = DensitySetting.regular
-    @AppStorage(TotalSpendSetting.key) private var showTotalSpend = true
 
     var body: some View {
         PopoverScrollView {
             VStack(alignment: .leading, spacing: 0) {
+                HStack(spacing: 10) {
+                    Text("TokenPlan").font(.title3.weight(.semibold))
+                    Spacer(minLength: 8)
+                    Button(action: onRefresh) {
+                        Group {
+                            if container.dataStore.refreshingProviderIDs.isEmpty {
+                                Image(systemName: "arrow.clockwise")
+                            } else {
+                                MotionAwareProgressView(controlSize: .mini)
+                            }
+                        }
+                        .frame(width: 28, height: 28).contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(!container.dataStore.refreshingProviderIDs.isEmpty)
+                    .accessibilityLabel("Refresh now")
+                    HeaderView(screen: .dashboard)
+                }
+                .padding(.bottom, density.sectionSpacing)
                 // A pending update found by a scheduled Sparkle check tops everything — it's the
                 // reminder the buried Sparkle window can't deliver for a dockless app.
                 if let updateVersion = updater.availableUpdateVersion {
@@ -47,19 +66,13 @@ struct DashboardContentView: View {
 
     @ViewBuilder
     private var widgetContent: some View {
-        // The cross-provider Total Spend ring stays visible whenever the user allows it and an enabled
-        // provider can track spend, even before fresh data arrives or when every metric row is hidden.
-        if showTotalSpend, layout.hasSpendCapableProvider {
-            TotalSpendCard()
-                .padding(.bottom, density.sectionSpacing)
-        }
         if layout.displayGroups.isEmpty {
             VStack(spacing: 10) {
                 Text("Nothing is being tracked yet. Choose which services and metrics to show.")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
-                Button("Open Customize") {
+                Button("Services & Subscriptions") {
                     withAnimation(Motion.modeSwitch) { layout.screen = .customize }
                 }
                 .controlSize(.small)

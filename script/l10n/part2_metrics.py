@@ -171,7 +171,5 @@ T = {
 "Refresh failed": ("刷新失败", "重新整理失敗", "更新に失敗しました", "새로고침 실패"),
 "Refresh failed: %@": ("刷新失败：%@", "重新整理失敗：%@", "更新に失敗しました：%@", "새로고침 실패: %@"),
 "Refresh timed out after %llds": ("刷新在 %lld 秒后超时", "重新整理在 %lld 秒後逾時", "%lld 秒後に更新がタイムアウトしました", "%lld초 후 새로고침 시간 초과"),
-"Based on the MIT-licensed OpenUsage project by Robin Ebers": ("基于 Robin Ebers 的 MIT 许可开源项目 OpenUsage", "基於 Robin Ebers 的 MIT 授權開源專案 OpenUsage", "Robin Ebers 氏による MIT ライセンスのオープンソース OpenUsage をもとにしています", "Robin Ebers의 MIT 라이선스 오픈소스 OpenUsage를 기반으로 합니다"),
-"Open source on": ("开源地址：", "開源位置：", "オープンソース：", "오픈소스:"),
 "TokenPlan": ("TokenPlan", "TokenPlan", "TokenPlan", "TokenPlan"),
 }

@@ -64,7 +64,7 @@ final class ProviderLinksTests: XCTestCase {
     /// Every installed provider ships at most two quick links with standard labels.
     @MainActor
     func testInstalledProvidersRespectQuickLinkCap() {
-        let allowed = Set(["Status", "Dashboard", "API Keys", "Usage", "Activity", "Credits"])
+        let allowed = Set(["Dashboard", "API Keys", "Usage", "Activity", "Credits"])
         let suiteName = "ProviderLinksTests.\(UUID().uuidString)"
         let defaults = UserDefaults(suiteName: suiteName)!
         defer { defaults.removePersistentDomain(forName: suiteName) }

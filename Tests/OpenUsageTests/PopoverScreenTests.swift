@@ -40,6 +40,38 @@ final class PopoverScreenTests: XCTestCase {
         XCTAssertTrue(store.isEditing)
     }
 
+    func testBackFollowsSettingsSubpagesAndSubscriptionEntryPoint() {
+        let store = makeStore("BackRoutes")
+        store.screen = .settings
+        for page in SettingsPage.allCases {
+            store.settingsPage = page
+            XCTAssertTrue(store.goBack())
+            XCTAssertEqual(store.screen, .settings)
+            XCTAssertNil(store.settingsPage)
+        }
+
+        store.screen = .customize
+        store.customizeProviderID = "claude"
+        store.goBack()
+        XCTAssertNil(store.customizeProviderID)
+        XCTAssertEqual(store.screen, .customize)
+        store.goBack()
+        XCTAssertEqual(store.screen, .settings)
+        store.goBack()
+        XCTAssertEqual(store.screen, .dashboard)
+
+        store.customizeProviderID = "codex"
+        store.screen = .customize
+        store.goBack()
+        XCTAssertEqual(store.screen, .dashboard, "A plan opened from the overview returns there directly")
+        XCTAssertNil(store.customizeProviderID)
+        XCTAssertFalse(store.goBack(), "Only the overview delegates Esc to closing the panel")
+        store.screen = .settings
+        store.settingsPage = .advanced
+        store.screen = .dashboard
+        XCTAssertNil(store.settingsPage, "Reopening Settings never strands the user in a subpage")
+    }
+
     private func makeStore(_ name: String) -> LayoutStore {
         let suiteName = "TokenPlanTests.PopoverScreen.\(name).\(UUID().uuidString)"
         let defaults = UserDefaults(suiteName: suiteName)!

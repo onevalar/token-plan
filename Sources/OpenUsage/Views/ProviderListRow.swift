@@ -21,29 +21,30 @@ struct ProviderListRow<Handle: View>: View {
             // Drag handle only — outside the open target so a tap on the grip doesn't open L2.
             handle(AnyView(ReorderGrip()))
 
-            // Open target: mark + name + count, expanding to fill so the gap before the toggle is
-            // tappable. `onTapGesture` on a content-shaped, full-width view is the reliable way to make
-            // the whole area (including the empty spacer) hit-test, where a plain Button's hit area
-            // would shrink to its drawn content.
-            HStack(spacing: 10) {
-                ProviderIcon(source: provider.icon)
-                    .frame(width: 18, height: 18)
-                VStack(alignment: .leading, spacing: 0) {
-                    Text(provider.displayName)
-                        .font(.system(size: density.headerPointSize, weight: .semibold))
-                        .foregroundStyle(.primary)
-                        .lineLimit(1)
-                    Text("\(metricCount) metrics")
-                        .font(.system(size: density.planBadgePointSize))
-                        .foregroundStyle(.secondary)
+            // A real full-width button supports keyboard navigation as well as pointer clicks.
+            Button(action: onOpen) {
+                HStack(spacing: 10) {
+                    ProviderIcon(source: provider.icon)
+                        .frame(width: 18, height: 18)
+                    VStack(alignment: .leading, spacing: 0) {
+                        Text(provider.displayName)
+                            .font(.system(size: density.headerPointSize, weight: .semibold))
+                            .foregroundStyle(.primary)
+                            .lineLimit(1)
+                        Text(trf("%lld metrics", metricCount))
+                            .font(.system(size: density.planBadgePointSize))
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer(minLength: 8)
                 }
-                Spacer(minLength: 8)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .contentShape(Rectangle())
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .contentShape(Rectangle())
-            .onTapGesture { onOpen() }
+            .buttonStyle(.plain)
+            .accessibilityLabel(String(localized: "Open \(provider.displayName)"))
 
-            Toggle("", isOn: Binding(get: { isEnabled }, set: { onToggle($0) }))
+            Toggle(provider.displayName, isOn: Binding(get: { isEnabled }, set: { onToggle($0) }))
+                .labelsHidden()
                 .settingsSwitchStyle()
 
             Button(action: onOpen) {

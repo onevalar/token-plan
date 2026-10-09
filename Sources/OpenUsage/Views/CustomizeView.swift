@@ -25,8 +25,7 @@ struct CustomizeView: View {
                 .frame(maxWidth: .infinity)
         }
         .onPreferenceChange(ReorderFramePreferenceKey.self) { frameStore.frames = $0 }
-        // The transient star/denial pill floats above the Customize content — the same capsule style
-        // as the dashboard's "Copied to clipboard" share pill. Green for a successful star/unstar,
+        // The transient star/denial pill floats above the Customize content. Green for a successful star/unstar,
         // orange for the per-provider cap denial.
         .overlay(alignment: .bottom) {
             if layout.customizationNotice != nil {

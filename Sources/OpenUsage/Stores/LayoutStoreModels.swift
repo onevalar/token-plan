@@ -1,5 +1,4 @@
-/// A provider and its placed (visible) widgets, split into Always Visible rows and On Demand rows
-/// behind the dashboard's caret. Drives the grouped dashboard list.
+/// A provider's enabled widgets, split into overview readings and details-only readings.
 struct ProviderGroup: Identifiable {
     let provider: Provider
     let alwaysShownWidgets: [PlacedWidget]
@@ -9,7 +8,18 @@ struct ProviderGroup: Identifiable {
     /// Every visible widget in display order (always-shown first, then expanded). Used where the split
     /// doesn't matter — reorder id lists and the lifted drag preview.
     var widgets: [PlacedWidget] { alwaysShownWidgets + expandedWidgets }
-    var hasExpandedMetrics: Bool { !expandedWidgets.isEmpty }
+}
+
+/// Accounts stay independent, but share one service heading in the overview.
+struct ProviderServiceGroup: Identifiable {
+    let id: String
+    var accounts: [ProviderGroup]
+
+    var provider: Provider {
+        let first = accounts[0].provider
+        let name = id == "claude" ? "Claude" : id == "codex" ? "Codex" : first.displayName
+        return Provider(id: id, displayName: name, icon: first.icon)
+    }
 }
 
 /// A provider and every metric it supports, in the provider's custom order, split between Always

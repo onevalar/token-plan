@@ -7,7 +7,6 @@ final class CursorProvider: ProviderRuntime {
         displayName: "Cursor",
         icon: .providerMark("cursor"),
         links: [
-            .init(label: "Status", url: "https://status.cursor.com/"),
             .init(label: "Dashboard", url: "https://www.cursor.com/dashboard")
         ]
     )

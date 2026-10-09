@@ -18,7 +18,7 @@ final class ProviderHeaderLayoutTests: XCTestCase {
                 plan: longPlan,
                 warning: "Refresh failed",
                 staleness: StalenessHint(label: "Outdated", tooltip: "Last updated 2h ago"),
-                onCopyScreenshot: { true }
+                onOpenDetails: {}
             )
             .defaultAppStorage(defaults)
             .environment(\.hoverTooltipsDisabled, true)
@@ -26,14 +26,6 @@ final class ProviderHeaderLayoutTests: XCTestCase {
             // 320pt popover minus 14pt outer and 8pt section padding on each side.
             try assertFits(header, width: 276)
         }
-    }
-
-    func testShareHeaderFitsOversizedPlan() throws {
-        let card = ShareCardView(
-            provider: CodexProvider.makeProvider(), plan: longPlan, rows: [], appearance: .light
-        )
-        // Test the header itself: the card's outer fixed frame would hide child overflow.
-        try assertFits(card.headerRow, width: ShareCardView.width - 32)
     }
 
     private func assertFits<Content: View>(
