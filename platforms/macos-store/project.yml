@@ -1,0 +1,96 @@
+name: TokenPlanStore
+options:
+  deploymentTarget:
+    macOS: '15.0'
+  developmentLanguage: en
+settings:
+  base:
+    SWIFT_VERSION: '6.0'
+    SWIFT_STRICT_CONCURRENCY: complete
+    SWIFT_ACTIVE_COMPILATION_CONDITIONS: '$(inherited) APP_STORE_BUILD'
+    MACOSX_DEPLOYMENT_TARGET: '15.0'
+    CODE_SIGN_STYLE: Automatic
+    DEVELOPMENT_TEAM: H4982D35ZR
+    ENABLE_HARDENED_RUNTIME: YES
+    MARKETING_VERSION: '1.0.0'
+    CURRENT_PROJECT_VERSION: '1'
+packages:
+  KeyboardShortcuts:
+    url: https://github.com/sindresorhus/KeyboardShortcuts
+    from: 3.0.1
+targets:
+  OpenUsage:
+    type: framework
+    platform: macOS
+    sources:
+      - path: ../../Sources/OpenUsage
+        excludes: [Resources]
+      - path: PrivacyInfo.xcprivacy
+      - path: ../../Sources/OpenUsage/Resources/ProviderIcons
+        type: folder
+      - path: ../../Sources/OpenUsage/Resources/LICENSE.txt
+      - path: ../../Sources/OpenUsage/Resources/pricing_supplement.json
+      - path: ../../Sources/OpenUsage/Resources/pricing_litellm_snapshot.json
+      - path: ../../Sources/OpenUsage/Resources/pricing_models_dev_snapshot.json
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.onevalar.tokenplan.framework
+        GENERATE_INFOPLIST_FILE: YES
+        SKIP_INSTALL: YES
+    dependencies:
+      - package: KeyboardShortcuts
+  TokenPlan:
+    type: application
+    platform: macOS
+    sources:
+      - path: PrivacyInfo.xcprivacy
+      - path: ../../Sources/OpenUsageApp
+      - path: ../../Localization
+      - path: ../../assets/AppIcon.icns
+    info:
+      path: generated/Info.plist
+      properties:
+        CFBundleDisplayName: TokenPlan
+        CFBundleIconFile: AppIcon
+        LSUIElement: true
+        LSApplicationCategoryType: public.app-category.utilities
+        NSHumanReadableCopyright: 'TokenPlan contributors; includes MIT-licensed OpenUsage components.'
+    entitlements:
+      path: generated/TokenPlan.entitlements
+      properties:
+        com.apple.security.app-sandbox: true
+        com.apple.security.network.client: true
+        com.apple.security.network.server: true
+        com.apple.security.files.user-selected.read-write: true
+        com.apple.security.files.bookmarks.app-scope: true
+        com.apple.developer.icloud-container-identifiers: [iCloud.com.onevalar.tokenplan]
+        com.apple.developer.icloud-services: [CloudDocuments]
+        com.apple.developer.ubiquity-container-identifiers: ['$(TeamIdentifierPrefix)iCloud.com.onevalar.tokenplan']
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.onevalar.tokenplan
+        PRODUCT_NAME: TokenPlan
+        SKIP_INSTALL: NO
+    dependencies:
+      - target: OpenUsage
+        embed: true
+  StoreTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources:
+      - path: ../../Tests/OpenUsageTests/StoreDistributionTests.swift
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.onevalar.tokenplan.storetests
+        GENERATE_INFOPLIST_FILE: YES
+    dependencies:
+      - target: OpenUsage
+schemes:
+  TokenPlan:
+    build:
+      targets:
+        TokenPlan: all
+    test:
+      targets: [StoreTests]
+    archive:
+      config: Release

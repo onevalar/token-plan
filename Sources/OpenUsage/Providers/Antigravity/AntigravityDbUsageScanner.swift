@@ -41,7 +41,7 @@ actor AntigravityDbUsageScanner {
     }
 
     static var geminiHome: String {
-        FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent(".gemini").path
+        ProviderHome.directory.appendingPathComponent(".gemini").path
     }
 
     /// Each Antigravity surface keeps its own store under `~/.gemini/antigravity*/conversations`: the

@@ -69,11 +69,16 @@ struct SettingsScreen: View {
                     ICloudSyncSettingsSection(sync: container.iCloudSync)
                 case .advanced:
                     privacySection
+                    #if !APP_STORE_BUILD
                     commandLineSection
+                    #endif
                     advancedSection
                     updatesSection
                 }
             } else {
+                #if APP_STORE_BUILD
+                StoreFileAuthorizationSection()
+                #endif
                 generalSection
                 section("More") {
                     ForEach(SettingsPage.generalPages, id: \.self) { page in

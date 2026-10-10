@@ -70,6 +70,7 @@
 "Antigravity usage is temporarily unavailable. Try again shortly." = "Antigravity の使用量は一時的に利用できません。しばらくしてからお試しください。";
 "App Interface" = "アプリの外観";
 "Appearance" = "外観";
+"Authorize a Folder" = "フォルダを許可";
 "Auto" = "自動";
 "Available Usage" = "取得済みの使用状況";
 "Back" = "戻る";
@@ -87,6 +88,7 @@
 "Check for Updates…" = "アップデートを確認…";
 "Checks hourly and shows a banner when an update is available." = "1 時間ごとに確認し、更新があるとバナーを表示します。";
 "Choose services and accounts to show. Hiding them keeps stars, overview and refresh unchanged." = "表示するサービスとアカウントを選択します。非表示にしてもスター、概要、更新は変わりません。";
+"Choose the service's local folder, such as .claude or .codex, to read its login and usage history." = "ログインと使用履歴を読むため、.claude や .codex などのサービスフォルダを選択してください。";
 "Choose what's visible and where" = "表示する内容と場所を選びます";
 "Choose which accounts appear in your overview and refresh automatically." = "概要に表示し、自動更新するアカウントを選びます。";
 "Claude Code logs on this device. Includes logs from different sign-ins, not the current account's complete usage." = "この端末の Claude Code ログを集計します。別のログイン時の記録も含み、現在のアカウント全体の使用量ではありません。";
@@ -200,6 +202,8 @@
 "Extra usage spent" = "追加使用量の支出";
 "Fable" = "Fable";
 "Fallback Model" = "フォールバックモデル";
+"Folder authorization failed. Select the folder again." = "フォルダを許可できませんでした。再度選択してください。";
+"Folder authorized. Enable the service and refresh its usage." = "フォルダを許可しました。サービスを有効にして使用量を更新してください。";
 "Follow System" = "システムに従う";
 "Free tier" = "無料プラン";
 "From Your Environment" = "環境変数から";
@@ -269,6 +273,7 @@
 "Loading Cursor token history…" = "Cursor のトークン履歴を読み込み中…";
 "Loading Models…" = "モデルを読み込み中…";
 "Local CLI" = "ローカルCLI";
+"Local Service Files" = "ローカルサービスファイル";
 "Local quota readings from the last 30 days. The most recent successful reading per hour is kept." = "直近30日間のローカル上限履歴です。各時間帯の最後に正常取得した値を保存します。";
 "Local token history is still updating." = "ローカルのトークン履歴はまだ更新中です。";
 "Local token logs could not be read. Try refreshing again." = "ローカルのトークンログを読み取れませんでした。再度更新してください。";
@@ -489,6 +494,7 @@
 "Team accounts have no personal quota. Spend below is still from your Grok logs." = "チームアカウントには個人の上限がありません。以下の支出は引き続き Grok のログから取得しています。";
 "Team request-based usage data unavailable. Try again later." = "チームのリクエスト単位の使用量データを取得できません。後でもう一度お試しください。";
 "Terminal Helper" = "ターミナルヘルパー";
+"TestFlight requires folder authorization to read existing service logins and usage history. API keys can be entered directly in service settings." = "TestFlight 版では既存のログインと使用履歴を読むためフォルダの許可が必要です。API キーはサービス設定に直接入力できます。";
 "That reset is no longer available" = "そのリセットはもう利用できません";
 "The bundled terminal helper couldn't be found. Reinstall TokenPlan and try again." = "同梱のターミナルヘルパーが見つかりません。TokenPlan を再インストールしてからもう一度お試しください。";
 "The connection timed out. Try again later." = "接続がタイムアウトしました。後で再試行してください。";

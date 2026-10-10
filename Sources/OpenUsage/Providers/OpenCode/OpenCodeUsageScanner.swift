@@ -37,7 +37,7 @@ struct OpenCodeUsageScanner: Sendable {
     static let defaultDatabasePaths: @Sendable () throws -> [String] = {
         let dir = OpenCodePaths.dataDirectory(
             environment: ProcessEnvironmentReader(),
-            homeDirectory: FileManager.default.homeDirectoryForCurrentUser
+            homeDirectory: ProviderHome.directory
         )
         return try OpenCodePaths.databaseFiles(in: dir)
     }

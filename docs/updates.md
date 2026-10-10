@@ -1,6 +1,6 @@
 # Updates
 
-TokenPlan keeps itself up to date using [Sparkle](https://sparkle-project.org), the standard update
+Direct-download builds of TokenPlan keep themselves up to date using [Sparkle](https://sparkle-project.org), the standard update
 framework for Mac apps. Updates are downloaded from TokenPlan's own release feed and verified before
 they install, so you always get a genuine, unmodified build.
 
@@ -33,3 +33,27 @@ Update builds are published on TokenPlan's GitHub releases, and the list of avai
 signed two ways — Apple notarization plus TokenPlan's own signature — and the app refuses anything that
 doesn't match. This is only available in the official signed release build, not in local developer
 builds.
+
+## TestFlight distribution (1.0.0)
+
+The independent Xcode project in `platforms/macos-store` builds the native app for TestFlight.
+It enables App Sandbox and excludes Sparkle, the bundled command-line executable and the CLI
+installation setting. Updates for this build come from TestFlight/App Store.
+
+Existing companion-app logins and local logs require explicit folder authorization in General
+Settings → Local Service Files. The app remembers only security-scoped bookmarks. Keys entered
+inside TokenPlan remain in its sandbox container; it does not source login-shell profiles.
+A path lookup never grants access. Localhost API access still uses the existing authentication.
+
+Regenerate the shared project with `xcodegen generate --spec platforms/macos-store/project.yml`
+after changing its specification or source files, and commit the generated project for Xcode Cloud.
+`script/build_testflight.sh check` validates project settings; `archive`, `export` and `upload`
+require an explicit numeric version/build and `TEAM_ID`. The export verifier rejects a missing
+sandbox, wrong bundle/version or embedded Sparkle. Xcode re-signs development archives during
+App Store export; verification without `--archive` also rejects debugging entitlements.
+
+Release status: App Store Connect record 6821419145 and App ID com.onevalar.tokenplan created.
+The owner selected 1.0.0 for the first TestFlight release. Store-target compilation and four
+resource/path/updater tests passed locally. Signing, sandbox UI/provider acceptance, cloud workflow,
+upload and TestFlight processing are still pending. A passing compiler is not a release or proof
+that every companion-app credential source works in App Sandbox.

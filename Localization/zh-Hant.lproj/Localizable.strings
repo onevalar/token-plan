@@ -70,6 +70,7 @@
 "Antigravity usage is temporarily unavailable. Try again shortly." = "Antigravity 用量暫時無法使用，請稍後再試。";
 "App Interface" = "介面外觀";
 "Appearance" = "外觀";
+"Authorize a Folder" = "授權資料夾";
 "Auto" = "自動";
 "Available Usage" = "用量資料";
 "Back" = "返回";
@@ -87,6 +88,7 @@
 "Check for Updates…" = "檢查更新…";
 "Checks hourly and shows a banner when an update is available." = "每小時檢查一次，有更新時顯示橫幅。";
 "Choose services and accounts to show. Hiding them keeps stars, overview and refresh unchanged." = "選擇顯示的服務和帳號。隱藏不會改變星號、總覽或重新整理。";
+"Choose the service's local folder, such as .claude or .codex, to read its login and usage history." = "選擇服務的本機資料夾（如 .claude 或 .codex），以讀取登入和用量記錄。";
 "Choose what's visible and where" = "選擇要顯示哪些內容與位置";
 "Choose which accounts appear in your overview and refresh automatically." = "選擇在概覽中顯示並自動重新整理的帳號。";
 "Claude Code logs on this device. Includes logs from different sign-ins, not the current account's complete usage." = "統計本機 Claude Code 日誌，包含不同登入留下的記錄，並非目前帳號的全部用量。";
@@ -200,6 +202,8 @@
 "Extra usage spent" = "額外用量已花費";
 "Fable" = "Fable";
 "Fallback Model" = "備用模型";
+"Folder authorization failed. Select the folder again." = "資料夾授權失敗，請重新選擇。";
+"Folder authorized. Enable the service and refresh its usage." = "資料夾已授權，請啟用服務並重新整理用量。";
 "Follow System" = "跟隨系統";
 "Free tier" = "免費版";
 "From Your Environment" = "來自環境變數";
@@ -269,6 +273,7 @@
 "Loading Cursor token history…" = "正在載入 Cursor Token 歷史…";
 "Loading Models…" = "正在載入模型…";
 "Local CLI" = "本機命令列工具";
+"Local Service Files" = "本機服務檔案";
 "Local quota readings from the last 30 days. The most recent successful reading per hour is kept." = "儲存最近 30 天的本機額度讀數，每小時保留最後一次成功重新整理的結果。";
 "Local token history is still updating." = "本機 token 記錄仍在更新。";
 "Local token logs could not be read. Try refreshing again." = "無法讀取本機 Token 日誌，請重新整理。";
@@ -489,6 +494,7 @@
 "Team accounts have no personal quota. Spend below is still from your Grok logs." = "團隊帳號沒有個人額度。下方花費仍來自你的 Grok 記錄檔。";
 "Team request-based usage data unavailable. Try again later." = "團隊按請求計費的用量資料暫時無法使用，請稍後再試。";
 "Terminal Helper" = "終端機輔助工具";
+"TestFlight requires folder authorization to read existing service logins and usage history. API keys can be entered directly in service settings." = "TestFlight 版需授權資料夾後才能讀取現有服務登入和用量記錄。API Key 可直接在服務設定中填寫。";
 "That reset is no longer available" = "該重置已無法使用";
 "The bundled terminal helper couldn't be found. Reinstall TokenPlan and try again." = "找不到內建的終端機輔助工具。請重新安裝 TokenPlan 後再試。";
 "The connection timed out. Try again later." = "連線逾時，請稍後重試。";

@@ -70,7 +70,7 @@ actor ClaudeLogUsageScanner {
 
     init(
         environment: EnvironmentReading = ProcessEnvironmentReader(),
-        homeDirectory: @escaping @Sendable () -> URL = { FileManager.default.homeDirectoryForCurrentUser },
+        homeDirectory: @escaping @Sendable () -> URL = { ProviderHome.directory },
         incrementalScanner: IncrementalJSONLScanner<Entry>? = nil,
         cacheIdentityOverride: String? = nil,
         accountUUID: String? = nil,

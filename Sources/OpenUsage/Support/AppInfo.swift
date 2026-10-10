@@ -6,6 +6,9 @@ import Foundation
 /// `script/release.sh` (release). It is the same string Sparkle shows in its update prompt. The
 /// fallback covers runs outside the packaged app (e.g. `swift run`, where there is no Info.plist).
 enum AppInfo {
+    /// The interface uses the English product name in every language.
+    static let displayName = "TokenPlan"
+
     static var version: String {
         (Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String) ?? "0.7.0"
     }

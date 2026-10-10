@@ -96,7 +96,7 @@ struct ClaudeDesktopAuthStore: Sendable {
         files: TextFileAccessing = LocalTextFileAccessor(),
         sqlite: SQLiteAccessing = SQLiteCLIAccessor(),
         keyReader: ClaudeDesktopSafeStorageKeyReading = ClaudeDesktopSafeStorageKeyReader(),
-        homeDirectory: @escaping @Sendable () -> URL = { FileManager.default.homeDirectoryForCurrentUser },
+        homeDirectory: @escaping @Sendable () -> URL = { ProviderHome.directory },
         now: @escaping @Sendable () -> Date = Date.init,
         keyCache: SafeStorageKeyCache = SafeStorageKeyCache()
     ) {

@@ -115,7 +115,7 @@ enum MenuBarStripRenderer {
             size: NSSize(width: CGFloat(cgImage.width) / renderer.scale, height: CGFloat(cgImage.height) / renderer.scale)
         )
         image.isTemplate = true
-        image.accessibilityDescription = "TokenPlan, usage hidden while the screen is shared"
+        image.accessibilityDescription = "\(AppInfo.displayName), usage hidden while the screen is shared"
         return image
     }()
 
@@ -123,14 +123,14 @@ enum MenuBarStripRenderer {
     static let fallbackIcon: NSImage = {
         let image = NSImage(
             systemSymbolName: "gauge.with.dots.needle.bottom.50percent",
-            accessibilityDescription: "TokenPlan"
+            accessibilityDescription: AppInfo.displayName
         ) ?? NSImage()
         image.isTemplate = true
         return image
     }()
 }
 
-/// The brand gauge mark plus wordmark drawn in place of the strip while screen-share privacy is
+/// The brand reservoir mark plus wordmark drawn in place of the strip while screen-share privacy is
 /// concealing usage. Same black-on-clear template treatment, glyph box, and type size as a
 /// single-metric text strip, so the swap doesn't jump the menu bar's rhythm.
 private struct MenuBarPrivacyLabel: View {
@@ -143,7 +143,7 @@ private struct MenuBarPrivacyLabel: View {
                     .fill(Color.black)
                     .frame(width: 16, height: 16)
             }
-            Text("TokenPlan")
+            Text(verbatim: AppInfo.displayName)
                 .font(.system(size: 12, weight: .bold))
         }
         .foregroundStyle(.black)

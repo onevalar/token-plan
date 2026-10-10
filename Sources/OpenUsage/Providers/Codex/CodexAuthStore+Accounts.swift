@@ -10,7 +10,7 @@ extension CodexAuthStore {
             if isWritable(candidate.source) { return candidate }
         } else if !isDiscovered(candidate.source) || isWritable(candidate.source),
                   CodexSwapAccount.discover(environment: environment, files: files,
-            home: FileManager.default.homeDirectoryForCurrentUser).isEmpty {
+            home: ProviderHome.directory).isEmpty {
             return candidate
         }
         // A first Finder launch can defer account assembly until shell discovery completes.

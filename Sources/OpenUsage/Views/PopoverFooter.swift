@@ -6,7 +6,7 @@ struct PopoverFooter: View {
     let onHeightChange: (CGFloat) -> Void
 
     var body: some View {
-        Text("TokenPlan \(AppInfo.version)")
+        Text(verbatim: "\(AppInfo.displayName) \(AppInfo.version)")
             .font(.caption2).foregroundStyle(.secondary)
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, horizontalPadding)
