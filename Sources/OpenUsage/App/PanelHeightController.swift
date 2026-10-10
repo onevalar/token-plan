@@ -5,7 +5,8 @@ import AppKit
 /// AppKit.
 @MainActor
 final class PanelHeightController {
-    static let panelWidth: CGFloat = 420
+    /// One shared width keeps overview, settings and details on the same navigation canvas.
+    static let panelWidth: CGFloat = 340
     static let defaultHeight: CGFloat = 800
 
     private let panel: MenuBarPanel

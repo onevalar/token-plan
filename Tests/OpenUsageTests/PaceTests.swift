@@ -179,8 +179,9 @@ final class PaceTests: XCTestCase {
 
     func testQuotaColorUsesActualRemainingNotProjectedPaceOrDisplayMode() {
         let cases: [(Double, WidgetData.MeterSeverity)] = [
-            (54, .normal), (79, .normal), (80, .warning), (89, .warning),
-            (90, .critical), (100, .critical)
+            (0, .normal), (54, .normal), (69, .normal), (69.9, .normal),
+            (70, .warning), (79, .warning), (89, .warning), (89.9, .warning),
+            (90, .critical), (100, .critical), (120, .critical)
         ]
         for mode in WidgetDisplayMode.allCases {
             for (used, expected) in cases {
@@ -196,5 +197,10 @@ final class PaceTests: XCTestCase {
         missing.hasData = true
         missing.limit = 0
         XCTAssertNil(missing.quotaSeverity)
+        // The new UI warning threshold must not silently advance notification fallback bands.
+        let warningColorOnly = WidgetData(title: "Quota", icon: .providerMark("codex"),
+                                         kind: .percent, used: 75, limit: 100)
+        XCTAssertEqual(warningColorOnly.quotaSeverity, .warning)
+        XCTAssertEqual(warningColorOnly.meterState(now: now), .level(.normal))
     }
 }

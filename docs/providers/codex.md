@@ -9,7 +9,7 @@ Tracks your ChatGPT/Codex subscription limits using the login from the Codex CLI
 | Session | 5-hour rolling window usage |
 | Weekly | 7-day window usage |
 | Spark / Spark Weekly | GPT-5.3-Codex-Spark model limits — a 5-hour and a weekly window. Shown only when your account has the limit (otherwise "No data"), and tucked below the "show more" caret by default |
-| Rate Limit Resets | Rate-limit reset credits, visible in the overview as a count (e.g. `2 available`) and nearest expiry; click the chevron for the full expiry list |
+| Rate Limit Resets | Available reset-credit count and reported expiries in subscription details; never an overview row |
 | Extra Usage | Flex credits, shown verbatim as dollars + credits (e.g. `$31.84 · 796 credits`) |
 | Today / Yesterday / Last 30 Days | Local spend, as cost, tokens, or both (see below) |
 
@@ -128,17 +128,17 @@ Spark and Spark Weekly come from the same response's `additional_rate_limits` ar
 
 TokenPlan preserves Codex's reported `used_percent` verbatim. If the API reports 1% used for an untouched window, the app shows 99% left; if it reports 0%, the app shows 100% left. Codex rows use the normal reset label rather than inferring a special "Not started" state. Burn-rate pacing still waits until enough of the window has elapsed — and until something has actually been used — to make a useful projection.
 
-The "Reset Count" row shows the reset-credit count and nearest expiry together in the overview. TokenPlan also makes a best-effort `GET https://chatgpt.com/backend-api/wham/rate-limit-reset-credits` call — the dedicated endpoint that lists each credit's expiry. Open subscription details, then click the reset row's chevron (or hover its value) for the full timeline, soonest-first — a numbered color dot, exact expiry time (`Jul 12 at 5:30 PM`), and countdown (`12d 18h`). When no credits are available the count reads `0` and the popover shows `You have no rate limit resets`. If the dedicated call fails, the row falls back to the count embedded in the usage body (`rate_limit_reset_credits.available_count`); since that body carries no per-credit expiries, both the overview and popover say expiry is unavailable rather than implying there are no credits. You can explicitly hide the row in subscription details.
+Reset credits do not occupy an overview row. Subscription details show **Reset Credits**, the count, and the full timeline directly, soonest-first: a numbered dot, numeric local expiry (`2026-10-23 11:35`), and countdown (`12d 18h`). TokenPlan makes a best-effort `GET https://chatgpt.com/backend-api/wham/rate-limit-reset-credits` call for these dates. With no credits, the count reads `0` and details say `You have no rate limit resets`. If the dedicated call fails, the count falls back to the usage body (`rate_limit_reset_credits.available_count`); unavailable per-credit dates are stated, never invented. You can explicitly hide the metric in subscription configuration.
 
-### Using a reset from the popover
+### Using a reset from subscription details
 
-You can also spend a reset credit from the timeline opened in subscription details — the same claim the Codex CLI's "Usage limit resets" picker performs. Hover a credit in the timeline and a **Use** button appears; clicking it expands that credit into an inline confirmation ("Immediately reset your usage limits. This can't be undone.") with **Reset** / **Cancel**. Confirming claims that exact credit and immediately resets your 5-hour and weekly windows; the app then refreshes Codex so the meters and the remaining count reflect it before the success line ("Reset claimed. Enjoy!") appears.
+You can spend a reset credit from the timeline — the same authenticated consume request the Codex CLI's "Usage limit resets" picker performs, not a local meter reset. **Use Credit** is visible beside each unexpired credit without hovering. Clicking it expands an inline confirmation explaining that one credit is consumed, only server-eligible usage windows are reset, and the operation cannot be undone. **Use Credit** confirms; **Cancel** spends nothing. The server decides which windows qualify: the app does not promise that every 5-hour and weekly limit will be reset. After a successful response it refreshes Codex, then shows **Reset credit used.** Automated verification uses simulated responses and does not redeem real credits.
 
 Safeguards, because a claim is irreversible:
 
-- Claiming is always a deliberate two-click flow inside the detail popover — nothing is ever claimed automatically.
+- Claiming is always a deliberate two-click flow inside subscription details — nothing is ever claimed automatically.
 - Each claim targets one explicit credit (re-matched against a fresh credit list at claim time) and carries an idempotency key, so a retry after a network error can never spend a second credit.
-- If the credit was meanwhile used elsewhere (CLI or web) the popover says it's no longer available and refreshes; if your usage doesn't need a reset, Codex refuses without spending the credit and the popover says so. After a claim resets usage, the remaining Use buttons disable ("nothing to reset") until the popover is reopened.
+- If the credit was meanwhile used elsewhere (CLI or web), details say it's no longer available and refresh; if your usage doesn't need a reset, Codex refuses without spending the credit and details say so. After a claim resets usage, the remaining Use Credit buttons disable until subscription details are reopened.
 
 ### Slow Local History
 

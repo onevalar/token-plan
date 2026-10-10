@@ -15,7 +15,8 @@ final class LayoutPersistenceTests: XCTestCase {
         defaults.set(["claude.session"], forKey: "layout.menuBarPins")
         defaults.set(["claude.weekly"], forKey: "layout.expandedMetrics")
         defaults.set(["cursor.requests"], forKey: "layout.expandOnEnable")
-        defaults.set(MenuBarStyle.bars.rawValue, forKey: "layout.menuBarStyle")
+        defaults.set(["claude", "cursor"], forKey: "layout.hiddenMenuBarServices")
+        defaults.set("ring", forKey: "layout.menuBarStyle")
 
         let persistence = LayoutPersistence(defaults: defaults, storageKey: "layout")
 
@@ -28,7 +29,8 @@ final class LayoutPersistenceTests: XCTestCase {
         XCTAssertEqual(persistence.loadPins(), ["claude.session"])
         XCTAssertEqual(persistence.loadExpandedMetrics(), ["claude.weekly"])
         XCTAssertEqual(persistence.loadExpandOnEnable(), ["cursor.requests"])
-        XCTAssertEqual(persistence.loadMenuBarStyle(), .bars)
+        XCTAssertEqual(persistence.loadHiddenMenuBarServices(), ["claude", "cursor"])
+        XCTAssertEqual(persistence.loadMenuBarStyle(), .ring)
     }
 
     func testSavesEveryExistingKeyAndFormat() throws {
@@ -42,7 +44,8 @@ final class LayoutPersistenceTests: XCTestCase {
         persistence.savePins(["claude.session"])
         persistence.saveExpandedMetrics(["claude.weekly"])
         persistence.saveExpandOnEnable(["cursor.requests"])
-        persistence.saveMenuBarStyle(.bars)
+        persistence.saveHiddenMenuBarServices(["cursor", "claude"])
+        persistence.saveMenuBarStyle(.ring)
 
         XCTAssertEqual(try decode([PlacedWidget].self, key: "layout", defaults: defaults).map(\.descriptorID), ["claude.session"])
         XCTAssertEqual(try decode([String].self, key: "layout.providerOrder", defaults: defaults), ["cursor", "claude"])
@@ -54,7 +57,32 @@ final class LayoutPersistenceTests: XCTestCase {
         XCTAssertEqual(Set(defaults.stringArray(forKey: "layout.menuBarPins") ?? []), ["claude.session"])
         XCTAssertEqual(Set(defaults.stringArray(forKey: "layout.expandedMetrics") ?? []), ["claude.weekly"])
         XCTAssertEqual(Set(defaults.stringArray(forKey: "layout.expandOnEnable") ?? []), ["cursor.requests"])
-        XCTAssertEqual(defaults.string(forKey: "layout.menuBarStyle"), MenuBarStyle.bars.rawValue)
+        XCTAssertEqual(defaults.stringArray(forKey: "layout.hiddenMenuBarServices"), ["claude", "cursor"])
+        XCTAssertEqual(defaults.string(forKey: "layout.menuBarStyle"), "ring")
+    }
+
+    func testMenuBarStyleHasExactlyTwoOptionsAndFallsBackWithoutWriting() {
+        XCTAssertEqual(MenuBarStyle.allCases, [.percentage, .ring])
+        let defaults = makeDefaults("StyleFallback")
+        let persistence = LayoutPersistence(defaults: defaults, storageKey: "layout")
+        XCTAssertEqual(persistence.loadMenuBarStyle(), .percentage)
+        XCTAssertNil(defaults.object(forKey: "layout.menuBarStyle"))
+        for raw in ["text", "bars", "bogus", ""] {
+            defaults.set(raw, forKey: "layout.menuBarStyle")
+            XCTAssertEqual(persistence.loadMenuBarStyle(), .percentage)
+            XCTAssertEqual(defaults.string(forKey: "layout.menuBarStyle"), raw)
+        }
+    }
+
+    func testEmptyHiddenServicesAreAnExplicitPersistedChoice() {
+        let defaults = makeDefaults("EmptyHiddenServices")
+        let persistence = LayoutPersistence(defaults: defaults, storageKey: "layout")
+        XCTAssertNil(persistence.loadHiddenMenuBarServices())
+
+        persistence.saveHiddenMenuBarServices([])
+
+        XCTAssertEqual(persistence.loadHiddenMenuBarServices(), [])
+        XCTAssertEqual(defaults.stringArray(forKey: "layout.hiddenMenuBarServices"), [])
     }
 
     private func decode<T: Decodable>(_ type: T.Type, key: String, defaults: UserDefaults) throws -> T {

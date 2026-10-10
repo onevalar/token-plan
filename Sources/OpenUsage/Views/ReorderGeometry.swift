@@ -2,8 +2,8 @@ import SwiftUI
 
 struct ReorderLift {
     enum Payload {
-        case dashboardProvider(provider: Provider, plan: String?, rows: [WidgetData])
-        case dashboardMetric(data: WidgetData)
+        case dashboardProvider(provider: Provider, plan: String?, rows: [WidgetData], columns: QuotaTableColumns)
+        case dashboardMetric(data: WidgetData, columns: QuotaTableColumns)
         case customizeProviderRow(provider: Provider, isEnabled: Bool, metricCount: Int)
         case customizeMetric(title: String)
     }
@@ -40,11 +40,6 @@ struct ReorderLift {
 struct ReorderLiftPreview: View {
     let lift: ReorderLift
 
-    // The previews are deliberately the same views the live screens render (shared row/card
-    // builders); reading the density here lets the header→card spacing track the live sections too,
-    // so a lifted provider block matches its source block in every density.
-    @AppStorage(DensitySetting.key) private var density = DensitySetting.regular
-
     var body: some View {
         preview
             .frame(width: lift.sourceFrame.width)
@@ -61,10 +56,10 @@ struct ReorderLiftPreview: View {
     @ViewBuilder
     private var preview: some View {
         switch lift.payload {
-        case .dashboardProvider(let provider, let plan, let rows):
-            dashboardProviderPreview(provider: provider, plan: plan, rows: rows)
-        case .dashboardMetric(let data):
-            dashboardMetricPreview(data)
+        case .dashboardProvider(let provider, let plan, let rows, let columns):
+            dashboardProviderPreview(provider: provider, plan: plan, rows: rows, columns: columns)
+        case .dashboardMetric(let data, let columns):
+            dashboardMetricPreview(data, columns: columns)
         case .customizeProviderRow(let provider, let isEnabled, let metricCount):
             customizeProviderRowPreview(provider: provider, isEnabled: isEnabled, metricCount: metricCount)
         case .customizeMetric(let title):
@@ -72,23 +67,24 @@ struct ReorderLiftPreview: View {
         }
     }
 
-    private func dashboardProviderPreview(provider: Provider, plan: String?, rows: [WidgetData]) -> some View {
-        // Same anatomy as the live dashboard section (`WidgetGroupedListView.section` + `container`):
-        // header over the shared metric card, at the density's header→card spacing.
-        VStack(alignment: .leading, spacing: density.headerToCardSpacing) {
-            ProviderSectionHeader(provider: provider, plan: plan)
-                .padding(.horizontal, 8)
-
-            DashboardMetricCard {
-                ForEach(Array(rows.enumerated()), id: \.offset) { _, row in
-                    WidgetRowView(data: row)
-                }
+    private func dashboardProviderPreview(provider: Provider, plan: String?, rows: [WidgetData],
+                                          columns: QuotaTableColumns) -> some View {
+        // Same anatomy as the live dashboard section (`WidgetGroupedListView.section`):
+        // header inside the shared card, and the same quota columns as the live rows.
+        let condensed = WidgetData.condensedTextRowOffsets(in: rows)
+        return DashboardMetricCard(tableColumns: columns) {
+            ProviderSectionHeader(provider: provider, plan: plan, onOpenDetails: {})
+                .padding(.horizontal, 12)
+            ForEach(Array(rows.enumerated()), id: \.offset) { index, row in
+                WidgetRowView(data: row, condensedTop: condensed.contains(index))
             }
         }
+        .liftedRowSurface()
     }
 
-    private func dashboardMetricPreview(_ data: WidgetData) -> some View {
+    private func dashboardMetricPreview(_ data: WidgetData, columns: QuotaTableColumns) -> some View {
         WidgetRowView(data: data)
+            .environment(\.quotaTableColumns, columns)
             .liftedRowSurface()
     }
 

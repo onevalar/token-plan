@@ -72,6 +72,39 @@ final class PopoverScreenTests: XCTestCase {
         XCTAssertNil(store.settingsPage, "Reopening Settings never strands the user in a subpage")
     }
 
+    func testOutgoingSubroutesRemainDisplayOnlyAndNeverLeakIntoANewVisit() {
+        let store = makeStore("OutgoingRoutes")
+        store.customizeProviderID = "claude"
+        store.screen = .customize
+        XCTAssertEqual(store.displayedCustomizeProviderID, "claude")
+        store.goBack()
+        XCTAssertEqual(store.screen, .dashboard)
+        XCTAssertNil(store.customizeProviderID)
+        XCTAssertEqual(store.displayedCustomizeProviderID, "claude",
+                      "The outgoing detail must not become Services & Subscriptions before sliding away")
+        store.screen = .customize
+        XCTAssertNil(store.displayedCustomizeProviderID, "A new visit starts at Services & Subscriptions")
+        store.customizeProviderID = "codex"
+        XCTAssertEqual(store.displayedCustomizeProviderID, "codex")
+        store.goBack() // Back within the same screen returns to its list, not the old detail.
+        XCTAssertEqual(store.screen, .customize)
+        XCTAssertNil(store.displayedCustomizeProviderID)
+
+        store.screen = .settings
+        store.settingsPage = .appearance
+        XCTAssertEqual(store.displayedSettingsPage, .appearance)
+        store.screen = .dashboard // Cmd-, exits even from a secondary Settings page.
+        XCTAssertNil(store.settingsPage)
+        XCTAssertEqual(store.displayedSettingsPage, .appearance,
+                      "The outgoing Appearance page must not become main Settings before sliding away")
+        store.screen = .settings
+        XCTAssertNil(store.displayedSettingsPage, "A new visit starts at main Settings")
+        store.settingsPage = .advanced
+        store.goBack()
+        XCTAssertEqual(store.screen, .settings)
+        XCTAssertNil(store.displayedSettingsPage)
+    }
+
     private func makeStore(_ name: String) -> LayoutStore {
         let suiteName = "TokenPlanTests.PopoverScreen.\(name).\(UUID().uuidString)"
         let defaults = UserDefaults(suiteName: suiteName)!

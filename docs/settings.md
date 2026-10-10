@@ -2,18 +2,23 @@
 
 Settings lives inside the popover — there is no separate window. Open it from the overview's **…** menu, with ⌘, while the popover is showing, or by right-clicking the menu bar icon and choosing Settings. One plain top-left Back button and Esc return one level at a time; ⌘, returns to the dashboard. There is no right-hand reset/navigation lookalike.
 
-The main Settings page contains **Services & Subscriptions**, **Usage Display** with a live preview, and **General**, including Language. Secondary pages are **Usage History**, **Appearance & Menu Bar**, **Notifications & Sync**, and **Privacy & Advanced**. Usage History holds cross-provider totals that no longer appear on the overview.
+Navigation keeps one panel width across the overview, Settings and subscription details. The page being left retains its title and content until it is gone; revisiting Settings or Services & Subscriptions starts at its main page. Closing during a transition cancels it; reopening starts on the overview. Reduce Animations switches screens immediately and keeps the same navigation and keyboard behavior.
+
+The main Settings page contains **General**, including Language, and links to **Display & Appearance**, **Menu Bar**, **Usage History**, **Notifications & Sync**, and **Privacy & Advanced**. Services & Subscriptions is managed directly from the overview's **…** menu, not duplicated in Settings. Usage History holds cross-provider totals that no longer appear on the overview.
+
+The **…** menu also offers checked **Used / Left** and **Percentage / Ring** choices, plus direct **Usage History** and **Menu Bar Settings** shortcuts. These change the same saved preferences as their Settings pages, not separate quick-menu overrides.
 
 **Services & Subscriptions** lets you enable services and open each subscription's connection, optional note, metric placement, menu-bar pins, and supported API-key controls. It explains how existing provider logins are detected; it is not a TokenPlan login screen. A restart detects supported additional logins without resetting display preferences. See [Dashboard](dashboard.md#subscription-details-and-configuration).
 
-## Usage Display
+## Display & Appearance
 
 | Setting | Options | What it does |
 |---|---|---|
-| Show Usage As | Used / Left | Whether the percentage and bar mean used or remaining. Readings show just `48%` or `52%`; screen readers retain the meaning. |
-| Reset Times | Countdown / Exact time | Hourglass + `3h 25m`, or calendar + exact time. Countdown units stay `d/h/m` in every language. |
+| Show Usage As | Used / Left | Whether the percentage and graphic mean used or remaining. Readings show just `48%` or `52%`; screen readers retain the meaning. |
 
-The preview updates immediately when you change either choice. Overview numbers and times are display-only, not hidden global setting buttons.
+Show Usage As sits above Theme, Density and the other appearance controls on one page. Its preview updates immediately and the choice survives relaunch. Overview and detail quotas always use horizontal bars; the old Vertical Bar/Ring preference is ignored without rewriting it at startup. Ring is available only in the menu bar. Colors always reflect actual remaining quota.
+
+Reset countdowns always use an hourglass and `d/h/m`, regardless of language or a previously saved Exact Time choice. Credit expiry dates are listed numerically in subscription details. Overview numbers and times are display-only, not hidden global setting buttons.
 
 ## General
 
@@ -36,16 +41,25 @@ time; it also reports unavailable iCloud, loading, write, and malformed-file sta
 
 ## Appearance
 
-Under **Appearance & Menu Bar**.
+Under **Display & Appearance**, alongside Show Usage As and its preview.
 
 | Setting | Options | What it does |
 |---|---|---|
-| Icon Style | Text / Bars | How starred metrics render in the menu bar. See [Menu bar](menu-bar.md). |
-| Theme | System / Light / Dark | App-wide appearance override for the popover. |
+| Theme | System / Light / Dark | System (default) follows macOS automatically, including changes while TokenPlan runs. Light and Dark override it only for TokenPlan. |
 | Density | Default / Compact | Default breathes; Compact is a real information-dense mode — text steps down one size, rows and provider sections pull together, and Customize / Settings rows tighten with them. In both, consecutive one-line metrics (Today / Yesterday / …) pull together; Compact pulls harder. |
 | Reduce Animations | Off / On | Off by default. On removes transitions, motion effects, and continuous decorative animation throughout the popover. The app also honors the macOS Reduce Motion accessibility setting. |
-| Time Format | Auto / 12-hour / 24-hour | How exact times read (e.g. `6:38 PM` vs `18:38`). Auto follows the system. |
-| Increase Transparency | Off / On | Off (default) keeps the popover a solid panel. On makes it translucent so your desktop shows through, while keeping the numbers and Options control legible with adaptive surfaces. It pauses automatically when you have the macOS **Reduce Transparency** or **Increase Contrast** accessibility setting turned on (a note explains why), so it never works against those preferences. |
+| Increase Transparency | Off / On | On by default: the popover uses native frosted blur. Off uses a solid background; an existing saved choice is preserved. macOS **Reduce Transparency** or **Increase Contrast** automatically keeps it solid (a note explains why), without changing your saved choice. |
+
+## Menu Bar
+
+Open **Settings → Menu Bar**, or **… → Menu Bar Settings** directly.
+
+| Setting | Options | What it does |
+|---|---|---|
+| Menu Bar Style | Percentage / Ring | Percentage (default) shows starred readings. Ring shows one primary quota per selected account: Claude 5h, Codex Pro 1w, Plus 5h. Fill follows Used / Left. The overview and details remain horizontal bars. |
+| Menu Bar Services | On / Off per service and account | All are selected by default. Keep every account or select individual accounts; multi-account services carry numbered badges. Hiding affects only the menu bar. See [Menu bar](menu-bar.md). |
+
+Both menu-bar styles skip metrics without data. Older saved Text/Bars styles read as Percentage without a startup preference rewrite. The service switches include enabled services with no stars or data. Hiding one does not disable it, change the overview, stop refresh, or erase saved stars and layout; showing it again restores its selections. Hide every service to show only the app icon in either style. These choices survive relaunch and customization resets; **Reset All Settings** restores Percentage and all service switches to on.
 
 The old Show Total Spend and Always Show Pacing toggles are removed. History is available on its own page; bars no longer show pace ticks or projections. Their colors reflect actual remaining quota. Pace-based notification choices below remain independent.
 

@@ -1,15 +1,12 @@
 import XCTest
 @testable import OpenUsage
 
-/// Covers `MenuBarContentBuilder`: it resolves pinned provider groups into Text groups (order, labels,
-/// and values preserved) and Bars entries (bounded metrics only, first four in order), and reports empty
-/// when nothing is pinned.
+/// Covers `MenuBarContentBuilder`: order, labels, unit-aware values, and no-data filtering.
 @MainActor
 final class MenuBarContentTests: XCTestCase {
     func testEmptyWhenNoGroups() {
         let content = MenuBarContentBuilder.build(groups: [], data: { $0.sample })
         XCTAssertTrue(content.isEmpty)
-        XCTAssertTrue(content.bars.isEmpty)
     }
 
     func testTextGroupsPreserveOrderLabelsAndValues() {
@@ -25,9 +22,7 @@ final class MenuBarContentTests: XCTestCase {
         XCTAssertEqual(content.groups[1].metrics.map(\.id), ["b.m1"])
     }
 
-    func testBarsIncludeBoundedMetricsAndDropUnbounded() {
-        // A bounded dollar metric has a fill, so it belongs in Bars. An unbounded value (raw spend,
-        // no limit) has no fill and is dropped.
+    func testStripIncludesBoundedAndUnboundedMetrics() {
         let content = MenuBarContentBuilder.build(
             groups: [group("a",
                 percent("a.pct", "Pct", 40),
@@ -36,11 +31,42 @@ final class MenuBarContentTests: XCTestCase {
             data: { $0.sample }
         )
 
-        XCTAssertEqual(content.groups[0].metrics.map(\.id), ["a.pct", "a.credits", "a.spend"])  // Text: all
-        XCTAssertEqual(content.bars.map(\.id), ["a.pct", "a.credits"])                          // Bars: bounded only
+        XCTAssertEqual(content.groups[0].metrics.map(\.id), ["a.pct", "a.credits", "a.spend"])
+        XCTAssertEqual(content.groups[0].metrics[0].fraction, 0.4)
+        XCTAssertEqual(content.groups[0].metrics[1].fraction, 12000.0 / 18000)
+        XCTAssertNil(content.groups[0].metrics[2].fraction)
     }
 
-    func testBarsCappedToFourInOrder() {
+    func testBoundedFractionsFollowWidgetDataUsedLeftAndRounding() {
+        for used in [0.0, 0.4, 27, 100] {
+            let metric = percent("a.session", "Session", used)
+            for mode in [WidgetDisplayMode.used, .remaining] {
+                var data = metric.sample
+                data.displayMode = mode
+                let content = MenuBarContentBuilder.build(groups: [group("a", metric)], data: { _ in data })
+                XCTAssertEqual(content.groups[0].metrics[0].fraction, data.fraction)
+                XCTAssertEqual(content.groups[0].metrics[0].value, data.menuBarValue)
+            }
+        }
+    }
+
+    func testMixedUnboundedBalanceKeepsActualValueInBothDisplayModes() {
+        let quota = percent("a.quota", "Quota", 27)
+        let balance = unbounded("a.balance", "Balance", 42)
+        for mode in [WidgetDisplayMode.used, .remaining] {
+            let content = MenuBarContentBuilder.build(groups: [group("a", quota, balance)], data: {
+                var data = $0.sample
+                data.displayMode = mode
+                return data
+            })
+            XCTAssertEqual(content.groups[0].metrics.map(\.id), ["a.quota", "a.balance"])
+            XCTAssertEqual(content.groups[0].metrics[0].fraction, mode == .used ? 0.27 : 0.73)
+            XCTAssertNil(content.groups[0].metrics[1].fraction)
+            XCTAssertEqual(content.groups[0].metrics[1].value, "$42")
+        }
+    }
+
+    func testAllProviderGroupsRenderWithoutAGlobalMetricCap() {
         let content = MenuBarContentBuilder.build(
             groups: [
                 group("a", percent("a.m1", "M1", 10), percent("a.m2", "M2", 20)),
@@ -50,8 +76,8 @@ final class MenuBarContentTests: XCTestCase {
             data: { $0.sample }
         )
 
-        XCTAssertEqual(content.bars.count, 4)
-        XCTAssertEqual(content.bars.map(\.id), ["a.m1", "a.m2", "b.m1", "b.m2"])
+        XCTAssertEqual(content.groups.flatMap { $0.metrics.map(\.id) },
+                       ["a.m1", "a.m2", "b.m1", "b.m2", "c.m1", "c.m2"])
     }
 
     func testNoDataMetricsDropFromStrip() {
@@ -68,7 +94,6 @@ final class MenuBarContentTests: XCTestCase {
 
         XCTAssertEqual(content.groups.map(\.providerID), ["a"])
         XCTAssertEqual(content.groups[0].metrics.map(\.id), ["a.live"])
-        XCTAssertEqual(content.bars.map(\.id), ["a.live"])
     }
 
     func testAllPinsWithoutDataFallBackToAppIcon() {
@@ -87,12 +112,67 @@ final class MenuBarContentTests: XCTestCase {
         XCTAssertEqual(content.accessibilityText, "A Session 41%, Weekly 12%")
     }
 
-    func testTrayLabelsShortenLongTimeWindows() {
+    func testAccessibilityKeepsFullMetricNamesEvenWithoutVisibleLabels() {
         let content = MenuBarContentBuilder.build(
             groups: [group("a", percent("a.today", "Today", 5), percent("a.month", "Last 30 Days", 80))],
             data: { $0.sample }
         )
-        XCTAssertEqual(content.groups[0].metrics.map(\.label), ["T", "M"])
+        XCTAssertEqual(content.groups[0].metrics.map(\.label), ["Today", "Last 30 Days"])
+        XCTAssertEqual(content.accessibilityText, "A Today 5%, Last 30 Days 80%")
+    }
+
+    func testRingSelectsOnePrimaryQuotaForClaudeAndActualCodexPlan() {
+        for (provider, tier, session, weekly, expectedID, expectedUsed) in [
+            ("claude", "Max", 13.0, 95.0, "claude.session", 13.0),
+            ("codex", "Pro 100", 95.0, 13.0, "codex.weekly", 13.0),
+            ("codex", "Pro 200", 95.0, 13.0, "codex.weekly", 13.0),
+            ("codex", "Pro 500", 95.0, 13.0, "codex.weekly", 13.0),
+            ("codex", "Plus", 13.0, 95.0, "codex.session", 13.0)
+        ] {
+            for mode in [WidgetDisplayMode.used, .remaining] {
+                let content = MenuBarContentBuilder.build(
+                    groups: [group(provider, percent("\(provider).weekly", "Weekly", weekly),
+                                   unbounded("\(provider).balance", "Balance"),
+                                   percent("\(provider).session", "Session", session))],
+                    style: .ring, plan: { _ in tier }, data: {
+                        var data = $0.sample
+                        data.displayMode = mode
+                        return data
+                    }
+                )
+                XCTAssertEqual(content.groups.flatMap { $0.metrics.map(\.id) }, [expectedID])
+                XCTAssertEqual(content.groups[0].metrics[0].fraction,
+                               mode == .used ? expectedUsed / 100 : (100 - expectedUsed) / 100)
+            }
+        }
+    }
+
+    func testOtherOrUnknownPlanChoosesActualTightestQuotaNotRoundedDisplayOrGuessedTier() {
+        for provider in ["amp", "codex"] {
+            let content = MenuBarContentBuilder.build(
+                groups: [group(provider, percent("\(provider).session", "Session", 69.9),
+                               percent("\(provider).weekly", "Weekly", 70.1))],
+                style: .ring, data: { $0.sample }
+            )
+            XCTAssertEqual(content.groups[0].metrics.map(\.id), ["\(provider).weekly"])
+        }
+        let missing = MenuBarContentBuilder.build(
+            groups: [group("claude", noDataPercent("claude.session", "Session"),
+                           percent("claude.weekly", "Weekly", 31))], style: .ring, data: { $0.sample }
+        )
+        XCTAssertEqual(missing.groups[0].metrics.map(\.id), ["claude.weekly"])
+    }
+
+    func testRingKeepsEverySelectedAccountEvenWhenTheirUsageIsAsymmetric() {
+        let content = MenuBarContentBuilder.build(
+            groups: [group("claude", percent("claude.session", "Session", 13), percent("claude.weekly", "Weekly", 95)),
+                     group("claude@work", percent("claude@work.session", "Session", 79),
+                           percent("claude@work.weekly", "Weekly", 5))],
+            style: .ring, accountNumbers: ["claude": 1, "claude@work": 2], data: { $0.sample }
+        )
+        XCTAssertEqual(content.groups.map(\.providerID), ["claude", "claude@work"])
+        XCTAssertEqual(content.groups.flatMap { $0.metrics.map(\.id) }, ["claude.session", "claude@work.session"])
+        XCTAssertEqual(content.groups.map(\.accountBadge), [1, 2])
     }
 
     func testBoundedTrayValuesStayUnitAware() {

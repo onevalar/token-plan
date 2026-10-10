@@ -29,8 +29,7 @@ final class ReduceAnimationsSettingTests: XCTestCase {
         XCTAssertFalse(DashboardView.screenTransitionIsActive(
             reduceAnimations: true,
             screenSlideID: 2,
-            animatedSlideID: 1,
-            slideProgress: 0
+            completedSlideID: 1
         ))
     }
 
@@ -64,14 +63,12 @@ final class ReduceAnimationsSettingTests: XCTestCase {
         XCTAssertTrue(DashboardView.screenTransitionIsActive(
             reduceAnimations: false,
             screenSlideID: 2,
-            animatedSlideID: 1,
-            slideProgress: 0
+            completedSlideID: 1
         ))
         XCTAssertFalse(DashboardView.screenTransitionIsActive(
             reduceAnimations: false,
             screenSlideID: 2,
-            animatedSlideID: 2,
-            slideProgress: 1
+            completedSlideID: 2
         ))
     }
 

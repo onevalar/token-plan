@@ -21,16 +21,19 @@ final class PopoverTransparencyStoreTests: XCTestCase {
                                  increaseContrast: increaseContrast)
     }
 
-    func testIncreaseTransparencyDefaultsOffAndPersistsBothTransitions() {
+    func testIncreaseTransparencyDefaultsOnWithoutWritingAndPersistsBothTransitions() {
         let defaults = makeDefaults("persist")
-        let store = PopoverTransparencyStore(defaults: defaults)
-        XCTAssertFalse(store.increaseTransparency)
-
-        store.increaseTransparency = true
-        XCTAssertTrue(PopoverTransparencyStore(defaults: defaults).increaseTransparency)
+        let store = PopoverTransparencyStore(defaults: defaults, reduceTransparency: false, increaseContrast: false)
+        XCTAssertTrue(store.increaseTransparency)
+        XCTAssertEqual(store.effectiveStyle, .increased)
+        XCTAssertNil(defaults.object(forKey: PopoverTransparencyStore.key), "Opening must not rewrite an absent preference")
 
         store.increaseTransparency = false
         XCTAssertFalse(PopoverTransparencyStore(defaults: defaults).increaseTransparency)
+        XCTAssertEqual(defaults.object(forKey: PopoverTransparencyStore.key) as? Bool, false, "An explicit opt-out stays saved")
+
+        store.increaseTransparency = true
+        XCTAssertTrue(PopoverTransparencyStore(defaults: defaults).increaseTransparency)
     }
 
     func testEggStateIsNeverPersisted() {
@@ -76,6 +79,7 @@ final class PopoverTransparencyStoreTests: XCTestCase {
     func testPartyToggleOffFromState4ClearsDrunkAndReturnsToBase() {
         // 1 -> 3 -> 4, then Party off goes 4 -> base (NOT 4 -> 3), clearing Drunk along the way.
         let store = makeStore("p4base1")
+        store.increaseTransparency = false          // explicitly choose opaque base 1
         store.toggleSecretCode()                    // 1 -> 3
         store.drunkMode = true                       // 3 -> 4
         XCTAssertEqual(store.effectiveStyle, .drunk)
@@ -111,6 +115,7 @@ final class PopoverTransparencyStoreTests: XCTestCase {
     func testEffectiveStyleFollowsEgg() {
         // With the accessibility flags pinned off, the egg resolves to the readable party / drunk.
         let store = makeStore("style")
+        store.increaseTransparency = false
         store.toggleSecretCode()        // secret code -> readable party
         XCTAssertEqual(store.effectiveStyle, .party)
         XCTAssertEqual(store.surfaceTreatment, .translucent)
@@ -128,6 +133,9 @@ final class PopoverTransparencyStoreTests: XCTestCase {
             makeStore("eggA11yReduce", reduceTransparency: true),
             makeStore("eggA11yContrast", increaseContrast: true)
         ] {
+            XCTAssertTrue(store.increaseTransparency, "The default frost must yield to accessibility too")
+            XCTAssertTrue(store.isPaused)
+            XCTAssertEqual(store.surfaceTreatment, .opaque)
             store.toggleSecretCode()
             XCTAssertTrue(store.secretCodeActive)
             XCTAssertEqual(store.effectiveStyle, .opaque)
@@ -219,19 +227,19 @@ final class PopoverTransparencyStoreTests: XCTestCase {
         XCTAssertFalse(PopoverTransparencyStore(defaults: defaults).popoverShown, "not persisted")
     }
 
-    func testResetToDefaultsTurnsOffTransparencyAndExitsTheEgg() {
+    func testResetToDefaultsRestoresTransparencyAndExitsTheEgg() {
         let defaults = makeDefaults("reset")
         let store = PopoverTransparencyStore(defaults: defaults)
-        store.increaseTransparency = true
+        store.increaseTransparency = false
         store.toggleSecretCode()
         store.drunkMode = true
 
         store.resetToDefaults()
 
-        XCTAssertFalse(store.increaseTransparency)
+        XCTAssertTrue(store.increaseTransparency)
         XCTAssertFalse(store.secretCodeActive, "reset exits the egg so it can't override the reset look")
         XCTAssertFalse(store.drunkMode)
         // A fresh store reading the same defaults sees the reset value.
-        XCTAssertFalse(PopoverTransparencyStore(defaults: defaults).increaseTransparency)
+        XCTAssertTrue(PopoverTransparencyStore(defaults: defaults).increaseTransparency)
     }
 }

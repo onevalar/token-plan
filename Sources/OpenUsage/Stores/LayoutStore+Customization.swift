@@ -49,11 +49,11 @@ extension LayoutStore {
         orderedProviderIDs().compactMap { registry.provider(id: $0) }
     }
 
-    /// History lives in details; enabled reset credits always show in the overview. Hide still wins.
+    /// History and reset credits live in details. Hide still wins; saved visibility is not erased.
     private func isAlwaysShownMetric(_ id: String) -> Bool {
         guard let sample = registry.descriptor(id: id)?.sample else { return false }
-        if sample.isChart || sample.isUsagePeriod { return false }
-        return sample.showsResetExpiries || !expandedMetricIDs.contains(id)
+        if sample.isChart || sample.isUsagePeriod || sample.showsResetExpiries { return false }
+        return !expandedMetricIDs.contains(id)
     }
 
     /// Enabled (and provider-enabled) widgets grouped by provider, in the user's provider order, each
@@ -71,12 +71,12 @@ extension LayoutStore {
             guard !widgets.isEmpty else { return nil }
             let alwaysShown = widgets.filter { isAlwaysShownMetric($0.descriptorID) }
             let expanded = widgets.filter { !isAlwaysShownMetric($0.descriptorID) }
-            // Promote quota/balance rows when all are set to Details, never history. A history-only
-            // service keeps its heading as an entry into details, without a blank overview card.
+            // Promote quota/balance rows when all are set to Details, never history or reset credits.
+            // A details-only service keeps its heading as an entry without a blank overview row.
             if alwaysShown.isEmpty {
                 let promoted = expanded.filter {
                     let sample = registry.descriptor(id: $0.descriptorID)!.sample
-                    return !sample.isChart && !sample.isUsagePeriod
+                    return !sample.isChart && !sample.isUsagePeriod && !sample.showsResetExpiries
                 }
                 return ProviderGroup(provider: provider, alwaysShownWidgets: promoted,
                                      expandedWidgets: expanded.filter { !promoted.contains($0) })
@@ -160,12 +160,48 @@ extension LayoutStore {
             + ordered.filter { expandedMetricIDs.contains($0) }
     }
 
+    /// Enabled service families in saved provider order, including services with no pins or data.
+    /// One Settings toggle controls all account cards in a family; hiding it must not remove its row.
+    var menuBarServices: [Provider] {
+        var seen = Set<String>()
+        return orderedProviders().compactMap { provider in
+            guard isProviderEnabled(provider.id) else { return nil }
+            let family = ProviderAccountID.family(of: provider.id)
+            guard seen.insert(family).inserted else { return nil }
+            let name = family == "claude" ? "Claude" : family == "codex" ? "Codex" : provider.displayName
+            return Provider(id: family, displayName: name, icon: provider.icon)
+        }
+    }
+
+    func menuBarAccounts(for serviceID: String) -> [Provider] {
+        orderedProviders().filter { ProviderAccountID.family(of: $0.id) == serviceID && isProviderEnabled($0.id) }
+    }
+
+    /// Number known sibling accounts in saved order, before visibility/no-data filtering. Hiding
+    /// account 1 must not rename account 2 to 1. Single-account services need no badge.
+    var menuBarAccountNumbers: [String: Int] {
+        let families = Dictionary(grouping: orderedProviders(), by: { ProviderAccountID.family(of: $0.id) })
+        var numbers: [String: Int] = [:]
+        for accounts in families.values where accounts.count > 1 {
+            for (index, account) in accounts.enumerated() { numbers[account.id] = index + 1 }
+        }
+        return numbers
+    }
+
+    /// Numeric pins and automatic primary rings share the same service/account visibility policy.
+    var menuBarGroups: [ProviderMetrics] {
+        menuBarStyle == .percentage ? pinnedGroups : customizeGroups.filter {
+            isMenuBarServiceVisible($0.provider.id) && isMenuBarAccountVisible($0.provider.id)
+        }
+    }
+
     /// Pinned metrics grouped by provider, in the user's Customize order (provider order, then each
-    /// provider's metric order). A temporarily disabled provider is excluded from the rendered groups
-    /// but keeps its pins. Drives the menu-bar strip.
+    /// provider's metric order). A disabled provider or menu-bar-hidden service is excluded from the
+    /// rendered groups but keeps its pins. Drives only the menu-bar strip, not the dashboard/refresh.
     var pinnedGroups: [ProviderMetrics] {
         orderedProviders().compactMap { provider in
-            guard isProviderEnabled(provider.id) else { return nil }
+            guard isProviderEnabled(provider.id), isMenuBarServiceVisible(provider.id),
+                  isMenuBarAccountVisible(provider.id) else { return nil }
             // Keep the strip order matching Customize: always-shown pins first, then expanded ones.
             let metrics = orderedSupportedMetrics(for: provider.id).filter { pinnedMetricIDs.contains($0.id) }
             return metrics.isEmpty ? nil : ProviderMetrics(

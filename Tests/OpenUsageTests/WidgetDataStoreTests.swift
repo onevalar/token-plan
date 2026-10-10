@@ -620,16 +620,15 @@ final class WidgetDataStoreTests: XCTestCase {
         let defaults = makeUserDefaults("reset-display-settings")
         let store = WidgetDataStore(registry: registry, providers: [], defaults: defaults)
         store.meterStyle = .used
-        store.resetDisplayMode = .absolute
+        defaults.set("absolute", forKey: "resetDisplayMode")
 
         store.resetDisplaySettings()
 
         XCTAssertEqual(store.meterStyle, .remaining)
-        XCTAssertEqual(store.resetDisplayMode, .relative)
+        XCTAssertNil(defaults.object(forKey: "resetDisplayMode"))
         // A second store on the same suite must load the defaults back, not the pre-reset values.
         let reloaded = WidgetDataStore(registry: registry, providers: [], defaults: defaults)
         XCTAssertEqual(reloaded.meterStyle, .remaining)
-        XCTAssertEqual(reloaded.resetDisplayMode, .relative)
     }
 
     private func makeUserDefaults(_ name: String) -> UserDefaults {

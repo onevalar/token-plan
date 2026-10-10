@@ -207,6 +207,7 @@ final class LocalLimitsAPITests: XCTestCase {
             "claude": ["session", "weekly", "sonnet", "fable", "extraUsage", "rateLimitResets"],
             "codex": ["session", "weekly", "spark", "sparkWeekly", "credits", "creditValue", "rateLimitResets"],
             "cursor": ["totalUsage", "grokBot", "autoUsage", "apiUsage", "onDemand", "requests", "credits"],
+            "amp": ["agent", "orb"],
             "antigravity": ["geminiSession", "geminiWeekly", "nonGeminiSession", "nonGeminiWeekly"],
             "copilot": ["premiumCredits", "extraUsage", "orgCredits", "orgSpend", "chat", "completions"],
             "devin": ["daily", "weekly", "extraUsageBalance"],

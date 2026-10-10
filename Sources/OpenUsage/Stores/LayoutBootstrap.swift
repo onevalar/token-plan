@@ -17,6 +17,7 @@ struct LayoutInitialState {
     let pinnedMetricIDs: Set<String>
     let expandedMetricIDs: Set<String>
     let defaultExpandedOnEnableIDs: Set<String>
+    let hiddenMenuBarServices: Set<String>
     let menuBarStyle: MenuBarStyle
 
     let shouldPersistPlaced: Bool
@@ -110,6 +111,7 @@ enum LayoutBootstrap {
             pinnedMetricIDs: pinnedMetricIDs,
             expandedMetricIDs: expandedMetricIDs,
             defaultExpandedOnEnableIDs: defaultExpandedOnEnableIDs,
+            hiddenMenuBarServices: Set(persistence.loadHiddenMenuBarServices() ?? []),
             menuBarStyle: persistence.loadMenuBarStyle(),
             shouldPersistPlaced: seededResult.shouldPersistPlaced,
             shouldPersistExpanded: shouldPersistExpanded,

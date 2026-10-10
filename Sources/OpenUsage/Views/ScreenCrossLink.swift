@@ -22,7 +22,7 @@ struct ScreenCrossLinkRow: View {
 
     var body: some View {
         Button {
-            withAnimation(Motion.modeSwitch) {
+            withAnimation(Motion.navigation) {
                 layout.screen = destination
             }
         } label: {

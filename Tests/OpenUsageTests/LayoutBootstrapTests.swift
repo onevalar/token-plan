@@ -15,6 +15,8 @@ final class LayoutBootstrapTests: XCTestCase {
         XCTAssertEqual(state.placed.map(\.descriptorID), ["claude.session", "claude.weekly"])
         XCTAssertEqual(state.pinnedMetricIDs, ["claude.session"])
         XCTAssertEqual(state.expandedMetricIDs, ["claude.weekly"])
+        XCTAssertTrue(state.hiddenMenuBarServices.isEmpty)
+        XCTAssertEqual(state.menuBarStyle, .percentage)
         XCTAssertEqual(state.seededDefaultsToPersist, ["claude.session", "claude.weekly"])
         XCTAssertTrue(state.shouldPersistExpanded)
         XCTAssertTrue(state.shouldPersistExpandOnEnable)
@@ -53,6 +55,28 @@ final class LayoutBootstrapTests: XCTestCase {
         XCTAssertEqual(state.placed.map(\.descriptorID), ["claude.session"])
         XCTAssertFalse(state.shouldPersistPlaced)
         XCTAssertNil(state.seededDefaultsToPersist)
+    }
+
+    func testSavedMenuBarVisibilityLoadsWithoutDroppingAbsentServicesOrRewritingPreferences() {
+        let (persistence, defaults) = makePersistence("HiddenServices")
+        persistence.saveHiddenMenuBarServices(["claude", "temporarilyAbsent"])
+        let saved = defaults.stringArray(forKey: "layout.hiddenMenuBarServices")
+
+        let state = LayoutBootstrap.load(registry: .mock, persistence: persistence, defaults: makeDefaultSet())
+
+        XCTAssertEqual(state.hiddenMenuBarServices, ["claude", "temporarilyAbsent"])
+        XCTAssertEqual(defaults.stringArray(forKey: "layout.hiddenMenuBarServices"), saved)
+    }
+
+    func testMenuBarStyleLoadsWithoutStartupWrites() {
+        let (persistence, defaults) = makePersistence("Style")
+        for (raw, expected) in [("ring", MenuBarStyle.ring), ("percentage", .percentage),
+                                ("text", .percentage), ("bars", .percentage), ("invalid", .percentage)] {
+            defaults.set(raw, forKey: "layout.menuBarStyle")
+            let state = LayoutBootstrap.load(registry: .mock, persistence: persistence, defaults: makeDefaultSet())
+            XCTAssertEqual(state.menuBarStyle, expected)
+            XCTAssertEqual(defaults.string(forKey: "layout.menuBarStyle"), raw)
+        }
     }
 
     private func makeDefaultSet() -> LayoutDefaultSet {

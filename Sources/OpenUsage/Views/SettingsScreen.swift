@@ -53,7 +53,7 @@ struct SettingsScreen: View {
     private var content: some View {
         // Same section rhythm as the dashboard and Customize (all read the density setting).
         VStack(alignment: .leading, spacing: density.sectionSpacing) {
-            if let page = layout.settingsPage {
+            if let page = layout.displayedSettingsPage {
                 switch page {
                 case .history:
                     if layout.hasSpendCapableProvider {
@@ -64,6 +64,7 @@ struct SettingsScreen: View {
                             .frame(maxWidth: .infinity).padding(.vertical, 24)
                     }
                 case .appearance: SettingsAppearanceSection()
+                case .menuBar: SettingsMenuBarSection()
                 case .notifications:
                     notificationsSection
                     ICloudSyncSettingsSection(sync: container.iCloudSync)
@@ -74,18 +75,11 @@ struct SettingsScreen: View {
                     updatesSection
                 }
             } else {
-                ScreenCrossLinkRow(
-                    systemImage: "rectangle.stack",
-                    title: "Services & Subscriptions",
-                    subtitle: "Manage services, logins and metrics",
-                    destination: .customize
-                )
-                usageDisplaySection
                 generalSection
                 section("More") {
                     ForEach(SettingsPage.allCases, id: \.self) { page in
                         Button {
-                            withAnimation(Motion.spring) { layout.settingsPage = page }
+                            withAnimation(Motion.navigation) { layout.settingsPage = page }
                         } label: {
                             HStack {
                                 Text(page.title)
@@ -104,7 +98,7 @@ struct SettingsScreen: View {
         .padding(.horizontal, 14)
         .padding(.vertical, 12)
         .task { await refreshNotificationsAuth() }
-        .onChange(of: layout.settingsPage) { _, _ in scrollPosition.scrollTo(edge: .top) }
+        .onChange(of: layout.displayedSettingsPage) { _, _ in scrollPosition.scrollTo(edge: .top) }
         .onChange(of: layout.screen) { _, screen in
             if screen == .settings {
                 scrollPosition.scrollTo(edge: .top)
@@ -169,30 +163,6 @@ struct SettingsScreen: View {
                     .hoverTooltip("Open TokenPlan from anywhere")
             }
         }
-    }
-
-    private var usageDisplaySection: some View {
-        @Bindable var store = container.dataStore
-        return section("Usage Display") {
-            row("Show Usage As") {
-                picker($store.meterStyle, options: WidgetDisplayMode.allCases, label: \.label)
-            }
-            row("Reset Times") {
-                picker($store.resetDisplayMode, options: ResetDisplayMode.allCases, label: \.label)
-            }
-            Text("Preview").font(.caption).foregroundStyle(.secondary)
-                .frame(maxWidth: .infinity, alignment: .leading).padding(.horizontal, 12)
-            WidgetRowView(data: displayPreview)
-        }
-    }
-
-    private var displayPreview: WidgetData {
-        var data = WidgetData(title: tr("Session"), icon: .providerMark("claude"), kind: .percent, used: 18, limit: 100)
-        data.periodDurationMs = MetricPeriod.sessionMs
-        data.resetsAt = Date().addingTimeInterval(2 * 3600 + 35 * 60)
-        data.displayMode = container.dataStore.meterStyle
-        data.resetDisplayMode = container.dataStore.resetDisplayMode
-        return data
     }
 
     private var privacySection: some View {

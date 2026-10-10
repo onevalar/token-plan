@@ -50,7 +50,7 @@ struct CustomizeView: View {
 
     @ViewBuilder
     private var content: some View {
-        if let id = layout.customizeProviderID {
+        if let id = layout.displayedCustomizeProviderID {
             CustomizeProviderDetailView(
                 providerID: id,
                 reorderSpaceName: reorderSpaceName,

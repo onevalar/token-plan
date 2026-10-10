@@ -62,6 +62,7 @@ struct CustomizeProviderDetailView: View {
                     ProviderNoticeRow(message: notice)
                 }
                 ForEach(group.metrics.filter { layout.isMetricEnabled($0.id) }, id: \.id) { metric in
+                    if metric.sample.showsResetExpiries { Divider().padding(.horizontal, 14) }
                     WidgetRowView(data: dataStore.data(for: metric), showsDetails: true)
                         .environment(\.codexResetClaim, codexResetClaims[providerID])
                 }
@@ -75,7 +76,7 @@ struct CustomizeProviderDetailView: View {
     private func metricSections(_ group: ProviderMetrics) -> some View {
         VStack(alignment: .leading, spacing: density.sectionSpacing) {
             metricSection("Display Metrics", metrics: group.metrics, providerID: group.provider.id)
-            Text("Menu Bar: up to 2 metrics. Details and history are shown on this page.")
+            Text("Menu Bar: Percentage shows up to 2 starred metrics; Ring shows one primary quota per selected account.")
                 .font(.caption).foregroundStyle(.secondary).padding(.horizontal, 8)
         }
     }
@@ -119,12 +120,10 @@ struct CustomizeProviderDetailView: View {
                     get: { placement(of: metric) },
                     set: { setPlacement($0, for: metric) }
                 )) {
-                    if !metric.sample.isChart && !metric.sample.isUsagePeriod {
+                    if !metric.sample.isChart && !metric.sample.isUsagePeriod && !metric.sample.showsResetExpiries {
                         Text("Visible").tag(MetricPlacement.visible)
                     }
-                    if !metric.sample.showsResetExpiries {
-                        Text("Details").tag(MetricPlacement.details)
-                    }
+                    Text("Details").tag(MetricPlacement.details)
                     Text("Hidden").tag(MetricPlacement.hidden)
                 }
                 .labelsHidden().pickerStyle(.menu).frame(width: 100)
@@ -143,7 +142,7 @@ struct CustomizeProviderDetailView: View {
 
     private func placement(of metric: WidgetDescriptor) -> MetricPlacement {
         guard layout.isMetricEnabled(metric.id) else { return .hidden }
-        if metric.sample.isChart || metric.sample.isUsagePeriod { return .details }
+        if metric.sample.isChart || metric.sample.isUsagePeriod || metric.sample.showsResetExpiries { return .details }
         // Keep saved placements editable even when the whole service is off. Match the overview's
         // all-On-Demand promotion without relying on its enabled-service-only list.
         let visible = layout.customizeDetail(for: providerID)?.alwaysShownMetrics
@@ -152,9 +151,9 @@ struct CustomizeProviderDetailView: View {
     }
 
     private func setPlacement(_ placement: MetricPlacement, for metric: WidgetDescriptor) {
-        if placement == .details && !metric.sample.isChart && !metric.sample.isUsagePeriod {
+        if placement == .details && !metric.sample.isChart && !metric.sample.isUsagePeriod && !metric.sample.showsResetExpiries {
             let otherVisible = layout.customizeDetail(for: providerID)?.alwaysShownMetrics
-                .contains { $0.id != metric.id && !$0.sample.isChart && !$0.sample.isUsagePeriod && layout.isMetricEnabled($0.id) } == true
+                .contains { $0.id != metric.id && !$0.sample.isChart && !$0.sample.isUsagePeriod && !$0.sample.showsResetExpiries && layout.isMetricEnabled($0.id) } == true
             guard otherVisible else {
                 layout.presentCustomizationNotice("Keep at least one metric in the overview.", tone: .notice)
                 return

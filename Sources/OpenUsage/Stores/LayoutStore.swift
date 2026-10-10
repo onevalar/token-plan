@@ -39,6 +39,9 @@ final class LayoutStore {
         get { navigation.settingsPage }
         set { navigation.settingsPage = newValue }
     }
+    /// The outgoing page's render route remains frozen while its logical selection is cleared.
+    var displayedCustomizeProviderID: String? { navigation.displayedCustomizeProviderID }
+    var displayedSettingsPage: SettingsPage? { navigation.displayedSettingsPage }
     @discardableResult
     func goBack() -> Bool { navigation.goBack() }
     /// Placed widget being drag-reordered (transient). `PlacedWidget.id`, never persisted.
@@ -89,7 +92,10 @@ final class LayoutStore {
     /// back onto the stack (an undo must not be recorded as a new, separately-undoable action).
     private var isApplyingUndo = false
 
-    /// Menu-bar display style (Text strip vs. compact Bars). Persisted; defaults to `.text`.
+    /// Settings-owned service-family visibility, independent of provider enablement and metric pins.
+    /// Empty permits every enabled service. Retained across layout resets, undo, and account discovery.
+    private(set) var hiddenMenuBarServices: Set<String>
+    /// Settings-owned presentation. Not part of customization snapshots or resets.
     var menuBarStyle: MenuBarStyle {
         didSet { persistence.saveMenuBarStyle(menuBarStyle) }
     }
@@ -136,6 +142,7 @@ final class LayoutStore {
         pinnedMetricIDs = initial.pinnedMetricIDs
         expandedMetricIDs = initial.expandedMetricIDs
         defaultExpandedOnEnableIDs = initial.defaultExpandedOnEnableIDs
+        hiddenMenuBarServices = initial.hiddenMenuBarServices
         menuBarStyle = initial.menuBarStyle
 
         if initial.shouldPersistExpandOnEnable { persistExpandOnEnable() }
@@ -229,9 +236,46 @@ final class LayoutStore {
         persistExpandOnEnable()
     }
 
+    // MARK: - Menu bar visibility
+
+    func isMenuBarServiceVisible(_ providerID: String) -> Bool {
+        !hiddenMenuBarServices.contains(ProviderAccountID.family(of: providerID))
+    }
+
+    /// Only changes menu-bar visibility. Pins, dashboard layout, enablement, and refresh stay intact.
+    func setMenuBarServiceVisible(_ visible: Bool, for providerID: String) {
+        setMenuBarEntryVisible(visible, key: ProviderAccountID.family(of: providerID))
+    }
+
+    func isMenuBarAccountVisible(_ providerID: String) -> Bool {
+        !hiddenMenuBarServices.contains("account:\(providerID)")
+    }
+
+    /// The account namespace distinguishes the bare default card from its family switch.
+    func setMenuBarAccountVisible(_ visible: Bool, for providerID: String) {
+        setMenuBarEntryVisible(visible, key: "account:\(providerID)")
+    }
+
+    private func setMenuBarEntryVisible(_ visible: Bool, key: String) {
+        if visible {
+            guard hiddenMenuBarServices.remove(key) != nil else { return }
+        } else {
+            guard hiddenMenuBarServices.insert(key).inserted else { return }
+        }
+        persistence.saveHiddenMenuBarServices(hiddenMenuBarServices)
+    }
+
+    /// Settings' Reset All Settings restores both menu-bar choices; Customize must not call this.
+    func resetMenuBarSettings() {
+        // An explicit reset also replaces a legacy raw value that already resolves to Percentage.
+        menuBarStyle = .percentage
+        hiddenMenuBarServices = []
+        persistence.saveHiddenMenuBarServices(hiddenMenuBarServices)
+    }
+
     // MARK: - Menu bar pins
 
-    /// Per-provider cap is a rendering constraint — the Text strip stacks a provider's values two to a
+    /// Per-provider cap is a rendering constraint — the text strip stacks a provider's values two to a
     /// column, so a third would not fit the menu bar height.
     static let maxPinsPerProvider = 2
 
@@ -331,6 +375,7 @@ final class LayoutStore {
 
     func resetToDefault() {
         cancelDrag()
+        // Settings-owned menu-bar style and service visibility are not part of a customization reset.
         // Reset is its own deliberate action, not an undoable layout edit; the recorded snapshots
         // describe the pre-reset layout, so the undo stack is dropped wholesale here.
         undoHistory.clear()

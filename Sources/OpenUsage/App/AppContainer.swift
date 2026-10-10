@@ -218,8 +218,8 @@ final class AppContainer {
     /// screen resets those alongside this call.
     func resetAllSettings() {
         layout.resetToDefault()
-        // The menu-bar Icon Style is a Settings preference, not part of the Customize layout reset.
-        layout.menuBarStyle = .text
+        // Menu-bar style and service visibility belong to Settings, not customization resets.
+        layout.resetMenuBarSettings()
         reseedEnabledProviders()
         dataStore.resetDisplaySettings()
         notificationSettings.resetToDefaults()

@@ -11,7 +11,7 @@ import Observation
 final class PopoverTransparencyStore {
     static let key = "increaseTransparency"
 
-    /// The persisted preference (default off). Stored here rather than as a view-local `@AppStorage` so
+    /// The persisted preference (default on). Stored here rather than as a view-local `@AppStorage` so
     /// the AppKit panel honors exactly the value the Settings toggle writes. The no-op guard avoids a
     /// redundant defaults write (and the firehose `UserDefaults.didChangeNotification` it would emit).
     var increaseTransparency: Bool {
@@ -51,7 +51,7 @@ final class PopoverTransparencyStore {
         increaseContrast: Bool = NSWorkspace.shared.accessibilityDisplayShouldIncreaseContrast
     ) {
         self.defaults = defaults
-        self.increaseTransparency = defaults.bool(forKey: Self.key)
+        self.increaseTransparency = defaults.object(forKey: Self.key) == nil || defaults.bool(forKey: Self.key)
         // The flags default to the live `NSWorkspace` values (production) but are injectable so tests can
         // pin them and exercise the accessibility clamp deterministically, independent of the test host.
         self.reduceTransparency = reduceTransparency
@@ -88,12 +88,12 @@ final class PopoverTransparencyStore {
         AppLog.info(.statusItem, "Too-much-transparency egg \(active ? "enabled" : "disabled")")
     }
 
-    /// Restores the transparency preference to its default (off) and exits the easter egg — the
+    /// Restores the transparency preference to its default (on) and exits the easter egg — the
     /// Settings "Reset All Settings" path. Without the egg exit, a reset during Party/Drunk Mode
     /// would keep overriding the freshly-reset preference with the party look.
     func resetToDefaults() {
         setSecretCode(false)
-        increaseTransparency = false
+        increaseTransparency = true
     }
 
     /// Flips the on-screen flag from `StatusItemController`'s show/hide chokepoints. Guards on change so a

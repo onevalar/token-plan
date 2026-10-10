@@ -23,17 +23,10 @@ struct WidgetData: Hashable {
     var countSuffix: String?   // e.g. "credits", "requests"
     var valuePrefix: String?   // e.g. "~" for forecasts
     var displayMode: WidgetDisplayMode = .used
-    /// Global relative/absolute reset display, stamped by `WidgetDataStore` (like `displayMode`).
-    var resetDisplayMode: ResetDisplayMode = .relative
     var resetsAt: Date?
-    /// Zero or more future expiry instants surfaced in the row's hover tooltip (Codex rate-limit-reset
-    /// credits — one entry per still-available credit). Empty for every other row. Kept as raw `Date`s so
-    /// the tooltip formats live and follows the global relative/absolute mode (see `expiryTooltip`).
+    /// One expiry per reset credit with a known deadline. Details format these live.
     var expiriesAt: [Date] = []
-    /// Descriptor opt-in marking this as the Codex rate-limit-reset-credits row. When set, the value
-    /// column reveals the resets popover on hover (a timeline of each credit's expiry, or an empty
-    /// state when none are available) and lights up like the spend rows — so it stays reachable even
-    /// at "0 available", where `expiriesAt` is empty. Off for every other row.
+    /// Reset credits belong in subscription details, never in the overview.
     var showsResetExpiries: Bool = false
     /// Names of models this period's spend used that have no known price. Their usage is excluded
     /// unless a fallback estimate is enabled; either way the missing-price warning stays visible.
@@ -49,6 +42,8 @@ struct WidgetData: Hashable {
     /// Fixed trailing word for an unbounded row, e.g. "left" for an extra balance or "spent" for a
     /// spend estimate. When set it replaces the global left/used mode word.
     var unboundedValueWord: String?
+    /// Separates an individual credit balance from subscription quotas in overview and details.
+    var showsBalanceBand: Bool = false
     /// Optional source/disclaimer note for locally-estimated tiles. Rendered on the value-side hover,
     /// not beside the left label, so labels stay inert.
     var infoNote: String?
@@ -230,7 +225,7 @@ struct WidgetData: Hashable {
         // A `.values` row's primary reading is its first selected value; meters fall through to the
         // bounded/`used` formatting.
         if let first = selectedValues.first {
-            return (valuePrefix ?? "") + MetricFormatter.number(first.number, kind: first.kind, style: .row)
+            return (valuePrefix ?? "") + MetricFormatter.number(first.number, kind: first.kind, style: showsBalanceBand ? .full : .row)
         }
         return (valuePrefix ?? "") + format(displayedValue)
     }
@@ -374,25 +369,19 @@ struct WidgetData: Hashable {
         Int((selectedValues.first?.number ?? 0).rounded(.down))
     }
 
-    /// Hover tooltip for a row carrying expiry instants (the Codex reset-credit row, "2 available"):
-    /// when each credit's reset will expire, following the global relative/absolute mode. One credit →
-    /// "Reset expires in 12d 18h" (relative) / "Reset expires Feb 15 at 3:45 PM" (absolute); several →
-    /// a numbered list under a "Resets expire in:" / "Resets expire:" header. `nil` when the row carries
-    /// no expiries, so non-reset rows fall through to their figures tooltip.
+    /// Compact expiry descriptions for reset-credit value consumers outside the detail timeline.
     var expiryTooltip: String? {
         guard hasData, !expiriesAt.isEmpty else { return nil }
         let now = Date()
         let sorted = expiriesAt.sorted()
         if sorted.count == 1 {
-            return Formatters.deadlineLabel("Reset expires", at: sorted[0], mode: resetDisplayMode, now: now)
+            return Formatters.deadlineLabel("Reset expires", at: sorted[0], mode: .relative, now: now)
         }
         let entries = sorted.enumerated().compactMap { index, date -> String? in
-            Formatters.whenLabel(at: date, mode: resetDisplayMode, now: now).map { "\(index + 1). \($0)" }
+            Formatters.whenLabel(at: date, mode: .relative, now: now).map { "\(index + 1). \($0)" }
         }
         guard !entries.isEmpty else { return nil }
-        // The header carries the verb; "in" only fits the relative durations beneath it (absolute
-        // entries already read "Feb 15 at 3:45 PM").
-        let header = tr(resetDisplayMode == .relative ? "Resets expire in:" : "Resets expire:")
+        let header = tr("Resets expire in:")
         return ([header] + entries).joined(separator: "\n")
     }
 
@@ -529,7 +518,7 @@ extension WidgetData {
                 let eta = Pace.secondsToRunOut(used: used, limit: ctx.limit, resetsAt: ctx.resetsAt,
                                                periodDuration: ctx.period, now: now)
                     .flatMap { Formatters.deadlineLabel("Limit", at: now.addingTimeInterval($0),
-                                                        mode: resetDisplayMode, now: now) }
+                                                        mode: .relative, now: now) }
                 return .runningOut(eta: eta, projectedFraction: result.projectedUsage / ctx.limit)
             }
         }
@@ -547,10 +536,13 @@ extension WidgetData {
         return .level(.normal)
     }
 
-    /// Actual quota bands, independent of reset timing, consumption speed and display preference.
+    /// Actual remaining quota: blue above 30%, yellow above 10% through 30%, red at or below 10%.
+    /// Independent of rounding, reset timing, consumption speed and display preference.
     var quotaSeverity: MeterSeverity? {
         guard hasData, let limit, limit > 0 else { return nil }
-        return absoluteLevelState(used: used, limit: limit).severity
+        if remainingFraction <= 0.10 { return .critical }
+        if remainingFraction <= 0.30 { return .warning }
+        return .normal
     }
 
     /// Verb-less reset text for the overview's hourglass/calendar, honoring the display preference.
@@ -560,7 +552,7 @@ extension WidgetData {
         if let subtitleOverride { return subtitleOverride }
         if isFreshSessionWindow(now: now) { return tr("Not started") }
         if let resetsAt {
-            return Formatters.compactDeadline(at: resetsAt, mode: resetDisplayMode, now: now)
+            return Formatters.compactDeadline(at: resetsAt, mode: .relative, now: now)
         }
         return boundedSubtitle
     }
@@ -595,15 +587,11 @@ extension WidgetData {
     /// once you send your first message, so there's no live countdown to show yet.
     static var freshSessionTooltip: String { tr("Sessions start after you send your first message.") }
 
-    /// Hover tooltip for the reset label: the *opposite* format from what's shown, mirroring the
-    /// original's `formatResetTooltipText`. A fresh ("Not started") session explains itself instead of
-    /// showing a reset time, since the window hasn't begun counting down.
+    /// An exact reset instant remains available to consumers requesting detail, never on the overview.
     func resetTooltip(now: Date = Date()) -> String? {
         if isFreshSessionWindow(now: now) { return Self.freshSessionTooltip }
         guard hasResetLabel(now: now), let resetsAt else { return nil }
-        return resetDisplayMode == .absolute
-            ? Formatters.resetRelativeLabel(until: resetsAt, now: now)
-            : Formatters.resetAbsoluteLabel(at: resetsAt, now: now)
+        return Formatters.resetAbsoluteLabel(at: resetsAt, now: now)
     }
 
     /// True when the bounded headline is a flippable Used/Left reading (so the row makes it the

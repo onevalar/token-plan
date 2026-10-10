@@ -2,8 +2,8 @@ import AppKit
 
 /// The popover panel's backdrop: two full-frame layers built once and switched by visibility.
 ///
-/// `.opaque` shows a solid `NSBox` (the `Theme.trayNSColor` tray) so the data region never reveals the
-/// desktop — the app's default look. `.translucent` shows a behind-window `NSVisualEffectView` that
+/// `.opaque` shows a solid `NSBox` (the `Theme.trayNSColor` tray) when accessibility or the user's
+/// preference requires it. The default `.translucent` shows a behind-window `NSVisualEffectView` that
 /// samples the desktop with vibrancy, which is the HIG-correct way to "increase transparency" (SwiftUI
 /// `glassEffect`/`Material` only sample in-app content, so they can't show the desktop).
 ///
@@ -38,10 +38,10 @@ final class PopoverBackdropView: NSView {
         vibrancy.state = .active
         vibrancy.maskImage = Self.roundedMaskImage(cornerRadius: cornerRadius)
         vibrancy.wantsLayer = true
-        vibrancy.alphaValue = 0                      // starts hidden; opaque tray is the default look
+        vibrancy.alphaValue = 0                      // the controller applies the resolved mode before showing
         vibrancy.translatesAutoresizingMaskIntoConstraints = false
 
-        // The opaque box sits above the vibrancy view so the default look fully covers it; only one is
+        // The opaque box sits above the vibrancy view so the solid fallback fully covers it; only one is
         // ever visible at a time, so the order is just defensive.
         addSubview(vibrancy)
         addSubview(opaqueBox, positioned: .above, relativeTo: vibrancy)

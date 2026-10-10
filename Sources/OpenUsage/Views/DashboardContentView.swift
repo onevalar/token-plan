@@ -23,21 +23,25 @@ struct DashboardContentView: View {
                     Text("TokenPlan").font(.title3.weight(.semibold))
                     Spacer(minLength: 8)
                     Button(action: onRefresh) {
-                        Group {
+                        HStack(spacing: 5) {
                             if container.dataStore.refreshingProviderIDs.isEmpty {
                                 Image(systemName: "arrow.clockwise")
                             } else {
                                 MotionAwareProgressView(controlSize: .mini)
                             }
+                            Text("Refresh")
                         }
-                        .frame(width: 28, height: 28).contentShape(Rectangle())
+                        .font(.subheadline)
+                        .padding(.horizontal, 9)
+                        .frame(height: 28).contentShape(Capsule())
                     }
                     .buttonStyle(.plain)
+                    .interactiveGlass(in: Capsule(), reinforced: container.transparency.effectiveStyle.needsChromeLegibilityBacking)
                     .disabled(!container.dataStore.refreshingProviderIDs.isEmpty)
-                    .accessibilityLabel("Refresh now")
+                    .accessibilityLabel(container.dataStore.refreshingProviderIDs.isEmpty ? tr("Refresh now") : tr("Refreshing…"))
                     HeaderView(screen: .dashboard)
                 }
-                .padding(.bottom, density.sectionSpacing)
+                .padding(.bottom, density.cardGutter * 2)
                 // A pending update found by a scheduled Sparkle check tops everything — it's the
                 // reminder the buried Sparkle window can't deliver for a dockless app.
                 if let updateVersion = updater.availableUpdateVersion {

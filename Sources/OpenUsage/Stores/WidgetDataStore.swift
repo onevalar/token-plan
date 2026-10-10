@@ -45,7 +45,6 @@ final class WidgetDataStore {
     private let postNotification: @MainActor (String, String, String, String) async -> Bool
 
     private static let meterStyleKey = "meterStyle"
-    private static let resetDisplayModeKey = "resetDisplayMode"
     /// How long a provider that just failed is skipped before the loop will probe it again. A failed
     /// refresh isn't cached, so — unlike a success, which the snapshot cache gates for an interval —
     /// nothing else stops the loop from re-probing a broken provider (logged-out Devin/Grok especially)
@@ -102,18 +101,12 @@ final class WidgetDataStore {
         didSet { defaults.set(meterStyle.rawValue, forKey: Self.meterStyleKey) }
     }
 
-    /// Global reset-countdown format: relative ("Resets in 4d 17h") or absolute ("Resets tomorrow at
-    /// 9:00 AM"). Persisted across relaunch; defaults to `.relative`. Toggled by clicking a reset label.
-    var resetDisplayMode: ResetDisplayMode {
-        didSet { defaults.set(resetDisplayMode.rawValue, forKey: Self.resetDisplayModeKey) }
-    }
-
-    /// Restores the Usage Display preferences (meter style and reset-time format) to
-    /// their defaults — the Settings "Reset All Settings" path. Cached usage snapshots are data, not
+    /// Restores the usage reading to its default — the Settings "Reset All Settings" path.
+    /// Cached usage snapshots are data, not
     /// settings, and stay untouched.
     func resetDisplaySettings() {
         meterStyle = .remaining
-        resetDisplayMode = .relative
+        defaults.removeObject(forKey: "resetDisplayMode")
     }
 
     init(
@@ -150,7 +143,6 @@ final class WidgetDataStore {
             }
         self.providerIdentityKeys = providerIdentityKeys
         self.meterStyle = defaults.enumValue(forKey: Self.meterStyleKey, default: .remaining)
-        self.resetDisplayMode = defaults.enumValue(forKey: Self.resetDisplayModeKey, default: .relative)
         // Stale-while-revalidate: load whatever was cached (expired included) so the menu bar and
         // dashboard show last-known values immediately at launch instead of "—"; the refresh loop
         // replaces them as soon as fresh data lands.
@@ -543,7 +535,6 @@ final class WidgetDataStore {
         // so stamping the mode once makes them follow the global setting. Inert for unbounded rows
         // (limit == nil), whose displayed value ignores displayMode.
         result.displayMode = meterStyle
-        result.resetDisplayMode = resetDisplayMode
         return result
     }
 

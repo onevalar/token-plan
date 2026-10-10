@@ -1,8 +1,8 @@
 import SwiftUI
 
-/// The dashboard display: one inset group per provider (System Settings style). A provider's icon + name
-/// sits above a rounded container holding its metric rows, so heterogeneous metric sets read as belonging
-/// to their provider. Rows are the shared `WidgetRowView`, fed by the same `WidgetDataStore` the menu bar
+/// The dashboard display: one inset group per provider. A provider's icon + name
+/// leads its metric rows, with a separator between groups rather than a nested rounded card.
+/// Rows are the shared `WidgetRowView`, fed by the same `WidgetDataStore` the menu bar
 /// uses.
 ///
 /// Reordering works here directly (no Customize needed): drag any metric row to reorder it within its
@@ -21,20 +21,23 @@ struct WidgetGroupedListView: View {
     @State private var activeMetricID: String?
     @AppStorage(DensitySetting.key) private var density = DensitySetting.regular
 
-    @Environment(\.codexResetClaims) private var codexResetClaims
-
     var body: some View {
+        let services = layout.displayServices
+        let rowsByProvider = Dictionary(uniqueKeysWithValues: services.flatMap(\.accounts).map {
+            ($0.id, resolvedRows($0.alwaysShownWidgets))
+        })
+        let columns = QuotaTableColumns(rows: rowsByProvider.values.flatMap { $0.map(\.data) }, density: density)
         // Provider-section spacing is noticeably wider than the in-card row rhythm (so groups
         // still read as groups); the exact step comes from the density setting.
         VStack(alignment: .leading, spacing: density.sectionSpacing) {
-            ForEach(layout.displayServices) { service in
+            ForEach(services) { service in
                 VStack(alignment: .leading, spacing: density.headerToCardSpacing) {
                     if service.accounts.count > 1 {
                         ProviderSectionHeader(provider: service.provider)
                             .padding(.horizontal, 8)
                     }
                     ForEach(service.accounts) { group in
-                        section(group, service: service)
+                        section(group, service: service, rows: rowsByProvider[group.id]!, columns: columns)
                     }
                 }
             }
@@ -44,10 +47,16 @@ struct WidgetGroupedListView: View {
         .animation(Motion.spring, value: layout.displayGroups.map(\.provider.id))
     }
 
-    private func section(_ group: ProviderGroup, service: ProviderServiceGroup) -> some View {
-        VStack(alignment: .leading, spacing: density.headerToCardSpacing) {
+    private func section(_ group: ProviderGroup, service: ProviderServiceGroup,
+                         rows: [ResolvedRow], columns sharedColumns: QuotaTableColumns) -> some View {
+        let providerID = group.provider.id
+        // Amp quotas are not rolling 5h/1w windows. Share tracks within this card without
+        // borrowing another service's deadline column; keep explicit Amp resets when reported.
+        let columns = providerID == "amp" ? QuotaTableColumns(rows: rows.map(\.data), density: density) : sharedColumns
+        let condensedIDs = condensedTextRowIDs(rows)
+        return DashboardMetricCard(tableColumns: columns) {
             if service.accounts.count == 1 {
-                header(group, service: service.provider)
+                header(group, service: service.provider, columns: columns)
             } else {
                 Button { openCustomize(for: group.id) } label: {
                     HStack {
@@ -63,7 +72,7 @@ struct WidgetGroupedListView: View {
                         Image(systemName: "chevron.right").foregroundStyle(.secondary)
                     }
                     .contentShape(Rectangle())
-                    .padding(.horizontal, 10)
+                    .padding(.horizontal, 14)
                     .padding(.vertical, 6)
                 }
                 .buttonStyle(.plain)
@@ -72,13 +81,19 @@ struct WidgetGroupedListView: View {
             if let note = container.subscriptionNotes.overviewNote(for: group.id) {
                 Text(note).font(.caption).foregroundStyle(.secondary).padding(.horizontal, 10)
             }
-            container(group)
+            if let notice = dataStore.headerNotice(for: providerID) {
+                ProviderNoticeRow(message: notice)
+            }
+            ForEach(rows) { entry in
+                row(entry.descriptor, data: entry.data, in: providerID,
+                    condensedTop: condensedIDs.contains(entry.descriptor.id), columns: columns)
+            }
         }
         .opacity(activeProviderID == group.provider.id ? 0 : 1)
         .reorderFrame(id: group.provider.id, in: .named(reorderSpaceName))
     }
 
-    private func header(_ group: ProviderGroup, service: Provider) -> some View {
+    private func header(_ group: ProviderGroup, service: Provider, columns: QuotaTableColumns) -> some View {
         ProviderSectionHeader(
             provider: service,
             plan: dataStore.plan(for: group.provider.id),
@@ -88,8 +103,8 @@ struct WidgetGroupedListView: View {
             onOpenDetails: { openCustomize(for: group.id) }
         )
         // Keep the provider mark and hover-revealed copy control aligned with the card's content edges.
-        .padding(.horizontal, 8)
-        .highPriorityGesture(providerDragGesture(for: group))
+        .padding(.horizontal, 12)
+        .highPriorityGesture(providerDragGesture(for: group, columns: columns))
         .contextMenu {
             // Hides the whole provider section (the Customize provider list brings it back). Mirrors
             // the per-metric "Hide" but one level up, so the verb order reads the same on a header as a row.
@@ -116,23 +131,6 @@ struct WidgetGroupedListView: View {
         var id: PlacedWidget.ID { widget.id }
     }
 
-    @ViewBuilder
-    private func container(_ group: ProviderGroup) -> some View {
-        let providerID = group.provider.id
-        let rows = resolvedRows(group.alwaysShownWidgets)
-        let condensedIDs = condensedTextRowIDs(rows)
-        let notice = dataStore.headerNotice(for: providerID)
-        if !rows.isEmpty || notice != nil {
-            DashboardMetricCard {
-                if let notice { ProviderNoticeRow(message: notice) }
-                ForEach(rows) { entry in
-                    row(entry.descriptor, data: entry.data, in: providerID,
-                        condensedTop: condensedIDs.contains(entry.descriptor.id))
-                }
-            }
-        }
-    }
-
     private func resolvedRows(_ widgets: [PlacedWidget]) -> [ResolvedRow] {
         widgets.compactMap { widget -> ResolvedRow? in
             guard let descriptor = layout.descriptor(for: widget) else { return nil }
@@ -147,15 +145,14 @@ struct WidgetGroupedListView: View {
     }
 
     private func row(_ descriptor: WidgetDescriptor, data: WidgetData, in providerID: String,
-                     condensedTop: Bool) -> some View {
+                     condensedTop: Bool, columns: QuotaTableColumns) -> some View {
         return WidgetRowView(
             data: data,
             condensedTop: condensedTop
         )
-            .environment(\.codexResetClaim, codexResetClaims[providerID])
             .contentShape(Rectangle())
             .opacity(activeMetricID == descriptor.id ? 0 : 1)
-            .highPriorityGesture(metricDragGesture(for: descriptor, providerID: providerID))
+            .highPriorityGesture(metricDragGesture(for: descriptor, providerID: providerID, columns: columns))
             .contextMenu { rowMenu(descriptor, providerID: providerID) }
             .reorderFrame(id: descriptor.id, in: .named(reorderSpaceName))
     }
@@ -192,33 +189,34 @@ struct WidgetGroupedListView: View {
 
     /// From the dashboard, jump straight into this provider's Customize metrics (L2), not the provider list.
     private func openCustomize(for providerID: String) {
-        withAnimation(Motion.modeSwitch) {
+        withAnimation(Motion.navigation) {
             layout.customizeProviderID = providerID
             layout.isEditing = true
         }
     }
 
-    private func providerDragGesture(for group: ProviderGroup) -> some Gesture {
+    private func providerDragGesture(for group: ProviderGroup, columns: QuotaTableColumns) -> some Gesture {
         reorderDragGesture(
             id: group.provider.id,
             coordinateSpaceName: reorderSpaceName,
             frameStore: frameStore,
             active: $activeProviderID,
             lift: $reorderLift,
-            makeLift: { makeProviderLift(for: group, value: $0) },
+            makeLift: { makeProviderLift(for: group, columns: columns, value: $0) },
             orderedIDs: { layout.displayGroups.map(\.provider.id) },
             reorder: { layout.reorderProvider(dragged: group.provider.id, target: $0) }
         )
     }
 
-    private func metricDragGesture(for descriptor: WidgetDescriptor, providerID: String) -> some Gesture {
+    private func metricDragGesture(for descriptor: WidgetDescriptor, providerID: String,
+                                   columns: QuotaTableColumns) -> some Gesture {
         reorderDragGesture(
             id: descriptor.id,
             coordinateSpaceName: reorderSpaceName,
             frameStore: frameStore,
             active: $activeMetricID,
             lift: $reorderLift,
-            makeLift: { makeMetricLift(for: descriptor, value: $0) },
+            makeLift: { makeMetricLift(for: descriptor, columns: columns, value: $0) },
             orderedIDs: { metricTargetIDs(for: providerID) },
             reorder: { layout.reorderMetric(dragged: descriptor.id, target: $0, in: providerID) }
         )
@@ -231,24 +229,28 @@ struct WidgetGroupedListView: View {
         return resolvedRows(group.alwaysShownWidgets).map { $0.descriptor.id }
     }
 
-    private func makeProviderLift(for group: ProviderGroup, value: DragGesture.Value) -> ReorderLift? {
+    private func makeProviderLift(for group: ProviderGroup, columns: QuotaTableColumns,
+                                  value: DragGesture.Value) -> ReorderLift? {
         let rows = resolvedRows(group.alwaysShownWidgets).map(\.data)
         return ReorderLift.make(
             id: group.provider.id,
             payload: .dashboardProvider(
                 provider: group.provider,
                 plan: dataStore.plan(for: group.provider.id),
-                rows: rows
+                rows: rows,
+                columns: columns
             ),
             value: value,
             frames: frameStore.frames
         )
     }
 
-    private func makeMetricLift(for descriptor: WidgetDescriptor, value: DragGesture.Value) -> ReorderLift? {
-        ReorderLift.make(
+    private func makeMetricLift(for descriptor: WidgetDescriptor, columns: QuotaTableColumns,
+                                value: DragGesture.Value) -> ReorderLift? {
+        return ReorderLift.make(
             id: descriptor.id,
-            payload: .dashboardMetric(data: dataStore.data(for: descriptor)),
+            payload: .dashboardMetric(data: dataStore.data(for: descriptor),
+                                      columns: columns),
             value: value,
             frames: frameStore.frames
         )

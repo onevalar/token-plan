@@ -51,6 +51,19 @@ protocol CategorizedError: Error {
 // Retroactive conformances kept in one file so the full mapping is reviewable at a glance and a new
 // error case forces a compile error here (exhaustive switches) rather than silently falling to `.other`.
 
+extension AmpUsageError: CategorizedError {
+    var errorCategory: ErrorCategory {
+        switch self {
+        case .cliMissing: .notAvailable
+        case .notLoggedIn: .notLoggedIn
+        case .credentialsUnreadable: .credentialAccess
+        case .commandFailed: .other
+        case .timedOut: .network
+        case .invalidResponse: .decoding
+        }
+    }
+}
+
 extension ClaudeAuthError: CategorizedError {
     var errorCategory: ErrorCategory {
         switch self {

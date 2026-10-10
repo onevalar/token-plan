@@ -13,7 +13,7 @@ struct PopoverTopBar: View {
                 Text(title).font(.headline).lineLimit(1)
                 HStack {
                     Button {
-                        withAnimation(Motion.modeSwitch) { _ = layout.goBack() }
+                        withAnimation(Motion.navigation) { _ = layout.goBack() }
                     } label: {
                         Image(systemName: "chevron.backward")
                             .font(.system(size: 13, weight: .medium))
@@ -33,7 +33,7 @@ struct PopoverTopBar: View {
 
     private var title: String {
         screen == .settings
-            ? layout.settingsPage?.title ?? tr("Settings")
-            : tr(layout.customizeProviderID == nil ? "Services & Subscriptions" : "Subscription Details")
+            ? layout.displayedSettingsPage?.title ?? tr("Settings")
+            : tr(layout.displayedCustomizeProviderID == nil ? "Services & Subscriptions" : "Subscription Details")
     }
 }

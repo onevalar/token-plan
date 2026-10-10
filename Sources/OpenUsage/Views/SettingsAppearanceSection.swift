@@ -1,26 +1,54 @@
 import SwiftUI
 
-/// Secondary settings: appearance and menu-bar chrome, kept off the common preferences page.
+/// Display semantics and appearance share one page; menu-bar controls have their own page.
 struct SettingsAppearanceSection: View {
-    @Environment(AppContainer.self) private var container
+    @Environment(WidgetDataStore.self) private var dataStore
+    @Environment(PopoverTransparencyStore.self) private var transparency
     @AppStorage(AppearanceSetting.key) private var appearance = AppearanceSetting.system
-    @AppStorage(TimeFormatSetting.key) private var timeFormat = TimeFormatSetting.auto
     @AppStorage(DensitySetting.key) private var density = DensitySetting.regular
     @AppStorage(ReduceAnimationsSetting.key) private var reduceAnimations = ReduceAnimationsSetting.fallback
 
     var body: some View {
-        @Bindable var layout = container.layout
-        @Bindable var transparency = container.transparency
-        VStack(spacing: 0) {
-            row("Icon Style") {
-                picker($layout.menuBarStyle, options: MenuBarStyle.allCases, label: \.label)
+        VStack(spacing: density.sectionSpacing) {
+            usageSection
+            appearanceSection
+        }
+    }
+
+    private var usageSection: some View {
+        @Bindable var dataStore = dataStore
+        return VStack(spacing: 0) {
+            row("Show Usage As") {
+                picker($dataStore.meterStyle, options: WidgetDisplayMode.allCases, label: \.label)
             }
+            Text("Preview").font(.caption).foregroundStyle(.secondary)
+                .frame(maxWidth: .infinity, alignment: .leading).padding(.horizontal, 12)
+            WidgetRowView(data: displayPreview)
+                .environment(\.quotaTableColumns, QuotaTableColumns(rows: [displayPreview], density: density))
+            Text("Overview and details always use horizontal bars. Ring is available only in the menu bar.")
+                .font(.caption).foregroundStyle(.secondary)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 12).padding(.bottom, 8)
+        }
+        .cardSurface()
+    }
+
+    private var displayPreview: WidgetData {
+        var data = WidgetData(title: tr("Session"), icon: .providerMark("claude"), kind: .percent, used: 18, limit: 100)
+        data.periodDurationMs = MetricPeriod.sessionMs
+        data.resetsAt = Date().addingTimeInterval(2 * 3600 + 35 * 60)
+        data.displayMode = dataStore.meterStyle
+        return data
+    }
+
+    private var appearanceSection: some View {
+        @Bindable var transparency = self.transparency
+        return VStack(spacing: 0) {
             row("Theme") {
                 picker($appearance, options: AppearanceSetting.allCases, label: \.label)
                     .onChange(of: appearance) { AppearanceSetting.applyCurrent() }
             }
             row("Density") { picker($density, options: DensitySetting.allCases, label: \.label) }
-            row("Time Format") { picker($timeFormat, options: TimeFormatSetting.allCases, label: \.label) }
             row("Reduce Animations") {
                 Toggle("Reduce Animations", isOn: $reduceAnimations).labelsHidden().settingsSwitchStyle()
             }

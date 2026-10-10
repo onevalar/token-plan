@@ -1,7 +1,7 @@
 import SwiftUI
 
-/// Quota rows: cycle and reading, a full-width bar, and icon-led reset time.
-/// Balances/spend remain text rows; reset credits also expose their nearest expiry inline.
+/// Overview quota rows share cycle, track, reading and deadline columns; details stay stacked.
+/// Balances/spend remain text rows; reset credits render their timeline directly in details.
 struct WidgetRowView: View {
     let data: WidgetData
     /// The overview is read-only; breakdowns and credit actions belong in subscription details.
@@ -12,13 +12,11 @@ struct WidgetRowView: View {
     var condensedTop: Bool = false
 
     @AppStorage(DensitySetting.key) private var density = DensitySetting.regular
+    @Environment(\.quotaTableColumns) private var tableColumns
     @Environment(\.reduceAnimations) private var reduceAnimations
     @State private var modelHover = HoverPopoverState()
     /// Backs the reset-credit claim flow; previews and providers without a service remain read-only.
     @Environment(\.codexResetClaim) private var codexResetClaim
-    /// Party easter egg: fill meter bars with the party gradient instead of the severity color. Off by
-    /// default everywhere else.
-    @Environment(\.popoverPartyMode) private var partyMode
 
     private var supportingFont: Font {
         .system(size: density.supportingPointSize, weight: .regular)
@@ -39,7 +37,7 @@ struct WidgetRowView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, 14)
-        // Bar rows are multi-line and earn breathing room; single-line text rows (Today / Yesterday /
+        // Stacked detail bars earn breathing room; single-line overview and text rows (Today / Yesterday /
         // Last 30 Days) stay tighter so consecutive ones read as a cluster, not evenly-spaced
         // full-height rows. This differentiation — not the fonts — is what kills the "jumpy" rhythm.
         // All values come from the global density setting; a text row pulls up against a preceding
@@ -49,37 +47,60 @@ struct WidgetRowView: View {
     }
 
     private var topPadding: CGFloat {
-        if data.isBounded { return density.barRowPadding }
+        if data.isBounded { return tableColumns == nil ? density.barRowPadding : density.textRowPadding }
         return condensedTop ? density.condensedTextRowTopPadding : density.textRowPadding
     }
 
     private var bottomPadding: CGFloat {
-        data.isBounded ? density.barRowPadding : density.textRowPadding
+        data.isBounded && tableColumns == nil ? density.barRowPadding : density.textRowPadding
     }
 
     @ViewBuilder
     private var rowContent: some View {
-        if data.isChart, data.hasData {
+        if data.showsResetExpiries, showsDetails {
+            resetCredits
+        } else if data.isChart, data.hasData {
             // The sparkline owns its own label + bars; a chart with no real points falls through to the
             // unbounded "No data" row below (and so descriptor template data never leaks here).
             UsageSparkline(data: data)
         } else if data.isBounded {
             boundedRow
+        } else if data.showsBalanceBand {
+            balanceBand
         } else {
             unboundedRow
         }
     }
 
-    /// Text never competes with the track for horizontal space. Every row has the same track width.
+    /// Shared columns keep tracks equal even when cycle labels or countdowns have different lengths.
+    @ViewBuilder
     private var boundedRow: some View {
-        VStack(alignment: .leading, spacing: density.rowInnerSpacing) {
-            HStack(alignment: .firstTextBaseline, spacing: 8) {
-                Text(data.overviewTitle).font(supportingFont)
-                Spacer(minLength: 4)
-                headlineText.fixedSize()
+        if let columns = tableColumns {
+            HStack(alignment: .center, spacing: 8) {
+                Text(verbatim: data.overviewTitle).font(supportingFont)
+                    .frame(width: columns.title, alignment: .leading)
+                    .fixedSize(horizontal: false, vertical: true)
+                meter.frame(minWidth: 60)
+                headlineText
+                    .frame(width: columns.reading, alignment: .trailing)
+                    .fixedSize(horizontal: false, vertical: true)
+                if columns.context > 0 {
+                    HStack(spacing: 0) { trailingContext }
+                        .multilineTextAlignment(.trailing)
+                        .frame(width: columns.context, alignment: .trailing)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
             }
-            meter
-            trailingContext.frame(maxWidth: .infinity, alignment: .trailing)
+        } else {
+            VStack(alignment: .leading, spacing: density.rowInnerSpacing) {
+                HStack(alignment: .firstTextBaseline, spacing: 8) {
+                    Text(verbatim: data.overviewTitle).font(supportingFont)
+                    Spacer(minLength: 4)
+                    headlineText.fixedSize()
+                }
+                meter
+                trailingContext.frame(maxWidth: .infinity, alignment: .trailing)
+            }
         }
     }
 
@@ -105,33 +126,59 @@ struct WidgetRowView: View {
     private var trailingContext: some View {
         if let text = data.boundedTrailingText() {
             if data.hasResetLabel(), let date = data.resetsAt {
-                Label(text, systemImage: data.resetDisplayMode == .relative ? "hourglass" : "calendar")
-                    .font(supportingFont)
-                    .monospacedDigit()
-                    .foregroundStyle(.secondary)
-                    .accessibilityElement(children: .ignore)
-                    .accessibilityLabel(Formatters.deadlineLabel("Resets", at: date, mode: data.resetDisplayMode) ?? text)
+                HStack(spacing: 4) {
+                    Image(systemName: "hourglass")
+                        .frame(width: 12)
+                    Text(text)
+                }
+                .font(supportingFont)
+                .monospacedDigit()
+                .foregroundStyle(.secondary)
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(Formatters.deadlineLabel("Resets", at: date, mode: .relative) ?? text)
             } else {
                 Text(text).font(supportingFont).foregroundStyle(.secondary)
             }
         }
     }
 
-    @ViewBuilder
-    private var nearestExpiry: some View {
-        if data.showsResetExpiries, data.hasData, let expiry = data.expiriesAt.min(),
-           let text = Formatters.compactDeadline(at: expiry, mode: data.resetDisplayMode) {
-            // Unlike a quota's elapsed reset date, a credit's elapsed expiry is not "soon".
-            if expiry <= Date() {
-                Text("Expired").font(.caption).foregroundStyle(.secondary)
-            } else {
-                Label(text, systemImage: "calendar")
-                    .font(.caption).foregroundStyle(.secondary).monospacedDigit()
-                    .accessibilityLabel(Formatters.deadlineLabel("Reset expires", at: expiry, mode: data.resetDisplayMode) ?? text)
+    private var resetCredits: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text("Reset Credits").font(supportingFont.weight(.semibold))
+                Spacer(minLength: 8)
+                Text(data.hasData ? MetricFormatter.number(Double(data.resetCreditCount), kind: .count, style: .row)
+                                 : WidgetData.noDataHeadline)
+                    .font(supportingFont).monospacedDigit()
             }
-        } else if data.showsResetExpiries, data.hasData, data.resetCreditCount > 0 {
-            Text("Expiry unavailable").font(.caption).foregroundStyle(.secondary)
+            if data.hasData {
+                if codexResetClaim == nil {
+                    Text("Read-only in TokenPlan. Use reset credits in the provider's own app.")
+                        .font(.caption).foregroundStyle(.secondary)
+                }
+                RateLimitResetsDetail(count: data.resetCreditCount, expiries: data.expiriesAt,
+                                      claim: codexResetClaim.map { service in
+                    { expiry, requestID in
+                        await service.claim(creditExpiringAt: expiry, redeemRequestID: requestID)
+                    }
+                })
+            } else {
+                Text("No data").font(.caption).foregroundStyle(.secondary)
+            }
         }
+    }
+
+    private var balanceBand: some View {
+        HStack(spacing: 10) {
+            Text("Individual Credits").font(supportingFont.weight(.semibold))
+            Spacer(minLength: 8)
+            Text(data.hasData ? data.valueText : tr("No data"))
+                .font(supportingFont.weight(.semibold)).monospacedDigit()
+                .contentTransition(.numericText())
+        }
+        .padding(.horizontal, 10).padding(.vertical, 8)
+        .background(RoundedRectangle(cornerRadius: 8).fill(.quaternary))
+        .accessibilityElement(children: .combine)
     }
 
     /// Unbounded: no bar. Label on the left, with a single right-aligned descriptive line ("1,503 left")
@@ -139,14 +186,6 @@ struct WidgetRowView: View {
     private var unboundedRow: some View {
         unboundedRowContent
             .onChange(of: data.modelBreakdown) { _, _ in modelHover.dismiss() }
-            // A refresh can replace the reset credits (count and expiries) while the popover is open;
-            // drop it so it never lingers over a stale timeline — except while the claim flow has the
-            // popover pinned: the claim's own forced refresh is what changes the credits, and dismissing
-            // on it would close the popover before the claim's result banner ever renders. The pinned
-            // popover re-renders from the new data instead (the detail view reconciles its own state).
-            .onChange(of: data.expiriesAt) { _, _ in
-                if !modelHover.isPinned { modelHover.dismiss() }
-            }
             .onDisappear { modelHover.dismiss() }
     }
 
@@ -160,25 +199,18 @@ struct WidgetRowView: View {
         hasHoverPopover && (modelHover.overInline || modelHover.isPresented)
     }
 
-    /// Whether the value column reveals a hover popover: the model breakdown on spend rows, or the
-    /// resets timeline on the Codex rate-limit-resets row. One `modelHover` coordinator drives both — a
-    /// row is only ever one kind — so lighting the value and anchoring the popover share the spend
-    /// row's machinery. The resets row qualifies even at "0 available" (empty `expiriesAt`), so its
-    /// empty-state popover stays reachable — but only with real data: a "No data" tile must not open a
-    /// popover that reads as "zero credits" (`hasModelBreakdown` already carries its own `hasData`).
+    /// Only spend breakdowns use a hover popover; resets are visible directly in details.
     private var hasHoverPopover: Bool {
-        showsDetails && (data.hasModelBreakdown || (data.showsResetExpiries && data.hasData))
+        showsDetails && data.hasModelBreakdown
     }
 
     private var unboundedRowContent: some View {
-        HStack(alignment: .center, spacing: 10) {
+        return HStack(alignment: .center, spacing: 10) {
             labelColumn
             Spacer(minLength: 12)
             VStack(alignment: .trailing, spacing: 2) {
                 HStack(spacing: 4) {
-                    Text(data.showsResetExpiries && data.hasData
-                         ? MetricFormatter.number(Double(data.resetCreditCount), kind: .count, style: .row)
-                         : data.unboundedDetail)
+                    Text(data.unboundedDetail)
                         .font(supportingFont)
                         .foregroundStyle(.primary) // the value is the row's payload — match the bounded headline
                         .contentTransition(.numericText())
@@ -193,7 +225,6 @@ struct WidgetRowView: View {
                         // per-model tooltips carry the exact figures instead. The resets row likewise
                         // drops its tooltip — the timeline popover replaces it.
                         .hoverTooltip(hasHoverPopover ? nil : data.unboundedValueTooltip)
-                    nearestExpiry
                     if hasHoverPopover {
                         Button {
                             modelHover.setPinned(true)
@@ -206,7 +237,7 @@ struct WidgetRowView: View {
                         .accessibilityLabel("Details")
                     }
                 }
-                if !data.showsResetExpiries, let subtitle = data.unboundedSubtitle {
+                if let subtitle = data.unboundedSubtitle {
                     // Secondary, not tertiary: the subtitle is informational ("on-device estimate"),
                     // and tertiary is reserved for inactive content on glass.
                     Text(subtitle)
@@ -258,20 +289,6 @@ struct WidgetRowView: View {
                     ModelUsageDetail(title: data.title, breakdown: breakdown) { inside in
                         modelHover.detailHover(inside)
                     }
-                } else if data.showsResetExpiries {
-                    RateLimitResetsDetail(
-                        count: data.resetCreditCount, expiries: data.expiriesAt,
-                        onHoverChange: { inside in modelHover.detailHover(inside) },
-                        onPinChange: { pinned in modelHover.setPinned(pinned) },
-                        // Only Codex details get a claim service keyed by account;
-                        // Claude's resets row and previews show
-                        // the read-only timeline.
-                        claim: codexResetClaim.map { service in
-                            { expiry, redeemRequestID in
-                                await service.claim(creditExpiringAt: expiry, redeemRequestID: redeemRequestID)
-                            }
-                        }
-                    )
                 }
             }
         }
@@ -279,13 +296,13 @@ struct WidgetRowView: View {
 
     private var labelColumn: some View {
         HStack(spacing: 4) {
-            Text(data.showsResetExpiries ? tr("Reset Count") : data.title)
+            Text(data.title)
                 // Same point size as the trailing value so the single-line row reads tight;
                 // semibold alone keeps the name/value hierarchy.
                 .font(.system(size: density.supportingPointSize, weight: .semibold))
                 .foregroundStyle(.primary)
-                .lineLimit(1)
-                .fixedSize(horizontal: true, vertical: false)
+                .lineLimit(tableColumns == nil ? 1 : nil)
+                .fixedSize(horizontal: tableColumns == nil, vertical: true)
             unknownModelWarningIcon
         }
     }
@@ -304,31 +321,5 @@ struct WidgetRowView: View {
         }
     }
 
-    /// Full-width track; color reflects only the actual remaining quota, never projected pace.
-    private var meter: some View {
-        GeometryReader { proxy in
-            ZStack(alignment: .leading) {
-                // Semantic quaternary fill (not an opacity-faded color) so the track stays vibrant
-                // on glass and adapts to Increase Contrast / Reduce Transparency.
-                Capsule().fill(.quaternary)
-                Capsule()
-                    .fill(partyMode ? PartyMode.meterFill : severityColor(data.quotaSeverity))
-                    .frame(width: fillWidth(track: proxy.size.width))
-            }
-        }
-        .frame(height: density.meterHeight)
-        .animation(Motion.spring, value: data.fraction)
-        // VoiceOver reads the bar as "<metric>, <reading>" instead of skipping the purely graphic fill.
-        .accessibilityElement()
-        .accessibilityLabel(data.title)
-        .accessibilityValue(data.headline)
-    }
-
-    /// Fill width with a minimum-visible rule: any non-zero fraction renders at least a full circle
-    /// (width = bar height) so 1–2% never squashes into an invisible sliver — the same idea as the
-    /// menu-bar bars' minimum fill.
-    private func fillWidth(track: CGFloat) -> CGFloat {
-        guard data.hasData, data.fraction > 0 else { return 0 }
-        return max(density.meterHeight, track * data.fraction)
-    }
+    private var meter: some View { QuotaMeterView(data: data) }
 }

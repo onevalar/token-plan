@@ -140,6 +140,35 @@ final class WidgetMeterStyleTests: XCTestCase {
         XCTAssertEqual(reloaded.meterStyle, .used)
     }
 
+    func testRetiredDisplayPreferencesDoNotChangeReadingSeverityOrCountdown() async {
+        let defaults = makeUserDefaults("presentation")
+        defaults.set("absolute", forKey: "resetDisplayMode") // A retired preference cannot change countdowns.
+        let provider = Provider(id: "test", displayName: "Test", icon: .providerMark("codex"))
+        let descriptor = WidgetDescriptor.percent(id: "test.quota", provider: provider, title: "Session")
+        let now = Date(timeIntervalSince1970: 1_800_000_000)
+        let runtime = TestProviderRuntime(provider: provider, descriptors: [descriptor], snapshot: ProviderSnapshot(
+            providerID: provider.id, displayName: provider.displayName,
+            lines: [.progress(label: "Session", used: 80, limit: 100, format: .percent,
+                              resetsAt: now.addingTimeInterval(9360))]
+        ))
+        let registry = WidgetRegistry(providers: [provider], descriptors: [descriptor])
+        let store = WidgetDataStore(registry: registry, providers: [runtime], cache: makeCache(defaults), defaults: defaults)
+        await store.refreshAll()
+        for retiredPresentation in ["bar", "column", "ring"] {
+            defaults.set(retiredPresentation, forKey: "quotaPresentation")
+            for mode in WidgetDisplayMode.allCases {
+                store.meterStyle = mode
+                let reloaded = WidgetDataStore(registry: registry, providers: [], cache: makeCache(defaults), defaults: defaults)
+                let data = reloaded.data(for: descriptor)
+                XCTAssertEqual(data.valueText, mode == .used ? "80%" : "20%")
+                XCTAssertEqual(data.quotaSeverity, .warning)
+                XCTAssertEqual(data.boundedTrailingText(now: now), "2h 36m")
+            }
+            XCTAssertEqual(defaults.string(forKey: "quotaPresentation"), retiredPresentation,
+                           "Retired settings are ignored, not rewritten at startup")
+        }
+    }
+
     // MARK: - Helpers
 
     private func makeRefreshedStore(

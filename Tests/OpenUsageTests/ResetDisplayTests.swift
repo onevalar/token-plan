@@ -1,10 +1,7 @@
 import XCTest
 @testable import OpenUsage
 
-/// Covers the relative/absolute reset display: the shared `Formatters.deadlineLabel` (one helper for
-/// every "<verb> + when" string), its absolute day buckets (ported from the original
-/// `formatResetAbsoluteLabel`), and `WidgetData` honoring the global mode for the trailing label,
-/// the opposite-format tooltip, and the "Limit in …" run-out projection.
+/// Quota countdowns, numeric credit expiries, and the internal detail-date formatters.
 final class ResetDisplayTests: XCTestCase {
     private func utcCalendar() -> Calendar {
         var calendar = Calendar(identifier: .gregorian)
@@ -33,21 +30,15 @@ final class ResetDisplayTests: XCTestCase {
                                                      now: now, calendar: calendar), "Resets soon")
     }
 
-    func testWidgetDataTrailingAndTooltipHonorMode() {
+    func testWidgetDataUsesCountdownWithExactInstantAvailableForDetails() {
         var data = WidgetData(title: "Weekly", icon: .providerMark("codex"),
                               kind: .percent, used: 50, limit: 100)
         data.resetsAt = Date().addingTimeInterval(4 * 24 * 3600 + 17 * 3600) // ~4d17h out
         data.periodDurationMs = 7 * 24 * 60 * 60 * 1000
         XCTAssertTrue(data.hasResetLabel())
 
-        data.resetDisplayMode = .relative
         XCTAssertEqual(data.boundedTrailingText(), "4d 17h")
-        XCTAssertEqual(data.resetTooltip()?.hasPrefix("Resets "), true)         // opposite = absolute
-
-        data.resetDisplayMode = .absolute
-        XCTAssertFalse(data.boundedTrailingText()!.contains("Resets"))
-        XCTAssertTrue(data.boundedTrailingText()!.contains(" · "))
-        XCTAssertEqual(data.resetTooltip()?.hasPrefix("Resets in "), true)      // opposite = relative
+        XCTAssertEqual(data.resetTooltip()?.hasPrefix("Resets "), true)
     }
 
     func testFreshSessionWindowShowsNotStartedAndSuppressesPacing() {
@@ -126,9 +117,7 @@ final class ResetDisplayTests: XCTestCase {
         XCTAssertEqual(data.boundedTrailingText(now: now), "3d 12h")
     }
 
-    func testExpiryTooltipSingleCreditFollowsTimeSetting() {
-        // One reset credit: the row reads "1 available" and the hover tooltip is a single line. Relative
-        // → "Reset expires in 12d 18h"; absolute → a wall-clock phrase ("Reset expires … at …").
+    func testExpiryTooltipSingleCreditUsesCountdown() {
         var data = WidgetData(title: "Rate Limit Resets", icon: .providerMark("codex"),
                               kind: .count, used: 0, limit: nil)
         data.values = [MetricValue(number: 1, kind: .count, label: "available")]
@@ -136,17 +125,12 @@ final class ResetDisplayTests: XCTestCase {
 
         XCTAssertEqual(data.unboundedDetail, "1 available")
 
-        data.resetDisplayMode = .relative
         XCTAssertEqual(data.expiryTooltip, "Reset expires in 12d 18h")
-
-        data.resetDisplayMode = .absolute
-        XCTAssertEqual(data.expiryTooltip?.hasPrefix("Reset expires "), true)
-        XCTAssertEqual(data.expiryTooltip?.contains(" at "), true)        // wall-clock, not "in"
     }
 
     func testExpiryTooltipMultipleCreditsIsNumberedList() {
         // Several credits: the tooltip is a numbered list under a header, sorted soonest-first, each
-        // entry following the global mode. The row itself still reads just the count.
+        // entry using a countdown. The row itself still reads just the count.
         var data = WidgetData(title: "Rate Limit Resets", icon: .providerMark("codex"),
                               kind: .count, used: 0, limit: nil)
         data.values = [MetricValue(number: 2, kind: .count, label: "available")]
@@ -154,8 +138,6 @@ final class ResetDisplayTests: XCTestCase {
             Date().addingTimeInterval(12 * 24 * 3600 + 18 * 3600), // ~12d18h
             Date().addingTimeInterval(22 * 24 * 3600 + 12 * 3600)  // ~22d12h
         ]
-        data.resetDisplayMode = .relative
-
         XCTAssertEqual(data.unboundedDetail, "2 available")
         XCTAssertEqual(data.expiryTooltip, "Resets expire in:\n1. 12d 18h\n2. 22d 12h")
     }
@@ -213,18 +195,19 @@ final class ResetDisplayTests: XCTestCase {
         XCTAssertEqual(entries.map(\.number), [1, 2])
         XCTAssertEqual(entries[0].severity, .critical)   // soonest sorts first
         XCTAssertEqual(entries[1].severity, .normal)
-        XCTAssertEqual(entries[1].time.contains(" at "), true) // exact wall-clock time leads
+        XCTAssertNotNil(entries[1].time.range(of: #"^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$"#, options: .regularExpression))
         XCTAssertEqual(entries[1].countdown, "12d 18h")        // countdown trails
     }
 
-    func testResetsPopoverPastDueAndImminentEntriesReadSoonWithNoCountdown() {
+    func testCreditExpiryKeepsMinuteCountdownAndMarksElapsedDatesExpired() {
         let now = Date(timeIntervalSince1970: 1_800_000_000)
-        for offset in [-60.0, 180.0] {
+        for (offset, label, expired) in [(-60.0, "Expired", true), (0, "Expired", true), (1, "1m", false), (180, "3m", false)] {
             let entries = RateLimitResetsDetail.entries(from: [now.addingTimeInterval(offset)], now: now)
 
             XCTAssertEqual(entries.count, 1)
-            XCTAssertEqual(entries[0].time, "Expiring soon")
-            XCTAssertNil(entries[0].countdown)
+            XCTAssertEqual(entries[0].countdown, label)
+            XCTAssertEqual(entries[0].expired, expired)
+            XCTAssertFalse(entries[0].time.contains("soon"), "Keep the reported expiry even when it elapsed")
             XCTAssertEqual(entries[0].severity, .critical)
         }
     }
@@ -288,31 +271,22 @@ final class ResetDisplayTests: XCTestCase {
         return nil
     }
 
-    func testRunningOutEtaHonorsResetDisplayMode() {
+    func testRunningOutEtaUsesCountdown() {
         // Halfway through a 10h window with 90/100 used → behind pace, projected run-out ~34m away,
         // safely before the reset 5h out. The label carries its own "Limit" verb (no flame in tests),
-        // so the copy reads "Limit in 34m" / "Limit today at …".
+        // so the copy reads "Limit in 34m".
         var data = WidgetData(title: "Session", icon: .providerMark("codex"),
                               kind: .percent, used: 90, limit: 100)
         data.resetsAt = Date().addingTimeInterval(5 * 3600)
         data.periodDurationMs = 10 * 3600 * 1000
 
-        data.resetDisplayMode = .relative
         XCTAssertEqual(runningOutEta(data)?.hasPrefix("Limit in "), true) // e.g. "Limit in 34m"
         XCTAssertEqual(runningOutEta(data)?.hasSuffix("m"), true)         // compact duration like "34m"
-
-        data.resetDisplayMode = .absolute
-        // Wall-clock reading ~34m out: "Limit today at …", or "Limit tomorrow at …" when the test runs
-        // near local midnight (`WidgetData` evaluates against the real clock, so the bucket can roll).
-        let absolute = runningOutEta(data)
-        XCTAssertEqual(absolute?.hasPrefix("Limit today at ") == true
-                        || absolute?.hasPrefix("Limit tomorrow at ") == true, true)
     }
 
     func testNoResetLabelWithoutResetDate() {
         var data = WidgetData(title: "Credits", icon: .providerMark("codex"),
                               kind: .dollars, used: 12, limit: 20)
-        data.resetDisplayMode = .absolute
         XCTAssertFalse(data.hasResetLabel())        // no resetsAt → not a clickable reset
         XCTAssertNil(data.resetTooltip())
         XCTAssertEqual(data.boundedTrailingText(), "$20 limit") // falls back to limit context, unflipped

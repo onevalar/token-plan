@@ -22,6 +22,7 @@ struct CustomizeMetricRow<Handle: View, Trailing: View>: View {
             handle(AnyView(ReorderGrip()))
             Text(title)
                 .foregroundStyle(.primary)
+                .fixedSize(horizontal: false, vertical: true)
             Spacer(minLength: 8)
             trailing
         }

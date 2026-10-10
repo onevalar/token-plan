@@ -669,16 +669,16 @@ final class LayoutStoreTests: XCTestCase {
         // Claude's core meters keep Fable directly below Weekly; optional Sonnet and all history
         // rows belong in subscription details.
         XCTAssertEqual(primaryByProvider["claude"], [
-            "claude.session", "claude.weekly", "claude.fable", "claude.extra", "claude.rateLimitResets"
+            "claude.session", "claude.weekly", "claude.fable", "claude.extra"
         ])
         XCTAssertEqual(expandedByProvider["claude"], [
-            "claude.sonnet", "claude.trend", "claude.today", "claude.yesterday", "claude.last30"
+            "claude.sonnet", "claude.rateLimitResets", "claude.trend", "claude.today", "claude.yesterday", "claude.last30"
         ])
-        XCTAssertEqual(primaryByProvider["codex"], ["codex.session", "codex.weekly", "codex.rateLimitResets"])
+        XCTAssertEqual(primaryByProvider["codex"], ["codex.session", "codex.weekly"])
         // Spark (the optional model-specific limits) leads Details, before credits and history.
         XCTAssertEqual(expandedByProvider["codex"], [
             "codex.spark", "codex.sparkWeekly",
-            "codex.credits", "codex.trend", "codex.today", "codex.yesterday", "codex.last30"
+            "codex.credits", "codex.rateLimitResets", "codex.trend", "codex.today", "codex.yesterday", "codex.last30"
         ])
         XCTAssertEqual(primaryByProvider["devin"], ["devin.daily", "devin.weekly"])
         XCTAssertEqual(expandedByProvider["devin"], ["devin.extra"])
@@ -695,7 +695,7 @@ final class LayoutStoreTests: XCTestCase {
         store.setMetricEnabled("codex.rateLimitResets", false)
         XCTAssertFalse(store.displayGroups.first { $0.id == "codex" }!.widgets.contains {
             $0.descriptorID == "codex.rateLimitResets"
-        }, "Essential reset summaries still respect an explicit Hide")
+        }, "Reset details still respect an explicit Hide")
     }
 
     func testMetricOrderPersistsWhileMetricIsDisabled() {
@@ -1167,6 +1167,31 @@ final class LayoutStoreTests: XCTestCase {
         let historyOnly = try XCTUnwrap(store.displayGroups.first)
         XCTAssertTrue(historyOnly.alwaysShownWidgets.isEmpty)
         XCTAssertFalse(historyOnly.expandedWidgets.isEmpty, "The subscription remains reachable")
+    }
+
+    func testResetCreditsStayInDetailsWithLegacyVisibleAllDetailsAndCreditOnlyLayouts() throws {
+        let runtimes: [ProviderRuntime] = [ClaudeProvider(), CodexProvider()]
+        for runtime in runtimes {
+            let sessionID = "\(runtime.provider.id).session"
+            let resetID = "\(runtime.provider.id).rateLimitResets"
+            let store = LayoutStore(
+                registry: WidgetRegistry(providers: [runtime.provider], descriptors: runtime.widgetDescriptors),
+                defaults: makeDefaults("ResetPlacement.\(runtime.provider.id)"), storageKey: "layout",
+                defaultMetricIDs: [sessionID, resetID], defaultExpandedMetricIDs: []
+            )
+            for expanded in [Set<String>(), Set([sessionID, resetID])] {
+                store.expandedMetricIDs = expanded
+                let group = try XCTUnwrap(store.displayGroups.first)
+                XCTAssertEqual(group.alwaysShownWidgets.map(\.descriptorID), [sessionID])
+                XCTAssertEqual(group.expandedWidgets.map(\.descriptorID), [resetID])
+                XCTAssertTrue(store.isMetricEnabled(resetID), "Moving details preserves the saved selection")
+            }
+            store.setMetricEnabled(sessionID, false)
+            let creditOnly = try XCTUnwrap(store.displayGroups.first)
+            XCTAssertTrue(creditOnly.alwaysShownWidgets.isEmpty, "Never promote reset credits into overview")
+            XCTAssertEqual(creditOnly.expandedWidgets.map(\.descriptorID), [resetID])
+            XCTAssertTrue(store.customizeDetail(for: runtime.provider.id)!.expandedMetrics.contains { $0.id == resetID })
+        }
     }
 
     func testCustomizeProviderIDClearsWhenLeavingCustomize() {
