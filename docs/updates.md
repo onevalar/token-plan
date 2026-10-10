@@ -59,3 +59,5 @@ upload and TestFlight processing are still pending. A passing compiler is not a 
 that every companion-app credential source works in App Sandbox.
 
 The Xcode Cloud workflow `TestFlight 1.0.0` builds branch `testflight/1.0.0`. Cloud build 1 passed the store tests but failed distribution export because the document-container entitlement used a legacy team prefix. Both iCloud container entitlements now use the registered identifier `iCloud.com.onevalar.tokenplan` directly, matching the managed provisioning profile. Cloud validation must complete before calling this build installable.
+
+Cloud build 2 signed and uploaded successfully. The generated app Info.plist now derives its version from MARKETING_VERSION and CURRENT_PROJECT_VERSION instead of XcodeGen defaults; a rebuilt local bundle verified 1.0.0 (1). The cloud workflow distributes successful builds to TokenPlan Internal, currently containing only the owner.

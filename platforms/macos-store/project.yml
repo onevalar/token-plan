@@ -51,6 +51,8 @@ targets:
       path: generated/Info.plist
       properties:
         CFBundleDisplayName: TokenPlan
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         CFBundleIconFile: AppIcon
         LSUIElement: true
         LSApplicationCategoryType: public.app-category.utilities
