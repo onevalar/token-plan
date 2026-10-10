@@ -57,3 +57,5 @@ The owner selected 1.0.0 for the first TestFlight release. Store-target compilat
 resource/path/updater tests passed locally. Signing, sandbox UI/provider acceptance, cloud workflow,
 upload and TestFlight processing are still pending. A passing compiler is not a release or proof
 that every companion-app credential source works in App Sandbox.
+
+The Xcode Cloud workflow `TestFlight 1.0.0` builds branch `testflight/1.0.0`. Cloud build 1 passed the store tests but failed distribution export because the document-container entitlement used a legacy team prefix. Both iCloud container entitlements now use the registered identifier `iCloud.com.onevalar.tokenplan` directly, matching the managed provisioning profile. Cloud validation must complete before calling this build installable.

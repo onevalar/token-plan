@@ -65,7 +65,7 @@ targets:
         com.apple.security.files.bookmarks.app-scope: true
         com.apple.developer.icloud-container-identifiers: [iCloud.com.onevalar.tokenplan]
         com.apple.developer.icloud-services: [CloudDocuments]
-        com.apple.developer.ubiquity-container-identifiers: ['$(TeamIdentifierPrefix)iCloud.com.onevalar.tokenplan']
+        com.apple.developer.ubiquity-container-identifiers: [iCloud.com.onevalar.tokenplan]
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.onevalar.tokenplan
