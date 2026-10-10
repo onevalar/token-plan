@@ -21,7 +21,7 @@ enum OpenRouterAuthError: Error, LocalizedError, Equatable {
     var errorDescription: String? {
         switch self {
         case .missingKey:
-            return tr("No OpenRouter API key. Set OPENROUTER_API_KEY or add it to ~/.config/tokenplan/openrouter.json.")
+            return ProviderUsageErrorText.missingAPIKey("OpenRouter")
         case .invalidKey:
             return tr("OpenRouter API key invalid. Check your key at openrouter.ai/keys.")
         case .saveFailed:

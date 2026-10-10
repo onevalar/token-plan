@@ -8,6 +8,7 @@
 "%@ credits" = "%@ クレジット";
 "%@ left" = "残り %@";
 "%@ purchased" = "%@ 購入済み";
+"%@ rejected the usage request (code %@). Check your account on the provider’s website." = "%1$@ が使用量リクエストを拒否しました（コード %2$@）。サービスのサイトでアカウントを確認してください。";
 "%@ request failed (HTTP %lld)." = "%1$@ のリクエストに失敗しました（HTTP %2$lld）。";
 "%@ requests" = "%@ リクエスト";
 "%@ searches" = "%@ 回の検索";
@@ -42,6 +43,7 @@
 "AI Usage" = "AI 使用状況";
 "API Key" = "APIキー";
 "API Keys" = "APIキー";
+"About" = "情報";
 "About TokenPlan" = "TokenPlan について";
 "Activity" = "アクティビティ";
 "Add" = "追加";
@@ -66,6 +68,7 @@
 "Antigravity credentials are invalid. Open Antigravity or run `agy` to sign in again." = "Antigravity の認証情報が無効です。Antigravity を開くか `agy` を実行して再度サインインしてください。";
 "Antigravity sign-in expired. Open Antigravity or run `agy` to refresh." = "Antigravity のサインインの有効期限が切れました。Antigravity を開くか `agy` を実行して更新してください。";
 "Antigravity usage is temporarily unavailable. Try again shortly." = "Antigravity の使用量は一時的に利用できません。しばらくしてからお試しください。";
+"App Interface" = "アプリの外観";
 "Appearance" = "外観";
 "Auto" = "自動";
 "Available Usage" = "取得済みの使用状況";
@@ -99,6 +102,7 @@
 "Codex CLI logs on this device. Includes logs from different sign-ins, not the current account's complete usage." = "この端末の Codex CLI ログを集計します。別のログイン時の記録も含み、現在のアカウント全体の使用量ではありません。";
 "Codex auth data is invalid." = "Codex の認証データが無効です。";
 "Codex logs" = "Codex ログ";
+"Collapsed" = "折りたたみ";
 "Command Line" = "コマンドライン";
 "Compact" = "コンパクト";
 "Completions" = "補完";
@@ -107,6 +111,7 @@
 "Connection" = "接続";
 "Console" = "コンソール";
 "Consumes one reset credit. Only the usage windows eligible on the server will be reset. This can't be undone." = "リセットクレジットを1つ消費します。サーバーが対象とする利用枠のみリセットされます。この操作は取り消せません。";
+"Content Item" = "項目";
 "Copilot usage data is unavailable for this account." = "このアカウントでは Copilot の使用量データを取得できません。";
 "Copilot usage request failed (HTTP %lld). Try again later." = "Copilot の使用量リクエストに失敗しました（HTTP %lld）。後でもう一度お試しください。";
 "Copilot usage response invalid. Try again later." = "Copilot の使用量の応答が無効です。後でもう一度お試しください。";
@@ -155,12 +160,14 @@
 "Default" = "標準";
 "Density" = "密度";
 "Details" = "詳細";
+"Details Only" = "詳細のみ";
 "Detects provider logins again without resetting your display preferences." = "表示設定をリセットせずにログインを再検出します。";
 "Devin quota data unavailable. Try again later." = "Devin の上限データを取得できません。後でもう一度お試しください。";
 "Disabled" = "無効";
 "Disabling a provider stops its requests. Its existing login remains unchanged." = "プロバイダーを無効にするとリクエストが停止します。既存のログインは変更されません。";
 "Dismiss" = "閉じる";
 "Display & Appearance" = "表示と外観";
+"Display Content" = "表示内容";
 "Display Metrics" = "表示項目";
 "Done" = "完了";
 "Done." = "完了。";
@@ -173,14 +180,18 @@
 "Enable a service with usage history to see totals here." = "使用履歴に対応したサービスを有効にすると、ここに合計を表示します。";
 "Enable services in Services & Subscriptions to configure their menu-bar visibility." = "「サービスと契約」でサービスを有効にすると、メニューバーの表示を設定できます。";
 "Enabled" = "有効";
+"Enabled Services" = "有効なサービス";
+"Enter API Key" = "APIキーを入力";
 "Enterprise usage data unavailable. Try again later." = "Enterprise の使用量データを取得できません。後でもう一度お試しください。";
 "Error" = "エラー";
 "Estimate costs for models that don't have known pricing." = "価格が不明なモデルのコストを見積もります。";
 "Estimated locally, so it may be off" = "ローカルで推定しているため、誤差がある場合があります";
 "Example Data" = "サンプルデータ";
+"Expanded" = "展開済み";
 "Expired" = "期限切れ";
 "Expires %@" = "%@で失効";
 "Expiring soon" = "まもなく期限切れ";
+"Expiry Date" = "有効期限";
 "Expiry times unavailable" = "有効期限を取得できません";
 "Expiry unavailable" = "有効期限不明";
 "Extra Balance" = "追加残高";
@@ -205,6 +216,7 @@
 "Gemini Pro" = "Gemini Pro";
 "Gemini Weekly" = "Gemini 週間";
 "General" = "一般";
+"General Settings" = "一般設定";
 "Gift" = "ギフト";
 "GitHub token invalid or expired. Re-authenticate (gh auth login) and try again." = "GitHub トークンが無効か期限切れです。再認証（gh auth login）してからもう一度お試しください。";
 "Global Shortcut" = "グローバルショートカット";
@@ -250,6 +262,7 @@
 "Limit %@" = "上限 %@";
 "Limit in %@" = "%@ 後に上限";
 "Limit reached" = "上限に達しました";
+"Limit reached. Deselect an item to choose another." = "上限に達しました。別の項目を選ぶには選択を1つ解除してください。";
 "Limit soon" = "まもなく上限";
 "Live usage rate limited - data may be stale" = "リアルタイムの使用量がレート制限中です。データが古い可能性があります";
 "Live usage rate limited - retry in ~%@" = "リアルタイムの使用量がレート制限中です。約 %@ 後に再試行";
@@ -271,15 +284,18 @@
 "Menu Bar Settings" = "メニューバー設定";
 "Menu Bar Style" = "メニューバーのスタイル";
 "Menu Bar: %@" = "メニューバー：%@";
+"Menu Bar: %lld/%lld" = "メニューバー：%lld/%lld";
 "Menu Bar: Percentage shows up to 2 starred metrics; Ring shows one primary quota per selected account." = "メニューバー：パーセントはスター付き項目を最大2つ、リングは選択した各アカウントの主要な利用枠を1つ表示します。";
 "Metric" = "項目";
 "Monitor Your AI Subscriptions with TokenPlan" = "TokenPlan で AI サブスクリプションを監視";
 "Monthly" = "月間";
 "More" = "その他";
 "More Metrics" = "その他の指標";
+"More Usage Details" = "使用量の詳細";
 "Needs Attention" = "確認が必要";
 "Next refresh in %lldm" = "%lld 分後に更新";
 "Next refresh in %llds" = "%lld 秒後に更新";
+"No %@ API key. Open this service’s Settings to add it." = "%1$@ の API キーがありません。このサービスの「設定」で追加してください。";
 "No %@ API key. Set %@ or add it to %@." = "%1$@ の API キーがありません。%2$@ を設定するか、%3$@ に追加してください。";
 "No Enabled Providers" = "有効なプロバイダーがありません";
 "No Ollama key found. Install Ollama and run `ollama signin` to track cloud usage." = "Ollama のキーが見つかりません。Ollama をインストールして `ollama signin` を実行するとクラウド使用量を追跡できます。";
@@ -327,6 +343,7 @@
 "OpenRouter API key invalid. Check your key at openrouter.ai/keys." = "OpenRouter の API キーが無効です。openrouter.ai/keys でキーを確認してください。";
 "OpenRouter request failed (HTTP %lld)." = "OpenRouter のリクエストに失敗しました（HTTP %lld）。";
 "OpenRouter usage data unavailable. Try again later." = "OpenRouter の使用量データを取得できません。後でもう一度お試しください。";
+"Optional, saved on this Mac. Use it for a renewal date or an account reminder." = "任意でこのMacに保存。更新日やアカウントのメモに使えます。";
 "Options" = "オプション";
 "Orb Usage" = "Orb 使用量";
 "Orbs" = "Orb";
@@ -336,6 +353,7 @@
 "Other" = "その他";
 "Other Models" = "その他のモデル";
 "Other Reported Tokens" = "その他の報告済みトークン";
+"Other Services" = "その他のサービス";
 "Outdated" = "古い";
 "Output" = "出力";
 "Override With a Custom Key" = "カスタムキーで上書き";
@@ -441,6 +459,8 @@
 "Show Usage As" = "使用量の表示方法";
 "Show less" = "表示を減らす";
 "Show more" = "もっと見る";
+"Show on Home" = "ホームに表示";
+"Shown Services" = "表示するサービス";
 "Sign in to GitHub Copilot in your editor, or run gh auth login, and try again." = "エディタで GitHub Copilot にサインインするか、gh auth login を実行してからもう一度お試しください。";
 "Sign in to the provider's app or CLI, then restart TokenPlan to detect it. API keys can be entered in the service's settings." = "サービスのアプリやCLIでログインし、TokenPlanを再起動して検出します。APIキーは該当サービスの設定で入力できます。";
 "Sign in with Claude Code, then refresh." = "Claude Code でログインしてから更新してください。";
@@ -449,6 +469,7 @@
 "Some Cursor export rows were invalid. Totals may be incomplete." = "Cursor のエクスポートに無効な行があり、集計が不完全な可能性があります。";
 "Some local token logs were skipped or could not be read. Totals may be incomplete." = "一部のローカルログを読み取れないかスキップしました。集計が不完全な可能性があります。";
 "Some synced usage data couldn’t be read. Check the log for details." = "同期された使用量データの一部を読み取れませんでした。詳細はログを確認してください。";
+"Some usage data is unavailable. Available readings are shown below." = "一部の使用量を取得できません。取得できたデータを表示しています。";
 "Sonnet" = "Sonnet";
 "Spark" = "Spark";
 "Spark Weekly" = "Spark 週間";
@@ -456,6 +477,7 @@
 "Starred for menu bar" = "メニューバーにスター付きで追加しました";
 "Start Antigravity or run `agy` and try again." = "Antigravity を起動するか `agy` を実行してから、もう一度お試しください。";
 "Status" = "ステータス";
+"Status: %@" = "状態：%@";
 "Stop" = "停止";
 "Subscription" = "契約";
 "Subscription Details" = "契約の詳細";
@@ -463,6 +485,7 @@
 "Syncing usage history" = "使用履歴を同期中";
 "System" = "システム";
 "System Default" = "システムの設定に従う";
+"System Menu Bar" = "システムメニューバー";
 "Team accounts have no personal quota. Spend below is still from your Grok logs." = "チームアカウントには個人の上限がありません。以下の支出は引き続き Grok のログから取得しています。";
 "Team request-based usage data unavailable. Try again later." = "チームのリクエスト単位の使用量データを取得できません。後でもう一度お試しください。";
 "Terminal Helper" = "ターミナルヘルパー";
@@ -550,6 +573,7 @@
 "Using reset credit…" = "リセットクレジットを使用中…";
 "Vertical Bar" = "縦棒";
 "Visible" = "表示";
+"Visible appears in the overview; Details appears only here; Hidden removes the metric. Drag the handle to reorder." = "「表示」は概要、「詳細」はこのページのみ、「非表示」は表示しません。左のハンドルで並べ替えます。";
 "Vouchers" = "バウチャー";
 "Waiting for the first update…" = "初回の更新を待っています…";
 "Waiting for this Mac’s first iCloud update…" = "この Mac の最初の iCloud 更新を待っています…";

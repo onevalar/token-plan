@@ -64,7 +64,6 @@ struct SettingsScreen: View {
                             .frame(maxWidth: .infinity).padding(.vertical, 24)
                     }
                 case .appearance: SettingsAppearanceSection()
-                case .menuBar: SettingsMenuBarSection()
                 case .notifications:
                     notificationsSection
                     ICloudSyncSettingsSection(sync: container.iCloudSync)
@@ -77,9 +76,9 @@ struct SettingsScreen: View {
             } else {
                 generalSection
                 section("More") {
-                    ForEach(SettingsPage.allCases, id: \.self) { page in
+                    ForEach(SettingsPage.generalPages, id: \.self) { page in
                         Button {
-                            withAnimation(Motion.navigation) { layout.settingsPage = page }
+                            withAnimation(Motion.navigation) { layout.openSettingsPage(page, from: .generalSettings) }
                         } label: {
                             HStack {
                                 Text(page.title)

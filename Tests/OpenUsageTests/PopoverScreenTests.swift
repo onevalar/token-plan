@@ -43,8 +43,8 @@ final class PopoverScreenTests: XCTestCase {
     func testBackFollowsSettingsSubpagesAndSubscriptionEntryPoint() {
         let store = makeStore("BackRoutes")
         store.screen = .settings
-        for page in SettingsPage.allCases {
-            store.settingsPage = page
+        for page in SettingsPage.generalPages {
+            store.openSettingsPage(page, from: .generalSettings)
             XCTAssertTrue(store.goBack())
             XCTAssertEqual(store.screen, .settings)
             XCTAssertNil(store.settingsPage)
@@ -67,7 +67,7 @@ final class PopoverScreenTests: XCTestCase {
         XCTAssertNil(store.customizeProviderID)
         XCTAssertFalse(store.goBack(), "Only the overview delegates Esc to closing the panel")
         store.screen = .settings
-        store.settingsPage = .advanced
+        store.openSettingsPage(.advanced, from: .generalSettings)
         store.screen = .dashboard
         XCTAssertNil(store.settingsPage, "Reopening Settings never strands the user in a subpage")
     }
@@ -91,7 +91,7 @@ final class PopoverScreenTests: XCTestCase {
         XCTAssertNil(store.displayedCustomizeProviderID)
 
         store.screen = .settings
-        store.settingsPage = .appearance
+        store.openSettingsPage(.appearance)
         XCTAssertEqual(store.displayedSettingsPage, .appearance)
         store.screen = .dashboard // Cmd-, exits even from a secondary Settings page.
         XCTAssertNil(store.settingsPage)
@@ -99,10 +99,54 @@ final class PopoverScreenTests: XCTestCase {
                       "The outgoing Appearance page must not become main Settings before sliding away")
         store.screen = .settings
         XCTAssertNil(store.displayedSettingsPage, "A new visit starts at main Settings")
-        store.settingsPage = .advanced
+        store.openSettingsPage(.advanced, from: .generalSettings)
         store.goBack()
         XCTAssertEqual(store.screen, .settings)
         XCTAssertNil(store.displayedSettingsPage)
+    }
+
+    func testEveryDashboardSettingsDestinationReturnsDirectlyHome() {
+        let store = makeStore("DirectSettings")
+        for page in SettingsPage.dashboardPages {
+            store.openSettingsPage(page)
+            XCTAssertEqual(store.settingsPage, page)
+            XCTAssertEqual(store.screen, .settings)
+            XCTAssertTrue(store.goBack())
+            XCTAssertEqual(store.screen, .dashboard, "\(page) must not invent a General Settings parent")
+            XCTAssertNil(store.settingsPage)
+            XCTAssertEqual(store.displayedSettingsPage, page, "The outgoing page keeps its title during the slide")
+            XCTAssertFalse(store.goBack())
+        }
+    }
+
+    func testSettingsReturnOriginDoesNotLeakAcrossEntryPointsOrReopening() {
+        let store = makeStore("SettingsOrigins")
+        store.openSettingsPage()
+        store.openSettingsPage(.notifications, from: .generalSettings)
+        store.goBack()
+        XCTAssertEqual(store.screen, .settings)
+        XCTAssertNil(store.settingsPage)
+        store.goBack()
+        XCTAssertEqual(store.screen, .dashboard)
+
+        store.openSettingsPage(.history)
+        store.screen = .dashboard // Closing the panel resets both destination and origin.
+        store.openSettingsPage()
+        XCTAssertNil(store.settingsPage)
+        store.goBack()
+        XCTAssertEqual(store.screen, .dashboard)
+
+        store.openSettingsPage(.advanced, from: .generalSettings)
+        store.openSettingsPage(.appearance) // A direct entry replaces the old return path.
+        store.goBack()
+        XCTAssertEqual(store.screen, .dashboard)
+    }
+
+    func testSettingsDestinationsHaveNoDuplicateMenuEntries() {
+        XCTAssertEqual(SettingsPage.dashboardPages, [.appearance, .history],
+                       "Menu-bar controls belong inside Appearance, not in a separate destination")
+        XCTAssertTrue(Set(SettingsPage.dashboardPages).isDisjoint(with: SettingsPage.generalPages))
+        XCTAssertEqual(Set(SettingsPage.dashboardPages + SettingsPage.generalPages), Set(SettingsPage.allCases))
     }
 
     private func makeStore(_ name: String) -> LayoutStore {

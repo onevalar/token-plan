@@ -364,6 +364,7 @@ final class OpenCodeProviderTests: XCTestCase {
             ).refresh()
             XCTAssertNil(snapshot.errorCategory)
             XCTAssertNil(snapshot.plan)
+            XCTAssertNotNil(snapshot.warning)
             XCTAssertNil(snapshot.line(label: "Session"))
             XCTAssertNotNil(snapshot.line(label: "Today"))
         }

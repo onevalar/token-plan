@@ -180,8 +180,7 @@ final class ResetDisplayTests: XCTestCase {
     }
 
     func testResetsPopoverEntriesAreSoonestFirstAndNumbered() {
-        // The popover timeline sorts the credits soonest-first, numbers them from 1, and pairs each
-        // exact expiry time with its countdown. Per-credit dot color reuses the row's severity bands.
+        // The read-only list preserves each expiry and numbers cards in soonest-first order.
         let now = Date(timeIntervalSince1970: 1_800_000_000)
         let entries = RateLimitResetsDetail.entries(
             from: [
@@ -193,22 +192,20 @@ final class ResetDisplayTests: XCTestCase {
         )
 
         XCTAssertEqual(entries.map(\.number), [1, 2])
-        XCTAssertEqual(entries[0].severity, .critical)   // soonest sorts first
-        XCTAssertEqual(entries[1].severity, .normal)
+        XCTAssertLessThan(entries[0].date, entries[1].date)
         XCTAssertNotNil(entries[1].time.range(of: #"^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$"#, options: .regularExpression))
-        XCTAssertEqual(entries[1].countdown, "12d 18h")        // countdown trails
     }
 
-    func testCreditExpiryKeepsMinuteCountdownAndMarksElapsedDatesExpired() {
+    func testCreditExpiryKeepsExactDatesAndMarksElapsedDatesExpired() {
         let now = Date(timeIntervalSince1970: 1_800_000_000)
-        for (offset, label, expired) in [(-60.0, "Expired", true), (0, "Expired", true), (1, "1m", false), (180, "3m", false)] {
+        for (offset, expired) in [(-60.0, true), (0, true), (1, false), (180, false)] {
             let entries = RateLimitResetsDetail.entries(from: [now.addingTimeInterval(offset)], now: now)
 
             XCTAssertEqual(entries.count, 1)
-            XCTAssertEqual(entries[0].countdown, label)
+            XCTAssertEqual(entries[0].date, now.addingTimeInterval(offset))
             XCTAssertEqual(entries[0].expired, expired)
             XCTAssertFalse(entries[0].time.contains("soon"), "Keep the reported expiry even when it elapsed")
-            XCTAssertEqual(entries[0].severity, .critical)
+            XCTAssertEqual(entries[0].accessibilityLabel.contains("Expired"), expired)
         }
     }
 
@@ -290,6 +287,14 @@ final class ResetDisplayTests: XCTestCase {
         XCTAssertFalse(data.hasResetLabel())        // no resetsAt → not a clickable reset
         XCTAssertNil(data.resetTooltip())
         XCTAssertEqual(data.boundedTrailingText(), "$20 limit") // falls back to limit context, unflipped
+    }
+
+    func testModelScopedWeeklyTitlesDoNotRepeatTheCycle() {
+        for (title, scope) in [(tr("Claude Weekly"), "Claude"), (tr("Spark Weekly"), "Spark")] {
+            var data = WidgetData(title: title, icon: .providerMark("antigravity"), kind: .percent, used: 0, limit: 100)
+            data.periodDurationMs = MetricPeriod.weekMs
+            XCTAssertEqual(data.overviewTitle, "\(scope) · 1w")
+        }
     }
 
     func testOverviewNamesCycleWithoutInventingDeadlineAndPreservesModelScope() {

@@ -7,12 +7,12 @@ struct CustomizeProviderDetailView: View {
     @Environment(LayoutStore.self) private var layout
     @Environment(AppContainer.self) private var container
     @Environment(WidgetDataStore.self) private var dataStore
-    @Environment(\.codexResetClaims) private var codexResetClaims
     let providerID: String
     let reorderSpaceName: String
     @Binding var reorderLift: ReorderLift?
     let frameStore: ReorderFrameStore
 
+    @State private var showsSettings = false
     @State private var activeMetricID: String?
     @State private var isPresentingResetConfirm = false
     @AppStorage(DensitySetting.key) private var density = DensitySetting.regular
@@ -20,27 +20,54 @@ struct CustomizeProviderDetailView: View {
     var body: some View {
         if let group = layout.customizeDetail(for: providerID) {
             VStack(alignment: .leading, spacing: density.sectionSpacing) {
-                usageSection(group)
-                SubscriptionConnectionSection(providerID: providerID)
-                metricSections(group)
-                    .simultaneousGesture(metricDragGesture())
-                Button("Restore Defaults…") { isPresentingResetConfirm = true }
-                    .buttonStyle(.plain).foregroundStyle(.secondary).padding(.horizontal, 8)
-                    .alert("Restore Defaults?", isPresented: $isPresentingResetConfirm) {
-                        Button("Restore", role: .destructive) {
-                            withAnimation(Motion.spring) { layout.resetProvider(providerID) }
-                        }
-                        Button("Cancel", role: .cancel) {}
-                    } message: {
-                        Text("Restores this subscription's metric visibility, order and menu-bar selection. Other subscriptions are unchanged.")
+                HStack {
+                    ProviderSectionHeader(provider: group.provider, plan: dataStore.plan(for: providerID))
+                    SubscriptionStatusLabel(providerID: providerID)
+                    Button {
+                        Task { await dataStore.refresh(providerID: providerID, force: true) }
+                    } label: {
+                        Label("Refresh", systemImage: "arrow.clockwise")
+                            .font(.caption.weight(.medium))
+                            .padding(.horizontal, 9).frame(height: 28)
+                            .background(.primary.opacity(0.055), in: RoundedRectangle(cornerRadius: 6))
                     }
-                if let keyProvider = container.apiKeyProviders.first(where: { $0.provider.id == providerID }) {
-                    APIKeysSection(provider: keyProvider)
+                    .buttonStyle(.plain).foregroundStyle(.secondary)
+                    .fixedSize()
+                    .disabled(dataStore.refreshingProviderIDs.contains(providerID))
+                    .accessibilityLabel("Refresh Usage")
                 }
-                if ProviderAccountID.family(of: providerID) == "codex" {
-                    CodexPricingSection(providerIDs: container.registry.providers
-                        .map(\.id)
-                        .filter { ProviderAccountID.family(of: $0) == "codex" })
+                .padding(.horizontal, 8)
+                HStack(spacing: 4) {
+                    detailTab("Usage", settings: false)
+                    detailTab("Settings", settings: true)
+                }
+                .padding(4)
+                .background(.primary.opacity(0.04), in: RoundedRectangle(cornerRadius: 8))
+                if showsSettings {
+                    if let keyProvider = container.apiKeyProviders.first(where: { $0.provider.id == providerID }) {
+                        APIKeysSection(provider: keyProvider)
+                    }
+                    metricSections(group).simultaneousGesture(metricDragGesture())
+                    SubscriptionNoteSection(providerID: providerID)
+                    if ProviderAccountID.family(of: providerID) == "codex" {
+                        DetailDisclosure(title: "Cost Estimates") {
+                            CodexPricingSection(providerIDs: container.registry.providers
+                                .map(\.id).filter { ProviderAccountID.family(of: $0) == "codex" })
+                        }
+                    }
+                    Button("Restore Defaults…") { isPresentingResetConfirm = true }
+                        .buttonStyle(.plain).font(.caption).foregroundStyle(.secondary)
+                        .padding(.horizontal, 8)
+                        .alert("Restore Defaults?", isPresented: $isPresentingResetConfirm) {
+                            Button("Restore", role: .destructive) {
+                                withAnimation(Motion.spring) { layout.resetProvider(providerID) }
+                            }
+                            Button("Cancel", role: .cancel) {}
+                        } message: {
+                            Text("Restores this subscription's metric visibility, order and menu-bar selection. Other subscriptions are unchanged.")
+                        }
+                } else {
+                    usageSection(group)
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -53,52 +80,87 @@ struct CustomizeProviderDetailView: View {
         }
     }
 
+    private func detailTab(_ title: LocalizedStringKey, settings: Bool) -> some View {
+        Button { showsSettings = settings } label: {
+            Text(title).font(.subheadline.weight(.medium))
+                .frame(maxWidth: .infinity).padding(.vertical, 7)
+                .background(showsSettings == settings ? Theme.accent.opacity(0.14) : .clear,
+                            in: RoundedRectangle(cornerRadius: 6))
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .foregroundStyle(showsSettings == settings ? Theme.accent : Color.secondary)
+        .accessibilityAddTraits(showsSettings == settings ? .isSelected : [])
+    }
+
     private func usageSection(_ group: ProviderMetrics) -> some View {
-        VStack(alignment: .leading, spacing: density.headerToCardSpacing) {
-            ProviderSectionHeader(provider: group.provider, plan: dataStore.plan(for: providerID))
-                .padding(.horizontal, 8)
-            DashboardMetricCard {
-                if let notice = dataStore.headerNotice(for: providerID) {
-                    ProviderNoticeRow(message: notice)
-                }
-                ForEach(group.metrics.filter { layout.isMetricEnabled($0.id) }, id: \.id) { metric in
-                    if metric.sample.showsResetExpiries { Divider().padding(.horizontal, 14) }
+        let enabled = group.metrics.filter { layout.isMetricEnabled($0.id) }
+        let primary = enabled.filter { !$0.sample.isChart && !$0.sample.isUsagePeriod && !$0.sample.showsResetExpiries }
+        let credits = enabled.filter { $0.sample.showsResetExpiries }
+        let additional = enabled.filter { ($0.sample.isChart || $0.sample.isUsagePeriod) && !$0.sample.showsResetExpiries }
+        return VStack(alignment: .leading, spacing: density.sectionSpacing) {
+            if let notice = dataStore.headerNotice(for: providerID) {
+                ProviderNoticeRow(message: notice)
+            }
+            DashboardMetricCard(tableColumns: QuotaTableColumns(rows: primary.map { dataStore.data(for: $0) }, density: density)) {
+                ForEach(primary, id: \.id) { metric in
                     WidgetRowView(data: dataStore.data(for: metric), showsDetails: true)
-                        .environment(\.codexResetClaim, codexResetClaims[providerID])
                 }
-                if !group.provider.visibleLinks.isEmpty {
-                    ProviderLinksView(links: group.provider.visibleLinks)
+            }
+            .cardSurface()
+            ForEach(credits, id: \.id) { metric in
+                WidgetRowView(data: dataStore.data(for: metric), showsDetails: true)
+                    .padding(.vertical, density.cardGutter)
+                    .cardSurface()
+            }
+            if !additional.isEmpty {
+                VStack(spacing: 0) {
+                    ForEach(additional, id: \.id) { metric in
+                        WidgetRowView(data: dataStore.data(for: metric), showsDetails: true)
+                    }
                 }
+                .padding(.vertical, density.cardGutter)
+                .cardSurface()
+            }
+            if !group.provider.visibleLinks.isEmpty {
+                ProviderLinksView(links: group.provider.visibleLinks)
             }
         }
     }
 
     private func metricSections(_ group: ProviderMetrics) -> some View {
-        VStack(alignment: .leading, spacing: density.sectionSpacing) {
-            metricSection("Display Metrics", metrics: group.metrics, providerID: group.provider.id)
-            Text("Menu Bar: Percentage shows up to 2 starred metrics; Ring shows one primary quota per selected account.")
-                .font(.caption).foregroundStyle(.secondary).padding(.horizontal, 8)
-        }
-    }
-
-    // MARK: - Metric sections
-
-    private func metricSection(_ title: String, metrics: [WidgetDescriptor], providerID: String) -> some View {
-        VStack(alignment: .leading, spacing: density.headerToCardSpacing) {
-            Text(tr(title))
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(.secondary)
-                .padding(.horizontal, 8)
+        let pinCount = layout.pinnedCount(forProvider: providerID)
+        let atLimit = pinCount >= LayoutStore.maxPinsPerProvider
+        return VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text("Display Content").font(.subheadline.weight(.semibold))
+                Spacer()
+                Text(trf("Menu Bar: %lld/%lld", pinCount, LayoutStore.maxPinsPerProvider))
+                    .font(.caption.monospacedDigit())
+                    .foregroundStyle(atLimit ? Theme.notice : AnyShapeStyle(.secondary))
+                    .padding(.horizontal, 8).padding(.vertical, 4)
+                    .background(.primary.opacity(0.04), in: RoundedRectangle(cornerRadius: 6))
+            }
+            .padding(.horizontal, 8)
             VStack(spacing: 0) {
-                HStack {
-                    Text("Metric")
+                HStack(spacing: 10) {
+                    Text("Content Item")
                     Spacer(minLength: 8)
-                    Text("Overview").frame(width: 100)
-                    Text("Menu Bar").frame(width: 58)
+                    Text("Status").frame(width: 100)
+                    Label("Menu Bar", systemImage: "menubar.rectangle")
+                        .labelStyle(.iconOnly).frame(width: 58)
                 }
-                .font(.caption).foregroundStyle(.secondary).padding(.horizontal, 12).padding(.vertical, 8)
-                ForEach(metrics, id: \.id) { metric in
-                    metricRow(metric, in: providerID)
+                .font(.caption).foregroundStyle(.secondary)
+                .padding(.horizontal, 12).padding(.vertical, 8)
+                if atLimit {
+                    Label("Limit reached. Deselect an item to choose another.", systemImage: "info.circle")
+                        .font(.caption).foregroundStyle(Theme.notice)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal, 12).padding(.vertical, 8)
+                        .background(Theme.notice.opacity(0.06))
+                }
+                ForEach(group.metrics, id: \.id) { metric in
+                    metricRow(metric, in: group.provider.id)
                 }
             }
             .cardSurface()
@@ -116,18 +178,18 @@ struct CustomizeProviderDetailView: View {
                 AnyView(grip.reorderFrame(id: "grip:\(metric.id)", in: .named(reorderSpaceName)))
             },
             trailing: {
-                Picker("Overview", selection: Binding(
+                Picker("Status", selection: Binding(
                     get: { placement(of: metric) },
                     set: { setPlacement($0, for: metric) }
                 )) {
                     if !metric.sample.isChart && !metric.sample.isUsagePeriod && !metric.sample.showsResetExpiries {
-                        Text("Visible").tag(MetricPlacement.visible)
+                        Text("Show on Home").tag(MetricPlacement.visible)
                     }
-                    Text("Details").tag(MetricPlacement.details)
+                    Text("Details Only").tag(MetricPlacement.details)
                     Text("Hidden").tag(MetricPlacement.hidden)
                 }
                 .labelsHidden().pickerStyle(.menu).frame(width: 100)
-                .accessibilityLabel(trf("Overview: %@", metric.title))
+                .accessibilityLabel(trf("Status: %@", metric.title))
                 StarButton(metric: metric).frame(width: 58)
             }
         )
@@ -234,27 +296,21 @@ struct CustomizeProviderDetailView: View {
     }
 }
 
-/// The labeled menu-bar checkbox preserves pin feedback and the per-provider cap. No tooltips.
+/// Disable unavailable slots before interaction; selected items stay enabled for removal.
 private struct StarButton: View {
     let metric: WidgetDescriptor
     @Environment(LayoutStore.self) private var layout
-    @State private var shakeTrigger = 0
 
     var body: some View {
         if metric.pinnable {
             let pinned = layout.isPinned(metric.id)
-            Toggle("Menu Bar", isOn: Binding(get: { pinned }, set: { _ in
-                if layout.canPin(metric.id) {
-                    layout.togglePin(metric.id)
-                    layout.presentCustomizationNotice(pinned ? "Removed from menu bar" : "Starred for menu bar")
-                } else {
-                    shakeTrigger += 1
-                    layout.presentCustomizationNotice(layout.pinDenialReason(metric.id) ?? "Up to 2 stars per provider", tone: .notice)
-                }
+            Toggle("Menu Bar", isOn: Binding(get: { pinned }, set: { selected in
+                layout.setPinned(selected, for: metric.id)
             }))
             .toggleStyle(.checkbox).labelsHidden()
+            .disabled(!layout.canPin(metric.id))
+            .opacity(layout.canPin(metric.id) ? 1 : 0.35)
             .accessibilityLabel(trf("Menu Bar: %@", metric.title))
-            .denyShake(trigger: shakeTrigger)
             .animation(Motion.spring, value: pinned)
         } else {
             Text("—").foregroundStyle(.tertiary).accessibilityLabel("Unavailable")

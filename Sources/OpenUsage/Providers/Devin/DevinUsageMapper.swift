@@ -114,10 +114,18 @@ enum DevinUsageMapper {
 enum DevinUsageError: Error, LocalizedError, Equatable {
     case invalidResponse
     case quotaUnavailable
+    case connectionFailed
+    case requestFailed(Int)
 
     var errorDescription: String? {
         switch self {
-        case .invalidResponse, .quotaUnavailable:
+        case .connectionFailed:
+            return ProviderUsageErrorText.connectionFailed
+        case .requestFailed(let status):
+            return ProviderUsageErrorText.requestFailed(statusCode: status)
+        case .invalidResponse:
+            return ProviderUsageErrorText.invalidResponse
+        case .quotaUnavailable:
             return tr("Devin quota data unavailable. Try again later.")
         }
     }

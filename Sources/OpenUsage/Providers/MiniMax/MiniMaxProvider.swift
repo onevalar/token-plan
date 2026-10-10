@@ -16,7 +16,7 @@ final class MiniMaxProvider: ProviderRuntime {
         keysPage: "platform.minimaxi.com/user-center/basic-information/interface-key"
     )
     static let endpoints: [URL] = [
-        URL(string: "https://www.minimaxi.com/v1/api/openplatform/coding_plan/remains")!,
+        URL(string: "https://www.minimaxi.com/v1/token_plan/remains")!,
         URL(string: "https://www.minimax.io/v1/token_plan/remains")!
     ]
 
@@ -61,26 +61,33 @@ final class MiniMaxProvider: ProviderRuntime {
         guard let key = await loadOffMainActor({ [authStore] in authStore.loadAPIKey() }) else {
             return .error(provider: provider, error: authStore.missingKeyError)
         }
-        var sawAuthFailure = false
-        var lastError: KeyBalanceError?
         for url in Self.endpoints {
             switch await KeyBalanceFetcher.get(url, apiKey: key, provider: Self.spec.name, http: http,
                                                extraHeaders: ["Content-Type": "application/json"]) {
             case .authFailure:
-                sawAuthFailure = true
+                continue
             case .failed(let error):
-                lastError = error
+                return .error(provider: provider, error: error)
             case .ok(let body):
+                guard let root = ProviderParse.jsonObject(body) else {
+                    return .error(provider: provider, error: KeyBalanceError.invalidResponse(provider: Self.spec.name))
+                }
+                if let base = root["base_resp"] as? [String: Any],
+                   let code = ProviderParse.number(base["status_code"]), code != 0 {
+                    // MiniMax also rejects credentials in HTTP 200 responses.
+                    if code == 1004 { continue }
+                    return .error(provider: provider, error: KeyBalanceError.serviceRejected(provider: Self.spec.name, code: String(format: "%g", code)))
+                }
+                if let models = root["model_remains"] as? [[String: Any]], models.isEmpty {
+                    return .error(provider: provider, error: KeyBalanceError.notAvailable(provider: Self.spec.name, reason: String(localized: "No active Coding Plan found for this key.")))
+                }
                 if let lines = MiniMaxUsageMapper.map(body, now: now()) {
                     return .make(provider: provider, plan: nil, lines: lines, refreshedAt: now())
                 }
-                lastError = .notAvailable(provider: Self.spec.name, reason: String(localized: "No active Coding Plan found for this key."))
+                return .error(provider: provider, error: KeyBalanceError.invalidResponse(provider: Self.spec.name))
             }
         }
-        if sawAuthFailure && lastError == nil {
-            return .error(provider: provider, error: authStore.invalidKeyError)
-        }
-        return .error(provider: provider, error: lastError ?? authStore.invalidKeyError)
+        return .error(provider: provider, error: authStore.invalidKeyError)
     }
 }
 
@@ -92,42 +99,41 @@ extension MiniMaxProvider: APIKeyManaging {
 }
 
 enum MiniMaxUsageMapper {
-    /// Builds Session (+ Weekly when the payload carries weekly counts) from the model with the largest
-    /// window quota — the plan's headline text-model pool. Returns `nil` when there is nothing to meter.
+    /// Uses the text-model pool and prefers explicit percentages over legacy counts.
+    /// Returns nil for missing or malformed quota data.
     static func map(_ body: Data, now: Date) -> [MetricLine]? {
         guard let root = ProviderParse.jsonObject(body),
               let models = root["model_remains"] as? [[String: Any]], !models.isEmpty else { return nil }
-        guard let primary = models
-            .filter({ (ProviderParse.number($0["current_interval_total_count"]) ?? 0) > 0 })
-            .max(by: { (ProviderParse.number($0["current_interval_total_count"]) ?? 0)
-                     < (ProviderParse.number($1["current_interval_total_count"]) ?? 0) }) else { return nil }
+        // Text-model quota only: speech/image pools often have much larger numeric allowances.
+        guard let primary = models.first(where: {
+            ($0["model_name"] as? String)?.lowercased().hasPrefix("minimax-m") == true
+        }) else { return nil }
 
         var lines: [MetricLine] = []
-        if let total = ProviderParse.number(primary["current_interval_total_count"]),
-           let remaining = ProviderParse.number(primary["current_interval_usage_count"]) {
-            let end = ProviderParse.number(primary["end_time"]).map { Date(timeIntervalSince1970: $0 / 1000) }
-            let start = ProviderParse.number(primary["start_time"]).map { Date(timeIntervalSince1970: $0 / 1000) }
-            let periodMs: Int? = (start != nil && end != nil) ? Int(end!.timeIntervalSince(start!) * 1000) : nil
-            lines.append(.progress(
-                label: "Session",
-                used: percentUsed(total: total, remaining: remaining),
-                limit: 100,
-                format: .percent,
-                resetsAt: end.flatMap { $0 > now ? $0 : nil },
-                periodDurationMs: periodMs
-            ))
-        }
-        if let weeklyTotal = ProviderParse.number(primary["current_weekly_total_count"]), weeklyTotal > 0,
-           let weeklyRemaining = ProviderParse.number(primary["current_weekly_usage_count"]) {
-            let weeklyEnd = ProviderParse.number(primary["weekly_end_time"]).map { Date(timeIntervalSince1970: $0 / 1000) }
-            lines.append(.progress(
-                label: "Weekly",
-                used: percentUsed(total: weeklyTotal, remaining: weeklyRemaining),
-                limit: 100,
-                format: .percent,
-                resetsAt: weeklyEnd.flatMap { $0 > now ? $0 : nil },
-                periodDurationMs: 7 * 24 * 3600 * 1000
-            ))
+        for (label, prefix, startKey, endKey) in [
+            ("Session", "current_interval", "start_time", "end_time"),
+            ("Weekly", "current_weekly", "weekly_start_time", "weekly_end_time")
+        ] {
+            // Unlimited windows have no bounded percentage to display.
+            if ProviderParse.number(primary[prefix + "_status"]) == 3 { continue }
+            let used: Double?
+            if primary[prefix + "_remaining_percent"] != nil {
+                guard let remaining = ProviderParse.number(primary[prefix + "_remaining_percent"]), remaining >= 0 else { return nil }
+                used = ProviderParse.clampPercent(100 - remaining)
+            } else if let total = ProviderParse.number(primary[prefix + "_total_count"]), total > 0,
+                      let remaining = ProviderParse.number(primary[prefix + "_usage_count"]), remaining >= 0 {
+                used = percentUsed(total: total, remaining: remaining)
+            } else {
+                used = nil
+            }
+            guard let used else { continue }
+            let end = ProviderParse.number(primary[endKey]).map { Date(timeIntervalSince1970: $0 / 1000) }
+            let start = ProviderParse.number(primary[startKey]).map { Date(timeIntervalSince1970: $0 / 1000) }
+            let duration = start.flatMap { start in end.map { $0.timeIntervalSince(start) * 1000 } }
+            let periodMs = duration.flatMap { $0 > 0 && $0 < Double(Int.max) ? Int($0) : nil }
+            lines.append(.progress(label: label, used: used, limit: 100, format: .percent,
+                                   resetsAt: end.flatMap { $0 > now ? $0 : nil },
+                                   periodDurationMs: periodMs))
         }
         return lines.isEmpty ? nil : lines
     }

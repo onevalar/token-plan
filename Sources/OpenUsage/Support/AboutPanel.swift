@@ -1,44 +1,32 @@
 import AppKit
 
-/// Presents the standard macOS About panel for the footer menu's "About TokenPlan" item.
-///
-/// As a menu-bar accessory app, TokenPlan is not the active app while the popover is showing, so the
-/// app is activated first — otherwise the panel would open behind whatever app currently owns the
-/// foreground. The panel pulls the app icon, name, and version (`CFBundleShortVersionString` — the
-/// same string `AppInfo.version` surfaces in the footer) straight from the bundle; we only supply the
-/// product description and the bundled license notice.
+/// A compact version-only panel. Keep the controller alive so repeated openings reuse one window.
+@MainActor
 enum AboutPanel {
-    static var licenseURL: URL { Bundle.openUsageResources.url(forResource: "LICENSE", withExtension: "txt")! }
+    private static var controller: NSWindowController?
 
-    @MainActor
     static func present() {
-        NSApp.activate(ignoringOtherApps: true)
-        NSApplication.shared.orderFrontStandardAboutPanel(options: [.credits: credits])
-    }
-
-    /// The standard panel renders the local license link as clickable, without sending any data.
-    private static var credits: NSAttributedString {
-        let paragraph = NSMutableParagraphStyle()
-        paragraph.alignment = .center
-
-        let base: [NSAttributedString.Key: Any] = [
-            .font: NSFont.systemFont(ofSize: 11),
-            .foregroundColor: NSColor.secondaryLabelColor,
-            .paragraphStyle: paragraph,
-        ]
-
-        let credits = NSMutableAttributedString()
-        credits.append(NSAttributedString(string: tr("Your AI usage, limits and subscriptions at a glance."), attributes: base))
-        credits.append(NSAttributedString(string: "\n\n", attributes: base))
-        credits.append(link(tr("License"), licenseURL.absoluteString, base: base))
-        return credits
-    }
-
-    private static func link(_ text: String, _ urlString: String, base: [NSAttributedString.Key: Any]) -> NSAttributedString {
-        var attributes = base
-        if let url = URL(string: urlString) {
-            attributes[.link] = url
+        if controller == nil {
+            let panel = NSPanel(contentRect: NSRect(x: 0, y: 0, width: 280, height: 100),
+                                styleMask: [.titled, .closable], backing: .buffered, defer: false)
+            panel.title = tr("About")
+            panel.isReleasedWhenClosed = false
+            let version = NSTextField(labelWithString: AppInfo.version)
+            version.font = .systemFont(ofSize: 17, weight: .medium)
+            version.alignment = .center
+            version.translatesAutoresizingMaskIntoConstraints = false
+            let content = NSView()
+            content.addSubview(version)
+            NSLayoutConstraint.activate([
+                version.centerXAnchor.constraint(equalTo: content.centerXAnchor),
+                version.centerYAnchor.constraint(equalTo: content.centerYAnchor)
+            ])
+            panel.contentView = content
+            panel.center()
+            controller = NSWindowController(window: panel)
         }
-        return NSAttributedString(string: text, attributes: attributes)
+        NSApp.activate(ignoringOtherApps: true)
+        controller?.showWindow(nil)
+        controller?.window?.makeKeyAndOrderFront(nil)
     }
 }

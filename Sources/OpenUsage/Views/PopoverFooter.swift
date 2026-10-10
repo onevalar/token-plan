@@ -11,7 +11,6 @@ struct PopoverFooter: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, horizontalPadding)
             .padding(.vertical, 12)
-            .barGlass()
             .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { onHeightChange($0) }
     }
 }

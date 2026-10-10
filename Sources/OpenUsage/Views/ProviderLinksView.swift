@@ -49,7 +49,7 @@ struct ProviderLinksView: View {
             }
             .frame(maxWidth: .infinity)
         }
-        .buttonStyle(.bordered)
+        .buttonStyle(TokenPlanButtonStyle())
         .controlSize(.small)
         .accessibilityLabel("\(link.label), opens in browser")
     }

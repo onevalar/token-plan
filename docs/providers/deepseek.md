@@ -15,7 +15,7 @@ Tracks your [DeepSeek 深度求索](https://platform.deepseek.com) API account b
 DeepSeek has no companion app that TokenPlan can reuse a credential from, so you supply an API key. TokenPlan
 reads it from the first place it finds one:
 
-1. `~/.config/tokenplan/deepseek.json` — `{"apiKey":"…"}` (the file **Customize → DeepSeek → API Key** writes to)
+1. `~/.config/tokenplan/deepseek.json` — `{"apiKey":"…"}` (the file **Services & Subscriptions → DeepSeek → Settings → API Key** writes to)
 2. The `DEEPSEEK_API_KEY` environment variable
 
 Nothing leaves your Mac except the single request below, sent to `api.deepseek.com`.
@@ -23,8 +23,8 @@ Nothing leaves your Mac except the single request below, sent to `api.deepseek.c
 ## Setup
 
 1. Create an API key at [platform.deepseek.com/api_keys](https://platform.deepseek.com/api_keys).
-2. Paste it into **Customize → DeepSeek → API Key**, **or** export it (`export DEEPSEEK_API_KEY="YOUR_KEY"`).
-3. DeepSeek appears on the dashboard on the next refresh (turn it on in Customize if it isn't already).
+2. Paste it into **Services & Subscriptions → DeepSeek → Settings → API Key**, **or** export it (`export DEEPSEEK_API_KEY="YOUR_KEY"`).
+3. DeepSeek appears on the dashboard on the next refresh (turn it on in Services & Subscriptions if it isn't already).
 
 ## Under the hood
 
@@ -40,3 +40,5 @@ Nothing leaves your Mac except the single request below, sent to `api.deepseek.c
 | DeepSeek usage data unavailable… | The response had an unexpected shape. Please report it with the log (Settings → Advanced). |
 
 > These endpoints were written from the provider's public documentation and have not been exercised against every account type. If a card shows an unexpected value, check the log and open an issue.
+
+The whale mark is extracted from [DeepSeek’s official logo](https://github.com/deepseek-ai/DeepSeek-LLM/blob/main/images/logo.svg). Regression coverage checks missing keys, saved-key authorization, successful balance mapping, rejected keys and malformed responses using an in-memory credential store and mocked HTTP responses. These tests do not substitute for a live-account check.

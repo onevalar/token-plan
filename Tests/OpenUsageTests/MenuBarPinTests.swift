@@ -48,6 +48,29 @@ final class MenuBarPinTests: XCTestCase {
         XCTAssertTrue(store.canPin("a.m3"))
     }
 
+    func testPinAvailabilityTracksRemovalReplacementAndUndo() {
+        let store = makeStore("selectionAvailability")
+        store.setPinned(true, for: "a.m1")
+        store.setPinned(true, for: "a.m2")
+        XCTAssertFalse(store.canPin("a.m3"))
+        XCTAssertTrue(store.canPin("a.m1"), "Selected checkboxes must remain removable at the cap")
+        XCTAssertTrue(store.canPin("b.m1"), "The cap must not disable another subscription")
+
+        store.setPinned(false, for: "a.m1")
+        XCTAssertEqual(store.pinnedCount(forProvider: "a"), 1)
+        XCTAssertTrue(store.canPin("a.m3"))
+        store.setPinned(true, for: "a.m3")
+        XCTAssertFalse(store.canPin("a.m1"))
+        XCTAssertEqual(store.pinnedCount(forProvider: "a"), 2)
+
+        XCTAssertTrue(store.undo())
+        XCTAssertTrue(store.canPin("a.m1"))
+        XCTAssertEqual(store.pinnedCount(forProvider: "a"), 1)
+        XCTAssertTrue(store.undo())
+        XCTAssertFalse(store.canPin("a.m3"))
+        XCTAssertEqual(store.pinnedCount(forProvider: "a"), 2)
+    }
+
     func testEachProviderCanPinUpToTwo() {
         let store = makeStore("manyProviders")
         for provider in ["a", "b"] {

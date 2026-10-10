@@ -46,6 +46,7 @@ final class DevinProvider: ProviderRuntime {
     func refresh() async -> ProviderSnapshot {
         var sawAPIKey = false
         var sawAuthFailure = false
+        var lastFailure: DevinUsageError?
         let credentials = await loadOffMainActor { [authStore] in authStore.loadCredentialsFile() }
 
         if let credentials {
@@ -55,8 +56,8 @@ final class DevinProvider: ProviderRuntime {
                 return snapshot(from: mapped)
             case .authFailure:
                 sawAuthFailure = true
-            case .unavailable:
-                break
+            case .failed(let error):
+                lastFailure = error
             }
         }
 
@@ -69,11 +70,14 @@ final class DevinProvider: ProviderRuntime {
                 return snapshot(from: mapped)
             case .authFailure:
                 sawAuthFailure = true
-            case .unavailable:
-                break
+            case .failed(let error):
+                lastFailure = error
             }
         }
 
+        if let lastFailure {
+            return ProviderSnapshot.error(provider: provider, error: lastFailure)
+        }
         if sawAuthFailure {
             return ProviderSnapshot.error(provider: provider, error: DevinAuthError.notLoggedIn)
         }
@@ -91,11 +95,13 @@ final class DevinProvider: ProviderRuntime {
                 return .authFailure
             }
             guard (200..<300).contains(response.statusCode) else {
-                return .unavailable
+                return .failed(.requestFailed(response.statusCode))
             }
             return .success(try DevinUsageMapper.mapUserStatusResponse(response))
+        } catch let error as DevinUsageError {
+            return .failed(error)
         } catch {
-            return .unavailable
+            return .failed(.connectionFailed)
         }
     }
 
@@ -113,5 +119,5 @@ final class DevinProvider: ProviderRuntime {
 private enum DevinAuthAttempt {
     case success(DevinMappedUsage)
     case authFailure
-    case unavailable
+    case failed(DevinUsageError)
 }

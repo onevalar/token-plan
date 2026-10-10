@@ -21,7 +21,7 @@ enum ZAIAuthError: Error, LocalizedError, Equatable {
     var errorDescription: String? {
         switch self {
         case .missingKey:
-            return tr("No Z.ai API key. Set ZAI_API_KEY or add it to ~/.config/tokenplan/zai.json.")
+            return ProviderUsageErrorText.missingAPIKey("Z.ai")
         case .invalidKey:
             return tr("Z.ai API key invalid. Check your key at z.ai/manage-apikey/apikey-list.")
         case .saveFailed:

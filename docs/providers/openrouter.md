@@ -19,7 +19,7 @@ TokenPlan shows the reported tier (such as "Pay as you go" or "Free tier") besid
 
 Unlike the other providers, OpenRouter has no companion app or CLI that leaves a credential on your
 machine, so you supply an API key. Create one at [openrouter.ai/keys](https://openrouter.ai/keys),
-then add it in **Settings → API Keys** (recommended): expand OpenRouter, paste the key, and Save.
+then add it in **Services & Subscriptions → OpenRouter → Settings → API Key** (recommended): expand OpenRouter, paste the key, and Save.
 The key is stored at `~/.config/tokenplan/openrouter.json` and picked up on the next refresh.
 
 You can also provide the key directly (checked in this order, first match wins):
@@ -43,7 +43,7 @@ the saved key falls back to the environment key, or to none.
 
 ## Troubleshooting
 
-- **"No OpenRouter API key"** — add the key in Settings → API Keys (or the config file / env var), then refresh.
+- **"No OpenRouter API key"** — add the key in Services & Subscriptions → OpenRouter → Settings → API Key (or the config file / env var), then refresh.
 - **"API key invalid"** — the key was rejected (401/403). Check or recreate it at openrouter.ai/keys.
 
 ## Under the hood
@@ -51,10 +51,12 @@ the saved key falls back to the environment key, or to none.
 Two REST calls with a `Bearer` token against `https://openrouter.ai/api/v1`:
 
 - `GET /credits` — account-wide `total_credits` and `total_usage`; the Credits meter and Balance come
-  from these. Required for a usable snapshot.
+  from these. A usable `/key` response can still supply partial usage when `/credits` is unavailable.
 - `GET /key` — best-effort: the tier, daily/weekly/monthly spend, and an optional per-key cap
   (`limit` minus `limit_remaining` for the current window). If this call fails, the balance still
   renders from `/credits`.
 
 A period spend of `$0.00` is shown as a real, measured zero (the API reports it directly) rather than
 "No data". Credit values may be up to ~60 seconds stale on OpenRouter's side.
+
+A partial endpoint failure keeps the readings that succeeded and shows a warning; the log records which endpoint failed without including credentials or response bodies.

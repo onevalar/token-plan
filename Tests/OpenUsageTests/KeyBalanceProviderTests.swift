@@ -83,12 +83,11 @@ final class KeyBalanceAuthTests: XCTestCase {
         }
     }
 
-    func testMissingKeyMessageNamesProviderEnvAndFile() {
+    func testMissingKeyMessageNamesProviderAndSettingsAction() {
         let error = KeyBalanceAuthStore(spec: MoonshotProvider.spec, files: FakeFiles(), environment: FakeEnvironment()).missingKeyError
         let text = error.localizedDescription
         XCTAssertTrue(text.contains("Kimi"))
-        XCTAssertTrue(text.contains("MOONSHOT_API_KEY"))
-        XCTAssertTrue(text.contains("moonshot.json"))
+        XCTAssertEqual(text, ProviderUsageErrorText.missingAPIKey("Kimi"))
         XCTAssertEqual(error.errorCategory, .notLoggedIn)
     }
 }
@@ -116,5 +115,28 @@ final class RefreshIntervalSettingTests: XCTestCase {
         RefreshSetting.setMinutes(3, defaults: d, center: center) // not an offered option
         XCTAssertEqual(RefreshSetting.minutes(defaults: d), 15)
         XCTAssertEqual(posts, 1)
+    }
+}
+
+@MainActor
+final class DeepSeekRefreshTests: XCTestCase {
+    func testSavedKeyRefreshAndFailures() async throws {
+        let http = FakeHTTPClient(response: HTTPResponse(statusCode: 200, headers: [:], body: Data(#"{"balance_infos":[{"currency":"CNY","total_balance":"110","granted_balance":"10","topped_up_balance":"100"}]}"#.utf8)))
+        let provider = DeepSeekProvider(authStore: KeyBalanceAuthStore(spec: DeepSeekProvider.spec, files: FakeFiles(), environment: FakeEnvironment()), http: http)
+        let missing = await provider.refresh()
+        XCTAssertEqual(missing.errorCategory, .notLoggedIn)
+        XCTAssertTrue(http.requests.isEmpty)
+        try provider.saveAPIKey("fixture-key")
+        let success = await provider.refresh()
+        XCTAssertNil(success.errorCategory)
+        XCTAssertEqual(success.lines.count, 3)
+        XCTAssertEqual(http.requests.first?.url, DeepSeekProvider.balanceURL)
+        XCTAssertEqual(http.requests.first?.headers["Authorization"], "Bearer fixture-key")
+        http.response = HTTPResponse(statusCode: 401, headers: [:], body: Data())
+        let invalid = await provider.refresh()
+        XCTAssertEqual(invalid.errorCategory, .authInvalid)
+        http.response = HTTPResponse(statusCode: 200, headers: [:], body: Data("{}".utf8))
+        let malformed = await provider.refresh()
+        XCTAssertEqual(malformed.errorCategory, .decoding)
     }
 }

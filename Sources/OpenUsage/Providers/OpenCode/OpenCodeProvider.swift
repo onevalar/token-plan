@@ -150,6 +150,7 @@ final class OpenCodeProvider: ProviderRuntime {
             }
         }
 
+        var partialWarning: String?
         let scan: OpenCodeUsageScan?
         do {
             scan = try await usageScanner.scan(now: refreshedAt)
@@ -161,6 +162,7 @@ final class OpenCodeProvider: ProviderRuntime {
                 LogTag.plugin("opencode"),
                 "local database unreadable; showing Go meters only: \(error.localizedDescription)"
             )
+            partialWarning = error.localizedDescription
             scan = nil
         }
 
@@ -202,7 +204,8 @@ final class OpenCodeProvider: ProviderRuntime {
                     modelUsage: $0.logScan.modelUsage,
                     unknownModelsByDay: $0.logScan.unknownModelsByDay
                 )
-            }
+            },
+            warning: partialWarning ?? goError?.localizedDescription ?? authReadError?.localizedDescription
         )
     }
 

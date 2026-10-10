@@ -120,6 +120,42 @@ final class ProviderHeaderLayoutTests: XCTestCase {
         }
     }
 
+    func testAntigravityScopedTitlesFitOneLineInBothDensities() {
+        for density in DensitySetting.allCases {
+            let rows = [("Claude", MetricPeriod.sessionMs), (tr("Claude Weekly"), MetricPeriod.weekMs)].map { title, period in
+                var data = WidgetData(title: title, icon: .providerMark("antigravity"), kind: .percent, used: 0, limit: 100)
+                data.periodDurationMs = period
+                data.resetsAt = Date().addingTimeInterval(6 * 86_400 + 23 * 3600)
+                return data
+            }
+            let columns = QuotaTableColumns(rows: rows, density: density)
+            for row in rows {
+                let width = (row.overviewTitle as NSString).size(withAttributes: [.font: NSFont.systemFont(ofSize: density.supportingPointSize)]).width
+                XCTAssertLessThanOrEqual(width, columns.title, "Model and cycle should fit without wrapping")
+            }
+        }
+    }
+
+    func testExpiryRowsKeepUniformHeightForPastAndFutureDates() throws {
+        for density in DensitySetting.allCases {
+            let suite = "ExpiryRows.\(UUID().uuidString)"
+            let defaults = try XCTUnwrap(UserDefaults(suiteName: suite))
+            defaults.set(density.rawValue, forKey: DensitySetting.key)
+            defer { defaults.removePersistentDomain(forName: suite) }
+            let now = Date()
+            var heights: [Int] = []
+            for offsets in [[3600.0, 86_400.0], [-3600.0, 86_400.0]] {
+                let renderer = ImageRenderer(content: RateLimitResetsDetail(count: 2, expiries: offsets.map { now.addingTimeInterval($0) })
+                    .defaultAppStorage(defaults))
+                renderer.proposedSize = ProposedViewSize(width: 284, height: nil)
+                let image = try XCTUnwrap(renderer.cgImage)
+                XCTAssertLessThanOrEqual(image.width, 284)
+                heights.append(image.height)
+            }
+            XCTAssertEqual(heights[0], heights[1], "An expired badge must not push an individual card onto another line")
+        }
+    }
+
     private func blueFillSpans(_ bitmap: NSBitmapImageRep) -> [Int] {
         var spans: [Int] = []
         var insideTrack = false

@@ -109,9 +109,13 @@ final class ZAIProvider: ProviderRuntime {
     private func loadOptional(_ call: () async throws -> HTTPResponse) async -> Data? {
         do {
             let response = try await call()
-            guard (200..<300).contains(response.statusCode) else { return nil }
+            guard (200..<300).contains(response.statusCode) else {
+                AppLog.warn(LogTag.plugin("zai"), "optional subscription lookup failed (HTTP \(response.statusCode))")
+                return nil
+            }
             return response.body
         } catch {
+            AppLog.warn(LogTag.plugin("zai"), "optional subscription lookup failed (transport)")
             return nil
         }
     }

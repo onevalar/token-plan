@@ -230,6 +230,7 @@ final class OpenRouterProviderTests: XCTestCase {
 
         XCTAssertFalse(snapshot.lines.contains { $0.isError })
         XCTAssertNotNil(snapshot.line(label: "Balance"))
+        XCTAssertNotNil(snapshot.warning)
     }
 
     func testRefreshShowsKeyDataWhenCreditsForbidden() async {
@@ -250,6 +251,7 @@ final class OpenRouterProviderTests: XCTestCase {
         XCTAssertFalse(snapshot.lines.contains { $0.isError })
         XCTAssertNotNil(snapshot.line(label: "Today"))
         XCTAssertNil(snapshot.line(label: "Balance"))
+        XCTAssertNotNil(snapshot.warning)
     }
 
     func testRefreshWithoutKeyReportsNotLoggedIn() async {

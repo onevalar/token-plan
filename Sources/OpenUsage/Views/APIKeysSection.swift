@@ -28,7 +28,7 @@ struct APIKeysSection: View {
     @State private var revealedKey: String?
     @State private var actionError: String?
 
-    private static let inputPlaceholder = "sk-or-v1-…"
+    private static var inputPlaceholder: String { tr("Enter API Key") }
 
     var body: some View {
         VStack(alignment: .leading, spacing: density.headerToCardSpacing) {
@@ -44,11 +44,11 @@ struct APIKeysSection: View {
                 }
             }
             .cardSurface()
-            // Clip the recessed editor block to the card's rounded corners so its flush rectangle
-            // background can't poke out of the card's rounded bottom.
-            .clipShape(Theme.cardShape)
         }
-        .onAppear { status = provider.apiKeyStatus }
+        .onAppear {
+            status = provider.apiKeyStatus
+            if status == .notSet { isOpen = true }
+        }
     }
 
     // MARK: - Rows
@@ -60,10 +60,10 @@ struct APIKeysSection: View {
             Text(provider.provider.displayName)
             Spacer(minLength: 8)
             statusDot
-            Button(isOpen ? "Done" : (status == .notSet ? "Add" : "Edit")) {
+            Button(tr(isOpen ? "Done" : (status == .notSet ? "Add" : "Edit"))) {
                 toggleExpand()
             }
-            .buttonStyle(.bordered)
+            .buttonStyle(TokenPlanButtonStyle())
             .controlSize(.small)
         }
         .padding(.horizontal, 12)
@@ -113,7 +113,6 @@ struct APIKeysSection: View {
         }
         .padding(12)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Rectangle().fill(.fill.quinary))
         .onChange(of: overrideChecked) { _, isOn in
             // Flipping into override mode starts a fresh entry; flipping back drops the draft.
             if isOn { input = ""; revealInput = false }
@@ -136,7 +135,7 @@ struct APIKeysSection: View {
                 onClear: nil
             )
         } else {
-            let hint = sourceHint
+            let hint = tr(sourceHint)
             let display = revealDisplay ? (revealedKey ?? hint) : hint
             // Only a saved (config-file) key can be cleared here — an env-only key can't be deleted
             // from the app. Clearing an override falls back to the env key.
@@ -171,14 +170,14 @@ struct APIKeysSection: View {
     }
 
     private func primaryButton(_ title: String, disabled: Bool, action: @escaping () -> Void) -> some View {
-        Button(title, action: action)
-            .buttonStyle(.borderedProminent)
+        Button(tr(title), action: action)
+            .buttonStyle(TokenPlanButtonStyle(prominent: true))
             .controlSize(.small)
             .disabled(disabled)
     }
 
     private func ghostButton(_ title: String, action: @escaping () -> Void) -> some View {
-        Button(title, action: action)
+        Button(tr(title), action: action)
             .buttonStyle(.borderless)
             .controlSize(.small)
     }
@@ -278,7 +277,8 @@ private struct APIKeyField: View {
                     SecureField(placeholder, text: $text)
                 }
             }
-            .textFieldStyle(.roundedBorder)
+            .textFieldStyle(.plain)
+            .tokenPlanField()
             fieldIcon(reveal ? "eye.slash" : "eye", action: onReveal, label: reveal ? "Hide" : "Show")
         }
     }
@@ -293,6 +293,6 @@ private struct APIKeyField: View {
                 .contentShape(Rectangle())
         }
         .buttonStyle(.borderless)
-        .accessibilityLabel(label)
+        .accessibilityLabel(tr(label))
     }
 }

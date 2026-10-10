@@ -159,6 +159,8 @@ extension DevinAuthError: CategorizedError {
 extension DevinUsageError: CategorizedError {
     var errorCategory: ErrorCategory {
         switch self {
+        case .connectionFailed: .network
+        case .requestFailed(let status): ErrorCategory.http(status)
         case .invalidResponse: .decoding
         case .quotaUnavailable: .notAvailable
         }

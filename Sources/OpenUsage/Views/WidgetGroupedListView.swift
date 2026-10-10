@@ -40,6 +40,11 @@ struct WidgetGroupedListView: View {
                         section(group, service: service, rows: rowsByProvider[group.id]!, columns: columns)
                     }
                 }
+                .overlay(alignment: .top) {
+                    if service.id != services.first?.id {
+                        Divider().offset(y: -density.sectionSpacing / 2)
+                    }
+                }
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -79,7 +84,7 @@ struct WidgetGroupedListView: View {
                 .accessibilityLabel(String(localized: "Open \(group.provider.displayName)"))
             }
             if let note = container.subscriptionNotes.overviewNote(for: group.id) {
-                Text(note).font(.caption).foregroundStyle(.secondary).padding(.horizontal, 10)
+                Text(note).font(.caption).foregroundStyle(.secondary).lineLimit(2).padding(.horizontal, 10)
             }
             if let notice = dataStore.headerNotice(for: providerID) {
                 ProviderNoticeRow(message: notice)

@@ -4,6 +4,10 @@ import Foundation
 /// verbatim (transport failure, malformed response, non-2xx status). Providers whose wording
 /// intentionally differs — e.g. Grok's "billing" phrasing — keep their own strings.
 enum ProviderUsageErrorText {
+    static func missingAPIKey(_ provider: String) -> String {
+        String(localized: "No \(provider) API key. Open this service’s Settings to add it.")
+    }
+
     /// The request never completed (network/transport failure).
     static var connectionFailed: String { tr("Usage request failed. Check your connection.") }
     /// The response came back but could not be parsed.

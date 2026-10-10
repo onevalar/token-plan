@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Display semantics and appearance share one page; menu-bar controls have their own page.
+/// One display destination, grouped by usage readings, app interface and system menu bar.
 struct SettingsAppearanceSection: View {
     @Environment(WidgetDataStore.self) private var dataStore
     @Environment(PopoverTransparencyStore.self) private var transparency
@@ -9,9 +9,10 @@ struct SettingsAppearanceSection: View {
     @AppStorage(ReduceAnimationsSetting.key) private var reduceAnimations = ReduceAnimationsSetting.fallback
 
     var body: some View {
-        VStack(spacing: density.sectionSpacing) {
-            usageSection
-            appearanceSection
+        VStack(alignment: .leading, spacing: density.sectionSpacing) {
+            section("Usage Display") { usageSection }
+            section("App Interface") { appearanceSection }
+            section("System Menu Bar") { SettingsMenuBarSection() }
         }
     }
 
@@ -25,10 +26,6 @@ struct SettingsAppearanceSection: View {
                 .frame(maxWidth: .infinity, alignment: .leading).padding(.horizontal, 12)
             WidgetRowView(data: displayPreview)
                 .environment(\.quotaTableColumns, QuotaTableColumns(rows: [displayPreview], density: density))
-            Text("Overview and details always use horizontal bars. Ring is available only in the menu bar.")
-                .font(.caption).foregroundStyle(.secondary)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, 12).padding(.bottom, 8)
         }
         .cardSurface()
     }
@@ -72,6 +69,13 @@ struct SettingsAppearanceSection: View {
             }
         }
         .cardSurface()
+    }
+
+    private func section(_ title: LocalizedStringKey, @ViewBuilder content: () -> some View) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(title).font(.subheadline.weight(.semibold)).padding(.horizontal, 8)
+            content()
+        }
     }
 
     private func row(_ title: LocalizedStringKey, @ViewBuilder control: () -> some View) -> some View {

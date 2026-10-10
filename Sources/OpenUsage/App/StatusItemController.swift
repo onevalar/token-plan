@@ -256,11 +256,11 @@ final class StatusItemController: NSObject {
         if panel.isVisible { hidePanel() }
 
         let menu = NSMenu()
-        menu.addItem(ClosureMenuItem(title: tr("Settings"), systemSymbol: "gearshape", keyEquivalent: ",") { [weak self] in
+        menu.addItem(ClosureMenuItem(title: tr("General Settings"), systemSymbol: "gearshape", keyEquivalent: ",") { [weak self] in
             self?.openSettings()
         })
         menu.addItem(.separator())
-        menu.addItem(ClosureMenuItem(title: tr("Quit TokenPlan"), systemSymbol: "power", keyEquivalent: "q") {
+        menu.addItem(ClosureMenuItem(title: tr("Quit"), systemSymbol: "power", keyEquivalent: "q") {
             NSApplication.shared.terminate(nil)
         })
 
@@ -272,7 +272,7 @@ final class StatusItemController: NSObject {
     /// Opens the dashboard popover on the Settings screen — Settings is an in-popover screen, not a
     /// separate window. The screen is set before showing the panel so it opens already sized to Settings.
     private func openSettings() {
-        container.layout.screen = .settings
+        container.layout.openSettingsPage()
         if !panel.isVisible {
             showPanel()
         }

@@ -22,7 +22,6 @@ struct DashboardMetricCard<Rows: View>: View {
         }
         .environment(\.quotaTableColumns, tableColumns)
         .padding(.vertical, density.cardGutter)
-        .cardSurface()
     }
 }
 

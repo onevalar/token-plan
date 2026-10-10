@@ -90,3 +90,24 @@ in-app **Settings → API Keys** card manages its key with no per-provider UI wo
 
 Persist the key to a file the auth store already checks (don't introduce a parallel store), so the
 file remains the source of truth and a user can still edit it by hand.
+
+## Credential and Usage Verification
+
+A settings page opening is not provider verification. Exercise the provider's real `refresh()` path
+with isolated credentials and HTTP fixtures: missing credentials, rejected credentials, network failure,
+rate limiting, server failure, malformed payload, measured zero, and partial endpoint failure. Check
+that each error remains actionable and does not turn missing data into a zero reading or a false
+subscription claim. `ProviderBoundaryAuditTests` covers the six manually configured API-key services
+and Devin's failure classification.
+
+For a separately authorized live-account check on a developer Mac:
+
+```bash
+TOKENPLAN_AUDIT_PROVIDER=copilot swift test -j 2 --filter ProviderLiveAuditTests
+```
+
+Select one provider ID at a time. This opt-in test reads the existing local login and calls its real
+usage API; normal test runs skip it. It prints categories and metric labels, not credentials or raw
+responses. Missing credentials, transport failures, and a status-only response are not passes. A
+successful fetch still needs comparison with the provider's own usage page before claiming numerical
+accuracy for that account/plan. Keep mock coverage, live fetches, and console comparisons distinct.

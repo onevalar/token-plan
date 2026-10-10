@@ -12,6 +12,7 @@ struct CustomizeProviderListView: View {
     @Binding var reorderLift: ReorderLift?
     let frameStore: ReorderFrameStore
 
+    @State private var showsOtherServices = false
     @State private var activeProviderID: String?
     @State private var isPresentingResetConfirm = false
     @AppStorage(DensitySetting.key) private var density = DensitySetting.regular
@@ -20,15 +21,25 @@ struct CustomizeProviderListView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: density.sectionSpacing) {
-            Text("Uses your provider login. No TokenPlan sign-in is needed.")
-                .font(.caption).foregroundStyle(.secondary).padding(.horizontal, 8)
-            ProviderLoginHelpView().padding(12).cardSurface()
-            VStack(spacing: 0) {
-                ForEach(orderedRows) { row in
+            VStack(alignment: .leading, spacing: 0) {
+                Text("Enabled Services")
+                    .font(.caption.weight(.semibold)).foregroundStyle(.secondary)
+                    .padding(.horizontal, 12)
+                ForEach(orderedRows.filter(\.isEnabled)) { row in
                     providerRow(row)
                 }
             }
-            .cardSurface()
+            DisclosureGroup("Other Services", isExpanded: $showsOtherServices) {
+                VStack(spacing: 0) {
+                    ForEach(orderedRows.filter { !$0.isEnabled }) { row in
+                        providerRow(row)
+                    }
+                }
+                .padding(.top, 8)
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            ProviderLoginHelpView()
             Button("Restore All Defaults…") { isPresentingResetConfirm = true }
                 .buttonStyle(.plain).foregroundStyle(.secondary).padding(.horizontal, 8)
                 .alert("Restore All Defaults?", isPresented: $isPresentingResetConfirm) {
@@ -42,16 +53,10 @@ struct CustomizeProviderListView: View {
                 } message: {
                     Text("Restores service visibility, metric order and menu-bar selections to their defaults. Connection details and notes are unchanged.")
                 }
-            // App behavior/appearance options live on the other screen; catch users who came here
-            // hunting for them once they've scanned past the provider list.
-            ScreenCrossLinkRow(
-                systemImage: "gearshape",
-                title: "Settings",
-                subtitle: "Notifications, appearance and more",
-                destination: .settings
-            )
+
         }
-        .animation(Motion.spring, value: orderedRows.map(\.id))
+        .animation(Motion.spring, value: orderedRows.filter(\.isEnabled).map(\.id))
+        .animation(Motion.spring, value: showsOtherServices)
         .onChange(of: layout.customizeProviderID) { _, _ in isPresentingResetConfirm = false }
         .onChange(of: layout.screen) { _, _ in isPresentingResetConfirm = false }
     }

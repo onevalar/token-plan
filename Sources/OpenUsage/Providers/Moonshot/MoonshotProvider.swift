@@ -59,26 +59,20 @@ final class MoonshotProvider: ProviderRuntime {
         guard let key = await loadOffMainActor({ [authStore] in authStore.loadAPIKey() }) else {
             return .error(provider: provider, error: authStore.missingKeyError)
         }
-        var sawAuthFailure = false
-        var lastError: KeyBalanceError?
         for host in Self.hosts {
             switch await KeyBalanceFetcher.get(host.url, apiKey: key, provider: Self.spec.name, http: http) {
             case .authFailure:
-                sawAuthFailure = true
+                continue
             case .failed(let error):
-                lastError = error
+                return .error(provider: provider, error: error)
             case .ok(let body):
                 guard let lines = MoonshotUsageMapper.map(body, kind: host.kind) else {
-                    lastError = .invalidResponse(provider: Self.spec.name)
-                    continue
+                    return .error(provider: provider, error: KeyBalanceError.invalidResponse(provider: Self.spec.name))
                 }
                 return .make(provider: provider, plan: nil, lines: lines, refreshedAt: now())
             }
         }
-        if sawAuthFailure && lastError == nil {
-            return .error(provider: provider, error: authStore.invalidKeyError)
-        }
-        return .error(provider: provider, error: lastError ?? authStore.invalidKeyError)
+        return .error(provider: provider, error: authStore.invalidKeyError)
     }
 }
 

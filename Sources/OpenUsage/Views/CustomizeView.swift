@@ -57,6 +57,7 @@ struct CustomizeView: View {
                 reorderLift: $reorderLift,
                 frameStore: frameStore
             )
+            .id(id)
             .transition(.move(edge: .trailing))
         } else {
             CustomizeProviderListView(

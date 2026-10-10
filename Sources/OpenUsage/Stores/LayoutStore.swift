@@ -35,9 +35,9 @@ final class LayoutStore {
         get { navigation.customizeProviderID }
         set { navigation.customizeProviderID = newValue }
     }
-    var settingsPage: SettingsPage? {
-        get { navigation.settingsPage }
-        set { navigation.settingsPage = newValue }
+    var settingsPage: SettingsPage? { navigation.settingsPage }
+    func openSettingsPage(_ page: SettingsPage? = nil, from entryPoint: SettingsEntryPoint = .dashboard) {
+        navigation.openSettingsPage(page, from: entryPoint)
     }
     /// The outgoing page's render route remains frozen while its logical selection is cleared.
     var displayedCustomizeProviderID: String? { navigation.displayedCustomizeProviderID }

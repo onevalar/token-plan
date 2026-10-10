@@ -12,13 +12,14 @@ enum KeyBalanceError: Error, LocalizedError, Equatable, CategorizedError {
     case connectionFailed(provider: String)
     case invalidResponse(provider: String)
     case requestFailed(provider: String, status: Int)
+    case serviceRejected(provider: String, code: String)
     /// The key works but the account has nothing to meter (e.g. MiniMax key without a coding plan).
     case notAvailable(provider: String, reason: String)
 
     var errorDescription: String? {
         switch self {
-        case .missingKey(let provider, let env, let file):
-            return String(localized: "No \(provider) API key. Set \(env) or add it to \(file).")
+        case .missingKey(let provider, _, _):
+            return ProviderUsageErrorText.missingAPIKey(provider)
         case .invalidKey(let provider, let keysPage):
             return String(localized: "\(provider) API key invalid. Check your key at \(keysPage).")
         case .saveFailed(let provider):
@@ -29,6 +30,8 @@ enum KeyBalanceError: Error, LocalizedError, Equatable, CategorizedError {
             return String(localized: "Couldn't reach \(provider). Check your connection.")
         case .invalidResponse(let provider):
             return String(localized: "\(provider) usage data unavailable. Try again later.")
+        case .serviceRejected(let provider, let code):
+            return String(localized: "\(provider) rejected the usage request (code \(code)). Check your account on the provider’s website.")
         case .requestFailed(let provider, let status):
             return String(localized: "\(provider) request failed (HTTP \(status)).")
         case .notAvailable(let provider, let reason):
@@ -40,7 +43,7 @@ enum KeyBalanceError: Error, LocalizedError, Equatable, CategorizedError {
         switch self {
         case .missingKey: .notLoggedIn
         case .invalidKey: .authInvalid
-        case .saveFailed, .deleteFailed: .other
+        case .saveFailed, .deleteFailed, .serviceRejected: .other
         case .connectionFailed: .network
         case .invalidResponse: .decoding
         case .requestFailed(_, let status): ErrorCategory.http(status)
@@ -131,7 +134,6 @@ enum KeyBalanceFetcher {
 /// Parsing helpers for balance payloads that carry money as decimal strings ("110.00").
 enum KeyBalanceParse {
     static func decimal(_ value: Any?) -> Double? {
-        if let string = value as? String { return Double(string.trimmingCharacters(in: .whitespaces)) }
         return ProviderParse.number(value)
     }
 

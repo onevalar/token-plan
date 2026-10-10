@@ -20,18 +20,32 @@ enum PopoverScreen: Hashable, Sendable {
 }
 
 enum SettingsPage: CaseIterable, Hashable {
-    case appearance, menuBar, history, notifications, advanced
+    case appearance, history, notifications, advanced
+
+    /// Each destination has one visible entry point.
+    static let dashboardPages: [SettingsPage] = [.appearance, .history]
+    static let generalPages: [SettingsPage] = [.notifications, .advanced]
+
+    var symbol: String {
+        switch self {
+        case .appearance: "paintpalette"
+        case .history: "clock.arrow.circlepath"
+        case .notifications: "bell"
+        case .advanced: "slider.horizontal.3"
+        }
+    }
 
     var title: String {
         switch self {
         case .history: tr("Usage History")
         case .appearance: tr("Display & Appearance")
-        case .menuBar: tr("Menu Bar")
         case .notifications: tr("Notifications & Sync")
         case .advanced: tr("Privacy & Advanced")
         }
     }
 }
+
+enum SettingsEntryPoint { case dashboard, generalSettings }
 
 /// In-popover navigation: which screen is showing, the master/detail route inside Customize, and the
 /// horizontal screen-switch slide bookkeeping. Split out of `LayoutStore` (which owns the *layout* —
@@ -63,7 +77,10 @@ final class PopoverNavigationStore {
             // never a stranded detail screen. The popover-closed reset sets `screen = .dashboard`, so
             // this also covers close/reopen.
             if screen != .customize { customizeProviderID = nil }
-            if screen != .settings { settingsPage = nil }
+            if screen != .settings {
+                settingsPage = nil
+                settingsEntryPoint = .dashboard
+            }
         }
     }
     /// Supports DashboardView's horizontal screen-switch slide: the screen being left, plus a counter
@@ -80,7 +97,16 @@ final class PopoverNavigationStore {
     /// shows that provider's metric sections and API key. UI-only (not persisted): cleared when leaving
     /// Customize (see `screen`'s didSet) and on popover close.
     var customizeProviderID: String?
-    var settingsPage: SettingsPage?
+    private(set) var settingsPage: SettingsPage?
+    private var settingsEntryPoint = SettingsEntryPoint.dashboard
+
+    /// Store the entry point explicitly so Back never invents a visit to General Settings.
+    func openSettingsPage(_ page: SettingsPage? = nil, from entryPoint: SettingsEntryPoint = .dashboard) {
+        screen = .settings
+        settingsPage = page
+        settingsEntryPoint = page == nil ? .dashboard : entryPoint
+    }
+
     private var customizeReturnScreen = PopoverScreen.dashboard
     private var openedDashboardDetail = false
     private var outgoingCustomizeProviderID: String?
@@ -101,7 +127,12 @@ final class PopoverNavigationStore {
         switch screen {
         case .dashboard: return false
         case .settings:
-            if settingsPage != nil { settingsPage = nil } else { screen = .dashboard }
+            if settingsPage != nil, settingsEntryPoint == .generalSettings {
+                settingsPage = nil
+                settingsEntryPoint = .dashboard
+            } else {
+                screen = .dashboard
+            }
         case .customize:
             if customizeProviderID != nil, !openedDashboardDetail {
                 customizeProviderID = nil

@@ -74,7 +74,12 @@ final class OpenRouterProvider: ProviderRuntime {
         }
 
         if !lines.isEmpty {
-            return ProviderSnapshot.make(provider: provider, plan: plan, lines: lines, refreshedAt: now())
+            let partial = !credits.succeeded || !key.succeeded
+            if partial {
+                AppLog.warn(LogTag.plugin("openrouter"), "partial usage: credits=\(credits.diagnostic), key=\(key.diagnostic)")
+            }
+            return ProviderSnapshot.make(provider: provider, plan: plan, lines: lines, refreshedAt: now(),
+                warning: partial ? tr("Some usage data is unavailable. Available readings are shown below.") : nil)
         }
 
         // Nothing usable came back. Only call the key invalid when BOTH endpoints rejected it
@@ -117,6 +122,19 @@ private enum EndpointResult {
     case success([String: Any])
     case authFailure
     case failed(OpenRouterUsageError)
+
+    var succeeded: Bool {
+        if case .success = self { return true }
+        return false
+    }
+
+    var diagnostic: String {
+        switch self {
+        case .success: "ok"
+        case .authFailure: "unauthorized_or_forbidden"
+        case .failed(let error): error.errorCategory.rawValue
+        }
+    }
 
     var isAuthFailure: Bool {
         if case .authFailure = self { return true }

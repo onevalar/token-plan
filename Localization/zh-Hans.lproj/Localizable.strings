@@ -8,6 +8,7 @@
 "%@ credits" = "%@ 额度";
 "%@ left" = "剩余 %@";
 "%@ purchased" = "已购买 %@";
+"%@ rejected the usage request (code %@). Check your account on the provider’s website." = "%1$@ 拒绝了用量请求（代码 %2$@）。请在服务商网站检查账户状态。";
 "%@ request failed (HTTP %lld)." = "%1$@ 请求失败（HTTP %2$lld）。";
 "%@ requests" = "%@ 次请求";
 "%@ searches" = "%@ 次搜索";
@@ -42,6 +43,7 @@
 "AI Usage" = "AI 用量";
 "API Key" = "API 密钥";
 "API Keys" = "API 密钥";
+"About" = "关于";
 "About TokenPlan" = "关于 TokenPlan";
 "Activity" = "活动";
 "Add" = "添加";
@@ -66,6 +68,7 @@
 "Antigravity credentials are invalid. Open Antigravity or run `agy` to sign in again." = "Antigravity 凭据无效。请打开 Antigravity 或运行 `agy` 重新登录。";
 "Antigravity sign-in expired. Open Antigravity or run `agy` to refresh." = "Antigravity 登录已过期。请打开 Antigravity 或运行 `agy` 刷新。";
 "Antigravity usage is temporarily unavailable. Try again shortly." = "Antigravity 用量暂时不可用，请稍后重试。";
+"App Interface" = "界面外观";
 "Appearance" = "外观";
 "Auto" = "自动";
 "Available Usage" = "用量数据";
@@ -99,6 +102,7 @@
 "Codex CLI logs on this device. Includes logs from different sign-ins, not the current account's complete usage." = "统计本机 Codex CLI 日志，包含不同登录留下的记录，并非当前账户的全部用量。";
 "Codex auth data is invalid." = "Codex 认证数据无效。";
 "Codex logs" = "Codex 日志";
+"Collapsed" = "已收起";
 "Command Line" = "命令行";
 "Compact" = "紧凑";
 "Completions" = "补全";
@@ -107,6 +111,7 @@
 "Connection" = "连接";
 "Console" = "控制台";
 "Consumes one reset credit. Only the usage windows eligible on the server will be reset. This can't be undone." = "将消耗一份重置额度，仅重置服务端允许的用量周期。此操作无法撤销。";
+"Content Item" = "内容项";
 "Copilot usage data is unavailable for this account." = "该账户无法获取 Copilot 用量数据。";
 "Copilot usage request failed (HTTP %lld). Try again later." = "Copilot 用量请求失败（HTTP %lld），请稍后重试。";
 "Copilot usage response invalid. Try again later." = "Copilot 用量响应无效，请稍后重试。";
@@ -155,12 +160,14 @@
 "Default" = "默认";
 "Density" = "密度";
 "Details" = "详情";
+"Details Only" = "仅详情";
 "Detects provider logins again without resetting your display preferences." = "重新检测服务登录，不会重置显示设置。";
 "Devin quota data unavailable. Try again later." = "Devin 额度数据暂不可用，请稍后重试。";
 "Disabled" = "已停用";
 "Disabling a provider stops its requests. Its existing login remains unchanged." = "停用提供方后将停止请求，已有登录不会受到影响。";
 "Dismiss" = "关闭";
 "Display & Appearance" = "显示与外观";
+"Display Content" = "显示内容";
 "Display Metrics" = "显示指标";
 "Done" = "完成";
 "Done." = "完成。";
@@ -173,14 +180,18 @@
 "Enable a service with usage history to see totals here." = "启用支持用量历史的服务后，可在这里查看汇总。";
 "Enable services in Services & Subscriptions to configure their menu-bar visibility." = "在“服务与订阅”中启用服务，即可设置它们在菜单栏中的显示。";
 "Enabled" = "已启用";
+"Enabled Services" = "已启用服务";
+"Enter API Key" = "输入 API Key";
 "Enterprise usage data unavailable. Try again later." = "企业版用量数据暂不可用，请稍后重试。";
 "Error" = "错误";
 "Estimate costs for models that don't have known pricing." = "为没有已知定价的模型估算费用。";
 "Estimated locally, so it may be off" = "在本地估算，可能有偏差";
 "Example Data" = "示例数据";
+"Expanded" = "已展开";
 "Expired" = "已到期";
 "Expires %@" = "%@到期";
 "Expiring soon" = "即将到期";
+"Expiry Date" = "到期时间";
 "Expiry times unavailable" = "到期时间未知";
 "Expiry unavailable" = "到期时间未知";
 "Extra Balance" = "额外余额";
@@ -205,6 +216,7 @@
 "Gemini Pro" = "Gemini Pro";
 "Gemini Weekly" = "Gemini 每周";
 "General" = "通用";
+"General Settings" = "通用设置";
 "Gift" = "赠送";
 "GitHub token invalid or expired. Re-authenticate (gh auth login) and try again." = "GitHub 令牌无效或已过期。请重新认证（gh auth login）后重试。";
 "Global Shortcut" = "全局快捷键";
@@ -250,6 +262,7 @@
 "Limit %@" = "上限 %@";
 "Limit in %@" = "%@ 后达到上限";
 "Limit reached" = "已达上限";
+"Limit reached. Deselect an item to choose another." = "已选满，请先取消一项再选择。";
 "Limit soon" = "即将达到上限";
 "Live usage rate limited - data may be stale" = "实时用量被限流，数据可能已过期";
 "Live usage rate limited - retry in ~%@" = "实时用量被限流，约 %@ 后重试";
@@ -271,15 +284,18 @@
 "Menu Bar Settings" = "菜单栏设置";
 "Menu Bar Style" = "菜单栏样式";
 "Menu Bar: %@" = "菜单栏：%@";
+"Menu Bar: %lld/%lld" = "菜单栏：%lld/%lld";
 "Menu Bar: Percentage shows up to 2 starred metrics; Ring shows one primary quota per selected account." = "菜单栏：百分比显示最多 2 项星标指标；环形为每个所选账号显示一项主要额度。";
 "Metric" = "指标";
 "Monitor Your AI Subscriptions with TokenPlan" = "用 TokenPlan 监控你的 AI 订阅";
 "Monthly" = "每月";
 "More" = "更多";
 "More Metrics" = "更多指标";
+"More Usage Details" = "更多用量详情";
 "Needs Attention" = "需要处理";
 "Next refresh in %lldm" = "%lld 分钟后刷新";
 "Next refresh in %llds" = "%lld 秒后刷新";
+"No %@ API key. Open this service’s Settings to add it." = "尚未添加 %1$@ API 密钥，请在此服务的“设置”中添加。";
 "No %@ API key. Set %@ or add it to %@." = "没有 %1$@ 的 API 密钥。请设置 %2$@，或将其添加到 %3$@。";
 "No Enabled Providers" = "没有已启用的服务商";
 "No Ollama key found. Install Ollama and run `ollama signin` to track cloud usage." = "没有找到 Ollama 密钥。请安装 Ollama 并运行 `ollama signin` 以追踪云端用量。";
@@ -327,6 +343,7 @@
 "OpenRouter API key invalid. Check your key at openrouter.ai/keys." = "OpenRouter 的 API 密钥无效。请到 openrouter.ai/keys 检查你的密钥。";
 "OpenRouter request failed (HTTP %lld)." = "OpenRouter 请求失败（HTTP %lld）。";
 "OpenRouter usage data unavailable. Try again later." = "OpenRouter 用量数据暂不可用，请稍后重试。";
+"Optional, saved on this Mac. Use it for a renewal date or an account reminder." = "选填，仅保存在本机。可记录续费日期或账号提醒。";
 "Options" = "选项";
 "Orb Usage" = "Orb 用量";
 "Orbs" = "Orb";
@@ -336,6 +353,7 @@
 "Other" = "其他";
 "Other Models" = "其他模型";
 "Other Reported Tokens" = "其他已报告 Token";
+"Other Services" = "其他服务";
 "Outdated" = "已过期";
 "Output" = "输出";
 "Override With a Custom Key" = "用自定义密钥覆盖";
@@ -441,6 +459,8 @@
 "Show Usage As" = "用量显示方式";
 "Show less" = "收起";
 "Show more" = "展开";
+"Show on Home" = "首页显示";
+"Shown Services" = "显示的服务";
 "Sign in to GitHub Copilot in your editor, or run gh auth login, and try again." = "请在编辑器中登录 GitHub Copilot，或运行 gh auth login 后重试。";
 "Sign in to the provider's app or CLI, then restart TokenPlan to detect it. API keys can be entered in the service's settings." = "先在服务应用或命令行工具中登录，再重启 TokenPlan 检测。API 密钥可在对应服务的设置中填写。";
 "Sign in with Claude Code, then refresh." = "请先在 Claude Code 中登录，再刷新。";
@@ -449,6 +469,7 @@
 "Some Cursor export rows were invalid. Totals may be incomplete." = "部分 Cursor 导出记录无效，统计可能不完整。";
 "Some local token logs were skipped or could not be read. Totals may be incomplete." = "部分本机日志已跳过或无法读取，统计可能不完整。";
 "Some synced usage data couldn’t be read. Check the log for details." = "部分已同步的用量数据无法读取。详情请查看日志。";
+"Some usage data is unavailable. Available readings are shown below." = "部分用量暂时无法获取，下方显示已获取的数据。";
 "Sonnet" = "Sonnet";
 "Spark" = "Spark";
 "Spark Weekly" = "Spark 每周";
@@ -456,6 +477,7 @@
 "Starred for menu bar" = "已加星标到菜单栏";
 "Start Antigravity or run `agy` and try again." = "请启动 Antigravity 或运行 `agy` 后重试。";
 "Status" = "状态";
+"Status: %@" = "状态：%@";
 "Stop" = "停止";
 "Subscription" = "订阅";
 "Subscription Details" = "订阅详情";
@@ -463,6 +485,7 @@
 "Syncing usage history" = "正在同步用量历史";
 "System" = "跟随系统";
 "System Default" = "跟随系统";
+"System Menu Bar" = "系统菜单栏";
 "Team accounts have no personal quota. Spend below is still from your Grok logs." = "团队账户没有个人额度。下方花费仍来自你的 Grok 日志。";
 "Team request-based usage data unavailable. Try again later." = "团队按请求计费的用量数据暂不可用，请稍后重试。";
 "Terminal Helper" = "终端助手";
@@ -550,6 +573,7 @@
 "Using reset credit…" = "正在使用重置额度…";
 "Vertical Bar" = "竖柱";
 "Visible" = "显示";
+"Visible appears in the overview; Details appears only here; Hidden removes the metric. Drag the handle to reorder." = "“显示”放在首页，“详情”仅在详情页显示，“隐藏”则不显示。拖动左侧手柄可排序。";
 "Vouchers" = "代金券";
 "Waiting for the first update…" = "等待首次更新…";
 "Waiting for this Mac’s first iCloud update…" = "正在等待这台 Mac 的首次 iCloud 更新…";

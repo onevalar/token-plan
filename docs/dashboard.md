@@ -2,7 +2,7 @@
 
 Open TokenPlan from its menu bar icon to see current AI usage and available quota. TokenPlan reads existing provider logins — there is no TokenPlan account to sign into. Detected Claude and Codex logins share a service heading but keep separate usage sections. Matching plan names also show the login identity so the subscriptions remain distinguishable.
 
-The labeled **Refresh** button is at the top, beside the **…** menu. It shows progress while fetching and prevents duplicate requests. The overview has no bottom action bar. Open **Settings** or **Services & Subscriptions** from **…**; a subscription's right-hand chevron opens its details directly.
+The labeled **Refresh** button is at the top, beside the **…** menu. It shows progress while fetching and prevents duplicate requests. The overview has no bottom action bar. Open **General Settings** or **Services & Subscriptions** from **…**; a subscription's right-hand chevron opens its details directly.
 
 ## First launch
 
@@ -13,31 +13,31 @@ Updates preserve your existing provider choices. When an update adds a provider 
 ## Overview readings
 
 - Quotas show a short cycle such as `5h` or `1w` in every language, and a percentage without an extra Used/Left phrase. Model-specific scopes remain distinguishable, such as `Sonnet · 1w`.
-- **… → Used / Left**, or **Settings → Display & Appearance → Show Usage As**, chooses whether the number and bar mean used or remaining. The choice persists and updates the preview immediately. Overview and detail quotas always use horizontal bars; Ring is menu-bar only. Screen readers retain the reading's meaning. The numbers are display-only, not hidden setting buttons.
+- **… → Display & Appearance → Show Usage As** chooses whether the number and bar mean used or remaining. The choice persists and updates the preview immediately. Overview and detail quotas always use horizontal bars; Ring is menu-bar only. Screen readers retain the reading's meaning. The numbers are display-only, not hidden setting buttons.
 - Color always reflects actual remaining quota, not how fast you have been using it: blue above 30% remaining, yellow above 10% through 30%, red at 10% or less. Bands use the actual remaining share before display rounding and do not change with Used/Left. Notification rules remain independent.
 - An hourglass always precedes the countdown; its units are `d`, `h` and `m` in every language. The former Exact Time preference no longer changes quota rows. No known reset date means no invented countdown. An elapsed snapshot reads `soon` until fresh data arrives — it does not prove the quota has recovered.
 - Fresh rolling sessions say **Not started** until the provider's session-start signal is present.
 - Balances remain compact text readings. Reset-credit counts and expiries live only in subscription details, not in an extra overview row.
 
-Only metrics configured as **Visible** appear here. There is no bottom Details expander. Reset credits, usage history, trends and model breakdowns belong on the subscription detail page, even if an older saved layout marked them Visible. Those saved selections are not erased. A details-only subscription retains its heading and detail entry without empty quota rows.
+Only metrics configured as **Show on Home** appear here. There is no bottom Details expander. Reset credits, usage history, trends and model breakdowns belong on the subscription detail page, even if an older saved layout marked them Visible. Those saved selections are not erased. A details-only subscription retains its heading and detail entry without empty quota rows.
 
 If a provider cannot be read, the card shows the reason and suggested fix. The header also indicates errors, refresh progress or outdated data. With no tracked services, the overview offers **Services & Subscriptions**.
 
 ## Subscription details and configuration
 
-The subscription's chevron opens one page with readings at the top and configuration below. Back returns to the screen you came from. **Services & Subscriptions** also lists disabled services, so you can enable them or inspect their saved configuration.
+The subscription's chevron opens a detail page with Usage and Settings tabs. Back returns to the screen you came from. **Services & Subscriptions** also lists disabled services, so you can enable them or inspect their saved configuration.
 
-The top readings include enabled quota, balance and history metrics. Spend rows combine cost and tokens; a chevron opens a model breakdown where supported, and hovering the value also works. **Reset Credits** shows the count and each reported credit directly, soonest expiry first, with a numeric local expiry (`2026-10-23 11:35`) and `d/h/m` countdown. Expired credits say **Expired**, not `soon`; unknown dates are stated explicitly, including when only some dates are known. Codex's **Use Credit** action is visible without hovering and requires confirmation: it spends one credit and only resets server-eligible usage windows. Opening details never consumes a credit. Claude is labeled read-only; use its credits in Claude Code. Useful dashboard and account-management links open the provider's own website; provider status-page links are not included.
+Subscription details open on **Usage**, showing enabled quotas and balances. Enabled history, trends and reset credits are shown directly below the primary readings, without another disclosure. Spend rows combine cost and tokens; a chevron opens a model breakdown where supported, and hovering the value also works. **Reset Credits** has its own card with the count and one numeric local expiry (`2026-10-23 11:35`) per credit, soonest first. The same read-only rows are used for Claude and Codex, with no redemption action or countdown. Expired credits retain their date and an **Expired** label; unavailable dates are stated explicitly. Useful dashboard and account-management links open the provider's own website; provider status-page links are not included.
 
-Below the readings are connection status, login source and optional notes. Notes stay off the overview unless you explicitly choose to show them. **Add Service Login** explains signing in through the provider's app or CLI and restarting TokenPlan to detect that login. It does not sign you in or switch accounts; restarting preserves display preferences. Additional-account discovery depends on supported Claude/Codex sources.
+The **Settings** tab starts with Display Content. Connection status and a labeled Refresh button accompany the subscription name on both tabs. Optional multiline notes follow the controls. Notes stay off the overview unless you explicitly choose to show them. **Add Service Login**, available only on the **Services & Subscriptions** list, explains signing in through the provider's app or CLI and restarting TokenPlan to detect that login. It does not sign you in or switch accounts; restarting preserves display preferences. Additional-account discovery depends on supported Claude/Codex sources.
 
-The **Display Metrics** table offers **Visible**, **Details** or **Hidden**, plus a **Menu Bar** checkbox. History and reset-credit metrics offer Details or Hidden only. Keep at least one quota/balance metric Visible when available. Up to two metrics per provider can be pinned to the menu bar. Drag grips reorder within a placement; use the dropdown to change placement. Supported API-key and cost-estimate controls remain below.
+**Display Content** is expanded at the top of the Settings tab. It lists Content Item and Status, plus menu-bar checkboxes. Status offers **Show on Home**, **Details Only** or **Hidden**. History and reset-credit metrics offer Details Only or Hidden. Keep at least one quota/balance metric on Home when available. The menu-bar counter shows up to two selections per subscription. Once full, unchecked boxes are disabled with a visible explanation; selected boxes remain removable, and removing one immediately restores the other choices. Drag grips reorder within a placement; use the dropdown to change placement. Supported API-key controls remain on Settings; cost estimates expand separately.
 
 **Restore Defaults…** is a text action below the configuration, not a navigation icon. It asks for confirmation and restores this subscription's metric visibility, order and menu-bar selection without changing other subscriptions. **Restore All Defaults…** below the service list restores the overall layout and re-detects installed tools. Connection details and notes remain unchanged; resets clear the customization undo history.
 
 ## Usage History
 
-Open **… → Usage History** or **Settings → Usage History** for cross-provider totals. The title switches between **Cost**, **Cost/MTok** and **Tokens**; the period picker offers **Today**, **Yesterday** and **30 Days**. Both choices persist across launches.
+Open **… → Usage History** for cross-provider totals. The title switches between **Cost**, **Cost/MTok** and **Tokens**; the period picker offers **Today**, **Yesterday** and **30 Days**. Both choices persist across launches.
 
 The ring and ranked legend follow the selected metric. Cost/MTok shows each provider's rate and a blended overall rate. Hover the center for the exact value and any local-estimate note. An enabled spend-capable provider still contributes when its own spend rows are hidden. Unrelated dollar balances do not mix into history totals. A period without data shows an empty state, not a fabricated zero. With no history-capable service enabled, the page explains what to enable.
 
@@ -51,7 +51,7 @@ Right-click a metric for **Hide**, **Star for menu bar / Unstar**, **Refresh** a
 
 **⌘Z** undoes recent customization changes, including visibility, order and pins. Undo is per-session and resets clear it. New default metrics are added once to existing layouts; hiding one remains respected.
 
-The **…** menu offers checked **Used / Left** and **Percentage / Ring** choices, followed by **Services & Subscriptions**, **Usage History**, **Menu Bar Settings**, **Settings**, update checking when available, **About TokenPlan** and **Quit TokenPlan**. The switches share the Settings preferences. Screenshot sharing and Report an Issue are not included. About gives a short product introduction and a local license link; it does not upload information.
+The **…** menu offers **Services & Subscriptions**, **Display & Appearance**, **Usage History**, **General Settings**, update checking when available, **About** and **Quit**. Display & Appearance groups Usage Display, App Interface and System Menu Bar settings on one page. It and Usage History return directly to the overview. General Settings does not repeat them. Screenshot sharing and Report an Issue are not included. About displays only the installed version number. Repository and bundled license files remain unchanged.
 
 ## Keyboard and closing
 

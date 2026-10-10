@@ -22,14 +22,14 @@ TokenPlan reads it from the first place it finds one, in this order:
 3. The `ZAI_API_KEY` environment variable
 4. The `GLM_API_KEY` environment variable (the legacy Zhipu name, still accepted)
 
-You can also add and rotate the key from **Settings → API Keys** without touching a file. Either
+You can also add and rotate the key from **Services & Subscriptions → Z.ai → Settings → API Key** without touching a file. Either
 way, nothing leaves your Mac except the same API calls Z.ai's own subscription UI makes.
 
 ## Setup
 
 1. [Subscribe to a GLM Coding plan](https://z.ai/subscribe) and get your API key from the
    [Z.ai console](https://z.ai/manage-apikey/apikey-list).
-2. Add the key to TokenPlan via **Settings → API Keys**, **or** export it:
+2. Add the key to TokenPlan via **Services & Subscriptions → Z.ai → Settings → API Key**, **or** export it:
 
 ```bash
 export ZAI_API_KEY="YOUR_API_KEY"
@@ -57,7 +57,7 @@ an invalid response instead of being shown as zero.
 
 ## Troubleshooting
 
-- **"No Z.ai API key"** — add a key in Settings → API Keys, or export `ZAI_API_KEY`.
+- **"No Z.ai API key"** — add a key in Services & Subscriptions → Z.ai → Settings → API Key, or export `ZAI_API_KEY`.
 - **"Z.ai API key invalid"** — the key was rejected (401/403). Regenerate it in the
   [Z.ai console](https://z.ai/manage-apikey/apikey-list).
 - **"No active GLM Coding Plan"** (amber notice by the name) — the key is valid, but the account has no
@@ -65,3 +65,5 @@ an invalid response instead of being shown as zero.
   usage appears once your plan is active.
 - **Meters show "No usage data"** — you have a plan, but the quota endpoint returned no usable limits
   yet. Check your [plan](https://z.ai/manage-apikey/coding-plan/personal/my-plan).
+
+An optional subscription-name request failure is recorded in the diagnostic log while successful quota readings remain available.

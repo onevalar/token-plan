@@ -18,18 +18,9 @@ struct SettingsMenuBarSection: View {
             }
             .padding(.horizontal, 12)
             .padding(.vertical, density.controlRowPadding)
-            Divider().padding(.vertical, 8)
-            VStack(alignment: .leading, spacing: 4) {
-                Text("Menu Bar Services").font(.subheadline.weight(.semibold))
-                Text("Choose services and accounts to show. Hiding them keeps stars, overview and refresh unchanged.")
-                    .font(.caption).foregroundStyle(.secondary)
-                if layout.menuBarStyle == .ring {
-                    Text("One ring per selected account: Claude 5h, Codex Pro 1w, Plus 5h. Other plans use the quota with least remaining.")
-                        .font(.caption).foregroundStyle(.secondary)
-                }
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.horizontal, 12).padding(.bottom, 8)
+            Text("Shown Services").font(.caption.weight(.medium)).foregroundStyle(.secondary)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 12).padding(.top, 10).padding(.bottom, 4)
             if layout.menuBarServices.isEmpty {
                 Text("Enable services in Services & Subscriptions to configure their menu-bar visibility.")
                     .font(.caption).foregroundStyle(.secondary)

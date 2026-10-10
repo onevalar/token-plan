@@ -122,23 +122,15 @@ For supported GPT-5.4, GPT-5.5, GPT-5.6, and GPT-6 models, requests above 272k i
 
 For Codex Swap cards, a 401/403 instead tries the next matching access token without refreshing tokens.
 Credential changes while a request is pending discard that result and retry from current matching
-logins. The reset-credit action is also bound to its card's account, including after a default switch.
+logins. Reset-credit dates are also bound to their card's account, including after a default switch.
 
 Spark and Spark Weekly come from the same response's `additional_rate_limits` array — model-specific limits that reuse the duration-based Session/Weekly classification. TokenPlan surfaces the entry whose name identifies GPT-5.3-Codex-Spark as those two meters; accounts without the limit simply omit the entry, so the rows read "No data". Other model limits in that array aren't shown.
 
 TokenPlan preserves Codex's reported `used_percent` verbatim. If the API reports 1% used for an untouched window, the app shows 99% left; if it reports 0%, the app shows 100% left. Codex rows use the normal reset label rather than inferring a special "Not started" state. Burn-rate pacing still waits until enough of the window has elapsed — and until something has actually been used — to make a useful projection.
 
-Reset credits do not occupy an overview row. Subscription details show **Reset Credits**, the count, and the full timeline directly, soonest-first: a numbered dot, numeric local expiry (`2026-10-23 11:35`), and countdown (`12d 18h`). TokenPlan makes a best-effort `GET https://chatgpt.com/backend-api/wham/rate-limit-reset-credits` call for these dates. With no credits, the count reads `0` and details say `You have no rate limit resets`. If the dedicated call fails, the count falls back to the usage body (`rate_limit_reset_credits.available_count`); unavailable per-credit dates are stated, never invented. You can explicitly hide the metric in subscription configuration.
+Reset credits do not occupy an overview row. Subscription details show **Reset Credits**, the count, and the full timeline directly, soonest-first: a row number and numeric local expiry (`2026-10-23 11:35`). TokenPlan makes a best-effort `GET https://chatgpt.com/backend-api/wham/rate-limit-reset-credits` call for these dates. With no credits, the count reads `0` and details say `You have no rate limit resets`. If the dedicated call fails, the count falls back to the usage body (`rate_limit_reset_credits.available_count`); unavailable per-credit dates are stated, never invented. You can explicitly hide the metric in subscription configuration.
 
-### Using a reset from subscription details
-
-You can spend a reset credit from the timeline — the same authenticated consume request the Codex CLI's "Usage limit resets" picker performs, not a local meter reset. **Use Credit** is visible beside each unexpired credit without hovering. Clicking it expands an inline confirmation explaining that one credit is consumed, only server-eligible usage windows are reset, and the operation cannot be undone. **Use Credit** confirms; **Cancel** spends nothing. The server decides which windows qualify: the app does not promise that every 5-hour and weekly limit will be reset. After a successful response it refreshes Codex, then shows **Reset credit used.** Automated verification uses simulated responses and does not redeem real credits.
-
-Safeguards, because a claim is irreversible:
-
-- Claiming is always a deliberate two-click flow inside subscription details — nothing is ever claimed automatically.
-- Each claim targets one explicit credit (re-matched against a fresh credit list at claim time) and carries an idempotency key, so a retry after a network error can never spend a second credit.
-- If the credit was meanwhile used elsewhere (CLI or web), details say it's no longer available and refresh; if your usage doesn't need a reset, Codex refuses without spending the credit and details say so. After a claim resets usage, the remaining Use Credit buttons disable until subscription details are reopened.
+The expiry list is read-only. TokenPlan does not expose a redemption button in subscription details; use the provider's own tools to spend credits.
 
 ### Slow Local History
 

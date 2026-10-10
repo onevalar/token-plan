@@ -31,3 +31,5 @@ If the CLI credentials fail but the app is signed in with a different account, t
 ## Under the hood
 
 Connect RPC `GetUserStatus` on the configured API server (default `server.codeium.com`). Quota percentages arrive as "remaining" and are flipped to "used". No token refresh — a 401/403 switches to the next auth source instead.
+
+Network failures, HTTP errors (including rate limits), and malformed responses retain distinct error categories and messages. If alternate credentials also fail authentication, they do not overwrite a preceding network or server failure with a login hint.

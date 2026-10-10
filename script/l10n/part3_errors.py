@@ -1,5 +1,8 @@
 # Provider error / notice messages.
 T = {
+"No %@ API key. Open this service’s Settings to add it.": ("尚未添加 %1$@ API 密钥，请在此服务的“设置”中添加。", "尚未加入 %1$@ API 金鑰，請在此服務的「設定」中加入。", "%1$@ の API キーがありません。このサービスの「設定」で追加してください。", "%1$@ API 키가 없습니다. 이 서비스의 설정에서 추가하세요."),
+"Some usage data is unavailable. Available readings are shown below.": ("部分用量暂时无法获取，下方显示已获取的数据。", "部分用量暫時無法取得，下方顯示已取得的資料。", "一部の使用量を取得できません。取得できたデータを表示しています。", "일부 사용량을 가져올 수 없습니다. 확인된 데이터를 아래에 표시합니다."),
+"%@ rejected the usage request (code %@). Check your account on the provider’s website.": ("%1$@ 拒绝了用量请求（代码 %2$@）。请在服务商网站检查账户状态。", "%1$@ 拒絕了用量請求（代碼 %2$@）。請在服務商網站檢查帳戶狀態。", "%1$@ が使用量リクエストを拒否しました（コード %2$@）。サービスのサイトでアカウントを確認してください。", "%1$@에서 사용량 요청을 거부했습니다(코드 %2$@). 서비스 웹사이트에서 계정을 확인하세요."),
 "Amp CLI not found. Install Amp and run amp login in Terminal.": ("找不到 Amp 命令行工具。请安装 Amp，并在终端运行 amp login。", "找不到 Amp 命令列工具。請安裝 Amp，並在終端機執行 amp login。", "Amp CLIが見つかりません。Ampをインストールし、ターミナルでamp loginを実行してください。", "Amp CLI를 찾을 수 없습니다. Amp를 설치하고 터미널에서 amp login을 실행하세요."),
 "Amp is not logged in. Run amp login in Terminal, then refresh.": ("Amp 尚未登录。请在终端运行 amp login，然后刷新。", "Amp 尚未登入。請在終端機執行 amp login，然後重新整理。", "Ampにログインしていません。ターミナルでamp loginを実行してから更新してください。", "Amp에 로그인하지 않았습니다. 터미널에서 amp login을 실행한 뒤 새로고침하세요."),
 "Couldn't read Amp's saved login. Check its file permissions or log in to Amp again.": ("无法读取 Amp 已保存的登录。请检查文件权限，或重新登录 Amp。", "無法讀取 Amp 已儲存的登入。請檢查檔案權限，或重新登入 Amp。", "Ampの保存済みログインを読み取れません。ファイルの権限を確認するか、Ampに再ログインしてください。", "Amp에 저장된 로그인을 읽을 수 없습니다. 파일 권한을 확인하거나 Amp에 다시 로그인하세요."),

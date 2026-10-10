@@ -1,14 +1,16 @@
 # Settings
 
-Settings lives inside the popover — there is no separate window. Open it from the overview's **…** menu, with ⌘, while the popover is showing, or by right-clicking the menu bar icon and choosing Settings. One plain top-left Back button and Esc return one level at a time; ⌘, returns to the dashboard. There is no right-hand reset/navigation lookalike.
+General Settings lives inside the popover. Open it from the overview’s **… → General Settings**, with ⌘, while the popover is showing, or by right-clicking the menu bar icon. Back and Esc return to the actual entry point; ⌘, returns to the dashboard from any settings destination.
 
 Navigation keeps one panel width across the overview, Settings and subscription details. The page being left retains its title and content until it is gone; revisiting Settings or Services & Subscriptions starts at its main page. Closing during a transition cancels it; reopening starts on the overview. Reduce Animations switches screens immediately and keeps the same navigation and keyboard behavior.
 
-The main Settings page contains **General**, including Language, and links to **Display & Appearance**, **Menu Bar**, **Usage History**, **Notifications & Sync**, and **Privacy & Advanced**. Services & Subscriptions is managed directly from the overview's **…** menu, not duplicated in Settings. Usage History holds cross-provider totals that no longer appear on the overview.
+The overview menu directly opens **Display & Appearance** and **Usage History**. Each returns directly to the overview. These destinations are not duplicated inside General Settings. **General Settings** contains refresh interval, language, launch at login and the global shortcut, plus **Notifications & Sync** and **Privacy & Advanced**; those two subpages return to General Settings.
 
-The **…** menu also offers checked **Used / Left** and **Percentage / Ring** choices, plus direct **Usage History** and **Menu Bar Settings** shortcuts. These change the same saved preferences as their Settings pages, not separate quick-menu overrides.
+Settings navigation records the entry point explicitly. Closing the popover or opening a different destination clears the previous return path. Usage History holds cross-provider totals; menu-bar style and usage-display preferences keep their existing saved values.
 
 **Services & Subscriptions** lets you enable services and open each subscription's connection, optional note, metric placement, menu-bar pins, and supported API-key controls. It explains how existing provider logins are detected; it is not a TokenPlan login screen. A restart detects supported additional logins without resetting display preferences. See [Dashboard](dashboard.md#subscription-details-and-configuration).
+
+Supported API-key services (DeepSeek, Kimi, MiniMax, OpenRouter, SiliconFlow and Z.ai) show the API-key card first in their Settings tab. With no key configured, the input opens automatically. Missing-key errors point to the service’s Settings tab. Save is disabled for blank input; saved keys can be revealed or cleared. Environment keys can be overridden with a saved key. Saving credentials does not enable a disabled service; enable it in Services & Subscriptions to fetch usage.
 
 ## Display & Appearance
 
@@ -16,7 +18,7 @@ The **…** menu also offers checked **Used / Left** and **Percentage / Ring** c
 |---|---|---|
 | Show Usage As | Used / Left | Whether the percentage and graphic mean used or remaining. Readings show just `48%` or `52%`; screen readers retain the meaning. |
 
-Show Usage As sits above Theme, Density and the other appearance controls on one page. Its preview updates immediately and the choice survives relaunch. Overview and detail quotas always use horizontal bars; the old Vertical Bar/Ring preference is ignored without rewriting it at startup. Ring is available only in the menu bar. Colors always reflect actual remaining quota.
+Display & Appearance has three labeled sections: Usage Display (Show Usage As and a live preview), App Interface (theme, density, animations and transparency), and System Menu Bar (style and visible services/accounts). Its preview updates immediately and the choice survives relaunch. Overview and detail quotas always use horizontal bars; the old Vertical Bar/Ring preference is ignored without rewriting it at startup. Ring is available only in the menu bar. Colors always reflect actual remaining quota.
 
 Reset countdowns always use an hourglass and `d/h/m`, regardless of language or a previously saved Exact Time choice. Credit expiry dates are listed numerically in subscription details. Overview numbers and times are display-only, not hidden global setting buttons.
 
@@ -52,7 +54,7 @@ Under **Display & Appearance**, alongside Show Usage As and its preview.
 
 ## Menu Bar
 
-Open **Settings → Menu Bar**, or **… → Menu Bar Settings** directly.
+Open **… → Display & Appearance → System Menu Bar**. Back returns directly to the overview.
 
 | Setting | Options | What it does |
 |---|---|---|
@@ -122,3 +124,9 @@ The app version shows in the Settings footer.
 Your settings carry across updates — layout, stars, preferences, and the menu-bar shortcut all stay put. When an update changes how a setting is stored, the app upgrades it in place on launch, stepping through any in-between versions if you skipped a few. Nothing is reset. (Earlier betas wiped all settings on every update; that no longer happens.)
 
 Which providers you have on also carries across updates — your choices are never overridden. A brand-new install picks its starting set by detecting the AI tools on your Mac (see [Dashboard § First launch](dashboard.md#first-launch)). When an update ships a provider you've never seen, the same local detection runs once for just that provider and turns it on only if you actually have the tool; everything you've already decided about stays exactly as you set it. See [Which Providers Are On](provider-enablement.md).
+
+Services & Subscriptions opens with enabled services. Expand Other Services to enable another provider; enabled services remain reorderable. App preferences, including notifications and sync, are reached through General Settings in the overview menu.
+
+Each subscription separates Usage from Settings. Usage shows all enabled details directly. Settings starts with Display Content, followed by optional notes and provider-specific options. The connection status and labeled Refresh action remain available on both tabs. Display Content uses explicit Home / Details Only / Hidden choices. Its menu-bar selection counter shows the per-subscription limit; at two selections, unselected checkboxes are disabled and a notice asks the user to deselect one before choosing another. Selected checkboxes remain available, and freeing a slot immediately enables the others. Add Service Login appears only on the Services & Subscriptions list, not in each subscription. Notes save locally as you type and appear on the overview only when selected.
+
+Display & Appearance and Usage History each have one entry in the overview menu; none is repeated in General Settings.

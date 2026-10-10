@@ -80,3 +80,5 @@ line is `opencode-next.db` — so all channels are unioned). Both `opencode-go` 
 count. OpenCode 1 logs to the `message` table and OpenCode 2 to `session_message`; both are read, and
 completed context compactions count too. OpenCode 2 copies old messages into the new table under the
 same ID, so each message is counted once. Read-only.
+
+If Go quota retrieval or credential reading fails while local usage remains available, the local totals remain visible with a warning explaining the failure. A failed local scan similarly keeps available Go meters with a warning. A local database without hosted Go/Zen usage is not a successful quota verification.

@@ -24,19 +24,7 @@ extension View {
     /// `@ViewBuilder` rather than a ternary (which would not type-check).
     @ViewBuilder
     func glassButtonStyle(prominent: Bool = false) -> some View {
-        if #available(macOS 26, *) {
-            if prominent {
-                buttonStyle(.glassProminent)
-            } else {
-                buttonStyle(.glass)
-            }
-        } else {
-            if prominent {
-                buttonStyle(.borderedProminent)
-            } else {
-                buttonStyle(.bordered)
-            }
-        }
+        buttonStyle(TokenPlanButtonStyle(prominent: prominent))
     }
 
     /// A single interactive Liquid Glass surface (in the given shape) drawn behind a *whole control* —

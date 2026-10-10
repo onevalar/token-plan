@@ -82,6 +82,7 @@ struct DashboardView: View {
             // scroll-edge fade (not a distinct bar).
             .background(PopoverSurface())
             .tint(Theme.accent)
+            .buttonStyle(TokenPlanButtonStyle())
             // Drive the host panel's height on SwiftUI's clock. At the body root, OUTSIDE `modeBody`'s
             // `.animation(nil, value: layout.screenSlideID)`, so the height rides the active spring (the
             // slide's, during a switch) instead of being snapped.
@@ -116,7 +117,8 @@ struct DashboardView: View {
                     // without a second SwiftUI registration fighting it.
                     onSettings: {
                         withAnimation(Motion.navigation) {
-                            layout.screen = layout.screen == .settings ? .dashboard : .settings
+                            if layout.screen == .settings { layout.screen = .dashboard }
+                            else { layout.openSettingsPage() }
                         }
                         return true
                     },
@@ -479,7 +481,7 @@ struct DashboardView: View {
 
 /// The shared page backing: clear over the native frosted panel, or solid when transparency is off or
 /// accessibility requires it. The solid color matches `PopoverBackdropView`'s `NSBox`. Never hit-tests.
-private struct PopoverSurface: View {
+struct PopoverSurface: View {
     @Environment(\.popoverSurfaceTreatment) private var treatment
 
     var body: some View {
@@ -488,10 +490,9 @@ private struct PopoverSurface: View {
             case .opaque:
                 Theme.traySurface
             case .translucent:
-                // Clear so what's behind the page shows through: the behind-window vibrancy backdrop —
-                // the blurred desktop for increased/drunk, and the same desktop tinted by the party
-                // gradient for party mode.
-                Color.clear
+                // A neutral veil keeps text and controls predictable over any desktop while retaining
+                // a small amount of the native behind-window blur.
+                Theme.traySurface.opacity(0.96)
             }
         }
         .allowsHitTesting(false)

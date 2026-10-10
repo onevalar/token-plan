@@ -33,10 +33,11 @@ struct DashboardContentView: View {
                         }
                         .font(.subheadline)
                         .padding(.horizontal, 9)
-                        .frame(height: 28).contentShape(Capsule())
+                        .frame(height: 28).contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)
-                    .interactiveGlass(in: Capsule(), reinforced: container.transparency.effectiveStyle.needsChromeLegibilityBacking)
+                    .foregroundStyle(.secondary)
+                    .background(.primary.opacity(0.055), in: RoundedRectangle(cornerRadius: 8))
                     .disabled(!container.dataStore.refreshingProviderIDs.isEmpty)
                     .accessibilityLabel(container.dataStore.refreshingProviderIDs.isEmpty ? tr("Refresh now") : tr("Refreshing…"))
                     HeaderView(screen: .dashboard)

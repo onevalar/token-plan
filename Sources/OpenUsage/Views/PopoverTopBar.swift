@@ -27,13 +27,12 @@ struct PopoverTopBar: View {
             }
             .padding(.horizontal, horizontalPadding)
             .frame(height: height).frame(maxWidth: .infinity)
-            .barGlass()
         }
     }
 
     private var title: String {
         screen == .settings
-            ? layout.displayedSettingsPage?.title ?? tr("Settings")
+            ? layout.displayedSettingsPage?.title ?? tr("General Settings")
             : tr(layout.displayedCustomizeProviderID == nil ? "Services & Subscriptions" : "Subscription Details")
     }
 }

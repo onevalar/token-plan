@@ -28,12 +28,12 @@ back to the plan saved with your login.
 Anthropic occasionally grants free usage-limit resets — for example, one reset for Pro and Max
 subscribers when a new model launches. Using one refills your session and weekly limits right away.
 Subscription details show **Reset Credits**, the available count, and the full expiry list without another click.
-Each known deadline uses a numeric local date and a `d/h/m` countdown. A reset whose grant has no
+Each known deadline uses a numeric local date on one consistently aligned row, without a countdown. A reset whose grant has no
 deadline still counts; unknown dates are stated explicitly, including partly known expiry lists.
 Accounts outside the program read `0`; if Anthropic doesn't report the program at all for
 your plan, the row shows **No data**.
 
-TokenPlan labels these credits read-only and has no claim button. To use one, run `/rate-limit-options` in Claude Code, or
+The expiry list is read-only, with no claim button or explanatory banner. To use one, run `/rate-limit-options` in Claude Code, or
 use it when Claude Code offers it at a usage limit.
 
 ## Where credentials come from

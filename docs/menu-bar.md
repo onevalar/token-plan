@@ -16,7 +16,7 @@ Percentage uses your stars. Star a metric from any row's right-click menu, or fr
 
 ## Choosing services
 
-Settings → **Menu Bar** → **Menu Bar Services** has an independent switch for each enabled service. **… → Menu Bar Settings** opens this page directly. All are on by default. A switch covers every account of that service, including additional Claude and Codex logins.
+**… → Display & Appearance → System Menu Bar → Shown Services** has an independent switch for each enabled service. Back returns to the overview. All are on by default. A switch covers every account of that service, including additional Claude and Codex logins.
 
 - Hiding a service here only removes it from the menu bar. It stays enabled, keeps refreshing, and remains in the overview and subscription details.
 - Your metric stars, order, and layout stay saved. Showing a service again restores the same menu-bar selections.
@@ -28,7 +28,7 @@ Settings → **Menu Bar** → **Menu Bar Services** has an independent switch fo
 
 ## Choosing a style
 
-Settings → **Menu Bar** → **Menu Bar Style**, or the checked choices in **…**, offers exactly two choices:
+**… → Display & Appearance → System Menu Bar → Menu Bar Style** offers exactly two choices:
 
 - **Percentage** (default): numeric readings beside each provider mark. Percent quotas show percentages; balances and counts keep their own units.
 - **Ring**: exactly one quota ring per selected account. Claude uses its 5-hour limit. Codex Plus uses 5-hour; Codex Pro (including Pro 100/200/500) uses weekly. Other or unknown plans use their available quota with the smallest actual remaining share. A missing primary quota falls back to another reported quota, not a fabricated reading. Without any reported quota, an available balance remains numeric.

@@ -4,7 +4,7 @@ import SwiftUI
 /// Balances/spend remain text rows; reset credits render their timeline directly in details.
 struct WidgetRowView: View {
     let data: WidgetData
-    /// The overview is read-only; breakdowns and credit actions belong in subscription details.
+    /// The overview is read-only; breakdowns and expiry dates belong in subscription details.
     var showsDetails = false
     /// True when this text-only row sits directly under another text-only row. Rows don't know
     /// their neighbors — the list supplies it — and both densities use it to pull consecutive
@@ -15,8 +15,6 @@ struct WidgetRowView: View {
     @Environment(\.quotaTableColumns) private var tableColumns
     @Environment(\.reduceAnimations) private var reduceAnimations
     @State private var modelHover = HoverPopoverState()
-    /// Backs the reset-credit claim flow; previews and providers without a service remain read-only.
-    @Environment(\.codexResetClaim) private var codexResetClaim
 
     private var supportingFont: Font {
         .system(size: density.supportingPointSize, weight: .regular)
@@ -152,16 +150,7 @@ struct WidgetRowView: View {
                     .font(supportingFont).monospacedDigit()
             }
             if data.hasData {
-                if codexResetClaim == nil {
-                    Text("Read-only in TokenPlan. Use reset credits in the provider's own app.")
-                        .font(.caption).foregroundStyle(.secondary)
-                }
-                RateLimitResetsDetail(count: data.resetCreditCount, expiries: data.expiriesAt,
-                                      claim: codexResetClaim.map { service in
-                    { expiry, requestID in
-                        await service.claim(creditExpiringAt: expiry, redeemRequestID: requestID)
-                    }
-                })
+                RateLimitResetsDetail(count: data.resetCreditCount, expiries: data.expiriesAt)
             } else {
                 Text("No data").font(.caption).foregroundStyle(.secondary)
             }
@@ -177,7 +166,7 @@ struct WidgetRowView: View {
                 .contentTransition(.numericText())
         }
         .padding(.horizontal, 10).padding(.vertical, 8)
-        .background(RoundedRectangle(cornerRadius: 8).fill(.quaternary))
+        .background(RoundedRectangle(cornerRadius: 8).fill(.primary.opacity(0.035)))
         .accessibilityElement(children: .combine)
     }
 
