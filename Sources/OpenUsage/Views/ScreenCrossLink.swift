@@ -22,7 +22,7 @@ struct ScreenCrossLinkRow: View {
 
     var body: some View {
         Button {
-            withAnimation(Motion.modeSwitch) {
+            withAnimation(Motion.navigation) {
                 layout.screen = destination
             }
         } label: {
@@ -32,10 +32,10 @@ struct ScreenCrossLinkRow: View {
                     .foregroundStyle(.secondary)
                     .frame(width: 18, height: 18)
                 VStack(alignment: .leading, spacing: 0) {
-                    Text(title)
+                    Text(tr(title))
                         .font(.system(size: density.headerPointSize, weight: .semibold))
                         .foregroundStyle(.primary)
-                    Text(subtitle)
+                    Text(tr(subtitle))
                         .font(.system(size: density.planBadgePointSize))
                         .foregroundStyle(.secondary)
                 }

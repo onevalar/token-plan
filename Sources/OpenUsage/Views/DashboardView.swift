@@ -14,7 +14,7 @@ import SwiftUI
 /// (content scrolls flush). The panel **auto-fits its content**: each screen publishes its intrinsic
 /// height (`ScrollContentHeightKey` + the measured footer), and the host window is driven to that on
 /// SwiftUI's animation clock (`drivesPanelHeight` / `PanelHeightModifier`) — so a screen switch morphs
-/// the window height in lockstep with the slide (one spring), and the scroll views only take over once
+/// the window height in lockstep with the slide, and the scroll views only take over once
 /// content exceeds the screen-height cap.
 struct DashboardView: View {
     @Environment(AppContainer.self) private var container
@@ -44,15 +44,14 @@ struct DashboardView: View {
     /// id, a freshly-started transition pins to the outgoing screen so the first frame never flashes
     /// the destination.
     @State private var animatedSlideID = 0
+    /// Target values change at animation start, not at its visual end. Keep both pages mounted until
+    /// completion, otherwise setting slideProgress to 1 tears down the pager before it can slide.
+    @State private var completedSlideID = 0
     /// Reset to the top whenever the popover closes, so it never reopens mid-scroll.
     @State private var dashboardScrollPosition = ScrollPosition(edge: .top)
     /// Settings is expensive to mount because each menu picker creates an `NSPopUpButton`. Keep its
     /// view tree alive after the first visit so later screen switches don't rebuild those controls.
     @State private var hasVisitedSettings = false
-    /// Drives the macOS-native confirmation sheet for the Customize "reset all" button. The alert
-    /// attaches to this panel as a sheet (see `StatusItemController`'s attached-sheet guard), so a
-    /// click on its buttons can't be misread as an outside click that dismisses the popover.
-    @State private var isPresentingResetAllConfirm = false
     /// Shared horizontal inset for dashboard content and fixed chrome.
     private static let outerPadding: CGFloat = 14
     /// Breathing room between the bottom of the scrolling content and the pinned footer. Kept small
@@ -61,14 +60,16 @@ struct DashboardView: View {
     /// Footer content starts at the same standard padding as the provider containers.
     private static let footerHorizontalPadding: CGFloat = outerPadding
     private static let reorderSpace = "popoverReorderSpace"
-    /// One width across both densities — switching density shouldn't move the popover's left edge.
+    /// Every destination uses the same canvas and pager stride.
     private static let popoverWidth: CGFloat = PanelHeightController.panelWidth
     /// Fixed height of the Customize / Settings back nav bar — the bar pins itself to exactly this height.
     private static let topBarHeight: CGFloat = 44
 
     var body: some View {
         modeBody
-            .frame(width: Self.popoverWidth)
+            .frame(width: Self.popoverWidth, alignment: .leading)
+            .clipped()
+            .animation(nil, value: layout.screenSlideID)
             // Fill the panel. The panel auto-fits its content (the window height is driven to each
             // screen's measured ideal via `drivesPanelHeight`), so at rest the window is exactly the
             // content's height and this fill is a no-op; when content exceeds the screen cap the window
@@ -100,25 +101,13 @@ struct DashboardView: View {
                 // through and dismiss the popover.
                 PopoverKeyReader(
                     onEscape: {
-                        // From a provider's L2 detail, back out to the L1 list first; only from L1 /
-                        // Settings drop to the dashboard. Pressing Esc again from L1 closes the popover.
-                        if layout.customizeProviderID != nil {
-                            withAnimation(Motion.spring) { layout.customizeProviderID = nil }
-                            return true
-                        }
-                        guard layout.screen != .dashboard else { return false }
-                        withAnimation(Motion.modeSwitch) { layout.screen = .dashboard }
-                        return true
+                        withAnimation(Motion.navigation) { layout.goBack() }
                     },
                     onReturn: {
-                        // From a provider's L2 detail, back out to the L1 list first — matching Esc —
-                        // so Return steps L2 → L1 → dashboard instead of jumping L2 → dashboard.
-                        if layout.customizeProviderID != nil {
-                            withAnimation(Motion.spring) { layout.customizeProviderID = nil }
-                            return true
+                        withAnimation(Motion.navigation) {
+                            if layout.screen == .dashboard { layout.screen = .customize }
+                            else { _ = layout.goBack() }
                         }
-                        let target: PopoverScreen = layout.screen == .dashboard ? .customize : .dashboard
-                        withAnimation(Motion.modeSwitch) { layout.screen = target }
                         return true
                     },
                     // ⌘, toggles Settings, on this always-on monitor so it fires from every screen —
@@ -126,9 +115,13 @@ struct DashboardView: View {
                     // consuming it) also lets the Options menu's Settings item carry ⌘, as a label
                     // without a second SwiftUI registration fighting it.
                     onSettings: {
-                        withAnimation(Motion.modeSwitch) {
+                        withAnimation(Motion.navigation) {
                             layout.screen = layout.screen == .settings ? .dashboard : .settings
                         }
+                        return true
+                    },
+                    onRefresh: {
+                        refreshNow()
                         return true
                     },
                     // ⌘Z walks back the last customization step (remove/add, reorder, pin/unpin, caret
@@ -167,18 +160,11 @@ struct DashboardView: View {
                 layout.cancelDrag()
                 if screen == .settings { hasVisitedSettings = true }
             }
-            // The Reset All alert attaches to the Customize L1 nav bar. Leaving the list — back to the
-            // dashboard or into a provider's L2 detail — unmounts that host, which dismisses the alert
-            // but leaves `isPresentingResetAllConfirm` `true`. Drop it whenever L1 stops being visible
-            // so the destructive confirmation can't reappear stale on return without a fresh tap.
-            .onChange(of: layout.screen == .customize && layout.customizeProviderID == nil) { _, isL1Visible in
-                if !isL1Visible { isPresentingResetAllConfirm = false }
-            }
             // Each screen switch: pin to the outgoing screen for one render (`slideProgress = 0`),
-            // then spring to the incoming one on the next runloop tick. Deferring the animation one
+            // then slide to the incoming one on the next runloop tick. Deferring the animation one
             // tick is what makes it animate — setting 0 then 1 in the same closure collapses to a
             // no-op (SwiftUI animates from the last *committed* value). `slideProgress` drives the
-            // page offset so the screens slide between modes on one spring.
+            // page offset on the same clock as the panel height.
             .onChange(of: layout.screenSlideID) { _, id in
                 guard id != 0 else { return }
                 if reduceAnimations {
@@ -186,6 +172,7 @@ struct DashboardView: View {
                     // frame would pair the destination header with the outgoing screen; scheduling the
                     // spring would also keep that stale structure alive until its delayed completion.
                     animatedSlideID = id
+                    completedSlideID = id
                     slideProgress = 1
                     if let target = heightCoordinator.target(for: layout.screen) {
                         didEstablishHeight = true
@@ -197,7 +184,8 @@ struct DashboardView: View {
                 animatedSlideID = id
                 let destination = layout.screen
                 Task { @MainActor in
-                    // Co-animate the slide and the height on ONE spring → the coordinated morph: the
+                    guard layout.screenSlideID == id, transparency.popoverShown else { return }
+                    // Co-animate the slide and the height on one clock: the
                     // panel grows/shrinks to the destination's size as that screen slides in. The
                     // destination is usually mounted+measured by now (it mounted on the slideProgress=0
                     // render), so we morph to its ideal. If it ISN'T measured yet and the height was
@@ -208,16 +196,18 @@ struct DashboardView: View {
                     let coTarget: CGFloat? = heightCoordinator.target(for: destination)
                         ?? (animatedHeight > 0 ? animatedHeight : nil)
                     if coTarget != nil { didEstablishHeight = true }
-                    withAnimation(Motion.spring, completionCriteria: .logicallyComplete) {
+                    withAnimation(Motion.navigation, completionCriteria: .logicallyComplete) {
                         slideProgress = 1
                         if let coTarget { animatedHeight = coTarget }
                     } completion: {
+                        guard layout.screenSlideID == id, transparency.popoverShown else { return }
+                        completedSlideID = id
                         guard let target = heightCoordinator.target(for: layout.screen) else { return }
                         if !didEstablishHeight {
                             didEstablishHeight = true
                             animatedHeight = target            // un-animated establish — never grow from 0
                         } else if abs(target - animatedHeight) > 1 {
-                            withAnimation(Motion.spring) { animatedHeight = target }
+                            withAnimation(Motion.navigation) { animatedHeight = target }
                         }
                     }
                 }
@@ -239,11 +229,10 @@ struct DashboardView: View {
             // sibling of `PopoverKeyReader` that only observes (never consumes), so it can't disturb
             // navigation or typing.
             .background(TooMuchTransparencyKeyReader { transparency.toggleSecretCode() })
-            // Reaches `modeBody`, the `PopoverSurface` background, and every card: drives whether surfaces
-            // paint their opaque base or clear to the behind-window vibrancy backdrop.
+            // The page either covers the desktop or clears to the behind-window vibrancy backdrop.
             .environment(\.popoverSurfaceTreatment, transparency.surfaceTreatment)
             // The easter egg's visuals: the readable party (gradient backdrop + glowing rim, text crisp
-            // on frosted cards) for the secret code, or the woozy, barely-readable pink-glass drunk mode
+            // on the frosted panel) for the secret code, or the woozy, barely-readable pink-glass drunk mode
             // for "Drunk Mode". No-op for the normal/increased styles. Controls stay clickable (overlays
             // don't hit-test), so the Settings "Drunk Mode" toggle is reachable while it's running.
             .tooMuchTransparency(transparency.effectiveStyle)
@@ -265,18 +254,15 @@ struct DashboardView: View {
         if layout.screen != .dashboard { layout.screen = .dashboard }
         reorderLift = nil
         layout.cancelDrag()
-        // A "Copied to clipboard" pill mid-countdown would otherwise reappear stale on the next open,
-        // since the layout store survives the popover and only the timer clears it.
-        layout.clearShareConfirmation()
         layout.clearCustomizationNotice()
-        // Dismiss a pending Reset All confirmation if the popover closes mid-alert — the SwiftUI tree
-        // survives `orderOut`, so without this the sheet would reappear stale on the next open.
-        isPresentingResetAllConfirm = false
         // Drop the driven height so the next open re-establishes it (un-animated) from the reopened
         // screen's measurement instead of springing from this session's last value. Until then the
         // 0 sentinel keeps `PanelHeightModifier` from pushing, so the controller's opening guess stands.
         animatedHeight = 0
         didEstablishHeight = false
+        completedSlideID = layout.screenSlideID
+        animatedSlideID = layout.screenSlideID
+        slideProgress = 1
         dashboardScrollPosition.scrollTo(edge: .top)
     }
 
@@ -286,10 +272,9 @@ struct DashboardView: View {
     /// screens are both mounted, ordered left-to-right by `slideRank`, and slid by a pure offset —
     /// each with its own chrome (top bar + footer), so a page's bar travels with the page.
     ///
-    /// Why an offset and not a SwiftUI `.transition`: the cards' fill is translucent `.quaternary`
-    /// glass. Any transition carrying `.opacity` composites a screen into a transparency layer where
-    /// that material has no vibrant backdrop to sample and resolves to its opaque near-white base — a
-    /// white flash across the grey cards (the regression this removes; it has no clean SwiftUI fix).
+    /// Why an offset and not a SwiftUI `.transition`: the navigation chrome uses glass. A transition
+    /// carrying `.opacity` composites a screen into a transparency layer where that material loses its
+    /// vibrant backdrop and can flash near-white. Flat content groups don't need another material pass.
     /// A pure offset never touches opacity, so the glass keeps sampling the live popover backdrop. The
     /// pages are a `ForEach` keyed by screen, so the incoming page keeps its identity (and scroll
     /// position) when the slide collapses back to one page. Settings lives in a sibling overlay after
@@ -305,8 +290,10 @@ struct DashboardView: View {
             HStack(alignment: .top, spacing: 0) {
                 ForEach(pages, id: \.self) { screen in
                     pagerPage(screen, settingsKeptAlive: keepSettings)
-                        .frame(width: Self.popoverWidth)
+                        .frame(width: Self.popoverWidth, alignment: .leading)
                         .frame(maxHeight: .infinity, alignment: .top)
+                        .allowsHitTesting(screen == layout.screen)
+                        .accessibilityHidden(screen != layout.screen)
                 }
             }
             .frame(width: Self.popoverWidth, alignment: .leading)
@@ -343,6 +330,7 @@ struct DashboardView: View {
                 .allowsHitTesting(false)
         } else {
             screenView(screen)
+                .frame(width: Self.popoverWidth)
         }
     }
 
@@ -370,8 +358,7 @@ struct DashboardView: View {
         Self.screenTransitionIsActive(
             reduceAnimations: reduceAnimations,
             screenSlideID: layout.screenSlideID,
-            animatedSlideID: animatedSlideID,
-            slideProgress: slideProgress
+            completedSlideID: completedSlideID
         )
     }
 
@@ -380,12 +367,11 @@ struct DashboardView: View {
     static func screenTransitionIsActive(
         reduceAnimations: Bool,
         screenSlideID: Int,
-        animatedSlideID: Int,
-        slideProgress: CGFloat
+        completedSlideID: Int
     ) -> Bool {
         !reduceAnimations
             && screenSlideID != 0
-            && (screenSlideID != animatedSlideID || slideProgress < 1)
+            && screenSlideID != completedSlideID
     }
 
     /// One page at rest (the current screen); the two involved screens in left-to-right rank order
@@ -431,25 +417,29 @@ struct DashboardView: View {
                         layout: layout,
                         screen: screen,
                         height: Self.topBarHeight,
-                        horizontalPadding: Self.footerHorizontalPadding,
-                        onResetAll: {
-                            layout.resetToDefault()
-                            container.reseedEnabledProviders()
-                        },
-                        isPresentingResetAllConfirm: $isPresentingResetAllConfirm
+                        horizontalPadding: Self.footerHorizontalPadding
                     )
                 }
             }
             .pinnedFooter(spacing: 0) {
-                if includeChrome {
+                if includeChrome && screen == .settings {
                     PopoverFooter(
-                        screen: screen,
-                        layout: layout,
-                        dataStore: dataStore,
                         horizontalPadding: Self.footerHorizontalPadding
-                    ) { screen, height in
-                        heightCoordinator.setFooter(height, for: screen)
+                    ) { height in
+                        heightCoordinator.setFooter(height, for: .settings)
                     }
+                }
+            }
+            .overlay(alignment: .bottom) {
+                if screen == .dashboard, let notice = layout.pinLimitNotice {
+                    TransientPill(
+                        systemImage: "exclamationmark.triangle.fill",
+                        text: notice,
+                        tint: Theme.notice,
+                        trigger: layout.pinNoticeShakeTrigger
+                    )
+                        .padding(.bottom, 8)
+                        .allowsHitTesting(false)
                 }
             }
     }
@@ -467,6 +457,7 @@ struct DashboardView: View {
                 reorderSpaceName: Self.reorderSpace,
                 horizontalPadding: Self.outerPadding,
                 bottomGap: Self.contentBottomGap,
+                onRefresh: refreshNow,
                 reorderLift: $reorderLift,
                 scrollPosition: $dashboardScrollPosition
             )
@@ -480,14 +471,14 @@ struct DashboardView: View {
         }
     }
 
+    private func refreshNow() {
+        guard dataStore.refreshingProviderIDs.isEmpty else { return }
+        Task { await dataStore.refreshAll(force: true) }
+    }
 }
 
-/// The popover's opaque backdrop tray, painted behind all content so the popover reads as one solid
-/// panel — the data region never shows the desktop through it. Matches the AppKit panel backdrop
-/// (`PopoverBackdropView`'s `NSBox`): SwiftUI uses `Theme.traySurface` here while AppKit uses the
-/// matching `Theme.trayNSColor`. The footer draws its own frosted glass bar on top of this (in-window),
-/// so glass stays chrome over solid content. Never hit-tests, so it can't steal clicks from the content
-/// above it.
+/// The shared page backing: clear over the native frosted panel, or solid when transparency is off or
+/// accessibility requires it. The solid color matches `PopoverBackdropView`'s `NSBox`. Never hit-tests.
 private struct PopoverSurface: View {
     @Environment(\.popoverSurfaceTreatment) private var treatment
 

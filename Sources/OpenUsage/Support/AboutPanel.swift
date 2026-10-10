@@ -6,16 +6,17 @@ import AppKit
 /// app is activated first — otherwise the panel would open behind whatever app currently owns the
 /// foreground. The panel pulls the app icon, name, and version (`CFBundleShortVersionString` — the
 /// same string `AppInfo.version` surfaces in the footer) straight from the bundle; we only supply the
-/// credits line, naming the project and its open-source origin.
+/// product description and the bundled license notice.
 enum AboutPanel {
+    static var licenseURL: URL { Bundle.openUsageResources.url(forResource: "LICENSE", withExtension: "txt")! }
+
     @MainActor
     static func present() {
         NSApp.activate(ignoringOtherApps: true)
         NSApplication.shared.orderFrontStandardAboutPanel(options: [.credits: credits])
     }
 
-    /// Centered, secondary-styled credits with the same two links as the rest of the app: the author's
-    /// page and the GitHub repo. The standard panel renders `.link`-attributed runs as clickable.
+    /// The standard panel renders the local license link as clickable, without sending any data.
     private static var credits: NSAttributedString {
         let paragraph = NSMutableParagraphStyle()
         paragraph.alignment = .center
@@ -27,9 +28,9 @@ enum AboutPanel {
         ]
 
         let credits = NSMutableAttributedString()
-        credits.append(NSAttributedString(string: tr("Based on the MIT-licensed OpenUsage project by Robin Ebers"), attributes: base))
-        credits.append(NSAttributedString(string: "\n\n" + tr("Open source on") + " ", attributes: base))
-        credits.append(link("GitHub", "https://github.com/onevalar/token-plan", base: base))
+        credits.append(NSAttributedString(string: tr("Your AI usage, limits and subscriptions at a glance."), attributes: base))
+        credits.append(NSAttributedString(string: "\n\n", attributes: base))
+        credits.append(link(tr("License"), licenseURL.absoluteString, base: base))
         return credits
     }
 

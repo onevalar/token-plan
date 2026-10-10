@@ -10,7 +10,10 @@ final class MenuBarPinTests: XCTestCase {
         let store = makeStore("default")
         XCTAssertTrue(store.pinnedMetricIDs.isEmpty)
         XCTAssertTrue(store.pinnedGroups.isEmpty)
-        XCTAssertEqual(store.menuBarStyle, .text)
+        XCTAssertTrue(store.hiddenMenuBarServices.isEmpty)
+        XCTAssertEqual(store.menuBarStyle, .percentage)
+        XCTAssertEqual(store.menuBarServices.map(\.id), ["a", "b"])
+        XCTAssertTrue(store.menuBarServices.allSatisfy { store.isMenuBarServiceVisible($0.id) })
     }
 
     func testPinUnpinPersistsAcrossReload() {
@@ -107,13 +110,253 @@ final class MenuBarPinTests: XCTestCase {
         XCTAssertTrue(store.pinnedMetricIDs.isEmpty)
     }
 
-    func testMenuBarStylePersists() {
-        let defaults = makeDefaults("style")
+    func testHidingServicePreservesPinsDashboardLayoutAndEnablement() {
+        let defaults = makeDefaults("independentVisibility")
+        let enablement = ProviderEnablementStore(defaults: defaults)
+        enablement.seedEnabledProviders(["a", "b"])
+        var enablementChanges = 0
+        enablement.onChange = { enablementChanges += 1 }
+        let store = LayoutStore(
+            registry: makeRegistry(), defaults: defaults, storageKey: "layout",
+            defaultMetricIDs: ["a.m1", "a.m2", "b.m1"],
+            defaultPinnedMetricIDs: ["a.m1", "a.m2", "b.m1"],
+            defaultExpandedMetricIDs: ["a.m2"],
+            isProviderEnabled: { enablement.isEnabled($0) }
+        )
+        let pins = store.pinnedMetricIDs
+        let placed = store.placed
+        let visible = store.visiblePlaced
+        let dashboard = store.displayGroups.flatMap(\.widgets)
+        let providerOrder = store.providerOrder
+        let metricOrder = store.metricOrderByProvider
+        let expanded = store.expandedMetricIDs
+        let onEnable = store.defaultExpandedOnEnableIDs
+        let stripIDs = store.pinnedGroups.flatMap { $0.metrics.map(\.id) }
+
+        store.setMenuBarServiceVisible(false, for: "a")
+
+        XCTAssertEqual(store.pinnedGroups.map(\.id), ["b"])
+        XCTAssertEqual(store.menuBarServices.map(\.id), ["a", "b"])
+        XCTAssertEqual(store.pinnedMetricIDs, pins)
+        XCTAssertEqual(store.placed, placed)
+        XCTAssertEqual(store.visiblePlaced, visible)
+        XCTAssertEqual(store.displayGroups.flatMap(\.widgets), dashboard)
+        XCTAssertEqual(store.providerOrder, providerOrder)
+        XCTAssertEqual(store.metricOrderByProvider, metricOrder)
+        XCTAssertEqual(store.expandedMetricIDs, expanded)
+        XCTAssertEqual(store.defaultExpandedOnEnableIDs, onEnable)
+        XCTAssertFalse(store.canUndo)
+        XCTAssertEqual(enablement.enabledIDs, ["a", "b"])
+        XCTAssertEqual(enablementChanges, 0) // No enablement callback to wake refresh or rewrite history.
+
+        store.setMenuBarServiceVisible(true, for: "a")
+        XCTAssertEqual(store.pinnedGroups.flatMap { $0.metrics.map(\.id) }, stripIDs)
+        XCTAssertEqual(store.pinnedMetricIDs, pins)
+    }
+
+    func testHiddenServicesPersistAndReshowRestoresExactPinsAndOrder() {
+        let defaults = makeDefaults("hiddenPersist")
         let store = LayoutStore(registry: makeRegistry(), defaults: defaults, storageKey: "layout")
-        store.menuBarStyle = .bars
+        store.setPinned(true, for: "a.m3")
+        store.setPinned(true, for: "a.m1")
+        store.setPinned(true, for: "b.m2")
+        store.reorderProvider(dragged: "b", target: "a")
+        store.reorderMetric(dragged: "a.m3", target: "a.m1", in: "a")
+        let stripIDs = store.pinnedGroups.flatMap { $0.metrics.map(\.id) }
+        let savedPins = defaults.stringArray(forKey: "layout.menuBarPins")
+        store.setMenuBarServiceVisible(false, for: "a")
 
         let reloaded = LayoutStore(registry: makeRegistry(), defaults: defaults, storageKey: "layout")
-        XCTAssertEqual(reloaded.menuBarStyle, .bars)
+        XCTAssertEqual(reloaded.hiddenMenuBarServices, ["a"])
+        XCTAssertEqual(reloaded.pinnedGroups.map(\.id), ["b"])
+        XCTAssertEqual(reloaded.pinnedMetricIDs, store.pinnedMetricIDs)
+        XCTAssertEqual(defaults.stringArray(forKey: "layout.menuBarPins"), savedPins)
+
+        reloaded.setMenuBarServiceVisible(true, for: "a")
+        XCTAssertEqual(reloaded.pinnedGroups.flatMap { $0.metrics.map(\.id) }, stripIDs)
+        XCTAssertEqual(defaults.stringArray(forKey: "layout.menuBarPins"), savedPins)
+        let shown = LayoutStore(registry: makeRegistry(), defaults: defaults, storageKey: "layout")
+        XCTAssertTrue(shown.hiddenMenuBarServices.isEmpty)
+        XCTAssertEqual(shown.pinnedGroups.flatMap { $0.metrics.map(\.id) }, stripIDs)
+    }
+
+    func testHideEveryServiceProducesAppIconFallbackWithoutUnpinning() {
+        let store = makeStore("hideAll")
+        store.setPinned(true, for: "a.m1")
+        store.setPinned(true, for: "b.m2")
+        let pins = store.pinnedMetricIDs
+        for service in store.menuBarServices {
+            store.setMenuBarServiceVisible(false, for: service.id)
+        }
+
+        let content = MenuBarContentBuilder.build(groups: store.pinnedGroups, data: { $0.sample })
+        XCTAssertTrue(content.isEmpty)
+        for style in MenuBarStyle.allCases {
+            store.menuBarStyle = style
+            XCTAssertNil(MenuBarStripRenderer.image(for: content, style: store.menuBarStyle))
+        }
+        XCTAssertEqual(store.pinnedMetricIDs, pins)
+        XCTAssertEqual(store.menuBarServices.map(\.id), ["a", "b"])
+    }
+
+    func testServiceListIncludesNoDataNoPinsAndNoMetricsButExcludesDisabledServices() {
+        let providers = ["a", "b", "c", "disabled"].map {
+            Provider(id: $0, displayName: $0.uppercased(), icon: .providerMark("cursor"))
+        }
+        var sample = metric(providers[0], id: "a.noData", label: "No Data").sample
+        sample.hasData = false
+        let noData = WidgetDescriptor(id: "a.noData", providerID: "a", metricLabel: "No Data", sample: sample)
+        let registry = WidgetRegistry(providers: providers, descriptors: [noData])
+        let store = LayoutStore(
+            registry: registry, defaults: makeDefaults("unpinnedServices"), storageKey: "layout",
+            defaultPinnedMetricIDs: ["a.noData"], isProviderEnabled: { $0 != "disabled" }
+        )
+        XCTAssertTrue(MenuBarContentBuilder.build(groups: store.pinnedGroups, data: { $0.sample }).isEmpty)
+        XCTAssertEqual(store.menuBarServices.map(\.id), ["a", "b", "c"])
+
+        store.setMenuBarServiceVisible(false, for: "b")
+        XCTAssertFalse(store.isMenuBarServiceVisible("b"))
+        XCTAssertEqual(store.menuBarServices.map(\.id), ["a", "b", "c"])
+    }
+
+    func testOneToggleControlsEveryAccountInServiceFamily() {
+        let defaults = makeDefaults("accountFamilies")
+        let ids = ["claude@work", "b", "claude", "codex", "codex@work", "claude@disabled"]
+        let registry = makeRegistry(providerIDs: ids)
+        let store = LayoutStore(
+            registry: registry, defaults: defaults, storageKey: "layout",
+            defaultPinnedMetricIDs: ids.map { "\($0).m1" },
+            isProviderEnabled: { $0 != "claude@disabled" }
+        )
+        XCTAssertEqual(store.menuBarServices.map(\.id), ["claude", "b", "codex"])
+        XCTAssertEqual(store.menuBarServices.map(\.displayName), ["Claude", "B", "Codex"])
+        let pins = store.pinnedMetricIDs
+
+        store.setMenuBarServiceVisible(false, for: "claude@work")
+        XCTAssertEqual(store.hiddenMenuBarServices, ["claude"])
+        XCTAssertFalse(store.isMenuBarServiceVisible("claude"))
+        XCTAssertFalse(store.isMenuBarServiceVisible("claude@newAccount"))
+        XCTAssertTrue(store.isMenuBarServiceVisible("codex@work"))
+        XCTAssertEqual(store.pinnedGroups.map(\.id), ["b", "codex", "codex@work"])
+        XCTAssertEqual(defaults.stringArray(forKey: "layout.hiddenMenuBarServices"), ["claude"])
+        XCTAssertEqual(store.pinnedMetricIDs, pins)
+
+        store.setMenuBarServiceVisible(true, for: "claude")
+        XCTAssertEqual(store.pinnedGroups.map(\.id), Array(ids.dropLast()))
+        XCTAssertEqual(store.pinnedMetricIDs, pins)
+    }
+
+    func testCustomizationResetsAndUndoKeepSettingsOwnedMenuBarChoices() {
+        let store = makeStore("visibilityReset")
+        store.setPinned(true, for: "a.m1")
+        store.setMenuBarServiceVisible(false, for: "a")
+        store.menuBarStyle = .ring
+        XCTAssertTrue(store.undo())
+        XCTAssertEqual(store.hiddenMenuBarServices, ["a"])
+        XCTAssertEqual(store.menuBarStyle, .ring)
+        store.resetProvider("a")
+        XCTAssertEqual(store.hiddenMenuBarServices, ["a"])
+        XCTAssertEqual(store.menuBarStyle, .ring)
+        store.resetToDefault()
+        XCTAssertEqual(store.hiddenMenuBarServices, ["a"])
+        XCTAssertEqual(store.menuBarStyle, .ring)
+
+        store.resetMenuBarSettings()
+        XCTAssertTrue(store.hiddenMenuBarServices.isEmpty)
+        XCTAssertTrue(store.isMenuBarServiceVisible("a"))
+        XCTAssertEqual(store.menuBarStyle, .percentage)
+    }
+
+    func testUserSelectsAllOrIndividualAccountsWithoutAutomaticSelectionOrRenumbering() {
+        let defaults = makeDefaults("accountVisibility")
+        let ids = ["claude", "claude@work", "codex"]
+        let registry = makeRegistry(providerIDs: ids)
+        let store = LayoutStore(
+            registry: registry, defaults: defaults, storageKey: "layout",
+            defaultMetricIDs: ids.map { "\($0).m1" }, defaultPinnedMetricIDs: []
+        )
+        // Save stars through the same user action as the UI, rather than changing the application's
+        // startup defaults only for the first instance of this synthetic registry.
+        for id in ids { store.setPinned(true, for: "\(id).m1") }
+        let dashboard = store.displayGroups.flatMap(\.widgets)
+        let pins = store.pinnedMetricIDs
+        for style in MenuBarStyle.allCases {
+            store.menuBarStyle = style
+            XCTAssertEqual(store.menuBarGroups.map(\.id), ids)
+            store.setMenuBarAccountVisible(false, for: "claude")
+            XCTAssertTrue(store.isMenuBarServiceVisible("claude"), "Default card is not the family switch")
+            XCTAssertEqual(store.menuBarGroups.map(\.id), ["claude@work", "codex"])
+            XCTAssertEqual(store.menuBarAccountNumbers["claude@work"], 2)
+            XCTAssertNil(store.menuBarAccountNumbers["codex"])
+            XCTAssertEqual(store.displayGroups.flatMap(\.widgets), dashboard)
+            XCTAssertEqual(store.pinnedMetricIDs, pins)
+            XCTAssertEqual(store.menuBarAccounts(for: "claude").map(\.id), ["claude", "claude@work"])
+
+            store.setMenuBarServiceVisible(false, for: "claude")
+            XCTAssertEqual(store.menuBarGroups.map(\.id), ["codex"])
+            store.setMenuBarServiceVisible(true, for: "claude")
+            XCTAssertEqual(store.menuBarGroups.map(\.id), ["claude@work", "codex"])
+            let reloaded = LayoutStore(
+                registry: registry, defaults: defaults, storageKey: "layout",
+                defaultMetricIDs: ids.map { "\($0).m1" }, defaultPinnedMetricIDs: []
+            )
+            XCTAssertEqual(reloaded.menuBarGroups.map(\.id), ["claude@work", "codex"])
+            XCTAssertEqual(reloaded.menuBarAccountNumbers["claude@work"], 2)
+            XCTAssertEqual(reloaded.pinnedMetricIDs, pins)
+            XCTAssertEqual(reloaded.displayGroups.flatMap(\.widgets).map(\.descriptorID), dashboard.map(\.descriptorID))
+            store.setMenuBarAccountVisible(true, for: "claude")
+            XCTAssertEqual(store.menuBarGroups.map(\.id), ids)
+        }
+    }
+
+    func testSavedStylesLoadWithoutStartupPreferenceRewrite() throws {
+        for (raw, expected) in [("percentage", MenuBarStyle.percentage), ("ring", .ring),
+                                ("text", .percentage), ("bars", .percentage), ("invalid", .percentage)] {
+            let defaults = makeDefaults("savedStyle.\(raw)")
+            defaults.set(raw, forKey: "layout.menuBarStyle")
+            let store = LayoutStore(registry: makeRegistry(), defaults: defaults, storageKey: "layout")
+            XCTAssertEqual(store.menuBarStyle, expected)
+            XCTAssertTrue(store.hiddenMenuBarServices.isEmpty)
+            XCTAssertNil(defaults.object(forKey: "layout.hiddenMenuBarServices"))
+            XCTAssertEqual(defaults.string(forKey: "layout.menuBarStyle"), raw)
+            store.setPinned(true, for: "a.m1")
+            let content = MenuBarContentBuilder.build(groups: store.pinnedGroups, data: { $0.sample })
+            let image = try XCTUnwrap(MenuBarStripRenderer.image(for: content, style: store.menuBarStyle))
+            XCTAssertEqual(image.accessibilityDescription, "A M1 10%")
+            XCTAssertEqual(defaults.string(forKey: "layout.menuBarStyle"), raw)
+        }
+    }
+
+    func testStylePersistsWithoutChangingVisibilityPinsOrUndo() {
+        let defaults = makeDefaults("stylePersist")
+        let store = LayoutStore(registry: makeRegistry(), defaults: defaults, storageKey: "layout")
+        XCTAssertNil(defaults.object(forKey: "layout.menuBarStyle"))
+        store.setMenuBarServiceVisible(false, for: "a")
+        store.menuBarStyle = .ring
+        XCTAssertFalse(store.canUndo)
+        XCTAssertTrue(store.pinnedMetricIDs.isEmpty)
+        XCTAssertEqual(store.hiddenMenuBarServices, ["a"])
+        XCTAssertEqual(defaults.string(forKey: "layout.menuBarStyle"), "ring")
+
+        let reloaded = LayoutStore(registry: makeRegistry(), defaults: defaults, storageKey: "layout")
+        XCTAssertEqual(reloaded.menuBarStyle, .ring)
+        XCTAssertEqual(reloaded.hiddenMenuBarServices, ["a"])
+        reloaded.menuBarStyle = .percentage
+        XCTAssertEqual(defaults.string(forKey: "layout.menuBarStyle"), "percentage")
+        XCTAssertEqual(LayoutStore(registry: makeRegistry(), defaults: defaults, storageKey: "layout").menuBarStyle, .percentage)
+    }
+
+    func testSettingsResetReplacesLegacyRawStyleAndPersistsBothDefaults() {
+        let defaults = makeDefaults("styleReset")
+        defaults.set("bars", forKey: "layout.menuBarStyle")
+        let store = LayoutStore(registry: makeRegistry(), defaults: defaults, storageKey: "layout")
+        store.setMenuBarServiceVisible(false, for: "a")
+        store.resetMenuBarSettings()
+        XCTAssertEqual(defaults.string(forKey: "layout.menuBarStyle"), "percentage")
+        XCTAssertEqual(defaults.stringArray(forKey: "layout.hiddenMenuBarServices"), [])
+        let reloaded = LayoutStore(registry: makeRegistry(), defaults: defaults, storageKey: "layout")
+        XCTAssertEqual(reloaded.menuBarStyle, .percentage)
+        XCTAssertTrue(reloaded.hiddenMenuBarServices.isEmpty)
     }
 
     func testInvalidPinnedIDsDroppedOnLoad() {
@@ -132,8 +375,8 @@ final class MenuBarPinTests: XCTestCase {
     }
 
     /// Two providers, each with three percent metrics, are sufficient to exercise provider-local caps.
-    private func makeRegistry() -> WidgetRegistry {
-        let providers = ["a", "b"].map { id in
+    private func makeRegistry(providerIDs: [String] = ["a", "b"]) -> WidgetRegistry {
+        let providers = providerIDs.map { id in
             Provider(id: id, displayName: id.uppercased(), icon: .providerMark("cursor"))
         }
         let descriptors = providers.flatMap { provider in

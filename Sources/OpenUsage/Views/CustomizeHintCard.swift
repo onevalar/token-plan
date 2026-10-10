@@ -18,7 +18,7 @@ struct CustomizeHintCard: View {
             systemImage: "slider.horizontal.3",
             title: "Welcome to TokenPlan",
             message: "We set you up with the AI tools found on your Mac. Add or hide providers any time.",
-            buttonTitle: "Open Customize",
+            buttonTitle: "Services & Subscriptions",
             action: { withAnimation(Motion.modeSwitch) { layout.screen = .customize } },
             onDismiss: { withAnimation(Motion.spring) { container.onboarding.dismissCustomizeHint() } }
         )

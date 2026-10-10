@@ -116,16 +116,18 @@ final class WidgetDataStoreTests: XCTestCase {
         XCTAssertEqual(store.headerNotice(for: provider.id), "Token expired. Run `claude` to log in again.")  // error wins
     }
 
-    func testRemainingProgressWithoutResetUsesPeriodDurationLabel() {
+    func testRemainingProgressWithoutResetNamesCycleWithoutDeadline() {
         for (period, expected) in [
-            (ClaudeUsageMapper.sessionPeriodMs, "Resets in 5h"),
-            (ClaudeUsageMapper.weeklyPeriodMs, "Resets in 7d 0h")
+            (ClaudeUsageMapper.sessionPeriodMs, "Usage · 5h"),
+            (ClaudeUsageMapper.weeklyPeriodMs, "Usage · 1w")
         ] {
             let data = WidgetData(
                 title: "Usage", icon: .providerMark("claude"), kind: .percent,
                 used: 0, limit: 100, displayMode: .remaining, periodDurationMs: period
             )
-            XCTAssertEqual(data.boundedSubtitle, expected)
+            XCTAssertEqual(data.overviewTitle, expected)
+            XCTAssertNil(data.boundedSubtitle)
+            XCTAssertNil(data.boundedTrailingText())
         }
     }
 
@@ -152,8 +154,7 @@ final class WidgetDataStoreTests: XCTestCase {
         }
     }
 
-    func testRequestsShowsBillingResetInsteadOfSuffix() {
-        // The requests tile resets on the billing cycle, so it shows the cadence rather than "requests".
+    func testRequestsDoesNotInventBillingDeadlineFromCadence() {
         let requests = WidgetData(
             title: "Requests",
             icon: .providerMark("cursor"),
@@ -163,7 +164,9 @@ final class WidgetDataStoreTests: XCTestCase {
             countSuffix: "requests",
             periodDurationMs: CursorUsageMapper.billingPeriodMs
         )
-        XCTAssertEqual(requests.boundedSubtitle, "Resets in 30d 0h")
+        XCTAssertEqual(requests.boundedSubtitle, "requests")
+        XCTAssertEqual(requests.boundedTrailingText(), "requests")
+        XCTAssertFalse(requests.hasResetLabel())
     }
 
     func testCreditsRenderDollarAndCountCombinedInvariantToMeterStyle() async {
@@ -617,19 +620,15 @@ final class WidgetDataStoreTests: XCTestCase {
         let defaults = makeUserDefaults("reset-display-settings")
         let store = WidgetDataStore(registry: registry, providers: [], defaults: defaults)
         store.meterStyle = .used
-        store.resetDisplayMode = .absolute
-        store.alwaysShowPacing = true
+        defaults.set("absolute", forKey: "resetDisplayMode")
 
         store.resetDisplaySettings()
 
         XCTAssertEqual(store.meterStyle, .remaining)
-        XCTAssertEqual(store.resetDisplayMode, .relative)
-        XCTAssertFalse(store.alwaysShowPacing)
+        XCTAssertNil(defaults.object(forKey: "resetDisplayMode"))
         // A second store on the same suite must load the defaults back, not the pre-reset values.
         let reloaded = WidgetDataStore(registry: registry, providers: [], defaults: defaults)
         XCTAssertEqual(reloaded.meterStyle, .remaining)
-        XCTAssertEqual(reloaded.resetDisplayMode, .relative)
-        XCTAssertFalse(reloaded.alwaysShowPacing)
     }
 
     private func makeUserDefaults(_ name: String) -> UserDefaults {

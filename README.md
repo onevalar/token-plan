@@ -15,6 +15,7 @@ TokenPlan shows how much of your AI plans you've used — session and weekly lim
 - **[Claude](docs/providers/claude.md)** — session, weekly, extra usage, rate-limit resets, local spend
 - **[Codex](docs/providers/codex.md)** — session, weekly, credits, rate-limit resets, local spend
 - **[Cursor](docs/providers/cursor.md)** — plan usage, on-demand, requests, spend
+- **[Amp](docs/providers/amp.md)** — agent and Orb subscription quotas, reported individual credit balance
 - **[Antigravity](docs/providers/antigravity.md)**, **[Copilot](docs/providers/copilot.md)**, **[Devin](docs/providers/devin.md)**, **[Grok](docs/providers/grok.md)**, **[Ollama](docs/providers/ollama.md)**, **[OpenCode](docs/providers/opencode.md)**
 
 **API keys you paste in** (Customize → provider → API Key, or an environment variable)
@@ -28,11 +29,11 @@ TokenPlan shows how much of your AI plans you've used — session and weekly lim
 
 ## Features
 
-- **Menu bar pins.** Pin metrics to the menu bar (up to 2 per provider) as compact text or mini bars.
-- **Dashboard popover.** Provider-grouped meters with live reset countdowns and pace indicators. Click a usage or reset value to flip its display everywhere; right-click a row for more.
+- **Menu bar.** Show starred percentages (up to 2 per provider) or one primary quota ring per selected account. Independently hide less-used services or accounts without disabling them.
+- **Dashboard popover.** Provider-grouped horizontal quota bars with compact reset countdowns. Switch Used/Left from the quick menu or Display & Appearance; open a subscription for reset credits, history and configuration. Rings are menu-bar only.
 - **Clear errors.** When a service can't be read (not logged in, key rejected…) the reason is written in its card, not only in a hover tooltip.
 - **Configurable refresh.** Choose 1 – 60 minutes in Settings → General → Refresh Interval.
-- **Customize.** Turn providers and metrics on or off, pick Always Visible vs. On Demand rows, drag to reorder.
+- **Customize.** Turn providers and metrics on or off, choose Visible, Details or Hidden, and drag to reorder.
 - **Global shortcut**, **notifications** when a limit runs low, **iCloud sync** of usage history across Macs (optional).
 - **[One-shot CLI](docs/cli.md)** (`tokenplan`) and **[local HTTP API](docs/local-http-api.md)** on `127.0.0.1:6757` — loopback-only, and closed to web pages.
 - **[Proxy support](docs/proxy.md)** via `~/.tokenplan/config.json`.

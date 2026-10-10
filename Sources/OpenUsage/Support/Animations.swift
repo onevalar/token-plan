@@ -4,6 +4,8 @@ import SwiftUI
 enum Motion {
     static let spring = Animation.spring(response: 0.42, dampingFraction: 0.80)
     static let modeSwitch = Animation.easeInOut(duration: 0.18)
+    /// Navigation settles without a bounce; page movement and panel height share this clock.
+    static let navigation = Animation.smooth(duration: 0.28)
 
     /// The single transaction policy behind Reduce Animations. `disablesAnimations` prevents inner
     /// `.animation` modifiers from restoring motion after this root policy clears an explicit animation.

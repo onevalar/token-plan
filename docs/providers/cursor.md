@@ -22,7 +22,7 @@ keep their dollar meter, including accounts that return zero placeholders beside
 When Cursor reports your plan name, TokenPlan shows it beside the provider name.
 
 Grok Bot has its own usage allowance, separate from Cursor's normal billing-cycle meter. Its widget
-is enabled by default in Cursor's On Demand section. It uses your existing Cursor login, so signing
+is enabled by default in Cursor's subscription details. It uses your existing Cursor login, so signing
 into the Grok CLI is not required.
 
 ## Where credentials come from

@@ -21,6 +21,7 @@ enum DefaultLayout {
     }
 
     static let metricIDs: [String] = [
+        "amp.agent", "amp.orb", "amp.balance",
         "antigravity.geminiPro", "antigravity.geminiWeekly", "antigravity.claude", "antigravity.claudeWeekly",
         "antigravity.trend", "antigravity.today", "antigravity.yesterday", "antigravity.last30",
 
@@ -81,6 +82,7 @@ enum DefaultLayout {
     /// per-provider cap (`LayoutStore.maxPinsPerProvider`). Filtered to the active registry by
     /// `LayoutStore`, like `metricIDs`.
     static let pinnedMetricIDs: [String] = [
+        "amp.agent", "amp.orb",
         "antigravity.geminiPro", "antigravity.geminiWeekly",
         "claude.session", "claude.weekly",
         "codex.session", "codex.weekly",
@@ -99,6 +101,7 @@ enum DefaultLayout {
     /// Filtered to the active registry by `LayoutStore`, and only seeded on a genuinely fresh launch
     /// (existing layouts keep everything always-shown unless they reset customization).
     static let expandedMetricIDs: [String] = [
+        "amp.balance",
         // Antigravity: the Gemini pool pair and usage trend stay above the fold; the non-Gemini
         // pool pair and spend-history rows sit below the caret, matching the other local scanners.
         "antigravity.claude", "antigravity.claudeWeekly",

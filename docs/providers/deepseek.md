@@ -7,8 +7,8 @@ Tracks your [DeepSeek 深度求索](https://platform.deepseek.com) API account b
 | Metric | Meaning |
 |---|---|
 | Balance | Total balance — topped-up plus granted (¥ for CNY accounts, $ for USD) |
-| Topped Up | The part you paid for (on demand) |
-| Granted | Unexpired promotional credit (on demand) |
+| Topped Up | The part you paid for (in subscription details by default) |
+| Granted | Unexpired promotional credit (in subscription details by default) |
 
 ## Where credentials come from
 

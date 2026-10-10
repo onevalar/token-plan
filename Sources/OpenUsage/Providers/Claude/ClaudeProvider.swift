@@ -9,7 +9,6 @@ final class ClaudeProvider: ProviderRuntime {
             displayName: displayName,
             icon: .providerMark("claude"),
             links: [
-                .init(label: "Status", url: "https://status.anthropic.com/"),
                 .init(label: "Dashboard", url: "https://claude.ai/settings/usage")
             ]
         )

@@ -7,8 +7,8 @@ Tracks your [Kimi / Moonshot AI 月之暗面](https://platform.kimi.com) open-pl
 | Metric | Meaning |
 |---|---|
 | Balance | Available balance (cash + vouchers) — ¥ on the mainland platform, $ on the global one |
-| Cash | Cash balance; can be negative when in arrears (on demand) |
-| Vouchers | Voucher balance (on demand) |
+| Cash | Cash balance; can be negative when in arrears (in subscription details by default) |
+| Vouchers | Voucher balance (in subscription details by default) |
 
 ## Where credentials come from
 

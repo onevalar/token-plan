@@ -19,4 +19,4 @@ The English text is the key. Three mechanisms read the tables in `Localization/<
 3. Run `script/generate_localizations.py` — it fails if a source string has no translation or a placeholder doesn't match, and rewrites the `.lproj` files. (Pass a `.stringsdata` directory from `swift build -Xswiftc -emit-localized-strings -Xswiftc -emit-localized-strings-path -Xswiftc <dir>` to include compiler-extracted `String(localized:)` keys.)
 4. `swift test` checks that all four tables have identical keys and matching placeholders.
 
-Brand and product names (Claude, Codex, DeepSeek…), command names and file paths are never translated. Compact durations (`3h 25m`) use localized unit patterns; dates and times follow the macOS region settings.
+Brand and product names (Claude, Codex, DeepSeek…), command names and file paths are never translated. Compact durations (`3h 25m`) use `d/h/m` in every language; dates and times follow the macOS region settings.

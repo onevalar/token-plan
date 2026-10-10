@@ -120,29 +120,6 @@ final class LayoutStoreTests: XCTestCase {
         XCTAssertFalse(store.expandedMetricIDs.contains("claude.session"), "undo moves the metric back above the caret")
     }
 
-    func testUndoDoesNotRestoreProviderCardCaretState() {
-        // Provider card expand/collapse is transient view state, not a layout edit, so undo must leave
-        // the caret where the user last put it — not rewind it to whatever was open when the undone
-        // step was recorded. Regression test for the snapshot wrongly capturing expandedProviderIDs.
-        let store = makeStore("UndoLeavesProviderCaret")
-        XCTAssertFalse(store.isProviderExpanded("codex"))
-
-        // Open Codex's card, then make an undoable layout edit. The pre-edit snapshot must not capture
-        // the open caret.
-        XCTAssertTrue(store.setProviderExpanded(true, for: "codex"))
-        XCTAssertTrue(store.isProviderExpanded("codex"))
-        store.setMetricEnabled("cursor.credits", true)
-        XCTAssertTrue(store.canUndo)
-
-        // Collapse the card after the step was recorded, then undo the enable.
-        XCTAssertTrue(store.setProviderExpanded(false, for: "codex"))
-        XCTAssertFalse(store.isProviderExpanded("codex"))
-
-        XCTAssertTrue(store.undo())
-        XCTAssertFalse(store.isMetricEnabled("cursor.credits"))
-        XCTAssertFalse(store.isProviderExpanded("codex"), "undo must not restore provider card caret state")
-    }
-
     func testUndoWalksBackMultipleMixedSteps() {
         let store = makeStore("UndoMultiStep")
         // Distinct, real changes: enable an off metric, pin an unpinned one, remove an on metric.
@@ -689,33 +666,36 @@ final class LayoutStoreTests: XCTestCase {
             ($0.provider.id, $0.expandedMetrics.map(\.id))
         })
 
-        // Claude's core meters keep Fable directly below Weekly; optional Sonnet and spend-history
-        // rows go below the caret.
+        // Claude's core meters keep Fable directly below Weekly; optional Sonnet and all history
+        // rows belong in subscription details.
         XCTAssertEqual(primaryByProvider["claude"], [
-            "claude.session", "claude.weekly", "claude.fable", "claude.extra", "claude.trend"
+            "claude.session", "claude.weekly", "claude.fable", "claude.extra"
         ])
         XCTAssertEqual(expandedByProvider["claude"], [
-            "claude.sonnet", "claude.rateLimitResets", "claude.today", "claude.yesterday", "claude.last30"
+            "claude.sonnet", "claude.rateLimitResets", "claude.trend", "claude.today", "claude.yesterday", "claude.last30"
         ])
-        XCTAssertEqual(primaryByProvider["codex"], ["codex.session", "codex.weekly", "codex.trend"])
-        // Spark (the optional model-specific limits) leads the On Demand section, before credits.
+        XCTAssertEqual(primaryByProvider["codex"], ["codex.session", "codex.weekly"])
+        // Spark (the optional model-specific limits) leads Details, before credits and history.
         XCTAssertEqual(expandedByProvider["codex"], [
             "codex.spark", "codex.sparkWeekly",
-            "codex.credits", "codex.rateLimitResets", "codex.today", "codex.yesterday", "codex.last30"
+            "codex.credits", "codex.rateLimitResets", "codex.trend", "codex.today", "codex.yesterday", "codex.last30"
         ])
         XCTAssertEqual(primaryByProvider["devin"], ["devin.daily", "devin.weekly"])
         XCTAssertEqual(expandedByProvider["devin"], ["devin.extra"])
-        XCTAssertEqual(primaryByProvider["grok"], ["grok.weekly", "grok.trend"])
+        XCTAssertEqual(primaryByProvider["grok"], ["grok.weekly"])
         XCTAssertEqual(expandedByProvider["grok"], [
-            "grok.payAsYouGo", "grok.today", "grok.yesterday", "grok.last30"
+            "grok.payAsYouGo", "grok.trend", "grok.today", "grok.yesterday", "grok.last30"
         ])
-        // Cursor spend tiles + usage trend are enabled: the trend joins the primary rows, and the
-        // today/yesterday/last30 rows sit below the caret alongside the other secondary metrics.
-        XCTAssertEqual(primaryByProvider["cursor"], ["cursor.usage", "cursor.auto", "cursor.api", "cursor.trend"])
+        // Cursor history remains enabled but appears only in subscription details.
+        XCTAssertEqual(primaryByProvider["cursor"], ["cursor.usage", "cursor.auto", "cursor.api"])
         XCTAssertEqual(expandedByProvider["cursor"], [
             "cursor.grokBot", "cursor.onDemand", "cursor.requests", "cursor.credits",
-            "cursor.today", "cursor.yesterday", "cursor.last30"
+            "cursor.trend", "cursor.today", "cursor.yesterday", "cursor.last30"
         ])
+        store.setMetricEnabled("codex.rateLimitResets", false)
+        XCTAssertFalse(store.displayGroups.first { $0.id == "codex" }!.widgets.contains {
+            $0.descriptorID == "codex.rateLimitResets"
+        }, "Reset details still respect an explicit Hide")
     }
 
     func testMetricOrderPersistsWhileMetricIsDisabled() {
@@ -1036,7 +1016,6 @@ final class LayoutStoreTests: XCTestCase {
         let group = store.displayGroups.first { $0.provider.id == "claude" }
         XCTAssertEqual(group?.alwaysShownWidgets.compactMap { store.descriptor(for: $0)?.id }, ["claude.session"])
         XCTAssertEqual(group?.expandedWidgets.compactMap { store.descriptor(for: $0)?.id }, ["claude.weekly"])
-        XCTAssertEqual(group?.hasExpandedMetrics, true)
     }
 
     func testProviderWithOnlyExpandedMetricsStillShowsRows() {
@@ -1058,35 +1037,6 @@ final class LayoutStoreTests: XCTestCase {
         XCTAssertTrue(group?.expandedWidgets.isEmpty ?? false)
     }
 
-    func testProviderExpandedAndCollapsedStatesPersistAcrossReload() {
-        let defaults = makeDefaults("ProviderExpanded")
-        let store = LayoutStore(registry: .mock, defaults: defaults, storageKey: "layout")
-
-        XCTAssertTrue(store.setProviderExpanded(true, for: "codex"))
-        XCTAssertTrue(LayoutStore(registry: .mock, defaults: defaults, storageKey: "layout").isProviderExpanded("codex"))
-
-        XCTAssertTrue(store.setProviderExpanded(false, for: "codex"))
-        XCTAssertFalse(LayoutStore(registry: .mock, defaults: defaults, storageKey: "layout").isProviderExpanded("codex"))
-    }
-
-    func testInvalidPersistedExpandedProviderIDsAreDropped() {
-        let defaults = makeDefaults("InvalidProviderExpanded")
-        defaults.set(["codex", "missing"], forKey: "layout.expandedProviders")
-
-        let store = LayoutStore(registry: .mock, defaults: defaults, storageKey: "layout")
-        XCTAssertTrue(store.isProviderExpanded("codex"))
-        XCTAssertFalse(store.isProviderExpanded("missing"))
-    }
-
-    func testResetClearsProviderExpandedState() {
-        let store = LayoutStore(registry: .mock, defaults: makeDefaults("ResetProviderExpanded"), storageKey: "layout")
-        XCTAssertTrue(store.setProviderExpanded(true, for: "codex"))
-
-        store.resetToDefault()
-
-        XCTAssertFalse(store.isProviderExpanded("codex"))
-    }
-
     func testResetProviderRestoresOneProviderAndLeavesOthersAndOrderUntouched() {
         let defaults = makeDefaults("ResetOneProvider")
         let store = LayoutStore(
@@ -1106,7 +1056,6 @@ final class LayoutStoreTests: XCTestCase {
         // Diverge Claude from its defaults in every dimension a reset should restore.
         store.setMetricEnabled("claude.weekly", true)
         store.setPinned(true, for: "claude.weekly")
-        store.setProviderExpanded(true, for: "claude")
         store.reorderMetric(dragged: "claude.extra", target: "claude.session", in: "claude")
 
         // Diverge Codex too — a Claude reset must not touch it.
@@ -1120,7 +1069,6 @@ final class LayoutStoreTests: XCTestCase {
         XCTAssertFalse(store.isMetricEnabled("claude.weekly"))
         XCTAssertTrue(store.isPinned("claude.session"))
         XCTAssertFalse(store.isPinned("claude.weekly"))
-        XCTAssertFalse(store.isProviderExpanded("claude"))
         XCTAssertEqual(
             store.orderedSupportedMetrics(for: "claude").map(\.id),
             MockData.descriptors(for: "claude").map(\.id)
@@ -1199,6 +1147,53 @@ final class LayoutStoreTests: XCTestCase {
         XCTAssertNil(store.customizeDetail(for: "nope"))
     }
 
+    func testHistoryStaysInDetailsEvenWithSavedVisibleOrAllDetailsLayout() throws {
+        let runtime = ClaudeProvider()
+        let registry = WidgetRegistry(providers: [runtime.provider], descriptors: runtime.widgetDescriptors)
+        let store = LayoutStore(registry: registry, defaults: makeDefaults("HistoryPlacement"),
+                                storageKey: "layout", defaultMetricIDs: ["claude.session"],
+                                defaultExpandedMetricIDs: [])
+        let historyIDs = Set(runtime.widgetDescriptors.filter { $0.sample.isChart || $0.sample.isUsagePeriod }.map(\.id))
+        XCTAssertFalse(historyIDs.isEmpty)
+        for metric in historyIDs { store.setMetricEnabled(metric, true) }
+        for allDetails in [false, true] {
+            store.expandedMetricIDs = allDetails ? Set(runtime.widgetDescriptors.map(\.id)) : []
+            let group = try XCTUnwrap(store.displayGroups.first)
+            XCTAssertEqual(group.alwaysShownWidgets.map(\.descriptorID), ["claude.session"])
+            XCTAssertTrue(historyIDs.isSubset(of: Set(group.expandedWidgets.map(\.descriptorID))))
+            XCTAssertTrue(historyIDs.allSatisfy { store.isMetricEnabled($0) }, "Moving history does not erase the user's selection")
+        }
+        store.setMetricEnabled("claude.session", false)
+        let historyOnly = try XCTUnwrap(store.displayGroups.first)
+        XCTAssertTrue(historyOnly.alwaysShownWidgets.isEmpty)
+        XCTAssertFalse(historyOnly.expandedWidgets.isEmpty, "The subscription remains reachable")
+    }
+
+    func testResetCreditsStayInDetailsWithLegacyVisibleAllDetailsAndCreditOnlyLayouts() throws {
+        let runtimes: [ProviderRuntime] = [ClaudeProvider(), CodexProvider()]
+        for runtime in runtimes {
+            let sessionID = "\(runtime.provider.id).session"
+            let resetID = "\(runtime.provider.id).rateLimitResets"
+            let store = LayoutStore(
+                registry: WidgetRegistry(providers: [runtime.provider], descriptors: runtime.widgetDescriptors),
+                defaults: makeDefaults("ResetPlacement.\(runtime.provider.id)"), storageKey: "layout",
+                defaultMetricIDs: [sessionID, resetID], defaultExpandedMetricIDs: []
+            )
+            for expanded in [Set<String>(), Set([sessionID, resetID])] {
+                store.expandedMetricIDs = expanded
+                let group = try XCTUnwrap(store.displayGroups.first)
+                XCTAssertEqual(group.alwaysShownWidgets.map(\.descriptorID), [sessionID])
+                XCTAssertEqual(group.expandedWidgets.map(\.descriptorID), [resetID])
+                XCTAssertTrue(store.isMetricEnabled(resetID), "Moving details preserves the saved selection")
+            }
+            store.setMetricEnabled(sessionID, false)
+            let creditOnly = try XCTUnwrap(store.displayGroups.first)
+            XCTAssertTrue(creditOnly.alwaysShownWidgets.isEmpty, "Never promote reset credits into overview")
+            XCTAssertEqual(creditOnly.expandedWidgets.map(\.descriptorID), [resetID])
+            XCTAssertTrue(store.customizeDetail(for: runtime.provider.id)!.expandedMetrics.contains { $0.id == resetID })
+        }
+    }
+
     func testCustomizeProviderIDClearsWhenLeavingCustomize() {
         let store = makeStore("RouteClears")
         store.screen = .customize
@@ -1213,21 +1208,6 @@ final class LayoutStoreTests: XCTestCase {
         store.customizeProviderID = "codex"
         store.screen = .settings
         XCTAssertNil(store.customizeProviderID)
-    }
-
-    // MARK: - Share confirmation
-
-    /// `clearShareConfirmation` hides the pill immediately and cancels the auto-clear task, so a
-    /// confirmation mid-countdown can't reappear stale after the popover closes and reopens.
-    func testClearShareConfirmationHidesPillAndCancelsTimer() {
-        let store = makeStore("ShareConfirmationClear")
-        XCTAssertFalse(store.shareConfirmation)
-
-        store.presentShareConfirmation()
-        XCTAssertTrue(store.shareConfirmation, "present sets the confirmation the pill reads")
-
-        store.clearShareConfirmation()
-        XCTAssertFalse(store.shareConfirmation, "clear hides the pill immediately")
     }
 
     /// Move a metric through the same divider-reorder route used by both dashboard and Customize

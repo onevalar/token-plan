@@ -85,6 +85,25 @@ enum Formatters {
         deadlineLabel("Resets", at: resetsAt, mode: .absolute, now: now, calendar: calendar)
     }
 
+    /// The overview supplies an hourglass/calendar icon instead of a reset verb. Keep a real
+    /// minute countdown even close to the deadline; an elapsed snapshot must not claim it reset.
+    static func compactDeadline(
+        at date: Date, mode: ResetDisplayMode, now: Date = Date(), calendar: Calendar = .current
+    ) -> String? {
+        let seconds = date.timeIntervalSince(now)
+        guard seconds.isFinite else { return nil }
+        guard seconds > 0 else { return imminent }
+        if mode == .relative { return compactDuration(seconds) }
+        let time = TimeFormatSetting.current.shortTime(date)
+        return calendar.isDate(date, inSameDayAs: now) ? time : "\(monthDayLabel(date)) · \(time)"
+    }
+
+    static func periodLabel(milliseconds: Int) -> String? {
+        if milliseconds == MetricPeriod.sessionMs { return "5h" }
+        if milliseconds == MetricPeriod.weekMs { return "1w" }
+        return compactDuration(TimeInterval(milliseconds) / 1000)
+    }
+
     /// Compact "Xd Yh" / "Xh Ym" / "Xm" duration. At the day scale it always shows two units — the
     /// hours ride along even when zero ("4d 0h") — so a span 4 days + 52 min out never reads as a flat
     /// "4d" that hides the sub-day remainder. Minutes are dropped at the day scale.
@@ -96,11 +115,11 @@ enum Formatters {
         let minutes = totalMinutes % 60
 
         if days > 0 {
-            return trf("%lldd %lldh", days, hours)
+            return "\(days)d \(hours)h"
         }
         if hours > 0 {
-            return minutes > 0 ? trf("%lldh %lldm", hours, minutes) : trf("%lldh", hours)
+            return minutes > 0 ? "\(hours)h \(minutes)m" : "\(hours)h"
         }
-        return trf("%lldm", minutes)
+        return "\(minutes)m"
     }
 }

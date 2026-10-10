@@ -1,8 +1,7 @@
 import SwiftUI
 
 /// Shared provider section header used by the dashboard and its lifted provider-reorder preview.
-/// The provider mark and name lead, followed by the optional plan badge. Dashboard callers supply a
-/// screenshot-copy action, revealed at the trailing edge while the header is hovered. Callers can also
+/// The provider mark and name lead, followed by the optional plan badge and detail entry. Callers can also
 /// supply an optional `warning` — the latest refresh error, rendered as a small amber
 /// triangle beside the name whose hover tooltip carries the message (e.g. "Not logged in. Run `codex`
 /// to authenticate."). The
@@ -21,16 +20,13 @@ struct ProviderSectionHeader: View {
     /// (dashboard only; `nil` in the reorder preview, which never surfaces staleness). Its tooltip carries
     /// the precise age.
     var staleness: StalenessHint?
-    /// Dashboard-only screenshot action. The reorder preview omits it, while Customize uses its own
-    /// row type and is unaffected by this header.
-    var onCopyScreenshot: (() -> Bool)?
+    var onOpenDetails: (() -> Void)?
 
     /// Header type and icon track the density setting like the rows do, so Compact shrinks the
     /// whole section anatomy — not just the rows under it.
     @AppStorage(DensitySetting.key) private var density = DensitySetting.regular
     /// Party easter egg: pulse the provider mark. Off by default everywhere else.
     @Environment(\.popoverPartyMode) private var partyMode
-    @State private var isHovered = false
 
     init(
         provider: Provider,
@@ -38,36 +34,43 @@ struct ProviderSectionHeader: View {
         warning: String? = nil,
         refreshing: Bool = false,
         staleness: StalenessHint? = nil,
-        onCopyScreenshot: (() -> Bool)? = nil
+        onOpenDetails: (() -> Void)? = nil
     ) {
         self.provider = provider
         self.plan = plan
         self.warning = warning
         self.refreshing = refreshing
         self.staleness = staleness
-        self.onCopyScreenshot = onCopyScreenshot
+        self.onOpenDetails = onOpenDetails
     }
 
     var body: some View {
+        let name = Text(provider.displayName)
+            .font(.system(size: density.headerPointSize, weight: .semibold))
+            .foregroundStyle(.primary)
         HStack(spacing: 5) {
             // The provider mark replaces the dashboard's visual drag grip. Reordering still belongs
             // to the whole header at the caller, so the logo itself stays presentational.
             ProviderIcon(source: provider.icon, inset: 0.04)
                 .frame(width: density.headerIconSize, height: density.headerIconSize)
                 .partyPulse(partyMode)
-            // Baseline-aligned pair: the plan badge (and stale tag) are smaller type and sit on the
-            // name's text baseline, so the words line up along the bottom rather than floating centered.
+            // Short names keep the compact baseline-aligned header. Long plans wrap below the
+            // identity instead of squeezing it into an unreadable sliver.
             HStack(alignment: .firstTextBaseline, spacing: 5) {
-                // Give the plan first choice of the available width, while still allowing an oversized
-                // plan to truncate. Account names and the lower-priority stale tag yield space first.
-                Text(provider.displayName)
-                    .font(.system(size: density.headerPointSize, weight: .semibold))
-                    .foregroundStyle(.primary)
-                    .lineLimit(1)
-                    .layoutPriority(1)
-                if let plan {
-                    ProviderPlanBadge(plan: plan)
-                        .layoutPriority(2)
+                ViewThatFits(in: .horizontal) {
+                    HStack(alignment: .firstTextBaseline, spacing: 5) {
+                        name.fixedSize()
+                        if let plan { ProviderPlanBadge(plan: plan).fixedSize() }
+                    }
+                    VStack(alignment: .leading, spacing: 2) {
+                        name.fixedSize(horizontal: false, vertical: true)
+                        if let plan {
+                            Text(plan)
+                                .font(.system(size: density.planBadgePointSize))
+                                .foregroundStyle(.secondary)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                    }
                 }
                 // Tertiary, below the plan in hierarchy: outdated content, not something the user acts on.
                 // Short by design ("Outdated") so it never pushes the plan name onto a second line — the
@@ -92,19 +95,21 @@ struct ProviderSectionHeader: View {
                     .accessibilityLabel(warning)
             }
             Spacer(minLength: 8)
-            if let onCopyScreenshot {
-                CopyFeedbackButton(
-                    accessibilityLabel: String(localized: "Copy \(provider.displayName) Screenshot"),
-                    isRevealed: isHovered,
-                    action: onCopyScreenshot
-                )
+            if let onOpenDetails {
+                Button(action: onOpenDetails) {
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 12, weight: .semibold))
+                        .frame(width: 26, height: 26)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(String(localized: "Open \(provider.displayName)"))
             }
         }
         .padding(.leading, 2)
         .padding(.trailing, 4)
         .padding(.vertical, 2)
         .contentShape(Rectangle())
-        .onHover { isHovered = $0 }
     }
 }
 

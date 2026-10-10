@@ -2,7 +2,7 @@ import AppKit
 import Observation
 
 /// Owns the menu-bar strip's render loop, split out of `StatusItemController`: render the pinned-metrics
-/// strip and re-render whenever anything it reads changes (pins, live data, meter style, menu-bar style).
+/// strip and re-render whenever anything it reads changes (pins, live data, meter/menu-bar style, service visibility).
 ///
 /// `withObservationTracking`'s `onChange` is one-shot, so each render re-arms it. After the first change,
 /// the next render waits briefly so a burst of snapshot writes collapses into one render with the latest
@@ -56,7 +56,7 @@ final class StatusItemImageUpdater {
         }
     }
 
-    /// The pinned-metrics strip in the chosen style, or the app icon when nothing is pinned.
+    /// Percentage uses stars; Ring selects one primary quota per user-selected account from live data.
     private func renderButtonImage() -> NSImage {
         // Screen-share privacy: while a capture is active (and the setting is on), the strip is
         // replaced with the wordmark so a shared screen never carries usage numbers. Read inside the
@@ -66,11 +66,15 @@ final class StatusItemImageUpdater {
                 ?? MenuBarIcon.image
                 ?? MenuBarStripRenderer.fallbackIcon
         }
+        let style = container.layout.menuBarStyle
         let content = MenuBarContentBuilder.build(
-            groups: container.layout.pinnedGroups,
+            groups: container.layout.menuBarGroups,
+            style: style,
+            plan: { container.dataStore.plan(for: $0) },
+            accountNumbers: container.layout.menuBarAccountNumbers,
             data: { container.dataStore.data(for: $0) }
         )
-        return MenuBarStripRenderer.image(for: content, style: container.layout.menuBarStyle)
+        return MenuBarStripRenderer.image(for: content, style: style)
             ?? MenuBarIcon.image
             ?? MenuBarStripRenderer.fallbackIcon
     }

@@ -123,4 +123,23 @@ final class ProviderAccountsStoreTests: XCTestCase {
         XCTAssertEqual(ProviderAccountID.family(of: "claude"), "claude")
         XCTAssertEqual(ProviderAccountID.family(of: "claude@ab12cd34"), "claude")
     }
+
+    func testSubscriptionNotesAreOptInPersistPerAccountAndDoNotChangeProviderAliases() {
+        let defaults = makeScratchDefaults()
+        let accounts = ProviderAccountsStore(defaults: defaults)
+        accounts.reconcile(with: [defaultHomeObservation(family: "claude", identityKey: "a", label: "Tool Alias")])
+        let records = accounts.records
+        let notes = SubscriptionNotesStore(defaults: defaults)
+        notes.setNote(" Personal ", for: "claude")
+        notes.setNote("Work", for: "claude@other")
+        XCTAssertNil(notes.overviewNote(for: "claude"))
+        notes.setShowsNote(true, for: "claude")
+        let restored = SubscriptionNotesStore(defaults: defaults)
+        XCTAssertEqual(restored.overviewNote(for: "claude"), "Personal")
+        XCTAssertEqual(restored.note(for: "claude@other"), "Work")
+        XCTAssertNil(restored.overviewNote(for: "claude@other"))
+        restored.setNote("  ", for: "claude")
+        XCTAssertNil(restored.overviewNote(for: "claude"))
+        XCTAssertEqual(ProviderAccountsStore(defaults: defaults).records, records)
+    }
 }

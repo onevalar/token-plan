@@ -16,8 +16,8 @@ struct LayoutInitialState {
     let metricOrderByProvider: [String: [String]]
     let pinnedMetricIDs: Set<String>
     let expandedMetricIDs: Set<String>
-    let expandedProviderIDs: Set<String>
     let defaultExpandedOnEnableIDs: Set<String>
+    let hiddenMenuBarServices: Set<String>
     let menuBarStyle: MenuBarStyle
 
     let shouldPersistPlaced: Bool
@@ -72,10 +72,6 @@ enum LayoutBootstrap {
             shouldPersistExpanded = true
         }
 
-        let expandedProviderIDs = Set(
-            (persistence.loadExpandedProviders() ?? []).filter { registry.provider(id: $0) != nil }
-        )
-
         // A newly-shipped default metric is new to an existing user, so it may safely start below the
         // caret when that is its declared default. Metrics they already had are never silently hidden.
         let newlyExpanded = Set(seededResult.newlyPlaced)
@@ -114,8 +110,8 @@ enum LayoutBootstrap {
             metricOrderByProvider: metricOrderByProvider,
             pinnedMetricIDs: pinnedMetricIDs,
             expandedMetricIDs: expandedMetricIDs,
-            expandedProviderIDs: expandedProviderIDs,
             defaultExpandedOnEnableIDs: defaultExpandedOnEnableIDs,
+            hiddenMenuBarServices: Set(persistence.loadHiddenMenuBarServices() ?? []),
             menuBarStyle: persistence.loadMenuBarStyle(),
             shouldPersistPlaced: seededResult.shouldPersistPlaced,
             shouldPersistExpanded: shouldPersistExpanded,

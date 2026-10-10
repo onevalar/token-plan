@@ -1,5 +1,12 @@
 # Provider error / notice messages.
 T = {
+"Amp CLI not found. Install Amp and run amp login in Terminal.": ("找不到 Amp 命令行工具。请安装 Amp，并在终端运行 amp login。", "找不到 Amp 命令列工具。請安裝 Amp，並在終端機執行 amp login。", "Amp CLIが見つかりません。Ampをインストールし、ターミナルでamp loginを実行してください。", "Amp CLI를 찾을 수 없습니다. Amp를 설치하고 터미널에서 amp login을 실행하세요."),
+"Amp is not logged in. Run amp login in Terminal, then refresh.": ("Amp 尚未登录。请在终端运行 amp login，然后刷新。", "Amp 尚未登入。請在終端機執行 amp login，然後重新整理。", "Ampにログインしていません。ターミナルでamp loginを実行してから更新してください。", "Amp에 로그인하지 않았습니다. 터미널에서 amp login을 실행한 뒤 새로고침하세요."),
+"Couldn't read Amp's saved login. Check its file permissions or log in to Amp again.": ("无法读取 Amp 已保存的登录。请检查文件权限，或重新登录 Amp。", "無法讀取 Amp 已儲存的登入。請檢查檔案權限，或重新登入 Amp。", "Ampの保存済みログインを読み取れません。ファイルの権限を確認するか、Ampに再ログインしてください。", "Amp에 저장된 로그인을 읽을 수 없습니다. 파일 권한을 확인하거나 Amp에 다시 로그인하세요."),
+"Amp usage failed. Run amp usage in Terminal to check your connection.": ("Amp 用量读取失败。请在终端运行 amp usage 检查连接。", "Amp 用量讀取失敗。請在終端機執行 amp usage 檢查連線。", "Ampの使用量を取得できません。ターミナルでamp usageを実行し、接続を確認してください。", "Amp 사용량을 가져오지 못했습니다. 터미널에서 amp usage를 실행하여 연결을 확인하세요."),
+"Amp usage timed out. Check your connection and refresh.": ("Amp 用量读取超时。请检查连接后刷新。", "Amp 用量讀取逾時。請檢查連線後重新整理。", "Ampの使用量取得がタイムアウトしました。接続を確認してから更新してください。", "Amp 사용량 요청 시간이 초과되었습니다. 연결을 확인한 뒤 새로고침하세요."),
+"Couldn't read Amp usage. Check amp usage in Terminal or update the Amp CLI.": ("无法识别 Amp 用量。请在终端检查 amp usage，或更新 Amp 命令行工具。", "無法辨識 Amp 用量。請在終端機檢查 amp usage，或更新 Amp 命令列工具。", "Ampの使用量を読み取れません。ターミナルでamp usageを確認するか、Amp CLIを更新してください。", "Amp 사용량을 읽을 수 없습니다. 터미널에서 amp usage를 확인하거나 Amp CLI를 업데이트하세요."),
+"Amp CLI did not report subscription quotas. Only the credit balance is available.": ("Amp 命令行工具未提供订阅额度，目前只能读取余额。", "Amp 命令列工具未提供訂閱額度，目前只能讀取餘額。", "Amp CLIから契約の上限が報告されていません。クレジット残高のみ表示できます。", "Amp CLI에서 구독 한도를 보고하지 않았습니다. 크레딧 잔액만 확인할 수 있습니다."),
 "No %@ API key. Set %@ or add it to %@.": ("没有 %1$@ 的 API 密钥。请设置 %2$@，或将其添加到 %3$@。", "沒有 %1$@ 的 API 金鑰。請設定 %2$@，或將其加入 %3$@。", "%1$@ の API キーがありません。%2$@ を設定するか、%3$@ に追加してください。", "%1$@ API 키가 없습니다. %2$@을(를) 설정하거나 %3$@에 추가하세요."),
 "%@ API key invalid. Check your key at %@.": ("%1$@ 的 API 密钥无效。请到 %2$@ 检查你的密钥。", "%1$@ 的 API 金鑰無效。請到 %2$@ 檢查你的金鑰。", "%1$@ の API キーが無効です。%2$@ でキーを確認してください。", "%1$@ API 키가 올바르지 않습니다. %2$@에서 키를 확인하세요."),
 "Couldn't save the %@ API key.": ("无法保存 %@ 的 API 密钥。", "無法儲存 %@ 的 API 金鑰。", "%@ の API キーを保存できませんでした。", "%@ API 키를 저장하지 못했습니다."),

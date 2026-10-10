@@ -10,6 +10,9 @@ final class AppContainer {
     let registry: WidgetRegistry
     let layout: LayoutStore
     let dataStore: WidgetDataStore
+    let subscriptionNotes = SubscriptionNotesStore()
+    /// Launch-discovered login sources, used only to explain a subscription's connection.
+    let accounts: ProviderAccountsStore
     /// Opt-in private iCloud document sync for additive machine-local daily history.
     let iCloudSync: ICloudUsageSyncStore
     /// Single source of truth for which providers the user has turned off. Both stores consult it (via
@@ -66,6 +69,7 @@ final class AppContainer {
         // The launch account pass: which account is signed in at each family's default home. Feeds
         // the snapshot cache's account stamp and reconciles the account registry.
         let accountAssembly = await ProviderAccountAssembly.make(waitsForLoginShell: true)
+        self.accounts = ProviderAccountsStore()
 
         let providers = ProviderCatalog.make(
             claudeCards: accountAssembly.claudeCards,
@@ -214,8 +218,8 @@ final class AppContainer {
     /// screen resets those alongside this call.
     func resetAllSettings() {
         layout.resetToDefault()
-        // The menu-bar Icon Style is a Settings preference, not part of the Customize layout reset.
-        layout.menuBarStyle = .text
+        // Menu-bar style and service visibility belong to Settings, not customization resets.
+        layout.resetMenuBarSettings()
         reseedEnabledProviders()
         dataStore.resetDisplaySettings()
         notificationSettings.resetToDefaults()
@@ -229,7 +233,7 @@ final class AppContainer {
         // `@AppStorage` properties observe the change. New settings must be added here.
         for key in [
             AppearanceSetting.key, TimeFormatSetting.key, DensitySetting.key,
-            ReduceAnimationsSetting.key, LogLevelSetting.key, TotalSpendSetting.key,
+            ReduceAnimationsSetting.key, LogLevelSetting.key,
             TotalSpendSetting.periodKey, TotalSpendSetting.metricKey,
         ] {
             UserDefaults.standard.removeObject(forKey: key)

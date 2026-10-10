@@ -1,16 +1,14 @@
 import Foundation
 
-/// How the menu-bar item renders the pinned metrics: a `text` strip (provider icon + values, one
-/// segment per pinned provider) or the compact `bars` glyph (up to four bounded-metric bars). Chosen in
-/// Settings and persisted by `LayoutStore`; defaults to `.text`.
-enum MenuBarStyle: String, Hashable, Sendable, CaseIterable {
-    case text
-    case bars
+/// Settings-owned menu-bar presentation, independent of the overview's quota style.
+enum MenuBarStyle: String, CaseIterable, Hashable, Sendable {
+    case percentage
+    case ring
 
     var label: String {
         switch self {
-        case .text: return tr("Text")
-        case .bars: return tr("Bars")
+        case .percentage: return tr("Percentage")
+        case .ring: return tr("Ring")
         }
     }
 }

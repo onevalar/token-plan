@@ -14,8 +14,8 @@ enum ResetClaimOutcome: Equatable, Sendable {
 
 /// Claims a Codex rate-limit reset credit — the app's only provider-API write, so it is deliberately
 /// narrow: one credit per call, always by explicit credit id, guarded by the caller's idempotency key.
-/// The protocol was reverse-engineered from the open-source Codex CLI and verified live once; see
-/// docs/research/codex-reset-credit-claim.md.
+/// The request follows the open-source Codex CLI's reset-credit protocol. Automated tests use
+/// simulated responses; they do not redeem a real account's credit.
 ///
 /// The claim re-fetches the credit list at claim time and matches the target credit by its expiry
 /// instant (the identity the popover timeline carries), rather than trusting a cached id: the list is a

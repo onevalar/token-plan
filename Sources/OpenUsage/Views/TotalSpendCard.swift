@@ -1,17 +1,16 @@
 import AppKit
 import SwiftUI
 
-/// The dashboard's cross-provider Total Spend section: a native segmented period picker
+/// Settings' cross-provider Usage History: a native segmented period picker
 /// (Today / Yesterday / Last 30 Days) over a donut ring whose segments are each provider's share of
 /// the selected metric, with the total in the center and a ranked legend beside it. The title is a
 /// pull-down menu for Cost / Cost/MTok / Tokens. Data comes from `TotalSpendAggregator` over
 /// the same snapshots the provider cards render. Shown whenever any enabled provider tracks spend
-/// (`LayoutStore.hasSpendCapableProvider`) and the toggle at the top of Settings is on; a period
+/// (`LayoutStore.hasSpendCapableProvider`); a period
 /// (or metric) with nothing to show uses a quiet empty state instead of hiding the card.
 struct TotalSpendCard: View {
     @Environment(LayoutStore.self) private var layout
     @Environment(WidgetDataStore.self) private var dataStore
-    @Environment(\.colorScheme) private var colorScheme
     @Namespace private var pickerNamespace
 
     /// The selected period survives popover closes and relaunches, like the meter-style toggles.
@@ -52,8 +51,7 @@ struct TotalSpendCard: View {
 
     // MARK: - Header
 
-    /// Section header matching the provider headers' scale: title menu leading, the share control
-    /// trailing where a provider header shows its mark.
+    /// Metric menu and information about the providers included in this total.
     private var header: some View {
         HStack(spacing: 5) {
             metricMenu
@@ -62,7 +60,6 @@ struct TotalSpendCard: View {
                 .foregroundStyle(.secondary)
                 .hoverTooltip(infoTooltip)
             Spacer(minLength: 8)
-            shareButton
         }
         .padding(.leading, 4)
         .padding(.trailing, 4)
@@ -108,17 +105,6 @@ struct TotalSpendCard: View {
         return String(localized: "Only includes \(names.formatted(.list(type: .and))).")
     }
 
-    private var shareButton: some View {
-        CopyFeedbackButton(accessibilityLabel: String(localized: "Copy \(metric.title) Screenshot")) {
-            ShareCardRenderer.shareTotalSpend(
-                total: total,
-                metric: metric,
-                appearance: colorScheme,
-                layout: layout
-            )
-        }
-    }
-
     // MARK: - Card
 
     private var card: some View {
@@ -136,16 +122,6 @@ struct TotalSpendCard: View {
         .cardSurface()
         .animation(Motion.spring, value: periodRawValue)
         .animation(Motion.spring, value: metricRawValue)
-        .contextMenu {
-            Button("Share Screenshot") {
-                ShareCardRenderer.shareTotalSpend(
-                    total: total,
-                    metric: metric,
-                    appearance: colorScheme,
-                    layout: layout
-                )
-            }
-        }
     }
 
     /// A capsule segmented switcher in the app's own design language (the footer's glass capsule
@@ -199,8 +175,7 @@ struct TotalSpendCard: View {
     }
 }
 
-/// The ring + legend body, shared by the live card and the share-card export so the PNG can't drift
-/// from what's on screen. Slices come ranked by the selected metric from `TotalSpend.projection`,
+/// The ring + legend body. Slices come ranked by the selected metric from `TotalSpend.projection`,
 /// so the ring reads clockwise from 12 o'clock in the same order the legend reads top-down.
 ///
 /// A period or metric switch **morphs** the arcs: each provider's slice slides and resizes to its
