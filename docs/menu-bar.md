@@ -1,5 +1,17 @@
 # Menu Bar
 
+## Missing Menu Bar Entry on macOS 26
+
+Check **System Settings → Menu Bar → Allow in the Menu Bar → TokenPlan** first. If it is already enabled, the system can still block TokenPlan through another application's saved menu-bar association. On one development Mac, enabling the build host's **ChatGPT** (`com.openai.codex`) switch immediately restored TokenPlan; disabling it blocked TokenPlan again. The TokenPlan switch alone had no effect.
+
+To distinguish this from an image or layout problem, inspect Control Center's `appStatusItems` log for TokenPlan's bundle identifier. `Moving host to blocked list` confirms system blocking; `Unblocking host` confirms that it was lifted. A non-nil status button, a rendered image, or `isVisible == true` does not prove that the system is displaying the entry.
+
+Change another application's display switch only with the user's agreement. A menu-bar manager can hide that application's own icon separately. Do not change TokenPlan's bundle identifier, repeatedly recreate its status item, or automatically reset Control Center to work around this state. This workaround restores visibility but does not remove the system's incorrect association.
+
+For an explicit, targeted repair on an affected development Mac, `python3 script/repair_menu_bar_association.py` checks whether the `com.openai.codex` record contains `com.onevalar.tokenplan.dev`. `--apply` backs up the original preferences in `~/Library/Logs/TokenPlan/MenuBarRepairs/`, removes only that foreign reference, and verifies the write. Both applications' allow/deny switches and unrelated associations remain unchanged. The tool requires existing macOS permission to access the protected preferences; stop at a permission denial and have the user run it from an authorized Terminal. It does not grant itself access or restart system processes. Restart Control Center and launch TokenPlan from Finder after applying, then verify that TokenPlan remains visible while ChatGPT is disallowed. Keep using the app bundle through Finder or the build script's LaunchServices `open` path; avoid directly launching its inner executable from a development tool.
+
+This targeted repair was verified on the affected Mac: it removed one reference, and TokenPlan remained in the visible menu-bar section after restarting both Control Center and TokenPlan while ChatGPT's system switch stayed off. Control Center logged TokenPlan as an allowed host and ChatGPT as a blocked host. This confirms the repaired local association; it does not guarantee that future macOS versions cannot create another incorrect association.
+
 Choose compact percentages or one primary quota ring per selected account.
 
 ## Right-clicking the icon

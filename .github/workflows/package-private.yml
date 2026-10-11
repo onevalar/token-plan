@@ -1,0 +1,108 @@
+name: Private packages
+# A unique snapshot branch is created by automation.py. Never publishes a Release.
+on:
+  push:
+    branches: ['tokenplan-package/**']
+permissions:
+  contents: read
+concurrency:
+  group: private-package-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  desktop:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-dotnet@v5
+        with:
+          global-json-file: platforms/desktop/global.json
+      - name: Resolve package request
+        id: request
+        run: |
+          python3 - <<'PY'
+          import json, re, os
+          request = json.load(open('.tokenplan-package-request.json'))
+          version = request['version']
+          assert re.fullmatch(r'[0-9]+\.[0-9]+\.[0-9]+(?:-beta\.[0-9]+)?', version)
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as f: f.write(f'version={version}\n')
+          PY
+      - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends nsis
+      - run: script/build_desktop.sh test
+      - name: Build Windows and Linux installers
+        env:
+          VERSION: ${{ steps.request.outputs.version }}
+        run: script/build_desktop_installers.sh "$VERSION"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: desktop-installers
+          path: dist/installers/*
+          if-no-files-found: error
+          retention-days: 14
+  native-tests:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v5
+        with:
+          global-json-file: platforms/desktop/global.json
+      - name: Install Linux interface fonts
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fonts-noto-cjk
+      - name: Build and run core checks on target OS
+        working-directory: platforms/desktop
+        shell: bash
+        run: |
+          dotnet run --project TokenPlan.Core.Tests
+          dotnet build TokenPlan.Desktop
+          TOKENPLAN_UI_CAPTURE="$RUNNER_TEMP/tokenplan-ui" dotnet run --project TokenPlan.Desktop.Tests
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ui-checks-${{ matrix.os }}
+          path: ${{ runner.temp }}/tokenplan-ui/*.png
+          if-no-files-found: warn
+          retention-days: 14
+  installer-checks:
+    needs: desktop
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v4
+        with:
+          name: desktop-installers
+          path: ${{ runner.temp }}/installers
+      - name: Install, upgrade, launch fixture and uninstall on Windows
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: ./script/ci/check_windows_installer.ps1
+      - name: Install, launch fixture and uninstall on Ubuntu
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb fonts-noto-cjk "$RUNNER_TEMP"/installers/tokenplan_*_amd64.deb
+          test -x /usr/bin/tokenplan
+          test -f /opt/tokenplan/THIRD-PARTY-NOTICES.txt
+          set +e
+          xvfb-run -a timeout 12s /usr/bin/tokenplan --fixture > "$RUNNER_TEMP/installed-fixture.log" 2>&1
+          result=$?
+          set -e
+          cat "$RUNNER_TEMP/installed-fixture.log"
+          test "$result" -eq 124
+          sudo apt-get install -y --reinstall "$RUNNER_TEMP"/installers/tokenplan_*_amd64.deb
+          sudo apt-get remove -y tokenplan
+          test ! -e /opt/tokenplan/TokenPlan.Desktop
