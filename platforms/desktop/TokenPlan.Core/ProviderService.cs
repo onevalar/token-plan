@@ -8,16 +8,25 @@ namespace TokenPlan.Core;
 
 public sealed partial class ProviderService : IDisposable
 {
+    readonly System.Collections.Concurrent.ConcurrentDictionary<string, string> attemptIdentities = new();
     readonly HttpClient http;
+    readonly string userHome;
+    readonly string? alternateAuthFile;
+    readonly bool encodedAuth;
+    readonly Func<string, string, CancellationToken, Task<string?>> credentialReader;
     readonly string codexHome;
     readonly string claudeHome;
     readonly string cursorDatabase;
     readonly Action<string, string> log;
     readonly System.Collections.Concurrent.ConcurrentDictionary<string, DateTimeOffset> cooldowns = new();
-    public ProviderService(string codexHome, string claudeHome, HttpMessageHandler? handler = null, Action<string, string>? log = null, TimeSpan? requestTimeout = null, string? cursorDatabase = null)
+    public ProviderService(string codexHome, string claudeHome, HttpMessageHandler? handler = null, Action<string, string>? log = null, TimeSpan? requestTimeout = null, string? cursorDatabase = null, APIKeyStore? keys = null, string? userHome = null, Func<string, string, CancellationToken, Task<string?>>? credentialReader = null, string? alternateAuthFile = null, bool encodedAuth = false)
     {
+        Keys = keys ?? new();
+        this.alternateAuthFile = alternateAuthFile; this.encodedAuth = encodedAuth;
+        this.userHome = userHome ?? Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+        this.credentialReader = credentialReader ?? SystemCredentialStore.Read;
         this.codexHome = codexHome;
-        this.claudeHome = claudeHome;
+        this.claudeHome = claudeHome.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).FirstOrDefault() ?? claudeHome;
         this.cursorDatabase = cursorDatabase ?? CursorAuth.DefaultDatabase;
         this.log = log ?? DiagnosticLog.Write;
         var timeout = requestTimeout ?? TimeSpan.FromSeconds(20);
@@ -27,16 +36,31 @@ public sealed partial class ProviderService : IDisposable
     }
     public async Task<ProviderResult> Refresh(string id, CancellationToken cancellationToken)
     {
-        if (id is not ("claude" or "codex" or "cursor")) throw new ArgumentException("Unknown provider", nameof(id));
-        var name = id == "claude" ? "Claude" : id == "codex" ? "Codex" : "Cursor";
+        var name = ProviderCatalog.Get(id).Name;
         // ResponseHeadersRead ends HttpClient's timeout at the headers; bound the body too.
         using var deadline = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         deadline.CancelAfter(http.Timeout);
         var operationToken = deadline.Token;
         string? fingerprint = null;
-        ProviderResult Fail(string key) { log(id, key); return new(id, name, null, key, fingerprint); }
+        attemptIdentities.TryRemove(id, out _);
+        ProviderResult Fail(string key) { log(id, key); return new(id, name, null, key, fingerprint ?? attemptIdentities.GetValueOrDefault(id)); }
         try
         {
+            if (id == "grok") return await RefreshGrok(operationToken);
+            if (id is "copilot" or "opencode" or "devin") return await RefreshLocal(id, operationToken);
+            if (id == "ollama") return await RefreshOllama(operationToken);
+            if (id == "antigravity") return await RefreshAntigravity(operationToken);
+            if (id == "amp") return await RefreshAmp(operationToken);
+            if (IsKeyProvider(id))
+            {
+                var apiKey = Keys.Load(id);
+                if (apiKey == null) return Fail("Add an API key in service settings, then refresh.");
+                fingerprint = Fingerprint(apiKey);
+                CheckCooldown(id + fingerprint);
+                return new(id, name, await FetchKeyUsage(id, apiKey, id + fingerprint, operationToken), null, fingerprint);
+            }
+            if (id is not ("claude" or "codex" or "cursor"))
+                return Fail("This service integration is not available in this build.");
             if (id == "cursor")
             {
                 var login = await Task.Run(() => CursorAuth.Load(cursorDatabase, operationToken), operationToken);
@@ -68,7 +92,7 @@ public sealed partial class ProviderService : IDisposable
                 }
                 return new(id, name, cursorSnapshot, null, fingerprint);
             }
-            var filename = Path.Combine(id == "codex" ? codexHome : claudeHome, id == "codex" ? "auth.json" : ".credentials.json");
+            var filename = alternateAuthFile ?? Path.Combine(id == "codex" ? codexHome : claudeHome, id == "codex" ? "auth.json" : ".credentials.json");
             if (!File.Exists(filename)) return Fail(id == "codex" ? "Sign in with the Codex CLI, then refresh." : "Sign in with Claude Code, then refresh.");
             var file = new FileInfo(filename);
             if (file.Length > 2 * 1024 * 1024) throw new InvalidDataException();
@@ -76,6 +100,7 @@ public sealed partial class ProviderService : IDisposable
             // Release the login file before networking; CLI login/rotation must remain possible.
             await using (var authStream = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete, 8192, FileOptions.Asynchronous | FileOptions.SequentialScan))
                 authBytes = await ReadBounded(authStream, operationToken);
+            if (encodedAuth) authBytes = Convert.FromBase64String(Encoding.UTF8.GetString(authBytes).Trim());
             using var auth = JsonDocument.Parse(authBytes);
             var key = id == "codex" ? "tokens" : "claudeAiOauth";
             if (auth.RootElement.ValueKind != JsonValueKind.Object || !auth.RootElement.TryGetProperty(key, out var tokens) || tokens.ValueKind != JsonValueKind.Object) throw new InvalidDataException();
@@ -89,18 +114,26 @@ public sealed partial class ProviderService : IDisposable
             request.Headers.Accept.ParseAdd("application/json");
             if (id == "codex" && UsageParser.String(tokens, "account_id") is { Length: > 0 } account) request.Headers.Add("ChatGPT-Account-Id", account);
             if (id == "claude") request.Headers.Add("anthropic-beta", "oauth-2025-04-20");
-            var snapshot = UsageParser.Parse(id, await Fetch(request, cooldownKey, operationToken), DateTimeOffset.UtcNow);
+            var usageJSON = await Fetch(request, cooldownKey, operationToken);
+            if (id == "codex") usageJSON = await WithCodexResetCredits(usageJSON, token, UsageParser.String(tokens, "account_id"), cooldownKey, operationToken);
+            var snapshot = UsageParser.Parse(id, usageJSON, DateTimeOffset.UtcNow);
             return new(id, name, snapshot, null, fingerprint);
         }
         catch (ProviderFailure e) { return Fail(e.Message == "Your session has expired. Sign in with the CLI again." && id == "cursor" ? "Your Cursor session has expired. Sign in with Cursor again." : e.Message); }
-        catch (Microsoft.Data.Sqlite.SqliteException) { return Fail("Cursor login could not be read. Open Cursor and sign in again."); }
+        catch (Microsoft.Data.Sqlite.SqliteException) { return Fail(id == "cursor" ? "Cursor login could not be read. Open Cursor and sign in again." : "Usage or login data could not be read. Sign in again."); }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (OperationCanceledException) { return Fail("The connection timed out. Try again later."); }
         catch (HttpRequestException) { return Fail("Cannot reach the provider. Check your connection."); }
-        catch (Exception e) when (e is JsonException or InvalidDataException or FormatException or ArgumentException or IOException or UnauthorizedAccessException)
+        catch (Exception e) when (e is JsonException or InvalidDataException or FormatException or ArgumentException or IOException or UnauthorizedAccessException or InvalidOperationException or CryptographicException)
         {
             return Fail("Usage or login data could not be read. Sign in again.");
         }
+    }
+    CancellationTokenSource OptionalMetadataDeadline(CancellationToken cancellation)
+    {
+        var deadline = CancellationTokenSource.CreateLinkedTokenSource(cancellation);
+        deadline.CancelAfter(TimeSpan.FromMilliseconds(Math.Min(3000, http.Timeout.TotalMilliseconds / 4)));
+        return deadline;
     }
     static string Fingerprint(string token) => Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(token)));
     void CheckCooldown(string key)
@@ -135,6 +168,6 @@ public sealed partial class ProviderService : IDisposable
         }
         return buffer.ToArray();
     }
-    public void Dispose() => http.Dispose();
+    public void Dispose() { http.Dispose(); foreach (var service in accountServices.Values) service.Dispose(); accountServices.Clear(); }
     sealed class ProviderFailure(string key) : Exception(key);
 }

@@ -2,9 +2,11 @@ using System.Text.Json;
 
 namespace TokenPlan.Core;
 
-public record UsageWindow(string Label, double UsedPercent, DateTimeOffset? ResetsAt)
+public record UsageWindow(string Label, double UsedPercent, DateTimeOffset? ResetsAt, double? Amount = null, string? Currency = null, double? Limit = null, IReadOnlyList<DateTimeOffset>? Expiries = null, double? PeriodSeconds = null)
 {
     public double RemainingPercent => Math.Max(0, 100 - UsedPercent);
+    public bool IsBalance => Amount != null && Limit == null;
+    public string FormattedAmount => (Currency == "CNY" ? "¥" : Currency == "USD" ? "$" : "") + (Currency == "COUNT" ? Amount?.ToString("N0") : Amount?.ToString("N2")) + (Limit != null ? " / " + Limit.Value.ToString("N2") : "");
 }
 public record UsageSnapshot(string Id, string Name, string? Plan, IReadOnlyList<UsageWindow> Windows, DateTimeOffset FetchedAt);
 public record ProviderResult(string Id, string Name, UsageSnapshot? Snapshot, string? ErrorKey, string? CredentialFingerprint = null)
@@ -12,7 +14,7 @@ public record ProviderResult(string Id, string Name, UsageSnapshot? Snapshot, st
     public ProviderResult PreserveLastSuccess(ProviderResult? previous) => Snapshot == null && ErrorKey != null && CredentialFingerprint != null && previous?.Id == Id && previous.CredentialFingerprint == CredentialFingerprint && previous.Snapshot != null ? this with { Snapshot = previous.Snapshot } : this;
 }
 
-public static class UsageParser
+public static partial class UsageParser
 {
     public static UsageSnapshot Parse(string provider, string json, DateTimeOffset now)
     {
@@ -34,19 +36,20 @@ public static class UsageParser
         {
             foreach (var (field, label) in new[] { ("five_hour", "Session"), ("seven_day", "Weekly"), ("seven_day_sonnet", "Sonnet") })
             {
-                if (!root.TryGetProperty(field, out var window) || window.ValueKind != JsonValueKind.Object) continue;
+                if (root.ValueKind != JsonValueKind.Object || !root.TryGetProperty(field, out var window) || window.ValueKind != JsonValueKind.Object) continue;
                 if (Number(window, "utilization") is not { } used || used < 0) continue;
                 DateTimeOffset? reset = DateTimeOffset.TryParse(String(window, "resets_at"), out var date) ? date : null;
-                windows.Add(new(label, used, reset));
+                windows.Add(new(label, used, reset, PeriodSeconds: field == "five_hour" ? 18000 : 604800));
             }
         }
         else throw new ArgumentException("Unknown provider");
+        AddSupplemental(provider, root, windows, now);
         if (windows.Count == 0) throw new InvalidDataException("No valid usage windows");
         return new(provider, provider == "codex" ? "Codex" : "Claude", plan, windows, now);
     }
     static void AddCodex(JsonElement root, string field, string fallback, DateTimeOffset now, List<UsageWindow> windows)
     {
-        if (!root.TryGetProperty(field, out var window) || window.ValueKind != JsonValueKind.Object) return;
+        if (root.ValueKind != JsonValueKind.Object || !root.TryGetProperty(field, out var window) || window.ValueKind != JsonValueKind.Object) return;
         if (Number(window, "used_percent") is not { } used || used < 0) return;
         var seconds = Number(window, "limit_window_seconds");
         var label = seconds == 604800 ? "Weekly" : seconds == 18000 ? "Session" : fallback;
@@ -58,7 +61,7 @@ public static class UsageParser
         }
         catch (ArgumentOutOfRangeException) { }
         catch (OverflowException) { }
-        var item = new UsageWindow(label, used, reset);
+        var item = new UsageWindow(label, used, reset, PeriodSeconds: seconds);
         var existing = windows.FindIndex(w => w.Label == label);
         if (existing < 0) windows.Add(item);
         else windows[existing] = item;

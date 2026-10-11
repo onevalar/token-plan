@@ -12,7 +12,7 @@ sealed class ProviderGrid : Panel
     protected override Size MeasureOverride(Size availableSize)
     {
         var width = double.IsFinite(availableSize.Width) ? availableSize.Width : 740;
-        columns = Math.Min(Math.Max(1, Children.Count), width >= 700 ? 3 : width >= 500 ? 2 : 1);
+        columns = Math.Min(Math.Max(1, Children.Count), width >= 660 ? 2 : 1);
         var itemWidth = Math.Max(0, (width - Gap * (columns - 1)) / columns);
         heights = new double[(Children.Count + columns - 1) / columns];
         for (var i = 0; i < Children.Count; i++)

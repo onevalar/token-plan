@@ -58,7 +58,7 @@ static class HistoryChecks
         check(legacy.ClaudeEnabled && legacy.CodexEnabled && legacy.CursorEnabled && legacy.HistoryDays == 7, "Existing preferences retain all providers and a seven-day history default");
         var changed = legacy.WithEnabled("cursor", false) with { HistoryDays = 30, TokenDays = 30 };
         changed.Save(defaultsFile);
-        check(Preferences.Load(defaultsFile) == changed, "Provider enablement and history range survive restart");
+        check(JsonSerializer.Serialize(Preferences.Load(defaultsFile)) == JsonSerializer.Serialize(changed), "Provider enablement and history range survive restart");
         File.WriteAllText(defaultsFile, """{"HistoryDays":500}""");
         try { Preferences.Load(defaultsFile); throw new Exception("Invalid history range accepted"); } catch (InvalidDataException) { check(true, "Unsupported history ranges are rejected"); }
 

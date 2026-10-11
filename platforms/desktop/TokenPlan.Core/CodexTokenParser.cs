@@ -8,12 +8,14 @@ public record TokenCounts(long Input, long Output, long CacheRead, long Other = 
     public TokenCounts Plus(TokenCounts other) => new(checked(Input + other.Input), checked(Output + other.Output), checked(CacheRead + other.CacheRead), checked(Other + other.Other), checked(CacheWrite + other.CacheWrite));
     public static TokenCounts Zero => new(0, 0, 0);
 }
-public record TokenEvent(DateTimeOffset Timestamp, TokenCounts Tokens);
+public record TokenEvent(DateTimeOffset Timestamp, TokenCounts Tokens, double? EstimatedCost = null);
 
 /// Mirrors the macOS rollout parser's cumulative counters and child replay gate.
 /// Only session metadata and token counters are retained; prompts and responses are discarded.
 public sealed class CodexTokenParser
 {
+    string? model;
+    bool fastMode;
     Raw? previous;
     TokenEvent? lastEvent;
     bool sawMeta;
@@ -24,13 +26,14 @@ public sealed class CodexTokenParser
     public TokenEvent? Parse(ReadOnlySpan<byte> line)
     {
         // Most rollout lines are conversation text. Do not deserialize those records.
-        if (line.IndexOf("token_count"u8) < 0 && line.IndexOf("session_meta"u8) < 0 && line.IndexOf("task_started"u8) < 0) return null;
+        if (line.IndexOf("token_count"u8) < 0 && line.IndexOf("session_meta"u8) < 0 && line.IndexOf("task_started"u8) < 0 && line.IndexOf("turn_context"u8) < 0) return null;
         try
         {
             using var document = JsonDocument.Parse(line.ToArray());
             var root = document.RootElement;
             if (root.ValueKind != JsonValueKind.Object || !root.TryGetProperty("payload", out var payload) || payload.ValueKind != JsonValueKind.Object) return null;
             var type = UsageParser.String(root, "type");
+            if (type == "turn_context") { model = UsageParser.String(payload, "model"); fastMode = UsageParser.String(payload, "service_tier") == "priority"; return null; }
             if (type == "session_meta" && !sawMeta)
             {
                 sawMeta = true;
@@ -65,6 +68,7 @@ public sealed class CodexTokenParser
             if (usage == null) return null;
             var cached = Math.Min(usage.Cached, usage.Input);
             var entry = new TokenEvent(timestamp, new(usage.Input - cached, usage.Output, cached, Math.Max(0, usage.Total - usage.Input - usage.Output)));
+            entry = entry with { EstimatedCost = ModelPricing.Estimate(model, entry.Tokens, fastMode, provider: "codex") };
             if (entry == lastEvent) return null;
             lastEvent = entry;
             return entry;

@@ -25,7 +25,7 @@ public sealed class ClaudeTokenParser
             _ = Identity(root, "sessionId");
             _ = Identity(message, "model");
             var sidechain = root.TryGetProperty("isSidechain", out var side) && side.ValueKind == JsonValueKind.True;
-            var entries = new List<ClaudeTokenEntry> { Read(usage, at, messageID, requestID, sidechain) };
+            var entries = new List<ClaudeTokenEntry> { Read(usage, at, messageID, requestID, sidechain, UsageParser.String(message, "model")) };
             if (usage.TryGetProperty("iterations", out var iterations) && iterations.ValueKind == JsonValueKind.Array)
             {
                 var index = 0;
@@ -33,7 +33,7 @@ public sealed class ClaudeTokenParser
                 {
                     if (iteration.ValueKind != JsonValueKind.Object || UsageParser.String(iteration, "type") != "advisor_message"
                         || string.IsNullOrEmpty(UsageParser.String(iteration, "model"))) continue;
-                    entries.Add(Read(iteration, at, messageID == null ? null : Hash(messageID + ":advisor:" + index++), requestID, sidechain));
+                    entries.Add(Read(iteration, at, messageID == null ? null : Hash(messageID + ":advisor:" + index++), requestID, sidechain, UsageParser.String(iteration, "model")));
                 }
             }
             return entries;
@@ -41,23 +41,25 @@ public sealed class ClaudeTokenParser
         catch (Exception e) when (e is JsonException or InvalidDataException or InvalidOperationException or OverflowException)
         { HadInvalidRecords = true; return Array.Empty<ClaudeTokenEntry>(); }
     }
-    static ClaudeTokenEntry Read(JsonElement usage, DateTimeOffset at, string? message, string? request, bool sidechain)
+    static ClaudeTokenEntry Read(JsonElement usage, DateTimeOffset at, string? message, string? request, bool sidechain, string? model)
     {
         if (usage.ValueKind != JsonValueKind.Object) throw new InvalidDataException();
         var input = Number(usage, "input_tokens", required: true);
         var output = Number(usage, "output_tokens", required: true);
         var read = Number(usage, "cache_read_input_tokens");
         var write = Number(usage, "cache_creation_input_tokens");
+        long oneHourWrites = 0;
         if (usage.TryGetProperty("cache_creation", out var split))
         {
             if (split.ValueKind != JsonValueKind.Object) throw new InvalidDataException();
-            write = checked(Number(split, "ephemeral_5m_input_tokens") + Number(split, "ephemeral_1h_input_tokens"));
+            oneHourWrites = Number(split, "ephemeral_1h_input_tokens");
+            write = checked(Number(split, "ephemeral_5m_input_tokens") + oneHourWrites);
         }
         var hasSpeed = usage.TryGetProperty("speed", out var speed);
         if (hasSpeed && (speed.ValueKind != JsonValueKind.String || speed.GetString() is not ("fast" or "standard"))) throw new InvalidDataException();
         var tokens = new TokenCounts(input, output, read, CacheWrite: write);
         _ = tokens.Total;
-        return new(new(at, tokens), message, request, sidechain, hasSpeed);
+        return new(new(at, tokens, ModelPricing.Estimate(model, tokens, hasSpeed && speed.GetString() == "fast", oneHourWrites)), message, request, sidechain, hasSpeed);
     }
     static long Number(JsonElement value, string key, bool required = false)
     {

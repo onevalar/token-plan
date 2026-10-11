@@ -13,12 +13,12 @@ namespace TokenPlan.Desktop;
 
 public sealed partial class MainWindow : Window
 {
-    static readonly string[] ProviderIDs = { "claude", "codex", "cursor" };
-    static readonly string[] Pages = { "overview", "providers", "history", "settings" };
+    static readonly string[] ProviderIDs = ProviderCatalog.All.Select(p => p.Id).ToArray();
+    static readonly string[] Pages = { "overview", "providers" };
     readonly ProviderService providers;
     readonly Dictionary<string, LocalTokenUsage> localTokens;
     readonly Dictionary<string, TokenTrend> tokenTrends = new();
-    string TokenProvider => preferences.IsEnabled(preferences.TokenProvider) ? preferences.TokenProvider : ProviderIDs.FirstOrDefault(preferences.IsEnabled) ?? preferences.TokenProvider;
+    string TokenProvider => preferences.IsEnabled(preferences.TokenProvider) ? preferences.TokenProvider : ProviderCatalog.TokenLogProviders.FirstOrDefault(preferences.IsEnabled) ?? preferences.TokenProvider;
     TokenTrend? tokenTrend {
         get {
             var trend = tokenTrends.GetValueOrDefault(TokenProvider);
@@ -26,9 +26,11 @@ public sealed partial class MainWindow : Window
             return trend.CredentialFingerprint != null && results.GetValueOrDefault("cursor")?.CredentialFingerprint == trend.CredentialFingerprint ? trend : null;
         }
     }
+    readonly QuotaAlerts usageAlerts = new();
     bool tokensLoading;
     readonly HashSet<string> expandedProviders = new();
     readonly Dictionary<string, ProviderResult> results = new();
+    readonly Dictionary<string, IReadOnlyList<ProviderResult>> additionalAccounts = new();
     readonly DispatcherTimer timer = new() { Interval = TimeSpan.FromMinutes(5) };
     readonly string preferencesFile;
     readonly string historyFile;
@@ -42,11 +44,12 @@ public sealed partial class MainWindow : Window
     public bool TrayAvailable { get; set; }
     public bool KeepRunningWhenClosed => preferences.KeepRunningWhenClosed;
     public void RefreshFromTray() => _ = Refresh();
-    public IEnumerable<string> TraySummaries() => ProviderIDs.Where(preferences.IsEnabled).Select(id => {
+    public IEnumerable<string> TraySummaries() => preferences.OrderedProviders.Where(preferences.IsEnabled).Where(id => preferences.TrayServices.GetValueOrDefault(id, true)).SelectMany(id => {
         var result = results.GetValueOrDefault(id);
-        var metric = result?.Snapshot?.Windows.FirstOrDefault();
-        return ProviderName(id) + " · " + (metric == null ? L.T("Needs Attention") : L.T(metric.Label) + " " + metric.UsedPercent.ToString("0.#") + "% " + L.T("Used"))
-            + (metric != null && result?.ErrorKey != null ? " · " + L.T("Needs Attention") : "");
+        var pins = preferences.PinnedMetrics.GetValueOrDefault(id) ?? Array.Empty<string>();
+        var metrics = result?.Snapshot?.Windows.Where(w => pins.Contains(w.Label)).ToArray() ?? Array.Empty<UsageWindow>();
+        return metrics.Select(metric => ProviderName(id) + " · " + L.T(metric.Label) + " " + MetricValue(metric)
+            + (result?.ErrorKey != null ? " · " + L.T("Needs Attention") : ""));
     });
     readonly Dictionary<string, Vector> scrollPositions = new();
     ScrollViewer? pageScroll;
@@ -59,13 +62,14 @@ public sealed partial class MainWindow : Window
     IBrush Ink => Brush.Parse(IsDark ? "#E4E4E7" : "#191B20");
     IBrush Muted => Brush.Parse(IsDark ? "#8C919B" : "#515661");
     IBrush Line => Brush.Parse(IsDark ? "#22242A" : "#DDDFE3");
-    IBrush Accent => this.GetPlatformSettings()?.GetColorValues().AccentColor1 is { } color ? new SolidColorBrush(color) : Brush.Parse("#2664C7");
+    IBrush Accent => Brush.Parse(IsDark ? "#4C8DFF" : "#2675E5");
 
     public MainWindow()
     {
         Title = Program.Fixture ? "TokenPlan · Interface Review" : "TokenPlan";
         Width = 1000; Height = 760; MinWidth = 680; MinHeight = 500;
         WindowStartupLocation = WindowStartupLocation.CenterScreen;
+        ConfigureControls();
         using (var icon = typeof(MainWindow).Assembly.GetManifestResourceStream("TokenPlan.AppIcon.png")) Icon = new WindowIcon(icon!);
         // The OS owns caption buttons, dragging, snapping and window decoration placement.
         ExtendClientAreaToDecorationsHint = false;
@@ -76,6 +80,7 @@ public sealed partial class MainWindow : Window
         L.Use(preferences.Language);
         try { history = Program.Fixture ? ExampleHistory() : UsageHistory.Load(historyFile, DateTimeOffset.UtcNow); }
         catch (Exception e) when (e is IOException or System.Text.Json.JsonException or InvalidDataException or UnauthorizedAccessException) { notice = "Usage history could not be read. New readings will start a fresh history."; DiagnosticLog.Write("history", notice); }
+        DiagnosticLog.Level = preferences.LogLevel;
         ApplyAppearance();
         var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
         var claudeConfig = Environment.GetEnvironmentVariable("CLAUDE_CONFIG_DIR");
@@ -86,6 +91,7 @@ public sealed partial class MainWindow : Window
             ["claude"] = new("", claudeHomes: claudeHomes)
         };
         providers = new(Environment.GetEnvironmentVariable("CODEX_HOME") ?? Path.Combine(home, ".codex"), Environment.GetEnvironmentVariable("CLAUDE_CONFIG_DIR") ?? Path.Combine(home, ".claude"), cursorDatabase: Environment.GetEnvironmentVariable("TOKENPLAN_CURSOR_STATE_DB"));
+        timer.Interval = TimeSpan.FromMinutes(preferences.RefreshMinutes);
         timer.Tick += (_, _) => { if (preferences.AutoRefresh && refresh == null) _ = Refresh(); };
         Opened += (_, _) => { timer.Start(); _ = Refresh(); };
         Closed += (_, _) => { ready = false; timer.Stop(); refresh?.Cancel(); providers.Dispose(); };
@@ -103,34 +109,38 @@ public sealed partial class MainWindow : Window
     }
     void ApplyAppearance() => RequestedThemeVariant = preferences.Appearance switch { "light" => ThemeVariant.Light, "dark" => ThemeVariant.Dark, _ => ThemeVariant.Default };
     static void Add(Grid grid, Control child, int row = 0, int column = 0) { Grid.SetRow(child, row); Grid.SetColumn(child, column); grid.Children.Add(child); }
-    TextBlock Text(string text, double size = 14, bool muted = false) => new() { Text = text, FontSize = size, Foreground = muted ? Muted : Ink, TextWrapping = TextWrapping.Wrap };
+    TextBlock Text(string text, double size = 14, bool muted = false) => new() { Text = text, FontSize = preferences.Compact ? Math.Max(11, size - 1) : size, Foreground = muted ? Muted : Ink, TextWrapping = TextWrapping.Wrap };
     static StackPanel Stack(double spacing = 12) => new() { Spacing = spacing };
     Button Action(string label, Action action)
     {
-        var button = new Button { Content = L.T(label), MinHeight = 36, Padding = new Thickness(14, 7), HorizontalAlignment = HorizontalAlignment.Left };
+        var button = new Button { Content = L.T(label), Background = Brush.Parse(IsDark ? "#202228" : "#EEF0F3"), Foreground = Ink, BorderThickness = new Thickness(0), CornerRadius = new CornerRadius(7), MinHeight = 36, Padding = new Thickness(14, 7), HorizontalAlignment = HorizontalAlignment.Left };
+        if (label == "Back") button.Name = "tokenplan-back";
         button.Click += (_, _) => action();
         return button;
     }
+    string ScrollKey(string pageID) => pageID == "detail" ? "detail/" + detailProvider + "/" + detailSettings : pageID;
     void Navigate(string next) { page = next; Render(); }
     void Render()
     {
         StateChanged?.Invoke();
         var version = ++renderVersion;
-        var renderedPage = page;
+        var renderedScroll = ScrollKey(page);
         var focusToRestore = focusedName;
+        var oldInput = this.GetVisualDescendants().OfType<TextBox>().FirstOrDefault(t => t.Name == focusedName);
+        var caret = oldInput?.CaretIndex;
         restoringFocus = true;
-        var offset = scrollPositions.GetValueOrDefault(page);
+        var offset = scrollPositions.GetValueOrDefault(ScrollKey(page));
         Background = Canvas;
         Foreground = Ink;
-        var content = page switch { "settings" => Settings(), "providers" => ProvidersPage(), "history" => HistoryPage(), _ => Overview() };
-        var destinationsText = new[] { L.T("Overview"), L.T("Providers"), L.T("History"), L.T("Settings") };
+        var content = page switch { "detail" => DetailPage(), "settings" => Settings(), "notifications" => NotificationPage(), "advanced" => AdvancedPage(), "appearance" => AppearancePage(), "about" => AboutPage(), "providers" => ProvidersPage(), "history" => HistoryPage(), _ => Overview() };
+        var destinationsText = new[] { L.T("Overview"), L.T("Providers") };
         var root = new Grid();
         if (OperatingSystem.IsLinux())
         {
             // A compact header and horizontal destinations fit GNOME/KDE window layouts.
             root.RowDefinitions = new RowDefinitions("Auto,*");
             var header = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto"), Margin = new Thickness(24, 14) };
-            Add(header, Text("TokenPlan", 20));
+            Add(header, Brand(20));
             var destinations = new TabStrip { Name = "tokenplan-navigation", ItemsSource = destinationsText, SelectedIndex = Array.IndexOf(Pages, page) };
             destinations.SelectionChanged += (_, _) => { if (destinations.SelectedIndex >= 0) Navigate(Pages[destinations.SelectedIndex]); };
             Add(header, destinations, 0, 1);
@@ -141,7 +151,7 @@ public sealed partial class MainWindow : Window
             // Windows keeps persistent navigation in a rail beside the content.
             root.ColumnDefinitions = new ColumnDefinitions("196,*");
             var rail = Stack(10); rail.Margin = new Thickness(20, 28);
-            rail.Children.Add(Text("TokenPlan", 22));
+            rail.Children.Add(Brand(22));
             rail.Children.Add(Text(L.T("AI Usage"), 12, true));
             var navigation = new ListBox { Name = "tokenplan-navigation", ItemsSource = destinationsText, SelectedIndex = Array.IndexOf(Pages, page), Margin = new Thickness(0, 24, 0, 0), Background = Brushes.Transparent, BorderThickness = new Thickness(0) };
             // Fluent's selected presenter reads these resources instead of the item's Background.
@@ -158,19 +168,20 @@ public sealed partial class MainWindow : Window
         }
         pageScroll = null;
         Content = root;
+        Classes.Set("reduce-motion", preferences.ReduceAnimations);
         Dispatcher.UIThread.Post(() => {
             if (!ready || version != renderVersion) return;
             var viewer = content as ScrollViewer ?? content.GetVisualDescendants().OfType<ScrollViewer>().FirstOrDefault();
             pageScroll = viewer;
             if (viewer != null) {
                 viewer.Offset = offset;
-                viewer.ScrollChanged += (_, _) => { if (ReferenceEquals(pageScroll, viewer)) scrollPositions[renderedPage] = viewer.Offset; };
+                viewer.ScrollChanged += (_, _) => { if (ReferenceEquals(pageScroll, viewer)) scrollPositions[renderedScroll] = viewer.Offset; };
             }
             if (focusToRestore != null) {
                 var target = this.GetVisualDescendants().OfType<Control>().FirstOrDefault(c => c.Name == focusToRestore && c.IsEnabled);
                 if (target is ListBox list && list.SelectedItem != null && list.ContainerFromItem(list.SelectedItem) is { } selected) selected.Focus();
                 else if (target is Expander expander) expander.GetVisualDescendants().OfType<ToggleButton>().FirstOrDefault()?.Focus();
-                else target?.Focus();
+                else { target?.Focus(); if (target is TextBox input && caret != null) input.CaretIndex = Math.Min(caret.Value, input.Text?.Length ?? 0); }
             }
             restoringFocus = false;
         }, DispatcherPriority.Loaded);
@@ -179,26 +190,38 @@ public sealed partial class MainWindow : Window
     {
         var body = Stack(20); body.Margin = new Thickness(32, 28); body.MaxWidth = 780;
         var heading = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto") };
-        var titles = Stack(6); titles.Children.Add(Text(L.T("AI Usage"), 28)); titles.Children.Add(Text(L.T("Your account limits, together in one place."), 13, true));
+        var titles = Stack(6); titles.Children.Add(Text(L.T("Overview"), 28));
         Add(heading, titles);
         var refreshAll = Action(refresh == null ? "Refresh" : "Stop", () => { if (refresh != null) refresh.Cancel(); else _ = Refresh(); });
         refreshAll.Name = "tokenplan-refresh-all";
-        Add(heading, refreshAll, 0, 1);
+        var actions = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
+        actions.Children.Add(refreshAll); actions.Children.Add(MoreMenu());
+        Add(heading, actions, 0, 1);
         body.Children.Add(heading);
         if (Program.Fixture) body.Children.Add(Note(L.T("Interface review uses example data. No accounts are connected.")));
         if (notice != null) body.Children.Add(Note(L.T(notice)));
         var available = results.Values.Count(r => r.Snapshot != null);
         body.Children.Add(Text(L.T("Available Usage") + "  " + available + " / " + ProviderIDs.Count(preferences.IsEnabled), 12, true));
         var cards = new ProviderGrid();
-        foreach (var id in ProviderIDs.Where(preferences.IsEnabled)) cards.Children.Add(Card(results.GetValueOrDefault(id) ?? new(id, ProviderName(id), null, "Waiting for the first update…")));
+        foreach (var id in preferences.OrderedProviders.Where(preferences.IsEnabled))
+        {
+            cards.Children.Add(Card(results.GetValueOrDefault(id) ?? new(id, ProviderName(id), null, "Waiting for the first update…")));
+            foreach (var account in additionalAccounts.GetValueOrDefault(id) ?? Array.Empty<ProviderResult>()) cards.Children.Add(Card(account));
+        }
         body.Children.Add(cards);
         if (!ProviderIDs.Any(preferences.IsEnabled)) { body.Children.Add(Note(L.T("No providers are enabled."))); body.Children.Add(Action("Manage Providers", () => Navigate("providers"))); }
-        body.Children.Add(TokenPanel());
-        body.Children.Add(Text(L.T("Reads existing logins on this device. Credentials are never copied or synced."), 12, true));
+
         return new ScrollViewer { Content = body, HorizontalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Disabled };
     }
+    Control Brand(double size)
+    {
+        var panel = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8, VerticalAlignment = VerticalAlignment.Center };
+        using var stream = typeof(MainWindow).Assembly.GetManifestResourceStream("TokenPlan.AppIcon.png")!;
+        panel.Children.Add(new Image { Source = new Avalonia.Media.Imaging.Bitmap(stream), Width = 28, Height = 28 });
+        var brandName = Text("TokenPlan", size); brandName.VerticalAlignment = VerticalAlignment.Center; panel.Children.Add(brandName); return panel;
+    }
     Control Note(string message) => new Border { Background = Canvas, CornerRadius = new CornerRadius(8), Padding = new Thickness(12), BorderBrush = Line, BorderThickness = new Thickness(1), Child = Text(message, 12, true) };
-    Control Card(ProviderResult result)
+    Control Card(ProviderResult result, bool detail = false)
     {
         var body = Stack(10);
         var header = new Grid { ColumnDefinitions = new ColumnDefinitions("Auto,*,Auto") };
@@ -207,62 +230,23 @@ public sealed partial class MainWindow : Window
         var title = Stack(2); title.Margin = new Thickness(10, 0, 0, 0); title.Children.Add(Text(result.Name, 16));
         if (result.Snapshot?.Plan is { Length: > 0 } plan) title.Children.Add(Text(plan, 11, true));
         Add(header, title, 0, 1);
-        var retry = Action("Refresh", () => _ = Refresh(result.Id)); retry.Name = "tokenplan-refresh-" + result.Id; retry.IsEnabled = refresh == null; Add(header, retry, 0, 2);
-        body.Children.Add(header);
+        if (!detail)
+        {
+            var open = Action("Details", () => OpenDetail(result.Id)); open.Content = "›"; open.MinWidth = 32;
+            Avalonia.Automation.AutomationProperties.SetName(open, result.Name + " · " + L.T("Details"));
+            Add(header, open, 0, 2); body.Children.Add(header);
+        }
         if (result.ErrorKey != null) body.Children.Add(Text(L.T(result.ErrorKey), 12, true));
         if (result.Snapshot is { } snapshot)
         {
-            Control Metric(UsageWindow window) {
-                var row = Stack(6); var labels = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto") };
-                Add(labels, Text(L.T(window.Label), 13));
-                Add(labels, Text(window.UsedPercent.ToString("0.#") + "% " + L.T("Used"), 13, true), 0, 1);
-                row.Children.Add(labels);
-                row.Children.Add(new ProgressBar { Minimum = 0, Maximum = 100, Value = Math.Clamp(window.UsedPercent, 0, 100), Height = 6, Foreground = window.UsedPercent >= 90 ? Brush.Parse(IsDark ? "#B96560" : "#D36661") : window.UsedPercent >= 75 ? Brush.Parse(IsDark ? "#AE9E50" : "#C6AC49") : Accent });
-                var meta = L.T("Remaining") + " " + window.RemainingPercent.ToString("0.#") + "%";
-                if (window.ResetsAt is { } reset) meta += "  ·  " + L.T("Resets") + " " + reset.ToLocalTime().ToString("g");
-                row.Children.Add(Text(meta, 11, true));
-                return row;
-            }
-            var primary = snapshot.Windows.Where(w => result.Id == "cursor" ? w == snapshot.Windows[0] : w.Label is "Session" or "Weekly").ToArray();
-            if (primary.Length == 0) primary = snapshot.Windows.Take(1).ToArray();
-            foreach (var window in primary) body.Children.Add(Metric(window));
-            var other = snapshot.Windows.Except(primary).ToArray();
-            if (other.Length > 0) {
-                var more = Stack(10); foreach (var window in other) more.Children.Add(Metric(window));
-                var disclosure = new Expander { Name = "tokenplan-metrics-" + result.Id, Header = L.T("More Metrics"), Content = more, IsExpanded = expandedProviders.Contains(result.Id), HorizontalAlignment = HorizontalAlignment.Stretch };
-                disclosure.Expanded += (_, _) => expandedProviders.Add(result.Id); disclosure.Collapsed += (_, _) => expandedProviders.Remove(result.Id);
-                body.Children.Add(disclosure);
-            }
+            var metrics = preferences.OrderedMetrics(result.Id, snapshot.Windows).Where(w => preferences.Placement(result.Id, w.Label) != MetricPlacement.Hidden).ToArray();
+            var primary = detail ? metrics : metrics.Where(w => preferences.Placement(result.Id, w.Label) == MetricPlacement.Home).ToArray();
+            if (!detail && primary.Length == 0) primary = metrics.Take(1).ToArray();
+            foreach (var metric in primary) body.Children.Add(MetricRow(metric));
+            if (detail && ProviderCatalog.TokenLogProviders.Contains(result.Id)) body.Children.Add(ServiceSpendRows(result.Id));
             body.Children.Add(Text(L.T(result.ErrorKey == null ? "Updated" : "Last Successful Update") + " " + snapshot.FetchedAt.ToLocalTime().ToString("g"), 11, true));
         }
-        return new Border { Background = Surface, BorderBrush = Line, BorderThickness = new Thickness(1), CornerRadius = new CornerRadius(8), Padding = new Thickness(16), Child = body };
-    }
-    Control Settings()
-    {
-        var body = Stack(20); body.Margin = new Thickness(32, 28); body.MaxWidth = 700;
-        body.Children.Add(Text(L.T("Settings"), 28));
-        if (notice != null) body.Children.Add(Note(L.T(notice)));
-        body.Children.Add(Text(L.T("Appearance"), 15));
-        var appearance = Choice(new[] { "Follow System", "Light", "Dark" }, Array.IndexOf(new[] { "system", "light", "dark" }, preferences.Appearance));
-        appearance.Name = "tokenplan-appearance";
-        appearance.SelectionChanged += (_, _) => { preferences = preferences with { Appearance = new[] { "system", "light", "dark" }[appearance.SelectedIndex] }; Save(); ApplyAppearance(); Render(); };
-        body.Children.Add(appearance);
-        body.Children.Add(Text(L.T("Language"), 15));
-        var languageLabels = new[] { L.T("Follow System"), "English", "简体中文", "繁體中文", "日本語", "한국어" };
-        var languages = new[] { "system", "en", "zh-Hans", "zh-Hant", "ja", "ko" };
-        var language = new ComboBox { Name = "tokenplan-language", ItemsSource = languageLabels, SelectedIndex = Array.IndexOf(languages, preferences.Language), MinWidth = 240 };
-        language.SelectionChanged += (_, _) => { preferences = preferences with { Language = languages[language.SelectedIndex] }; Save(); L.Use(preferences.Language); Render(); };
-        body.Children.Add(language);
-        var automatic = new CheckBox { Name = "tokenplan-auto-refresh", Content = L.T("Refresh Every Five Minutes"), IsChecked = preferences.AutoRefresh };
-        automatic.IsCheckedChanged += (_, _) => { preferences = preferences with { AutoRefresh = automatic.IsChecked == true }; Save(); Render(); };
-        body.Children.Add(automatic);
-        var background = new CheckBox { Name = "tokenplan-keep-running", Content = L.T("Keep Running When Window Closes"), IsChecked = preferences.KeepRunningWhenClosed, IsEnabled = TrayAvailable };
-        background.IsCheckedChanged += (_, _) => { preferences = preferences with { KeepRunningWhenClosed = background.IsChecked == true }; Save(); Render(); };
-        body.Children.Add(background);
-        body.Children.Add(Text(L.T("Use the tray menu to reopen TokenPlan, refresh usage or quit. Enable background mode only if your desktop displays the tray icon."), 12, true));
-        body.Children.Add(Note(L.T("Claude and Codex use CLI logins. Cursor uses its desktop login. Sign in again in the corresponding app if a session expires.")));
-        body.Children.Add(Text(L.T("This desktop preview does not yet include spending history, iCloud sync or automatic updates."), 12, true));
-        return new ScrollViewer { Content = body };
+        return new Border { Background = Surface, BorderBrush = Line, BorderThickness = new Thickness(1), CornerRadius = new CornerRadius(8), Padding = new Thickness(preferences.Compact ? 12 : 20), Child = body };
     }
     ComboBox Choice(string[] labels, int index) => new() { ItemsSource = labels.Select(L.T).ToArray(), SelectedIndex = index, MinWidth = 240 };
     void Save()
@@ -281,12 +265,30 @@ public sealed partial class MainWindow : Window
             tokenWork = RefreshTokens(only, pending.Token);
             foreach (var id in (only == null ? ProviderIDs : new[] { only }).Where(preferences.IsEnabled))
             {
+                DiagnosticLog.Write(id, "Refreshing usage", 3);
                 var result = Program.Fixture ? Example(id) : await providers.Refresh(id, pending.Token);
+                DiagnosticLog.Write(id, result.ErrorKey == null ? "Usage refreshed" : "Usage refresh failed", result.ErrorKey == null ? 2 : 1);
                 if (!ready || pending.IsCancellationRequested) return;
+                if (!Program.Fixture)
+                {
+                    var alertBatch = usageAlerts.Evaluate(result, preferences, DateTimeOffset.UtcNow);
+                    var alerts = alertBatch.Alerts;
+                    if (alerts.Count > 0)
+                    {
+                        try { await DesktopNotifications.Send("TokenPlan · " + result.Name, preferences.HideValues ? L.T("Usage Needs Attention") : string.Join(", ", alerts.Select(a => L.T(a.Metric) + " · " + L.T(a.Title)))); alertBatch.Commit(); }
+                        catch (Exception) { notice = "Notifications could not be delivered. Check system notification settings."; DiagnosticLog.Write("notifications", notice); }
+                    }
+                }
                 history.Observe(result, DateTimeOffset.UtcNow);
                 SaveHistory();
                 result = result.PreserveLastSuccess(results.GetValueOrDefault(id));
                 results[id] = result;
+                if (!Program.Fixture && id is "claude" or "codex")
+                {
+                    try { additionalAccounts[id] = (await providers.RefreshAdditionalAccounts(id, pending.Token)).Where(r => r.CredentialFingerprint == null || r.CredentialFingerprint != result.CredentialFingerprint).ToArray(); }
+                    catch (OperationCanceledException) { throw; }
+                    catch (Exception) { additionalAccounts.Remove(id); notice = "Additional accounts could not be read. Check the account configuration folders."; DiagnosticLog.Write(id, notice); }
+                }
                 Render();
             }
         }
@@ -298,7 +300,8 @@ public sealed partial class MainWindow : Window
     {
         using var stream = typeof(MainWindow).Assembly.GetManifestResourceStream("TokenPlan.Icons." + id + ".svg")!;
         var svg = System.Xml.Linq.XDocument.Load(stream);
-        var canvas = new Canvas { Width = 100, Height = 100 };
+        var bounds = (svg.Root?.Attribute("viewBox")?.Value ?? "0 0 100 100").Split(new[] { ' ', ',' }, StringSplitOptions.RemoveEmptyEntries).Select(v => double.Parse(v, System.Globalization.CultureInfo.InvariantCulture)).ToArray();
+        var canvas = new Canvas { Width = bounds[2], Height = bounds[3] };
         foreach (var path in svg.Descendants().Where(e => e.Name.LocalName == "path")) canvas.Children.Add(new Avalonia.Controls.Shapes.Path { Data = Geometry.Parse(path.Attribute("d")!.Value), Fill = Ink });
         return new Viewbox { Width = 24, Height = 24, Child = canvas };
     }
