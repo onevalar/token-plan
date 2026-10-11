@@ -2,6 +2,11 @@ using System.Net;
 using System.Text;
 using TokenPlan.Core;
 
+if (args.SequenceEqual(new[] { "usage" }) && Environment.GetEnvironmentVariable("TOKENPLAN_AMP_FIXTURE") is { } ampFixture)
+{
+    if (ampFixture == "error") { Console.Error.WriteLine("not logged in"); Environment.ExitCode = 1; return; }
+    Console.WriteLine("Subscription Megawatt: 75% agent usage and 50% orb usage remaining\nIndividual credits: $12.50 USD remaining"); return;
+}
 var checks = 0;
 void Check(bool condition, string message) { if (!condition) throw new Exception(message); checks++; }
 void Throws(Action action, string message) { try { action(); } catch (InvalidDataException) { checks++; return; } throw new Exception(message); }
@@ -22,6 +27,7 @@ Throws(() => UsageParser.Parse("codex", """{"rate_limit":{"primary_window":{"use
 Throws(() => UsageParser.Parse("claude", """{"five_hour":{"utilization":-1}}""", now), "Invalid negative usage");
 var claude = UsageParser.Parse("claude", """{"five_hour":{"utilization":101,"resets_at":"2026-10-07T05:00:00Z"},"seven_day":{"utilization":null}}""", now);
 Check(claude.Windows.Count == 1 && claude.Windows[0].RemainingPercent == 0, "Over-limit usage retains its actual value; missing windows stay absent");
+SettingsChecks.Run(now, Check);
 var root = Path.Combine(Path.GetTempPath(), "tokenplan-core-" + Guid.NewGuid().ToString("N"));
 Directory.CreateDirectory(root);
 try
@@ -102,16 +108,23 @@ try
         try { await pending; throw new Exception("Cancellation was ignored"); } catch (OperationCanceledException) { checks++; }
     }
     var preferencesFile = Path.Combine(root, "settings", "preferences.json");
-    Check(Preferences.Load(preferencesFile) == new Preferences(), "First-launch defaults");
+    Check(System.Text.Json.JsonSerializer.Serialize(Preferences.Load(preferencesFile)) == System.Text.Json.JsonSerializer.Serialize(new Preferences()), "First-launch defaults");
     var preferences = new Preferences("dark", "zh-Hans", false);
     preferences.Save(preferencesFile);
-    Check(Preferences.Load(preferencesFile) == preferences, "Settings survive restart");
+    Check(System.Text.Json.JsonSerializer.Serialize(Preferences.Load(preferencesFile)) == System.Text.Json.JsonSerializer.Serialize(preferences with { AutoRefresh = true }), "Settings survive restart and obsolete refresh-disable migrates to the visible interval");
     await File.WriteAllTextAsync(preferencesFile, """{"Appearance":"invalid","Language":"en"}""");
     Throws(() => Preferences.Load(preferencesFile), "Corrupt appearance is not silently accepted");
     Check(Directory.GetFiles(Path.GetDirectoryName(preferencesFile)!, "*.tmp").Length == 0, "Atomic saves leave no temporary credentials");
     await CursorChecks.Run(root, now, Check);
     HistoryChecks.Run(root, now, Check);
+    await ServiceChecks.Run(root, now, Check);
+    LocalServiceChecks.Run(root, now, Check);
     await TokenChecks.Run(root, now, Check);
+    await ParityChecks.Run(root, now, Check);
+    await ProviderBoundaryChecks.Run(root, Check);
+    await ServiceContractChecks.Run(root, Check);
+    await AmpProcessChecks.Run(root, Check);
+    await AdvancedServiceChecks.Run(root, Check);
     await ClaudeTokenChecks.Run(root, now, Check);
     await CursorTokenChecks.Run(root, now, Check);
 }
@@ -120,7 +133,7 @@ Console.WriteLine($"PASS: {checks} desktop core checks");
 
 sealed class Stub(Func<HttpRequestMessage, CancellationToken, Task<HttpResponseMessage>> action) : HttpMessageHandler
 {
-    protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken) => action(request, cancellationToken);
+    protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken) => request.RequestUri?.AbsolutePath.EndsWith("/rate-limit-reset-credits") == true ? Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent("{}") }) : action(request, cancellationToken);
 }
 
 sealed class StalledBody : Stream

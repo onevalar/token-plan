@@ -392,7 +392,13 @@ enum KeychainError: Error, LocalizedError {
 
 func expandHome(_ path: String) -> String {
     guard path == "~" || path.hasPrefix("~/") else { return path }
-    let home = FileManager.default.homeDirectoryForCurrentUser.path
+    #if APP_STORE_BUILD
+    // Keys entered in TokenPlan remain in its own container, separate from companion-app files.
+    if path.hasPrefix("~/.config/tokenplan/") {
+        return FileManager.default.homeDirectoryForCurrentUser.path + String(path.dropFirst())
+    }
+    #endif
+    let home = ProviderHome.directory.path
     if path == "~" { return home }
     return home + String(path.dropFirst())
 }

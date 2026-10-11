@@ -3,14 +3,14 @@ using System.Security.Cryptography;
 
 namespace TokenPlan.Core;
 
-public record TokenDay(DateOnly Date, TokenCounts Tokens);
+public record TokenDay(DateOnly Date, TokenCounts Tokens, CostTotal? Cost = null);
 public record TokenTrend(IReadOnlyList<TokenDay> Days, bool Partial, DateTimeOffset ScannedAt, string? ErrorKey = null, bool ScanningPending = false, string? CredentialFingerprint = null)
 {
     public IReadOnlyList<TokenDay> Range(int days, DateOnly today)
     {
         if (days is not (7 or 30)) throw new ArgumentOutOfRangeException(nameof(days));
-        var source = Days.ToDictionary(d => d.Date, d => d.Tokens);
-        return Enumerable.Range(1 - days, days).Select(offset => { var date = today.AddDays(offset); return new TokenDay(date, source.GetValueOrDefault(date) ?? TokenCounts.Zero); }).ToArray();
+        var source = Days.ToDictionary(d => d.Date);
+        return Enumerable.Range(1 - days, days).Select(offset => { var date = today.AddDays(offset); return source.GetValueOrDefault(date) ?? new TokenDay(date, TokenCounts.Zero, new()); }).ToArray();
     }
 }
 
@@ -38,6 +38,7 @@ public sealed class LocalTokenUsage(string codexHome, long byteBudget = 128 * 10
         public ClaudeTokenParser ClaudeParser = new();
         public List<ClaudeTokenEntry> ClaudeEntries = new();
         public Dictionary<DateOnly, TokenCounts> Days = new();
+        public Dictionary<DateOnly, CostTotal> Costs = new();
     }
     public async Task<TokenTrend> Scan(DateTimeOffset now, TimeZoneInfo zone, CancellationToken cancellation)
     {
@@ -95,25 +96,27 @@ public sealed class LocalTokenUsage(string codexHome, long byteBudget = 128 * 10
                     }
                     if (!cache.Completed) partial = scanningPending = true;
                     if (cache.Parser.SessionID is { } id && !sessionIDs.Add(id)) continue;
-                    foreach (var old in cache.Days.Keys.Where(day => day < since).ToArray()) cache.Days.Remove(old);
+                    foreach (var old in cache.Days.Keys.Where(day => day < since).ToArray()) { cache.Days.Remove(old); cache.Costs.Remove(old); }
                     partial |= cache.HadSkippedLines || cache.Parser.HadInvalidRecords || cache.ClaudeParser.HadInvalidRecords;
                     used.Add(cache);
                 }
                 catch (Exception e) when (e is IOException or UnauthorizedAccessException) { partial = true; DiagnosticLog.Write("token-logs", "Some local token logs could not be read. The totals may be incomplete."); }
             }
             var totals = new Dictionary<DateOnly, TokenCounts>();
+            var costs = new Dictionary<DateOnly, CostTotal>();
             foreach (var cache in used)
                 foreach (var (date, tokens) in cache.Days)
-                    totals[date] = (totals.GetValueOrDefault(date) ?? TokenCounts.Zero).Plus(tokens);
+                    { totals[date] = (totals.GetValueOrDefault(date) ?? TokenCounts.Zero).Plus(tokens); costs[date] = (costs.GetValueOrDefault(date) ?? new()).Plus(cache.Costs.GetValueOrDefault(date) ?? new()); }
             if (claudeHomes != null)
                 foreach (var entry in ClaudeTokenParser.Deduplicate(used.SelectMany(c => c.ClaudeEntries)))
                 {
                     var date = DateOnly.FromDateTime(TimeZoneInfo.ConvertTime(entry.Event.Timestamp, zone).DateTime);
                     totals[date] = (totals.GetValueOrDefault(date) ?? TokenCounts.Zero).Plus(entry.Event.Tokens);
+                    costs[date] = (costs.GetValueOrDefault(date) ?? new()).Add(entry.Event.EstimatedCost);
                 }
             _ = totals.Values.Aggregate(TokenCounts.Zero, (sum, tokens) => sum.Plus(tokens)).Total;
             if (partial) DiagnosticLog.Write("token-logs", "Some local token logs were skipped or could not be read. Totals may be incomplete.");
-            return new(totals.OrderBy(d => d.Key).Select(d => new TokenDay(d.Key, d.Value)).ToArray(), partial, now, ScanningPending: scanningPending || Expired());
+            return new(totals.OrderBy(d => d.Key).Select(d => new TokenDay(d.Key, d.Value, costs.GetValueOrDefault(d.Key))).ToArray(), partial, now, ScanningPending: scanningPending || Expired());
         }
         catch (Exception e) when (e is IOException or UnauthorizedAccessException or OverflowException)
         {
@@ -205,7 +208,7 @@ public sealed class LocalTokenUsage(string codexHome, long byteBudget = 128 * 10
                         var date = DateOnly.FromDateTime(TimeZoneInfo.ConvertTime(entry.Timestamp, zone).DateTime);
                         // Writers can append after the scan's start time; do not permanently lose those events.
                         if (date >= since && entry.Timestamp <= now.AddMinutes(5))
-                            cache.Days[date] = (cache.Days.GetValueOrDefault(date) ?? TokenCounts.Zero).Plus(entry.Tokens);
+                            { cache.Days[date] = (cache.Days.GetValueOrDefault(date) ?? TokenCounts.Zero).Plus(entry.Tokens); cache.Costs[date] = (cache.Costs.GetValueOrDefault(date) ?? new()).Add(entry.EstimatedCost); }
                         else if (entry.Timestamp > now.AddMinutes(5)) cache.HadSkippedLines = true;
                     }
                     cache.DiscardingLongLine = false; cache.Offset = position; length = 0;

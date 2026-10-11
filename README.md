@@ -1,4 +1,4 @@
-# TokenPlan
+# 一览 · TokenPlan
 
 Track your AI subscriptions and API balances from the macOS menu bar.
 

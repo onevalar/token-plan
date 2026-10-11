@@ -35,7 +35,13 @@ extension Bundle {
             // manifest). Skip it loudly and keep searching the remaining bases.
             AppLog.warn(.config, "ignoring resource bundle at \(base.lastPathComponent): missing expected resources")
         }
+        #if SWIFT_PACKAGE
         return .module
+        #else
+        let resources = Bundle(for: ResourceBundleToken.self)
+        precondition(isValidOpenUsageResourceBundle(resources), "Missing TokenPlan framework resources")
+        return resources
+        #endif
     }()
 }
 

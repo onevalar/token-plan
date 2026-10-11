@@ -32,3 +32,10 @@ __pycache__/
 # Local appcast / Sparkle feed output
 feed/
 appcast.xml
+
+# Xcode personal state; the shared store project is committed for Xcode Cloud.
+**/xcuserdata/
+
+# Local build diagnostics and packaging requests
+output/
+.tokenplan-package-request.json

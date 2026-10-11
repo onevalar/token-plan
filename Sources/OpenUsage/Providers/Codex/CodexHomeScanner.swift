@@ -24,7 +24,7 @@ struct CodexHomeScanner: Sendable {
     init(
         environment: EnvironmentReading = ProcessEnvironmentReader(),
         files: TextFileAccessing = LocalTextFileAccessor(),
-        homeDirectory: @escaping @Sendable () -> URL = { FileManager.default.homeDirectoryForCurrentUser },
+        homeDirectory: @escaping @Sendable () -> URL = { ProviderHome.directory },
         listDirectories: @escaping @Sendable (String) -> [String] = Self.listSubdirectories
     ) {
         self.environment = environment
@@ -113,7 +113,7 @@ struct CodexHomeScanner: Sendable {
     /// A home with `~`, `..`, and symlinks resolved, so an alias of a home xswap manages compares equal
     /// to the home itself.
     static func canonicalHome(
-        _ raw: String, homeDirectory: URL = FileManager.default.homeDirectoryForCurrentUser
+        _ raw: String, homeDirectory: URL = ProviderHome.directory
     ) -> String {
         URL(fileURLWithPath: standardizedHome(raw, homeDirectory: homeDirectory)).resolvingSymlinksInPath().path
     }

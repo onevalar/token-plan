@@ -15,6 +15,7 @@ keys = set()
 for file in (root / 'platforms/desktop/TokenPlan.Desktop').glob('*.cs'):
     text = file.read_text()
     keys.update(re.findall(r'L\.T\("([^"]+)"\)', text))
+    keys.update(re.findall(r'(?:Section|UtilityBody|SettingRow|Confirm)\("([^"]+)"', text))
     keys.update(re.findall(r'Action\("([^"]+)"', text))
 keys.update(line for line in (root / 'Localization/extra_keys.txt').read_text().splitlines() if line and not line.startswith('#'))
 for file in (root / 'platforms/desktop/TokenPlan.Core').glob('*.cs'):

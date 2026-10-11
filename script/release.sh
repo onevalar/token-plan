@@ -18,6 +18,9 @@ set -euo pipefail
 #   FEED_URL              appcast URL baked into the app. Default: GitHub Pages project URL.
 #   NOTARY_APPLE_ID / NOTARY_APP_PASSWORD / NOTARY_TEAM_ID   Apple ID, app-specific password, and team
 #                         ID for notarytool. When all three are set, the app and DMG are notarized + stapled.
+#   DISABLE_UPDATES=1  Build a standalone package without a configured Sparkle feed/key.
+#   TOKENPLAN_DIST_DIR  Override output directory to preserve existing builds.
+#   NOTARY_KEYCHAIN_PROFILE  Saved notarytool credentials; preferred over passwords in environment.
 #   ALLOW_UNNOTARIZED=1   Skip notarization for a LOCAL dry run. Without it, missing notary creds is a
 #                         hard error so CI never publishes an un-notarized build.
 
@@ -26,10 +29,13 @@ cd "$ROOT_DIR"
 
 : "${CODESIGN_IDENTITY:?set CODESIGN_IDENTITY to your Developer ID Application identity}"
 : "${ICLOUD_PROVISIONING_PROFILE:?set ICLOUD_PROVISIONING_PROFILE to the iCloud provisioning profile path}"
-: "${SPARKLE_PUBLIC_KEY:?set SPARKLE_PUBLIC_KEY to your base64 EdDSA public key}"
+if [ "${DISABLE_UPDATES:-0}" != "1" ]; then
+  : "${SPARKLE_PUBLIC_KEY:?set SPARKLE_PUBLIC_KEY or DISABLE_UPDATES=1 for a standalone package}"
+fi
 : "${TOKENPLAN_VERSION:?set TOKENPLAN_VERSION, e.g. 0.7.0}"
 
 APP_NAME="TokenPlan"
+APP_DISPLAY="TokenPlan"
 BUNDLE_ID="com.onevalar.tokenplan"
 MIN_SYSTEM_VERSION="15.0"
 VERSION="$TOKENPLAN_VERSION"
@@ -42,7 +48,7 @@ BUILD="${TOKENPLAN_BUILD:-$(git rev-list --count HEAD)}"
 FEED_URL="${FEED_URL:-https://onevalar.github.io/token-plan/appcast.xml}"
 DMG_NAME="$APP_NAME-$VERSION.dmg"
 
-DIST_DIR="$ROOT_DIR/dist"
+DIST_DIR="${TOKENPLAN_DIST_DIR:-$ROOT_DIR/dist}"
 APP_BUNDLE="$DIST_DIR/$APP_NAME.app"
 APP_CONTENTS="$APP_BUNDLE/Contents"
 APP_MACOS="$APP_CONTENTS/MacOS"
@@ -62,17 +68,23 @@ ENTITLEMENTS="$DIST_DIR/TokenPlan.release.resolved.entitlements.plist"
 # opt out with ALLOW_UNNOTARIZED=1 (the build will then be Gatekeeper-blocked on other Macs). Missing
 # creds without that opt-out is a hard error so CI never publishes an un-notarized DMG.
 NOTARIZE=0
-if [ -n "${NOTARY_APPLE_ID:-}" ] && [ -n "${NOTARY_APP_PASSWORD:-}" ] && [ -n "${NOTARY_TEAM_ID:-}" ]; then
+if [ -n "${NOTARY_KEYCHAIN_PROFILE:-}" ]; then
+  NOTARIZE=1
+elif [ -n "${NOTARY_APPLE_ID:-}" ] && [ -n "${NOTARY_APP_PASSWORD:-}" ] && [ -n "${NOTARY_TEAM_ID:-}" ]; then
   NOTARIZE=1
 elif [ "${ALLOW_UNNOTARIZED:-}" = "1" ]; then
   echo "WARNING: ALLOW_UNNOTARIZED=1 — build will NOT be notarized (other Macs will block it)." >&2
 else
-  echo "Notarization creds missing (NOTARY_APPLE_ID / NOTARY_APP_PASSWORD / NOTARY_TEAM_ID)." >&2
+  echo "Set NOTARY_KEYCHAIN_PROFILE or NOTARY_APPLE_ID / NOTARY_APP_PASSWORD / NOTARY_TEAM_ID." >&2
   echo "Set them, or set ALLOW_UNNOTARIZED=1 for a local dry run." >&2
   exit 1
 fi
 
 notarize() {  # $1: artifact to submit (.zip or .dmg)
+  if [ -n "${NOTARY_KEYCHAIN_PROFILE:-}" ]; then
+    xcrun notarytool submit "$1" --keychain-profile "$NOTARY_KEYCHAIN_PROFILE" --wait
+    return
+  fi
   xcrun notarytool submit "$1" \
     --apple-id "$NOTARY_APPLE_ID" --password "$NOTARY_APP_PASSWORD" --team-id "$NOTARY_TEAM_ID" --wait
 }
@@ -163,8 +175,8 @@ cat >"$APP_CONTENTS/Info.plist" <<PLIST
   <key>CFBundleIdentifier</key><string>$BUNDLE_ID</string>
   <key>CFBundleDevelopmentRegion</key><string>en</string>
   <key>CFBundleLocalizations</key><array><string>en</string><string>zh-Hans</string><string>zh-Hant</string><string>ja</string><string>ko</string></array>
-  <key>CFBundleName</key><string>$APP_NAME</string>
-  <key>CFBundleDisplayName</key><string>$APP_NAME</string>
+  <key>CFBundleName</key><string>$APP_DISPLAY</string>
+  <key>CFBundleDisplayName</key><string>$APP_DISPLAY</string>
   <key>CFBundlePackageType</key><string>APPL</string>
   <key>CFBundleShortVersionString</key><string>$VERSION</string>
   <key>CFBundleVersion</key><string>$BUILD</string>
@@ -174,7 +186,7 @@ cat >"$APP_CONTENTS/Info.plist" <<PLIST
   <key>NSPrincipalClass</key><string>NSApplication</string>
   <key>NSHighResolutionCapable</key><true/>
   <key>SUFeedURL</key><string>$FEED_URL</string>
-  <key>SUPublicEDKey</key><string>$SPARKLE_PUBLIC_KEY</string>
+  <key>SUPublicEDKey</key><string>${SPARKLE_PUBLIC_KEY:-}</string>
   <key>SUEnableAutomaticChecks</key><true/>
   <key>SUScheduledCheckInterval</key><integer>3600</integer>
   <key>NSUbiquitousContainers</key>
@@ -189,6 +201,12 @@ cat >"$APP_CONTENTS/Info.plist" <<PLIST
 </dict>
 </plist>
 PLIST
+
+if [ "${DISABLE_UPDATES:-0}" = "1" ]; then
+  for key in SUFeedURL SUPublicEDKey SUEnableAutomaticChecks SUScheduledCheckInterval; do
+    /usr/libexec/PlistBuddy -c "Delete :$key" "$APP_CONTENTS/Info.plist"
+  done
+fi
 
 cp "$ICLOUD_PROVISIONING_PROFILE" "$APP_CONTENTS/embedded.provisionprofile"
 "$ROOT_DIR/script/render_icloud_entitlements.sh" \
@@ -237,5 +255,5 @@ fi
 
 echo "==> done"
 echo "    DMG:  $DMG_PATH"
-echo "    dSYM: $APP_DSYM (uploaded to PostHog for crash symbolication by release.yml)."
+echo "    dSYM: $APP_DSYM (kept locally for crash symbolication)."
 echo "    The appcast is generated from this DMG by generate_appcast (see release.yml)."

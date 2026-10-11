@@ -21,16 +21,16 @@ MODE="${1:-run}"
 CONFIG="${CONFIG:-release}"
 
 TARGET_NAME="TokenPlan"                 # SwiftPM target / binary name
-APP_DISPLAY="TokenPlan"                 # user-facing app name
+APP_DISPLAY="${TOKENPLAN_DISPLAY_NAME:-TokenPlan}"                 # user-facing app name
 BUNDLE_ID="${BUNDLE_ID:-com.onevalar.tokenplan.dev}"
 ICLOUD_CONTAINER_ID="iCloud.com.onevalar.tokenplan.dev"
 MIN_SYSTEM_VERSION="15.0"
-APP_VERSION="0.7.0"
-APP_BUILD="0.7.0"
+APP_VERSION="${TOKENPLAN_VERSION:-1.0.0}"
+APP_BUILD="$(date +%s)"
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 DIST_DIR="$ROOT_DIR/dist"
-APP_BUNDLE="$DIST_DIR/$APP_DISPLAY.app"
+APP_BUNDLE="$DIST_DIR/$TARGET_NAME.app"
 APP_CONTENTS="$APP_BUNDLE/Contents"
 APP_MACOS="$APP_CONTENTS/MacOS"
 APP_HELPERS="$APP_CONTENTS/Helpers"
@@ -42,7 +42,9 @@ RESOURCE_BUNDLE_NAME="OpenUsage_OpenUsage.bundle"
 ENTITLEMENTS="$ROOT_DIR/script/TokenPlan.dev.entitlements.plist"
 SIGN_ENTITLEMENTS="$ROOT_DIR/script/TokenPlan.local.entitlements.plist"
 
-pkill -x "$TARGET_NAME" >/dev/null 2>&1 || true
+cd "$ROOT_DIR"
+# Stop only the staged development bundle, never the installed production app.
+pkill -f "^$APP_BINARY$" >/dev/null 2>&1 || true
 
 echo "==> swift build ($CONFIG)"
 swift build -c "$CONFIG" -j 2
@@ -202,7 +204,7 @@ launch_app() {
 case "$MODE" in
   run)
     launch_app
-    echo "==> launched $APP_DISPLAY (dist/$APP_DISPLAY.app)"
+    echo "==> launched $APP_DISPLAY ($APP_BUNDLE)"
     ;;
   build)
     : # build + stage + sign only

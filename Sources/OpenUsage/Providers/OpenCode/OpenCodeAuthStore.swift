@@ -40,7 +40,7 @@ struct OpenCodeAuthStore: Sendable {
     init(
         files: TextFileAccessing = LocalTextFileAccessor(),
         environment: EnvironmentReading = ProcessEnvironmentReader(),
-        homeDirectory: @escaping @Sendable () -> URL = { FileManager.default.homeDirectoryForCurrentUser },
+        homeDirectory: @escaping @Sendable () -> URL = { ProviderHome.directory },
         sqlite: SQLiteAccessing = SQLiteCLIAccessor(),
         databasePaths: (@Sendable () throws -> [String])? = nil
     ) {

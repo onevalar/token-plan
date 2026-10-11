@@ -19,17 +19,17 @@ public sealed partial class MainWindow
         var body = Stack(10);
         var heading = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto") };
         Add(heading, Text(L.T("Token Usage"), 18));
-        var range = new TabStrip { Name = "tokenplan-token-days", ItemsSource = new[] { L.T("Last 7 Days"), L.T("Last 30 Days") }, SelectedIndex = preferences.TokenDays == 7 ? 0 : 1, IsEnabled = ProviderIDs.Any(preferences.IsEnabled) };
+        var range = new TabStrip { Name = "tokenplan-token-days", ItemsSource = new[] { L.T("Last 7 Days"), L.T("Last 30 Days") }, SelectedIndex = preferences.TokenDays == 7 ? 0 : 1, IsEnabled = ProviderCatalog.TokenLogProviders.Any(preferences.IsEnabled) };
         Avalonia.Automation.AutomationProperties.SetName(range, L.T("Date Range"));
         range.Styles.Add(new Style(x => x.OfType<TabStripItem>()) { Setters = { new Setter(TabStripItem.FontSizeProperty, 13d), new Setter(TabStripItem.PaddingProperty, new Thickness(10, 6)), new Setter(TabStripItem.MinHeightProperty, 32d) } });
         range.SelectionChanged += (_, _) => { if (range.SelectedIndex < 0) return; preferences = preferences with { TokenDays = range.SelectedIndex == 0 ? 7 : 30 }; Save(); Render(); };
         Add(heading, range, 0, 1); body.Children.Add(heading);
-        var sourceIDs = ProviderIDs.Where(preferences.IsEnabled).ToArray();
+        var sourceIDs = ProviderCatalog.TokenLogProviders.Where(preferences.IsEnabled).ToArray();
         var source = new ComboBox { Name = "tokenplan-token-provider", ItemsSource = sourceIDs.Select(ProviderName).ToArray(), SelectedIndex = Array.IndexOf(sourceIDs, TokenProvider), MinWidth = 160, IsEnabled = sourceIDs.Length > 0 };
         Avalonia.Automation.AutomationProperties.SetName(source, L.T("Providers"));
         source.SelectionChanged += (_, _) => { if (source.SelectedIndex < 0) return; preferences = preferences with { TokenProvider = sourceIDs[source.SelectedIndex] }; Save(); Render(); };
         body.Children.Add(source);
-        body.Children.Add(Text(TokenProvider == "cursor" ? L.T("From the signed-in Cursor account's usage export. Only reported token counts are included.") : TokenProvider == "claude" ? L.T("Claude Code logs on this device. Includes logs from different sign-ins, not the current account's complete usage.") : L.T("Codex CLI logs on this device. Includes logs from different sign-ins, not the current account's complete usage."), 12, true));
+        body.Children.Add(Text(TokenProvider == "cursor" ? L.T("From the signed-in Cursor account's usage export. Only reported token counts are included.") : TokenProvider == "grok" ? L.T("From completed Grok CLI turns on this device.") : TokenProvider == "claude" ? L.T("Claude Code logs on this device. Includes logs from different sign-ins, not the current account's complete usage.") : L.T("Codex CLI logs on this device. Includes logs from different sign-ins, not the current account's complete usage."), 12, true));
         if (sourceIDs.Length == 0) body.Children.Add(Note(L.T("Enable a provider to view token history.")));
         else if (tokenTrend?.ErrorKey is { } error) body.Children.Add(Note(L.T(error)));
         else if (tokenTrend == null || tokenTrend.Days.Count == 0)
@@ -39,6 +39,9 @@ public sealed partial class MainWindow
             var days = tokenTrend.Range(preferences.TokenDays, DateOnly.FromDateTime(DateTime.Now));
             var total = days.Aggregate(TokenCounts.Zero, (sum, day) => sum.Plus(day.Tokens));
             body.Children.Add(Text(Count(total.Total) + " " + L.T("Tokens"), 26));
+            var cost = days.Aggregate(new CostTotal(), (sum, day) => sum.Plus(day.Cost ?? new(0, day.Tokens.Total > 0 ? 1 : 0)));
+            body.Children.Add(Text(L.T("Estimated API Cost") + "  " + (cost.Priced == 0 && cost.Unpriced > 0 ? "—" : "$" + cost.Dollars.ToString("N2")), 18));
+            body.Children.Add(Text(L.T(cost.Unpriced > 0 ? "Some models could not be priced. This estimate is incomplete." : "Estimated from model token rates, not your subscription bill."), 12, true));
             var values = days.Select(day => day.Tokens.Total).ToArray();
             var chart = new Grid { ColumnDefinitions = new ColumnDefinitions("52,*"), Height = 120 };
             var axis = new Grid { RowDefinitions = new RowDefinitions("*,*,*") };
@@ -69,7 +72,7 @@ public sealed partial class MainWindow
     }
     async Task RefreshTokens(string? only, CancellationToken cancellation)
     {
-        var ids = ProviderIDs.Where(id => preferences.IsEnabled(id) && (only == null || only == id)).ToArray();
+        var ids = ProviderCatalog.TokenLogProviders.Where(id => preferences.IsEnabled(id) && (only == null || only == id)).ToArray();
         if (ids.Length == 0) return;
         if (ids.Contains("cursor")) tokenTrends.Remove("cursor");
         tokensLoading = true; Render();
@@ -80,7 +83,7 @@ public sealed partial class MainWindow
                 cancellation.ThrowIfCancellationRequested();
                 try
                 {
-                    var trend = Program.Fixture ? ExampleTokens(id) : id == "cursor" ? await providers.RefreshCursorTokens(DateTimeOffset.UtcNow, TimeZoneInfo.Local, cancellation) : await localTokens[id].Scan(DateTimeOffset.UtcNow, TimeZoneInfo.Local, cancellation);
+                    var trend = Program.Fixture ? ExampleTokens(id) : id == "cursor" ? await providers.RefreshCursorTokens(DateTimeOffset.UtcNow, TimeZoneInfo.Local, cancellation) : id == "grok" ? await GrokTokenUsage.Scan(Environment.GetEnvironmentVariable("GROK_HOME") ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".grok"), DateTimeOffset.UtcNow, TimeZoneInfo.Local, cancellation) : await localTokens[id].Scan(DateTimeOffset.UtcNow, TimeZoneInfo.Local, cancellation);
                     if (ready && !cancellation.IsCancellationRequested) { tokenTrends[id] = trend; Render(); }
                 }
                 catch (OperationCanceledException) { throw; }

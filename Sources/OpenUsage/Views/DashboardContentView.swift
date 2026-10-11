@@ -20,7 +20,15 @@ struct DashboardContentView: View {
         PopoverScrollView {
             VStack(alignment: .leading, spacing: 0) {
                 HStack(spacing: 10) {
-                    Text("TokenPlan").font(.title3.weight(.semibold))
+                    Image(nsImage: NSApplication.shared.applicationIconImage)
+                        .resizable()
+                        .interpolation(.high)
+                        .frame(width: 30, height: 30)
+                        .accessibilityHidden(true)
+                    Text(verbatim: AppInfo.displayName)
+                        .font(.title3.weight(.semibold))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.85)
                     Spacer(minLength: 8)
                     Button(action: onRefresh) {
                         HStack(spacing: 5) {

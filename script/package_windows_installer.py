@@ -43,8 +43,8 @@ def main():
     current = None
     for rel, name, full in files:
         if rel != current:
-            target = '$INSTDIR' if rel == '.' else '$INSTDIR\\' + rel.replace('/', '\\')
-            install.append(f'SetOutPath "{nsis_path(target)}"')
+            target = '$INSTDIR' if rel == '.' else '$INSTDIR\\' + nsis_path(rel.replace('/', '\\'))
+            install.append(f'SetOutPath "{target}"')
             current = rel
             if rel != '.':
                 parts = rel.split(os.sep)

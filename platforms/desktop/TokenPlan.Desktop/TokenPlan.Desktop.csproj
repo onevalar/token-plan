@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Version>0.1.0</Version><Product>TokenPlan</Product><Company>onevalar</Company><Copyright>MIT License. Based on OpenUsage by Robin Ebers.</Copyright><OutputType>WinExe</OutputType><TargetFramework>net10.0</TargetFramework>
+    <Version>1.0.0</Version><Product>TokenPlan</Product><Company>onevalar</Company><Copyright>MIT License. Based on OpenUsage by Robin Ebers.</Copyright><OutputType>WinExe</OutputType><TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable><ImplicitUsings>enable</ImplicitUsings>
     <ApplicationManifest>app.manifest</ApplicationManifest><ApplicationIcon>../assets/TokenPlan.ico</ApplicationIcon><RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
   </PropertyGroup>
@@ -16,9 +16,8 @@
     <EmbeddedResource Include="../../../Localization/zh-Hant.lproj/Localizable.strings" LogicalName="TokenPlan.zh-Hant.lproj.Localizable.strings" />
     <EmbeddedResource Include="../../../Localization/ja.lproj/Localizable.strings" LogicalName="TokenPlan.ja.lproj.Localizable.strings" />
     <EmbeddedResource Include="../../../Localization/ko.lproj/Localizable.strings" LogicalName="TokenPlan.ko.lproj.Localizable.strings" />
-    <EmbeddedResource Include="../../../Sources/OpenUsage/Resources/ProviderIcons/claude.svg" LogicalName="TokenPlan.Icons.claude.svg" />
-    <EmbeddedResource Include="../../../Sources/OpenUsage/Resources/ProviderIcons/codex.svg" LogicalName="TokenPlan.Icons.codex.svg" />
-    <EmbeddedResource Include="../../../Sources/OpenUsage/Resources/ProviderIcons/cursor.svg" LogicalName="TokenPlan.Icons.cursor.svg" />
+    <EmbeddedResource Include="../../../Sources/OpenUsage/Resources/ProviderIcons/*.svg" LogicalName="TokenPlan.Icons.%(Filename)%(Extension)" />
+    <None Include="../THIRD-PARTY-NOTICES.txt" Link="THIRD-PARTY-NOTICES.txt" CopyToOutputDirectory="PreserveNewest" />
     <EmbeddedResource Include="../../../assets/AppIcon-1024.png" LogicalName="TokenPlan.AppIcon.png" />
   </ItemGroup>
 </Project>

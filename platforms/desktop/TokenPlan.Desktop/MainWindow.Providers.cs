@@ -13,7 +13,7 @@ public sealed partial class MainWindow
     string historyProvider = "all";
     (string Provider, long Hour)? historySelection;
     sealed record HistoryItem(HistoryReading Reading, string Label) { public override string ToString() => Label; }
-    static string ProviderName(string id) => id switch { "claude" => "Claude", "codex" => "Codex", "cursor" => "Cursor", _ => id };
+    static string ProviderName(string id) => ProviderCatalog.Get(id).Name;
     Control ProvidersPage()
     {
         var body = Stack(20); body.Margin = new Thickness(32, 28); body.MaxWidth = 780;
@@ -21,7 +21,7 @@ public sealed partial class MainWindow
         body.Children.Add(Text(L.T("Choose which accounts appear in your overview and refresh automatically."), 13, true));
         if (Program.Fixture) body.Children.Add(Note(L.T("Interface review uses example data. No accounts are connected.")));
         if (notice != null) body.Children.Add(Note(L.T(notice)));
-        foreach (var id in ProviderIDs)
+        foreach (var id in preferences.OrderedProviders)
         {
             var result = results.GetValueOrDefault(id);
             var enabled = preferences.IsEnabled(id);
@@ -45,7 +45,14 @@ public sealed partial class MainWindow
             Add(heading, refreshOne, 0, 2); Add(heading, toggle, 0, 3); card.Children.Add(heading);
             card.Children.Add(Text(id switch {
                 "claude" => L.T("Sign in with Claude Code, then refresh."), "codex" => L.T("Sign in with the Codex CLI, then refresh."),
-                _ => L.T("Sign in with the Cursor desktop app, then refresh.") }, 13, true));
+                "cursor" => L.T("Sign in with the Cursor desktop app, then refresh."),
+                _ => L.T(ProviderCatalog.Get(id).EnvironmentKey != null ? "Add an API key in service settings, then refresh." : "Sign in with the service app, then refresh.") }, 13, true));
+            var controls = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
+            controls.Children.Add(Action("Settings", () => { OpenDetail(id); detailSettings = true; Render(); }));
+            var order = preferences.OrderedProviders.ToArray();
+            var up = Action("Move Up", () => { preferences = preferences.MoveProvider(id, -1); Save(); Render(); }); up.IsEnabled = order[0] != id;
+            var down = Action("Move Down", () => { preferences = preferences.MoveProvider(id, 1); Save(); Render(); }); down.IsEnabled = order[^1] != id;
+            controls.Children.Add(up); controls.Children.Add(down); card.Children.Add(controls);
             if (enabled && result?.ErrorKey is { } error) card.Children.Add(Text(L.T(error), 12, true));
             if (enabled && result?.Snapshot is { } snapshot)
                 card.Children.Add(Text(L.T(result.ErrorKey == null ? "Updated" : "Last Successful Update") + " " + snapshot.FetchedAt.ToLocalTime().ToString("g"), 11, true));
@@ -55,10 +62,11 @@ public sealed partial class MainWindow
         return new ScrollViewer { Content = body, HorizontalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Disabled };
     }
 
-    Control HistoryPage()
+    Control QuotaHistoryPage()
     {
         var body = new Grid { RowDefinitions = new RowDefinitions("Auto,Auto,Auto,Auto,*"), Margin = new Thickness(32, 28), MaxWidth = 780 };
         var heading = Stack(8);
+        heading.Children.Add(Action("Back", () => Navigate(settingsOrigin)));
         heading.Children.Add(Text(L.T("History"), 28));
         heading.Children.Add(Text(L.T("Local quota readings from the last 30 days. The most recent successful reading per hour is kept."), 13, true));
         Add(body, heading);
@@ -104,7 +112,7 @@ public sealed partial class MainWindow
         {
             var line = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto") };
             Add(line, Text(L.T(window.Label), 12, true));
-            Add(line, Text(window.UsedPercent.ToString("0.#") + "% " + L.T("Used"), 12), 0, 1); row.Children.Add(line);
+            Add(line, Text(MetricValue(window), 12), 0, 1); row.Children.Add(line);
             if (window.ResetsAt is { } reset) row.Children.Add(Text(L.T("Resets") + " " + reset.ToLocalTime().ToString("g"), 11, true));
         }
         return new Border { Background = Surface, BorderBrush = Line, BorderThickness = new Thickness(1), CornerRadius = new CornerRadius(8), Padding = new Thickness(18), Child = row };

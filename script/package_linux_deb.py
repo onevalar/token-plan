@@ -17,7 +17,7 @@ HOMEPAGE = 'https://github.com/onevalar/token-plan'
 
 DEPENDS = ', '.join([
     'libc6 (>= 2.31)', 'libgcc-s1', 'libstdc++6', 'zlib1g',
-    'libx11-6', 'libice6', 'libsm6', 'libfontconfig1',
+    'libx11-6', 'libice6', 'libsm6', 'libfontconfig1', 'libsecret-tools', 'libnotify-bin',
     # .NET needs ICU and OpenSSL; their package names differ per distribution release.
     'libicu76 | libicu75 | libicu74 | libicu72 | libicu70 | libicu67 | libicu66 | libicu-dev',
     'libssl3t64 | libssl3 | libssl1.1',

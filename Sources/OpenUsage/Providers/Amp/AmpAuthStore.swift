@@ -9,7 +9,7 @@ struct AmpAuthStore: Sendable {
 
     var files: any TextFileAccessing = LocalTextFileAccessor()
     var environment: any EnvironmentReading = ProcessEnvironmentReader()
-    var homeDirectory: @Sendable () -> URL = { FileManager.default.homeDirectoryForCurrentUser }
+    var homeDirectory: @Sendable () -> URL = { ProviderHome.directory }
     var isExecutable: @Sendable (String) -> Bool = { FileManager.default.isExecutableFile(atPath: $0) }
 
     /// The same local-only loader serves refresh and automatic provider detection. Finding the CLI

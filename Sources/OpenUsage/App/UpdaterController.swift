@@ -1,3 +1,4 @@
+#if !APP_STORE_BUILD
 import AppKit
 import Combine
 import Foundation
@@ -299,3 +300,5 @@ final class UpdaterUserDriverDelegate: NSObject, SPUStandardUserDriverDelegate {
         }
     }
 }
+
+#endif

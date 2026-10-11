@@ -10,8 +10,8 @@ public sealed class UsageHistory
 {
     const int MaximumBytes = 2 * 1024 * 1024;
     const int MaximumReadings = 2400;
-    static readonly HashSet<string> Providers = new() { "claude", "codex", "cursor" };
-    static readonly HashSet<string> Metrics = new() { "Session", "Weekly", "Sonnet", "Total usage", "Cursor Models", "Other Models" };
+    static readonly HashSet<string> Providers = ProviderCatalog.All.Select(p => p.Id).ToHashSet();
+    static readonly HashSet<string> Metrics = new() { "Session", "Weekly", "Sonnet", "Total usage", "Cursor Models", "Other Models", "Balance", "Topped Up", "Granted", "Cash", "Voucher", "Gift", "Credits", "Today", "This Week", "This Month", "Key Limit", "Web Searches", "Agent Usage", "Orb Usage", "Monthly", "Chat", "Completions", "Daily quota", "Weekly quota", "Extra usage balance", "Claude", "Claude Weekly", "Last 4 Weeks", "Fable", "Extra usage spent", "Reset Credits", "Rate Limit Resets", "Spark", "Spark Weekly", "Org Credits", "Org Spend" };
     HistoryDocument document = new(1, new(), new());
 
     public static UsageHistory Load(string file, DateTimeOffset now)
@@ -23,13 +23,13 @@ public sealed class UsageHistory
         var length = stream.ReadAtLeast(buffer, buffer.Length, throwOnEndOfStream: false);
         if (length > MaximumBytes) throw new InvalidDataException("History exceeds its size limit");
         var value = JsonSerializer.Deserialize<HistoryDocument>(buffer.AsSpan(0, length)) ?? throw new InvalidDataException("Missing history document");
-        if (value.Version != 1 || value.Accounts == null || value.Readings == null || value.Accounts.Count > 3 || value.Readings.Count > MaximumReadings
+        if (value.Version != 1 || value.Accounts == null || value.Readings == null || value.Accounts.Count > Providers.Count || value.Readings.Count > MaximumReadings
             || value.Accounts.Any(a => !Providers.Contains(a.Key) || !IsFingerprint(a.Value))) throw new InvalidDataException("Invalid history document");
         foreach (var entry in value.Readings)
         {
             if (entry == null || !Providers.Contains(entry.Provider) || !value.Accounts.ContainsKey(entry.Provider)
-                || entry.FetchedAt == default || entry.FetchedAt > now.AddMinutes(5) || entry.Windows == null || entry.Windows.Count is < 1 or > 8
-                || entry.Windows.Any(w => w == null || !Metrics.Contains(w.Label) || !double.IsFinite(w.UsedPercent) || w.UsedPercent < 0)
+                || entry.FetchedAt == default || entry.FetchedAt > now.AddMinutes(5) || entry.Windows == null || entry.Windows.Count is < 1 or > 16
+                || entry.Windows.Any(w => w == null || !Metrics.Contains(w.Label) || (w.Limit is { } limit && (!double.IsFinite(limit) || limit <= 0)) || (w.Expiries?.Count > 128) || !double.IsFinite(w.UsedPercent) || w.UsedPercent < 0 || (w.Amount is { } amount && (!double.IsFinite(amount) || amount < 0 || w.Currency is not ("CNY" or "USD" or "COUNT"))))
                 || entry.Windows.Select(w => w.Label).Distinct().Count() != entry.Windows.Count)
                 throw new InvalidDataException("Invalid history reading");
         }
@@ -56,7 +56,7 @@ public sealed class UsageHistory
         }
         if (fingerprint != null) document.Accounts[result.Id] = fingerprint;
         // Failures, including a retained older snapshot, must never create a new reading.
-        if (fingerprint != null && result.ErrorKey == null && result.Snapshot is { } snapshot)
+        if (fingerprint != null && result.ErrorKey == null && result.Snapshot is { } snapshot && snapshot.Windows.Count > 0)
         {
             var prior = document.Readings.Find(r => r.Provider == result.Id && Hour(r.FetchedAt) == Hour(snapshot.FetchedAt));
             if (prior == null || prior.FetchedAt <= snapshot.FetchedAt)
