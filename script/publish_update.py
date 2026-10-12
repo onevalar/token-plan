@@ -105,6 +105,7 @@ def main():
         if readme.exists():
             text = readme.read_text()
             text = re.sub(r'tokenplan-v\d+\.\d+\.\d+',tag,text)
+            text = re.sub(r'\[TokenPlan \d+\.\d+\.\d+\]',f'[TokenPlan {args.version}]',text)
             text = re.sub(r'TokenPlan-(?:Setup-)?\d+\.\d+\.\d+\.(?:dmg|exe)',lambda m: re.sub(r'\d+\.\d+\.\d+',args.version,m[0]),text)
             text = re.sub(r'tokenplan_\d+\.\d+\.\d+_amd64.deb',f'tokenplan_{args.version}_amd64.deb',text)
             readme.write_text(text)
