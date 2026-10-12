@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.0.2
+
+### Chores
+- 完善云端构建、签名公证和三平台自动更新发布流程。by @onevalar
+
+---
+
 ## Unreleased
 
 TokenPlan starts from OpenUsage v0.7.14 (MIT, © Robin Ebers) and diverges as follows.
