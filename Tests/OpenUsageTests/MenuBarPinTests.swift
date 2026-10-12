@@ -332,6 +332,41 @@ final class MenuBarPinTests: XCTestCase {
         }
     }
 
+    func testSettingsAndStripShareGroupedAccountOrderAndIndividualSwitches() {
+        let defaults = makeDefaults("groupedEntries")
+        let ids = ["claude", "codex", "claude@work"]
+        let store = LayoutStore(registry: makeRegistry(providerIDs: ids), defaults: defaults, storageKey: "layout",
+                                defaultMetricIDs: ids.map { "\($0).m1" }, defaultPinnedMetricIDs: [])
+        for id in ids { store.setPinned(true, for: "\(id).m1") }
+        XCTAssertEqual(store.menuBarEntries.map(\.id), ["claude", "claude@work", "codex"])
+        XCTAssertEqual(store.menuBarEntries.filter { ProviderAccountID.family(of: $0.id) == "claude" }.count, 2)
+        for style in MenuBarStyle.allCases {
+            store.menuBarStyle = style
+            XCTAssertEqual(store.menuBarGroups.map(\.id), store.menuBarEntries.map(\.id))
+            store.setMenuBarServiceVisible(false, for: "claude")
+            store.setMenuBarEntrySelected(true, for: "claude@work")
+            XCTAssertFalse(store.isMenuBarEntrySelected("claude"))
+            XCTAssertTrue(store.isMenuBarEntrySelected("claude@work"))
+            XCTAssertEqual(store.menuBarGroups.map(\.id), ["claude@work", "codex"])
+            store.setMenuBarEntrySelected(true, for: "claude")
+        }
+        let provider = Provider(id: "claude@work", displayName: "Claude — redundant Organization", icon: .providerMark("claude"), accountLabel: "work@example.com")
+        XCTAssertEqual(provider.menuBarEntryLabel, "Claude-work@example.com")
+    }
+
+    func testBothStylesKeepSelectedAccountsEvenWithoutStars() {
+        let ids = ["claude", "codex", "claude@work"]
+        let store = LayoutStore(registry: makeRegistry(providerIDs: ids), defaults: makeDefaults("noAccountPins"),
+                                storageKey: "layout", defaultMetricIDs: ids.map { "\($0).m1" }, defaultPinnedMetricIDs: [])
+        store.setPinned(true, for: "claude.m1")
+        let pins = store.pinnedMetricIDs
+        for style in MenuBarStyle.allCases {
+            store.menuBarStyle = style
+            XCTAssertEqual(store.menuBarGroups.map(\.id), ["claude", "claude@work", "codex"])
+            XCTAssertEqual(store.pinnedMetricIDs, pins)
+        }
+    }
+
     func testSavedStylesLoadWithoutStartupPreferenceRewrite() throws {
         for (raw, expected) in [("percentage", MenuBarStyle.percentage), ("ring", .ring),
                                 ("text", .percentage), ("bars", .percentage), ("invalid", .percentage)] {

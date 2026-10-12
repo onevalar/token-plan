@@ -7,9 +7,11 @@ public sealed partial class ProviderService
     readonly Dictionary<string, (string Token, DateTimeOffset Expiry)> antigravityTokens = new();
     async Task<ProviderResult> RefreshAntigravity(CancellationToken cancellation)
     {
+        if (await RefreshAntigravityLocal(cancellation) is { } local) return local;
         string? raw;
         try { raw = await credentialReader("gemini", "antigravity", cancellation); }
-        catch (IOException) { throw new ProviderFailure("System credentials could not be read. Unlock your login keyring and try again."); }
+        catch (SystemCredentialException e) { throw new ProviderFailure(e.Message); }
+        catch (IOException) { throw new ProviderFailure("System credentials could not be read. Open Antigravity and refresh, or check your login keyring."); }
         if (raw == null) throw new ProviderFailure("Sign in with Antigravity, then refresh.");
         var login = AntigravityUsage.ParseLogin(raw);
         var fingerprint = Fingerprint(login.RefreshToken ?? login.AccessToken!); attemptIdentities["antigravity"] = fingerprint; var cooldown = "antigravity" + fingerprint; CheckCooldown(cooldown);

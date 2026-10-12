@@ -23,7 +23,7 @@ enum SettingsPage: CaseIterable, Hashable {
     case appearance, history, notifications, advanced
 
     /// Each destination has one visible entry point.
-    static let dashboardPages: [SettingsPage] = [.appearance, .history]
+    static let dashboardPages: [SettingsPage] = []
     static let generalPages: [SettingsPage] = [.notifications, .advanced]
 
     var symbol: String {
@@ -102,6 +102,12 @@ final class PopoverNavigationStore {
 
     /// Store the entry point explicitly so Back never invents a visit to General Settings.
     func openSettingsPage(_ page: SettingsPage? = nil, from entryPoint: SettingsEntryPoint = .dashboard) {
+        if page == .history {
+            customizeProviderID = nil
+            screen = .customize
+            return
+        }
+        let page = page == .appearance ? nil : page
         screen = .settings
         settingsPage = page
         settingsEntryPoint = page == nil ? .dashboard : entryPoint

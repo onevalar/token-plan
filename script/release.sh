@@ -14,7 +14,7 @@ set -euo pipefail
 #                         only signs the DMG if this matches the private key it signs with.
 #   TOKENPLAN_VERSION     human version, e.g. 0.7.0 (CFBundleShortVersionString)
 # Optional env:
-#   TOKENPLAN_BUILD       CFBundleVersion (monotonic). Default: git commit count.
+#   TOKENPLAN_BUILD       CFBundleVersion (monotonic). Default: Unix timestamp.
 #   FEED_URL              appcast URL baked into the app. Default: GitHub Pages project URL.
 #   NOTARY_APPLE_ID / NOTARY_APP_PASSWORD / NOTARY_TEAM_ID   Apple ID, app-specific password, and team
 #                         ID for notarytool. When all three are set, the app and DMG are notarized + stapled.
@@ -42,9 +42,9 @@ VERSION="$TOKENPLAN_VERSION"
 # CFBundleShortVersionString carries the full version, including any pre-release suffix (e.g.
 # "0.7.0-beta.1"). This is the human-readable string Sparkle shows in its update prompt and the app
 # shows in its footer/About, so they always match. Sparkle compares builds by CFBundleVersion (the
-# monotonic commit count below), not this string, and Developer ID notarization does not require it to
+# monotonic build number below), not this string, and Developer ID notarization does not require it to
 # be numeric. (Sparkle's own docs use a beta short version, e.g. "2.0b1".)
-BUILD="${TOKENPLAN_BUILD:-$(git rev-list --count HEAD)}"
+BUILD="${TOKENPLAN_BUILD:-$(date +%s)}"
 FEED_URL="${FEED_URL:-https://onevalar.github.io/token-plan/appcast.xml}"
 DMG_NAME="$APP_NAME-$VERSION.dmg"
 

@@ -75,6 +75,7 @@ struct ClaudeAuthStore: Sendable {
     let desktopOrganization: String?
     let expectedIdentityKey: String?
     let desktopOnly: Bool
+    let isolatedConfigDirectory: String?
     let swapAccount: ClaudeSwapAccount?
     let preferOrganizationScopedDesktop: Bool
 
@@ -87,6 +88,7 @@ struct ClaudeAuthStore: Sendable {
         expectedIdentityKey: String? = nil,
         desktopOnly: Bool = false,
         swapAccount: ClaudeSwapAccount? = nil,
+        isolatedConfigDirectory: String? = nil,
         preferOrganizationScopedDesktop: Bool = false,
         now: @escaping @Sendable () -> Date = Date.init
     ) {
@@ -98,6 +100,7 @@ struct ClaudeAuthStore: Sendable {
         self.expectedIdentityKey = expectedIdentityKey?.lowercased() ?? swapAccount?.identityKey
         self.desktopOnly = desktopOnly
         self.swapAccount = swapAccount
+        self.isolatedConfigDirectory = isolatedConfigDirectory
         self.preferOrganizationScopedDesktop = preferOrganizationScopedDesktop
         self.now = now
     }
@@ -165,7 +168,7 @@ struct ClaudeAuthStore: Sendable {
             stored = stored.filter { liveUsageAvailability($0) == .available }
                 + stored.filter { liveUsageAvailability($0) != .available }
         }
-        let candidates = desktopOnly || swapAccount != nil ? stored : applyingEnvironmentToken(to: stored)
+        let candidates = desktopOnly || swapAccount != nil || isolatedConfigDirectory != nil ? stored : applyingEnvironmentToken(to: stored)
         return ClaudeCredentialLoad(candidates: candidates, desktopStatus: desktopStatus)
     }
 
@@ -271,7 +274,7 @@ struct ClaudeAuthStore: Sendable {
     }
 
     func claudeHomeOverride() -> String? {
-        swapAccount?.sessionDirectory ?? envText("CLAUDE_CONFIG_DIR")
+        isolatedConfigDirectory ?? swapAccount?.sessionDirectory ?? envText("CLAUDE_CONFIG_DIR")
     }
 
     // Resolved OAuth endpoint strings before URL validation. The suffix is derived from the same
@@ -343,7 +346,7 @@ struct ClaudeAuthStore: Sendable {
         let base = "\(Self.keychainServicePrefix)\(resolveOAuthEndpoints().suffix)-credentials"
         if let configDir = claudeHomeOverride() {
             let scoped = "\(base)-\(hashSuffix(configDir))"
-            return swapAccount == nil ? [scoped, base] : [scoped]
+            return swapAccount == nil && isolatedConfigDirectory == nil ? [scoped, base] : [scoped]
         }
         return [base]
     }

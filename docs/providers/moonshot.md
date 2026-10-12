@@ -15,7 +15,7 @@ Tracks your [Kimi / Moonshot AI 月之暗面](https://platform.kimi.com) open-pl
 Kimi has no companion app that TokenPlan can reuse a credential from, so you supply an API key. TokenPlan
 reads it from the first place it finds one:
 
-1. `~/.config/tokenplan/moonshot.json` — `{"apiKey":"…"}` (the file **Services & Subscriptions → Kimi → Settings → API Key** writes to)
+1. `~/.config/tokenplan/moonshot.json` — `{"apiKey":"…"}` (the file **Subscription Services → Kimi → Settings → API Key** writes to)
 2. The `MOONSHOT_API_KEY` or `KIMI_API_KEY` environment variable
 
 Nothing leaves your Mac except the single request below, sent to `api.moonshot.cn` (and, if that rejects the key, `api.moonshot.ai`).
@@ -23,8 +23,8 @@ Nothing leaves your Mac except the single request below, sent to `api.moonshot.c
 ## Setup
 
 1. Create an API key at [platform.kimi.com/console/api-keys](https://platform.kimi.com/console/api-keys).
-2. Paste it into **Services & Subscriptions → Kimi → Settings → API Key**, **or** export it (`export MOONSHOT_API_KEY="YOUR_KEY"`).
-3. Kimi appears on the dashboard on the next refresh (turn it on in Services & Subscriptions if it isn't already).
+2. Paste it into **Subscription Services → Kimi → Settings → API Key**, **or** export it (`export MOONSHOT_API_KEY="YOUR_KEY"`).
+3. Kimi appears on the dashboard on the next refresh (turn it on in Subscription Services if it isn't already).
 
 ## Under the hood
 

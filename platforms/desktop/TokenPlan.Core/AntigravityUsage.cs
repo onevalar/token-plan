@@ -35,7 +35,6 @@ public static class AntigravityUsage
                 values[id] = new(labels.First(p => p.Item1 == id).Item2, Math.Round((1 - Math.Clamp(remaining, 0, 1)) * 100), DateTimeOffset.TryParse(UsageParser.String(bucket, "resetTime"), out var reset) ? reset : null);
             }
         }
-        if (values.Count == 0) throw new InvalidDataException();
         return new("antigravity", "Antigravity", plan, labels.Where(p => values.ContainsKey(p.Item1)).Select(p => values[p.Item1]).ToArray(), now);
     }
 }

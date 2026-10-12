@@ -144,3 +144,11 @@ way Claude Code does. Claude Code tokens refresh via `platform.claude.com/v1/oau
 The plan badge reads `GET https://api.anthropic.com/api/oauth/profile` (the organization's `rate_limit_tier`), because the plan Claude Code saves at sign-in never updates afterwards. To stay clear of Anthropic's rate limits, that lookup runs at most once per access token — after a usage fetch has succeeded — and cards bound to a specific account reuse the profile they already fetched to verify identity, so they make no extra request. Inference-only tokens skip it entirely.
 
 When the five-hour session window hasn't begun (the usage API reports no reset time), the Session row shows **Not started** on the trailing label. The session begins after your first message. A reported reset time means the window is running, so the row always shows the countdown then — even when Anthropic's whole-percent numbers still read 0% because less than 1% has been used, which matches what Claude Code itself shows.
+
+### Separate Terminal Accounts
+
+On macOS, Windows, and Linux, TokenPlan also discovers direct `.claude-*` directories in your home folder when their `.claude.json` identifies a signed-in account (for example, `claude2` using `~/.claude-account2`). Restart TokenPlan after adding an account. Each distinct account gets its own card; duplicate identities are merged. Account headings use the email followed by the subscription level, without organization metadata. Terminal aliases are never executed.
+
+Separate accounts read only their own directory's credentials (and scoped Keychain entry on macOS), never the default account's token or a shared environment token. Their local session history is scanned from that directory with account ownership checks. Accounts stored elsewhere or only inside a switching tool's private vault are not automatically discovered by this directory scan.
+
+Windows/Linux refresh their discovered account directories during refresh. Their quota snapshots are account-specific; token/cost history remains device-level and is not yet attributed to each additional account.

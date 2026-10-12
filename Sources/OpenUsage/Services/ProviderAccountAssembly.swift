@@ -7,6 +7,8 @@ struct ClaudeAccountCard: Equatable, Sendable {
     let displayName: String
     let usesDesktopCredentials: Bool
     let allowsUnattributedPiUsage: Bool
+    var accountLabel: String? = nil
+    var configDirectory: String? = nil
     var swapAccount: ClaudeSwapAccount? = nil
     var additionalLogDirectories: [String] = []
     var organizationName: String? = nil
@@ -76,6 +78,7 @@ struct ProviderAccountAssembly {
         families: Set<String> = ProviderAccountID.families,
         listCodexHomeDirectories: @escaping @Sendable (String) -> [String] = CodexHomeScanner.listSubdirectories,
         desktop: ClaudeDesktopAuthStore? = nil,
+        listClaudeHomeDirectories: @Sendable (URL) -> [String] = ClaudeHomeDiscovery.listDirectories,
         listDesktopOrganizationDirectories: @escaping @Sendable (URL) -> [String] = { root in
             let urls = (try? FileManager.default.contentsOfDirectory(
                 at: root, includingPropertiesForKeys: [.isDirectoryKey, .isSymbolicLinkKey],
@@ -127,6 +130,16 @@ struct ProviderAccountAssembly {
             return ProviderAccountAssembly(identityKeysByCard: identityKeys, codex: codex)
         }
 
+        let homes = ClaudeHomeDiscovery.discover(observer: observer, listDirectories: listClaudeHomeDirectories)
+        for home in homes {
+            let source = ProviderAccountSource(kind: .claudeHome, anchor: home.directory, holdsDefaultSource: false)
+            if let index = observations.firstIndex(where: { $0.family == "claude" && $0.identityKey == home.identity }) {
+                observations[index].sources.append(source)
+            } else {
+                observations.append(.init(family: "claude", identityKey: home.identity, label: home.label, sources: [source]))
+            }
+        }
+
         let swapAccounts = ClaudeSwapAccount.discover(files: observer.files, home: observer.homeDirectory())
         if !swapAccounts.isEmpty {
             AppLog.info(.config, "accounts: discovered \(swapAccounts.count) Claude Swap accounts")
@@ -144,7 +157,7 @@ struct ProviderAccountAssembly {
             }
         }
 
-        if let claudeIdentity = identityKeys["claude"], !claudeIdentity.contains("|"), swapAccounts.isEmpty {
+        if let claudeIdentity = identityKeys["claude"], !claudeIdentity.contains("|"), swapAccounts.isEmpty, homes.isEmpty {
             accountsStore.reconcile(with: observations)
             return ProviderAccountAssembly(identityKeysByCard: identityKeys, codex: codex)
         }
@@ -248,10 +261,34 @@ struct ProviderAccountAssembly {
             ))
             identityKeys[record.id] = account.identityKey
         }
+        for home in homes {
+            guard !cards.contains(where: { $0.identityKey == home.identity }),
+                  let record = records.first(where: { $0.family == "claude" && $0.identityKey == home.identity && !$0.removedTombstone })
+            else { continue }
+            cards.append(ClaudeAccountCard(
+                id: record.id, identityKey: home.identity,
+                organizationID: home.identity.contains("|") ? home.identity.split(separator: "|").last.map(String.init) : nil,
+                displayName: "Claude — \(home.label ?? URL(fileURLWithPath: home.directory).lastPathComponent)",
+                usesDesktopCredentials: false, allowsUnattributedPiUsage: allowsUnattributedPiUsage,
+                configDirectory: home.directory
+            ))
+            identityKeys[record.id] = home.identity
+        }
         for index in cards.indices {
+            let label = observations.first { $0.family == "claude" && $0.identityKey == cards[index].identityKey }?.label
+            cards[index].accountLabel = Self.accountEmail(from: label)
+
             cards[index].additionalLogDirectories = swapAccounts.map(\.sessionDirectory)
         }
         return ProviderAccountAssembly(identityKeysByCard: identityKeys, claudeCards: cards, codex: codex)
+    }
+
+    /// Account labels contain the email followed by optional organization metadata.
+    static func accountEmail(from label: String?) -> String? {
+        guard let label else { return nil }
+        let email = label.components(separatedBy: " (").first?.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard let email, email.contains("@"), !email.contains(" ") else { return nil }
+        return email
     }
 
     private struct DesktopOrganization {

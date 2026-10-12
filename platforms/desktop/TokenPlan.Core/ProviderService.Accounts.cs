@@ -8,16 +8,20 @@ public sealed partial class ProviderService
         var home = userHome;
         var sources = AccountHomes.Discover(family, home, family == "claude" ? claudeHome : codexHome);
         var output = new List<ProviderResult>();
+        var seen = new HashSet<string>(StringComparer.Ordinal);
+        if (family == "claude" && ClaudeAccountMetadata.Read(claudeHome, userHome) is { } primary) seen.Add(primary.Identity);
         foreach (var source in sources)
         {
+            var metadata = family == "claude" && source.AuthFile == null ? ClaudeAccountMetadata.Read(source.Home, userHome) : null;
+            if (metadata != null && !seen.Add(metadata.Identity)) continue;
             var key = family + "\0" + (source.AuthFile ?? source.Home);
             if (!accountServices.TryGetValue(key, out var service))
             {
-                service = new(family == "codex" ? source.Home : codexHome, family == "claude" ? source.Home : claudeHome, log: log, keys: Keys, alternateAuthFile: source.AuthFile, encodedAuth: source.Encoded);
+                service = new(family == "codex" ? source.Home : codexHome, family == "claude" ? source.Home : claudeHome, handler: accountHandler, log: log, keys: Keys, userHome: userHome, alternateAuthFile: source.AuthFile, encodedAuth: source.Encoded);
                 accountServices[key] = service;
             }
             var result = await service.Refresh(family, cancellation);
-            output.Add(result with { Name = ProviderCatalog.Get(family).Name + " · " + source.Label });
+            output.Add(result with { Name = ProviderCatalog.Get(family).Name + " · " + source.Label, AccountKey = family + ":" + Fingerprint(result.AccountIdentity ?? key), AccountEmail = result.AccountEmail ?? (source.Encoded ? source.Label : null) });
         }
         return output.DistinctBy(r => r.CredentialFingerprint ?? r.Name).ToArray();
     }

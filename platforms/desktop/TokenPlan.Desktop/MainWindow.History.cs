@@ -7,10 +7,10 @@ namespace TokenPlan.Desktop;
 public sealed partial class MainWindow
 {
     DateOnly? selectedSpendDate;
-    Control HistoryPage() => SpendHistoryPage();
-    Control SpendHistoryPage()
+    Control SpendOverview()
     {
-        var body = UtilityBody("Usage History");
+        var body = Stack(16); body.Name = "tokenplan-usage-overview";
+        body.Children.Add(Text(L.T("Usage Overview"), 18));
         if (selectedSpendDate is { } selected)
         {
             body.Children.Add(Action("Back to History", () => { selectedSpendDate = null; Render(); }));
@@ -22,7 +22,7 @@ public sealed partial class MainWindow
                 body.Children.Add(Section(ProviderName(id), Text(preferences.HideValues ? "•••" : day.Tokens.Total.ToString("N0") + " " + L.T("Tokens"), 19), CostLabel(day.Cost),
                     Text(preferences.HideValues ? "•••" : L.T("Input") + " " + Count(day.Tokens.Input) + " · " + L.T("Output") + " " + Count(day.Tokens.Output) + " · " + L.T("Cache Read") + " " + Count(day.Tokens.CacheRead), 13, true)));
             }
-            return new ScrollViewer { Content = body };
+            return body;
         }
         var ids = new[] { "all" }.Concat(ProviderCatalog.TokenLogProviders.Where(preferences.IsEnabled)).ToArray();
         if (!ids.Contains(historyProvider)) historyProvider = "all";
@@ -50,9 +50,9 @@ public sealed partial class MainWindow
             var totalTokens = slices.Sum(s => s.Tokens); var totalCost = slices.Sum(s => s.Cost);
             var total = preferences.SpendMetric == 2 ? Count(totalTokens) : !slices.Any(s => s.Priced) ? "—" : "$" + (preferences.SpendMetric == 1 ? totalCost / totalTokens * 1000000 : totalCost).ToString("N2");
             var overview = new Grid { ColumnDefinitions = new("200,*"), MinHeight = 200 };
-            var colors = new[] { "#2675E5", "#8A6CDF", "#329C85", "#C6933D" };
+
             var ring = new Grid { Width = 190, Height = 190 };
-            ring.Children.Add(new SpendRing(preferences.HideValues ? [] : slices.Select((s, i) => (s.Value, colors[i % colors.Length])).ToArray()));
+            ring.Children.Add(new SpendRing(preferences.HideValues ? [] : slices.Select(s => (s.Value, SpendColor(s.Id))).ToArray()));
             ring.Children.Add(new TextBlock { Text = preferences.HideValues ? "•••" : total, Foreground = Ink, FontSize = 22, VerticalAlignment = VerticalAlignment.Center, HorizontalAlignment = HorizontalAlignment.Center }); Add(overview, ring);
             var legend = Stack(10); legend.VerticalAlignment = VerticalAlignment.Center;
             foreach (var slice in slices) legend.Children.Add(SettingRow(ProviderName(slice.Id), Text(preferences.HideValues ? "•••" : preferences.SpendMetric == 2 ? Count(slice.Tokens) : !slice.Priced ? "—" : "$" + slice.Value.ToString("N2"), 14)));
@@ -68,8 +68,15 @@ public sealed partial class MainWindow
         }
         if (trends.Any(t => t.Partial || t.ErrorKey != null)) body.Children.Add(Note(L.T("Some local token logs were skipped or could not be read. Totals may be incomplete.")));
         body.Children.Add(Text(L.T("Estimated from model token rates, not your subscription bill."), 12, true));
-        return new ScrollViewer { Content = body };
+        if (preferences.CodexFallbackModel != null) body.Children.Add(Text(L.T("Unknown Codex models use the selected fallback price.") + " " + preferences.CodexFallbackModel, 12, true));
+        return body;
     }
+    string SpendColor(string id) => id switch {
+        "claude" => "#DE7356", "codex" => IsDark ? "#ECECF1" : "#202123",
+        "cursor" => IsDark ? "#B0B0B8" : "#636366", "antigravity" => "#4285F4",
+        "grok" => IsDark ? "#98989D" : "#8E8E93", "opencode" => IsDark ? "#AEAEB2" : "#6E6E73",
+        "amp" => "#F34E3F", _ => "#6467F2"
+    };
     Control CostLabel(CostTotal? cost)
     {
         var body = Stack(4); body.Children.Add(Text(L.T("Estimated API Cost") + "  " + (preferences.HideValues ? "•••" : (cost == null || cost.Priced == 0 && cost.Unpriced > 0) ? "—" : "$" + cost.Dollars.ToString("N2")), 15));

@@ -19,10 +19,8 @@ struct SettingsScreen: View {
     @State private var commandLineTool = CommandLineToolInstaller()
     @AppStorage(DensitySetting.key) private var density = DensitySetting.regular
     @AppStorage(LogLevelSetting.key) private var logLevel = LogLevelSetting.fallback
-    @AppStorage(LanguageSetting.key) private var language = LanguageSetting.fallback
     @AppStorage(RefreshSetting.key) private var refreshMinutes = RefreshSetting.defaultMinutes
     /// The language the running process started with; a different pick shows the restart prompt.
-    @State private var launchLanguage = LanguageSetting.current
     /// Surfaced under the Advanced rows when copying the path or revealing the file fails.
     @State private var logActionError: String?
     /// macOS notification authorization for OpenUsage, surfaced in the Notifications section so a
@@ -79,6 +77,7 @@ struct SettingsScreen: View {
                 #if APP_STORE_BUILD
                 StoreFileAuthorizationSection()
                 #endif
+                SettingsAppearanceSection()
                 generalSection
                 section("More") {
                     ForEach(SettingsPage.generalPages, id: \.self) { page in
@@ -133,22 +132,6 @@ struct SettingsScreen: View {
                     options: RefreshSetting.options,
                     label: RefreshSetting.label(forMinutes:)
                 )
-            }
-            row("Language") {
-                picker($language, options: LanguageSetting.allCases, label: \.label)
-                    .onChange(of: language) { _, newValue in LanguageSetting.apply(newValue) }
-            }
-            if language != launchLanguage {
-                HStack(spacing: 8) {
-                    Text("Restart TokenPlan to change the language.")
-                        .font(.caption)
-                        .foregroundStyle(Theme.notice)
-                    Spacer(minLength: 8)
-                    Button("Restart Now") { LanguageSetting.relaunch() }
-                        .controlSize(.small)
-                }
-                .padding(.horizontal, 12)
-                .padding(.bottom, 8)
             }
             row("Launch at Login") {
                 Toggle("", isOn: Binding(

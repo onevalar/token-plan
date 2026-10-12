@@ -65,12 +65,16 @@ struct WidgetGroupedListView: View {
             } else {
                 Button { openCustomize(for: group.id) } label: {
                     HStack {
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(dataStore.plan(for: group.id) ?? tr("Subscription"))
-                                .font(.subheadline.weight(.semibold))
-                            // Identity is essential only when two plans have the same name.
-                            if service.accounts.filter({ dataStore.plan(for: $0.id) == dataStore.plan(for: group.id) }).count > 1 {
-                                Text(group.provider.displayName).font(.caption).foregroundStyle(.secondary)
+                        HStack(alignment: .firstTextBaseline, spacing: 6) {
+                            Text(verbatim: group.provider.accountLabel ?? group.provider.displayName)
+                                .font(.subheadline.weight(.medium))
+                                .lineLimit(1)
+                                .truncationMode(.middle)
+                            if let plan = dataStore.plan(for: group.id) {
+                                Text(verbatim: plan)
+                                    .font(.subheadline)
+                                    .foregroundStyle(.secondary)
+                                    .fixedSize()
                             }
                         }
                         Spacer(minLength: 8)

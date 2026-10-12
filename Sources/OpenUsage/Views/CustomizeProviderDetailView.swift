@@ -20,21 +20,43 @@ struct CustomizeProviderDetailView: View {
     var body: some View {
         if let group = layout.customizeDetail(for: providerID) {
             VStack(alignment: .leading, spacing: density.sectionSpacing) {
-                HStack {
-                    ProviderSectionHeader(provider: group.provider, plan: dataStore.plan(for: providerID))
-                    SubscriptionStatusLabel(providerID: providerID)
-                    Button {
-                        Task { await dataStore.refresh(providerID: providerID, force: true) }
-                    } label: {
-                        Label("Refresh", systemImage: "arrow.clockwise")
-                            .font(.caption.weight(.medium))
-                            .padding(.horizontal, 9).frame(height: 28)
-                            .background(.primary.opacity(0.055), in: RoundedRectangle(cornerRadius: 6))
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack {
+                        if group.provider.accountLabel != nil {
+                            ProviderSectionHeader(provider: Provider(
+                                id: group.provider.id,
+                                displayName: ProviderAccountID.family(of: providerID) == "claude" ? "Claude" : group.provider.displayName,
+                                icon: group.provider.icon
+                            ))
+                        } else {
+                            ProviderSectionHeader(provider: group.provider, plan: dataStore.plan(for: providerID))
+                        }
+                        Button {
+                            Task { await dataStore.refresh(providerID: providerID, force: true) }
+                        } label: {
+                            Label("Refresh", systemImage: "arrow.clockwise")
+                                .font(.caption.weight(.medium))
+                                .padding(.horizontal, 9).frame(height: 28)
+                                .background(.primary.opacity(0.055), in: RoundedRectangle(cornerRadius: 6))
+                        }
+                        .buttonStyle(.plain).foregroundStyle(.secondary)
+                        .fixedSize()
+                        .disabled(dataStore.refreshingProviderIDs.contains(providerID))
+                        .accessibilityLabel("Refresh Usage")
                     }
-                    .buttonStyle(.plain).foregroundStyle(.secondary)
-                    .fixedSize()
-                    .disabled(dataStore.refreshingProviderIDs.contains(providerID))
-                    .accessibilityLabel("Refresh Usage")
+                    if let email = group.provider.accountLabel {
+                        HStack(alignment: .firstTextBaseline, spacing: 6) {
+                            Text(verbatim: email)
+                                .font(.subheadline.weight(.medium))
+                                .lineLimit(1).truncationMode(.middle)
+                            if let plan = dataStore.plan(for: providerID) {
+                                Text(verbatim: plan)
+                                    .font(.subheadline).foregroundStyle(.secondary)
+                                    .fixedSize()
+                            }
+                        }
+                        .padding(.leading, 2)
+                    }
                 }
                 .padding(.horizontal, 8)
                 HStack(spacing: 4) {
@@ -130,35 +152,27 @@ struct CustomizeProviderDetailView: View {
 
     private func metricSections(_ group: ProviderMetrics) -> some View {
         let pinCount = layout.pinnedCount(forProvider: providerID)
-        let atLimit = pinCount >= LayoutStore.maxPinsPerProvider
         return VStack(alignment: .leading, spacing: 8) {
             HStack {
                 Text("Display Content").font(.subheadline.weight(.semibold))
                 Spacer()
                 Text(trf("Menu Bar: %lld/%lld", pinCount, LayoutStore.maxPinsPerProvider))
                     .font(.caption.monospacedDigit())
-                    .foregroundStyle(atLimit ? Theme.notice : AnyShapeStyle(.secondary))
+                    .foregroundStyle(.secondary)
                     .padding(.horizontal, 8).padding(.vertical, 4)
                     .background(.primary.opacity(0.04), in: RoundedRectangle(cornerRadius: 6))
             }
             .padding(.horizontal, 8)
+            Text("Choose where each item appears. Menu Bar shows up to two values beside the app icon; uncheck one before choosing a replacement.")
+                .font(.caption).foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true).padding(.horizontal, 8)
             VStack(spacing: 0) {
-                HStack(spacing: 10) {
-                    Text("Content Item")
-                    Spacer(minLength: 8)
-                    Text("Status").frame(width: 100)
-                    Label("Menu Bar", systemImage: "menubar.rectangle")
-                        .labelStyle(.iconOnly).frame(width: 58)
+                CustomizeMetricRow(title: tr("Content Item"), handle: { AnyView($0.hidden()) }) {
+                    Text("Display Configuration").frame(width: 100)
+                    Text("Menu Bar").frame(width: 58)
                 }
                 .font(.caption).foregroundStyle(.secondary)
-                .padding(.horizontal, 12).padding(.vertical, 8)
-                if atLimit {
-                    Label("Limit reached. Deselect an item to choose another.", systemImage: "info.circle")
-                        .font(.caption).foregroundStyle(Theme.notice)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.horizontal, 12).padding(.vertical, 8)
-                        .background(Theme.notice.opacity(0.06))
-                }
+                Divider().padding(.horizontal, 12)
                 ForEach(group.metrics, id: \.id) { metric in
                     metricRow(metric, in: group.provider.id)
                 }
@@ -178,24 +192,38 @@ struct CustomizeProviderDetailView: View {
                 AnyView(grip.reorderFrame(id: "grip:\(metric.id)", in: .named(reorderSpaceName)))
             },
             trailing: {
-                Picker("Status", selection: Binding(
-                    get: { placement(of: metric) },
-                    set: { setPlacement($0, for: metric) }
-                )) {
+                Menu {
                     if !metric.sample.isChart && !metric.sample.isUsagePeriod && !metric.sample.showsResetExpiries {
-                        Text("Show on Home").tag(MetricPlacement.visible)
+                        placementOption("Show on Home", .visible, metric: metric)
                     }
-                    Text("Details Only").tag(MetricPlacement.details)
-                    Text("Hidden").tag(MetricPlacement.hidden)
+                    placementOption("Details Only", .details, metric: metric)
+                    placementOption("Hidden", .hidden, metric: metric)
+                } label: {
+                    HStack(spacing: 6) {
+                        Text(placement(of: metric) == .visible ? tr("Show on Home") : placement(of: metric) == .details ? tr("Details Only") : tr("Hidden"))
+                            .lineLimit(1)
+                        Spacer(minLength: 0)
+                        Image(systemName: "chevron.up.chevron.down").font(.caption)
+                    }
+                    .padding(.horizontal, 10).frame(width: 100, height: 30)
+                    .background(.primary.opacity(0.055), in: RoundedRectangle(cornerRadius: 8))
+                    .contentShape(Rectangle())
                 }
-                .labelsHidden().pickerStyle(.menu).frame(width: 100)
-                .accessibilityLabel(trf("Status: %@", metric.title))
+                .menuStyle(.button).buttonStyle(.plain).menuIndicator(.hidden).fixedSize()
+                .accessibilityLabel(trf("Display Configuration: %@", metric.title))
                 StarButton(metric: metric).frame(width: 58)
             }
         )
         .contentShape(Rectangle())
         .opacity(isActive ? 0 : 1)
         .reorderFrame(id: metric.id, in: .named(reorderSpaceName))
+    }
+
+    private func placementOption(_ title: LocalizedStringKey, _ value: MetricPlacement, metric: WidgetDescriptor) -> some View {
+        Button { setPlacement(value, for: metric) } label: {
+            if placement(of: metric) == value { Label(title, systemImage: "checkmark") }
+            else { Text(title) }
+        }
     }
 
     // MARK: - Container drag-reorder
@@ -309,7 +337,6 @@ private struct StarButton: View {
             }))
             .toggleStyle(.checkbox).labelsHidden()
             .disabled(!layout.canPin(metric.id))
-            .opacity(layout.canPin(metric.id) ? 1 : 0.35)
             .accessibilityLabel(trf("Menu Bar: %@", metric.title))
             .animation(Motion.spring, value: pinned)
         } else {

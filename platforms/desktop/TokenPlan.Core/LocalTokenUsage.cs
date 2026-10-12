@@ -23,6 +23,7 @@ public sealed class LocalTokenUsage(string codexHome, long byteBudget = 128 * 10
     readonly Dictionary<string, CachedFile> files = new(OperatingSystem.IsWindows() ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal);
     readonly SemaphoreSlim gate = new(1);
     string? timeZone;
+    int pricingRevision = -1;
     sealed class CachedFile
     {
         public long Offset;
@@ -53,7 +54,7 @@ public sealed class LocalTokenUsage(string codexHome, long byteBudget = 128 * 10
         bool Expired() => watch.Elapsed >= duration;
         var today = DateOnly.FromDateTime(TimeZoneInfo.ConvertTime(now, zone).DateTime);
         var since = today.AddDays(-29);
-        if (timeZone != zone.Id) { files.Clear(); timeZone = zone.Id; }
+        if (timeZone != zone.Id || pricingRevision != ModelPricing.Revision) { files.Clear(); timeZone = zone.Id; pricingRevision = ModelPricing.Revision; }
         var partial = false;
         var scanningPending = false;
         long remaining = byteBudget;

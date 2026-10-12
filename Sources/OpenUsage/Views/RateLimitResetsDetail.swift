@@ -10,15 +10,19 @@ struct RateLimitResetsDetail: View {
         VStack(alignment: .leading, spacing: 6) {
             switch Self.content(count: count, expiries: expiries) {
             case .timeline(let entries):
-                Text("Expiry Date").font(.caption).foregroundStyle(.secondary)
                 ForEach(entries, id: \.key) { entry in
-                    HStack(spacing: 10) {
-                        Text("\(entry.number)")
-                            .foregroundStyle(.secondary).frame(width: 18, alignment: .leading)
-                        Text(entry.time).monospacedDigit().fixedSize()
-                        Spacer(minLength: 8)
-                        if entry.expired {
-                            Text("Expired").font(.caption).foregroundStyle(.secondary).fixedSize()
+                    HStack(alignment: .top, spacing: 12) {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(entries.count == 1 && count <= 1 ? tr("Expiry Date") : trf("Reset Credit %lld", entry.number))
+                                .foregroundStyle(.secondary)
+                            Text("Expired").font(.caption).foregroundStyle(.secondary)
+                                .opacity(entry.expired ? 1 : 0).accessibilityHidden(!entry.expired)
+                        }
+                        Spacer(minLength: 0)
+                        VStack(alignment: .trailing, spacing: 4) {
+                            Text(String(entry.time.prefix(10))).monospacedDigit()
+                            Text(String(entry.time.suffix(5)) + " · " + tr("Local Time"))
+                                .font(.caption).monospacedDigit().foregroundStyle(.secondary)
                         }
                     }
                     .font(.system(size: density.supportingPointSize))

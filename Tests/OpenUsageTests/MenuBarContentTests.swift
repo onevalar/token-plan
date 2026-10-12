@@ -192,6 +192,22 @@ final class MenuBarContentTests: XCTestCase {
 
     // MARK: - Fixtures
 
+    func testPercentageRetainsAccountsWithoutPinsAndFallsBackWhenPinnedDataMissing() {
+        let groups = [
+            group("claude", percent("claude.session", "Session", 70)),
+            group("claude@work", percent("claude@work.session", "Session", 12), noDataPercent("claude@work.weekly", "Weekly")),
+            group("codex", percent("codex.weekly", "Weekly", 35))
+        ]
+        for pins: Set<String> in [["claude.session"], ["claude.session", "claude@work.weekly"]] {
+            let text = MenuBarContentBuilder.build(groups: groups, style: .percentage, plan: { _ in "Pro" },
+                                                  accountNumbers: ["claude": 1, "claude@work": 2], pinnedMetricIDs: pins, data: { $0.sample })
+            let rings = MenuBarContentBuilder.build(groups: groups, style: .ring, plan: { _ in "Pro" }, data: { $0.sample })
+            XCTAssertEqual(text.groups.map(\.providerID), rings.groups.map(\.providerID))
+            XCTAssertEqual(text.groups[1].metrics.first?.id, "claude@work.session")
+            XCTAssertEqual(text.groups[1].accountBadge, 2)
+        }
+    }
+
     private func group(_ providerID: String, _ metrics: WidgetDescriptor...) -> ProviderMetrics {
         let provider = Provider(
             id: providerID,

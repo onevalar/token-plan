@@ -29,7 +29,7 @@ sealed class ProviderGrid : Panel
         for (var row = 0; row < heights.Length; row++)
         {
             for (var column = 0; column < columns && row * columns + column < Children.Count; column++)
-                Children[row * columns + column].Arrange(new Rect(column * (itemWidth + Gap), y, itemWidth, heights[row]));
+                Children[row * columns + column].Arrange(new Rect(column * (itemWidth + Gap), y, itemWidth, Children[row * columns + column].DesiredSize.Height));
             y += heights[row] + Gap;
         }
         return finalSize;

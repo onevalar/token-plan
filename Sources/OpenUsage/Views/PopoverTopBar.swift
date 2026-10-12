@@ -33,6 +33,6 @@ struct PopoverTopBar: View {
     private var title: String {
         screen == .settings
             ? layout.displayedSettingsPage?.title ?? tr("General Settings")
-            : tr(layout.displayedCustomizeProviderID == nil ? "Services & Subscriptions" : "Subscription Details")
+            : tr(layout.displayedCustomizeProviderID == nil ? "Subscription Services" : "Subscription Details")
     }
 }

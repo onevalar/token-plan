@@ -18,6 +18,23 @@ Only an explicit reset timestamp creates a countdown. A date-only billing period
 
 Amp's Agent and Orb tracks align within its own overview card. When neither has a reported countdown, there is no empty deadline column. Balance is shown in a separate **Individual Credits** band with cents, rather than another subscription percentage. It is independent of Used/Left; an unreported balance remains unavailable, and a reported zero is shown as `$0.00`. Existing visibility and menu-bar selections are preserved.
 
+## Claude subscriptions used inside Amp
+
+Claude account quota percentages include usage charged to that same Claude subscription. Daily token and estimated-cost history is separate: TokenPlan currently reads Claude session logs, not Amp conversation exports.
+
+An October 12, 2026 check of a Claude Code-mode conversation running in an Amp Orb found no token or model-usage fields in `amp threads export`. The time-filtered `amp threads usage --details` response reported Orb runtime charges and zero tokens despite conversation activity. Do not import those zeros as measured Claude usage or classify Orb charges as Claude inference cost.
+
+The Orb's underlying `~/.claude/projects/**/*.jsonl` logs do contain measured Claude usage, including subagents. A signed-in Amp browser additionally requires passkey verification before its Files and Terminal panels can access them. The CLI conversation export is not a substitute for these logs.
+
+`script/amp_claude_history.py` provides an explicit, repeatable transfer:
+
+1. Run `python3 amp_claude_history.py export tokenplan-amp-usage.jsonl` on the executor. It exports only IDs, timestamps, models and token counts, never conversation text or credentials.
+2. Download the export through Amp's private Files panel.
+3. On the TokenPlan machine, run `python3 script/amp_claude_history.py import <export.jsonl> --thread <T-UUID> --account <Claude-account-UUID> --organization <Claude-organization-UUID>`. Use the account whose subscription was used in that Orb; account identifiers are required rather than inferred from the model name. `--claude-home` supports a custom Claude configuration directory.
+4. Refresh Claude in TokenPlan. Imports are stored under that Claude home's `projects/tokenplan-amp/`, with account ownership headers. The existing native scanner merges and deduplicates them with local logs. Reimporting the same source is idempotent; a partial export cannot erase earlier entries. Moving a source to another account is rejected.
+
+**This is not automatic cloud synchronization.** Later Orb usage requires another export/import. The macOS account attribution and parser have been validated; Windows/Linux automatic remote collection has not been implemented. An Orb whose logs were deleted cannot be recovered this way. Token-derived costs are API-price estimates, not additional subscription charges. Temporary exports should be moved out of the project after downloading so they cannot accidentally be committed.
+
 ## Where the login comes from
 
 - The CLI is found on your login-shell PATH or in standard Amp/Homebrew locations.

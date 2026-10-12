@@ -156,6 +156,20 @@ final class ProviderHeaderLayoutTests: XCTestCase {
         }
     }
 
+    func testSingleCreditExpiryFitsCompactCard() throws {
+        let view = RateLimitResetsDetail(count: 1, expiries: [Date().addingTimeInterval(86400)])
+            .environment(\.colorScheme, .light).background(Color.white)
+        let renderer = ImageRenderer(content: view)
+        renderer.proposedSize = ProposedViewSize(width: 260, height: nil)
+        let image = try XCTUnwrap(renderer.cgImage)
+        XCTAssertLessThanOrEqual(image.width, 260, "Date and local time must fit a narrow details card")
+        XCTAssertLessThan(image.height, 70, "A single expiry is one compact labeled record")
+        if let destination = ProcessInfo.processInfo.environment["TOKENPLAN_EXPIRY_CAPTURE"] {
+            let bitmap = NSBitmapImageRep(cgImage: image)
+            try bitmap.representation(using: .png, properties: [:])?.write(to: URL(fileURLWithPath: destination))
+        }
+    }
+
     private func blueFillSpans(_ bitmap: NSBitmapImageRep) -> [Int] {
         var spans: [Int] = []
         var insideTrack = false

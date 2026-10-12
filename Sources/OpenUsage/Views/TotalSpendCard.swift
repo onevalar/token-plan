@@ -352,8 +352,8 @@ struct TotalSpendRingContent: View {
 enum TotalSpendPalette {
     private static let byProviderID: [String: Color] = [
         "claude": hex(0xDE7356),                             // Claude terracotta
-        "codex": hex(0x10A37F),                              // OpenAI green (#10A37F)
-        "cursor": dynamic(light: 0x13120A, dark: 0xF5F5F7),  // brand black (#13120A), flipped near-white in dark mode
+        "codex": dynamic(light: 0x202123, dark: 0xECECF1),  // neutral OpenAI/Codex mark; adaptive for contrast
+        "cursor": dynamic(light: 0x636366, dark: 0xB0B0B8),  // brand black (#13120A), flipped near-white in dark mode
         "grok": dynamic(light: 0x8E8E93, dark: 0x98989D),    // brand black, offset to gray next to Cursor
         "opencode": dynamic(light: 0x6E6E73, dark: 0xAEAEB2),  // OpenCode — grayscale brand, medium gray
         "openrouter": hex(0x6467F2),                         // OpenRouter indigo

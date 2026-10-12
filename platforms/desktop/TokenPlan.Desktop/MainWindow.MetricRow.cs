@@ -8,7 +8,7 @@ public sealed partial class MainWindow
     Control MetricRow(UsageWindow metric)
     {
         var body = Stack(6);
-        var row = new Grid { ColumnDefinitions = new(metric.IsBalance ? "*,Auto" : "86,*,Auto,80"), MinHeight = preferences.Compact ? 26 : 32 };
+        var row = new Grid { ColumnDefinitions = new(metric.IsBalance ? "*,Auto" : "*,Auto,88"), MinHeight = preferences.Compact ? 22 : 26 };
         var label = Text(L.T(metric.Label), 13); label.VerticalAlignment = VerticalAlignment.Center; label.TextWrapping = Avalonia.Media.TextWrapping.NoWrap; label.TextTrimming = Avalonia.Media.TextTrimming.CharacterEllipsis; label.Margin = new Thickness(0, 0, 6, 0); Add(row, label);
         var value = Text(preferences.HideValues ? "•••" : metric.Amount != null ? metric.FormattedAmount : (preferences.ShowRemaining ? metric.RemainingPercent : metric.UsedPercent).ToString("0.#") + "%", 13);
         value.MinWidth = 54; value.Margin = new Thickness(8, 0, 0, 0); value.TextWrapping = Avalonia.Media.TextWrapping.NoWrap;
@@ -17,11 +17,11 @@ public sealed partial class MainWindow
         else
         {
             var progress = new ProgressBar { Minimum = 0, Maximum = 100, Value = preferences.HideValues ? 0 : Math.Clamp(preferences.ShowRemaining ? metric.RemainingPercent : metric.UsedPercent, 0, 100), Height = 6, MinHeight = 0, MaxHeight = 6, Background = Line, Foreground = metric.UsedPercent >= 90 ? Avalonia.Media.Brush.Parse("#DE7650") : Accent, CornerRadius = new CornerRadius(3), ClipToBounds = true, VerticalAlignment = VerticalAlignment.Center };
-            Avalonia.Automation.AutomationProperties.SetName(progress, L.T(metric.Label)); Add(row, progress, 0, 1); Add(row, value, 0, 2);
-            var reset = Text(preferences.HideValues ? "•••" : ResetLabel(metric.ResetsAt), 11, true); reset.HorizontalAlignment = HorizontalAlignment.Right; reset.VerticalAlignment = VerticalAlignment.Center; Add(row, reset, 0, 3);
+            Avalonia.Automation.AutomationProperties.SetName(progress, L.T(metric.Label)); body.Children.Add(progress); Add(row, value, 0, 1);
+            var reset = Text(preferences.HideValues ? "•••" : ResetLabel(metric.ResetsAt), 11, true); reset.HorizontalAlignment = HorizontalAlignment.Right; reset.VerticalAlignment = VerticalAlignment.Center; Add(row, reset, 0, 2);
         }
-        body.Children.Add(row);
-        if (metric.Expiries != null) foreach (var expiry in metric.Expiries) body.Children.Add(SettingRow("Expires", Text(expiry.ToLocalTime().ToString("g"), 12, true)));
+        body.Children.Insert(0, row);
+        if (metric.Expiries != null) foreach (var expiry in metric.Expiries) body.Children.Add(SettingRow("Expires", Text(preferences.HideValues ? "•••" : expiry.ToLocalTime().ToString("g"), 12, true)));
         return body;
     }
     static string ResetLabel(DateTimeOffset? reset)

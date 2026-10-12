@@ -346,6 +346,36 @@ final class AntigravityProviderTests: XCTestCase {
     }
 
     @MainActor
+    func testCloudQuotaIncludesResolvedAccountProject() async {
+        let routing = RoutingHTTPClient { request in
+            let body = try JSONSerialization.jsonObject(with: request.body ?? Data()) as? [String: Any]
+            if request.url.path.contains("loadCodeAssist") {
+                XCTAssertEqual((body?["metadata"] as? [String: String])?["ideType"], "ANTIGRAVITY")
+                XCTAssertTrue(((body?["metadata"] as? [String: String])?["platform"] ?? "").hasPrefix("DARWIN_"))
+                XCTAssertEqual(request.headers["User-Agent"], "antigravity")
+                return HTTPResponse(statusCode: 200, headers: [:], body: Data(#"{"cloudaicompanionProject":"consumer-project","paidTier":{"name":"Google AI Pro"}}"#.utf8))
+            }
+            XCTAssertEqual(body?["project"] as? String, "consumer-project")
+            return HTTPResponse(statusCode: 200, headers: [:], body: Data(#"{"groups":[{"buckets":[{"bucketId":"gemini-weekly","remainingFraction":0.75}]}]}"#.utf8))
+        }
+        let snapshot = await makeCloudCodeProvider(routing: routing).refresh()
+        XCTAssertFalse(snapshot.lines.contains { $0.isError })
+        XCTAssertEqual(snapshot.plan, "Pro")
+        XCTAssertEqual(snapshot.lines.count, 1)
+        XCTAssertEqual(used(snapshot.lines[0]), 25)
+    }
+
+    @MainActor
+    func testPermissionDeniedDoesNotReportExpiredLoginOrRefreshToken() async {
+        let routing = RoutingHTTPClient { request in
+            XCTAssertNotEqual(request.url.host, "oauth2.googleapis.com")
+            return HTTPResponse(statusCode: 403, headers: [:], body: Data())
+        }
+        let snapshot = await makeCloudCodeProvider(routing: routing).refresh()
+        XCTAssertEqual(snapshot.errorCategory, .network)
+    }
+
+    @MainActor
     func testRefreshErrorsWhenNothingAvailable() async {
         let routing = RoutingHTTPClient { _ in HTTPResponse(statusCode: 500, headers: [:], body: Data()) }
         let provider = makeCloudCodeProvider(routing: routing, keychainExpiry: nil)

@@ -3,8 +3,12 @@ using System.Text.Json;
 namespace TokenPlan.Core;
 
 public partial record Preferences(string Appearance = "system", string Language = "system", bool AutoRefresh = true,
-    bool ClaudeEnabled = true, bool CodexEnabled = true, bool CursorEnabled = true, int HistoryDays = 7, int TokenDays = 7, string TokenProvider = "codex", bool KeepRunningWhenClosed = false)
+    bool ClaudeEnabled = true, bool CodexEnabled = true, bool CursorEnabled = true, int HistoryDays = 7, int TokenDays = 7, string TokenProvider = "codex", bool KeepRunningWhenClosed = true)
 {
+    public Dictionary<string, bool> TrayAccounts { get; init; } = new();
+    public Dictionary<string, bool> AccountVisibility { get; init; } = new();
+    public string? CodexFallbackModel { get; init; }
+    public bool GlobalShortcut { get; init; }
     public int LogLevel { get; init; } = 2;
     public bool ReduceAnimations { get; init; }
     public Dictionary<string, bool> TrayServices { get; init; } = new();
@@ -54,6 +58,7 @@ public partial record Preferences(string Appearance = "system", string Language 
         if (value.Appearance is not ("system" or "light" or "dark") || value.Language is not ("system" or "en" or "zh-Hans" or "zh-Hant" or "ja" or "ko") || value.HistoryDays is not (7 or 30) || value.TokenDays is not (7 or 30)) throw new InvalidDataException();
         if (value.TokenProvider is not ("codex" or "claude" or "cursor" or "grok")) throw new InvalidDataException();
         if (value.RefreshMinutes is not (1 or 2 or 5 or 10 or 15 or 30 or 60) || value.ProviderOrder == null || value.PinnedMetrics == null || value.ExpandedMetrics == null || value.NotificationThreshold is < 50 or > 100 || value.PinnedMetrics.Values.Any(v => v == null || v.Length > 2) || value.ExpandedMetrics.Values.Any(v => v == null) || (value.HiddenMetrics == null || value.HiddenMetrics.Values.Any(v => v == null)) || value.AdditionalProviders == null || value.ProviderNotes == null || value.HiddenMetrics == null || value.AdditionalProviders.Keys.Any(id => !ProviderCatalog.All.Any(p => p.Id == id))) throw new InvalidDataException();
+        if (value.AccountVisibility == null || value.TrayAccounts == null) throw new InvalidDataException();
         if (value.LogLevel is < 0 or > 3 || value.TrayServices == null || value.MetricOrder == null || value.MetricOrder.Values.Any(v => v == null) || value.SpendPeriod is < 0 or > 2 || value.SpendMetric is < 0 or > 2) throw new InvalidDataException();
         if (value.NotificationsEnabled) value = value with { NotifyAlmostOut = true, NotificationsEnabled = false };
         return value with { AutoRefresh = true };

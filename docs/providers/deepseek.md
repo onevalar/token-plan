@@ -15,7 +15,7 @@ Tracks your [DeepSeek 深度求索](https://platform.deepseek.com) API account b
 DeepSeek has no companion app that TokenPlan can reuse a credential from, so you supply an API key. TokenPlan
 reads it from the first place it finds one:
 
-1. `~/.config/tokenplan/deepseek.json` — `{"apiKey":"…"}` (the file **Services & Subscriptions → DeepSeek → Settings → API Key** writes to)
+1. `~/.config/tokenplan/deepseek.json` — `{"apiKey":"…"}` (the file **Subscription Services → DeepSeek → Settings → API Key** writes to)
 2. The `DEEPSEEK_API_KEY` environment variable
 
 Nothing leaves your Mac except the single request below, sent to `api.deepseek.com`.
@@ -23,8 +23,8 @@ Nothing leaves your Mac except the single request below, sent to `api.deepseek.c
 ## Setup
 
 1. Create an API key at [platform.deepseek.com/api_keys](https://platform.deepseek.com/api_keys).
-2. Paste it into **Services & Subscriptions → DeepSeek → Settings → API Key**, **or** export it (`export DEEPSEEK_API_KEY="YOUR_KEY"`).
-3. DeepSeek appears on the dashboard on the next refresh (turn it on in Services & Subscriptions if it isn't already).
+2. Paste it into **Subscription Services → DeepSeek → Settings → API Key**, **or** export it (`export DEEPSEEK_API_KEY="YOUR_KEY"`).
+3. DeepSeek appears on the dashboard on the next refresh (turn it on in Subscription Services if it isn't already).
 
 ## Under the hood
 

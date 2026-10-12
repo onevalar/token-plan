@@ -40,7 +40,7 @@ TokenPlan shows how much of your AI plans you've used — session and weekly lim
 
 ## Windows and Linux
 
-Early desktop clients (Claude, Codex and Cursor quotas and token history) are built from `platforms/desktop`. Each tagged release carries `TokenPlan-Setup-<version>.exe` (Windows, per-user, no admin rights) and `tokenplan_<version>_amd64.deb` (Debian/Ubuntu) on the Releases page — see [Windows and Linux clients](docs/desktop-clients.md#installers). They are not code-signed yet.
+Desktop clients (tray panels, provider quotas, account settings and token history) are built from `platforms/desktop`. Each tagged release carries `TokenPlan-Setup-<version>.exe` (Windows, per-user, no admin rights) and `tokenplan_<version>_amd64.deb` (Debian/Ubuntu) on the Releases page — see [Windows and Linux clients](docs/desktop-clients.md#installers). They are not code-signed yet.
 
 ## Privacy
 

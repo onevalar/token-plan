@@ -14,7 +14,7 @@ Tracks your [MiniMax](https://platform.minimaxi.com) Coding Plan / Token Plan qu
 MiniMax has no companion app that TokenPlan can reuse a credential from, so you supply an API key. TokenPlan
 reads it from the first place it finds one:
 
-1. `~/.config/tokenplan/minimax.json` — `{"apiKey":"…"}` (the file **Services & Subscriptions → MiniMax → Settings → API Key** writes to)
+1. `~/.config/tokenplan/minimax.json` — `{"apiKey":"…"}` (the file **Subscription Services → MiniMax → Settings → API Key** writes to)
 2. The `MINIMAX_API_KEY` environment variable
 
 Nothing leaves your Mac except the single request below, sent to `www.minimaxi.com` (mainland) or `www.minimax.io` (global).
@@ -22,8 +22,8 @@ Nothing leaves your Mac except the single request below, sent to `www.minimaxi.c
 ## Setup
 
 1. Create an API key at [platform.minimaxi.com](https://platform.minimaxi.com/user-center/basic-information/interface-key) — use the **Coding Plan** key.
-2. Paste it into **Services & Subscriptions → MiniMax → Settings → API Key**, **or** export it (`export MINIMAX_API_KEY="YOUR_KEY"`).
-3. MiniMax appears on the dashboard on the next refresh (turn it on in Services & Subscriptions if it isn't already).
+2. Paste it into **Subscription Services → MiniMax → Settings → API Key**, **or** export it (`export MINIMAX_API_KEY="YOUR_KEY"`).
+3. MiniMax appears on the dashboard on the next refresh (turn it on in Subscription Services if it isn't already).
 
 ## Under the hood
 

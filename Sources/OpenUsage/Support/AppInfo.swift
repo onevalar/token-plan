@@ -1,4 +1,5 @@
 import Foundation
+import AppKit
 
 /// Single source of truth for the app's version, shown in the dashboard footer and the About settings
 /// tab. `CFBundleShortVersionString` carries the full version including any pre-release suffix
@@ -7,6 +8,12 @@ import Foundation
 /// fallback covers runs outside the packaged app (e.g. `swift run`, where there is no Info.plist).
 enum AppInfo {
     /// The interface uses the English product name in every language.
+    @MainActor static let icon: NSImage = {
+        guard let url = Bundle.module.url(forResource: "AppIcon-capsule", withExtension: "png"),
+              let image = NSImage(contentsOf: url) else { return NSApplication.shared.applicationIconImage }
+        return image
+    }()
+
     static let displayName = "TokenPlan"
 
     static var version: String {

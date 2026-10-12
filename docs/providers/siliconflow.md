@@ -15,7 +15,7 @@ Tracks your [SiliconFlow 硅基流动](https://cloud.siliconflow.cn) account bal
 SiliconFlow has no companion app that TokenPlan can reuse a credential from, so you supply an API key. TokenPlan
 reads it from the first place it finds one:
 
-1. `~/.config/tokenplan/siliconflow.json` — `{"apiKey":"…"}` (the file **Services & Subscriptions → SiliconFlow → Settings → API Key** writes to)
+1. `~/.config/tokenplan/siliconflow.json` — `{"apiKey":"…"}` (the file **Subscription Services → SiliconFlow → Settings → API Key** writes to)
 2. The `SILICONFLOW_API_KEY` environment variable
 
 Nothing leaves your Mac except the single request below, sent to `api.siliconflow.cn`.
@@ -23,8 +23,8 @@ Nothing leaves your Mac except the single request below, sent to `api.siliconflo
 ## Setup
 
 1. Create an API key at [cloud.siliconflow.cn/account/ak](https://cloud.siliconflow.cn/account/ak).
-2. Paste it into **Services & Subscriptions → SiliconFlow → Settings → API Key**, **or** export it (`export SILICONFLOW_API_KEY="YOUR_KEY"`).
-3. SiliconFlow appears on the dashboard on the next refresh (turn it on in Services & Subscriptions if it isn't already).
+2. Paste it into **Subscription Services → SiliconFlow → Settings → API Key**, **or** export it (`export SILICONFLOW_API_KEY="YOUR_KEY"`).
+3. SiliconFlow appears on the dashboard on the next refresh (turn it on in Subscription Services if it isn't already).
 
 ## Under the hood
 

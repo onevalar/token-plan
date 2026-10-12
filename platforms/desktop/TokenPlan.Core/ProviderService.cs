@@ -10,18 +10,22 @@ public sealed partial class ProviderService : IDisposable
 {
     readonly System.Collections.Concurrent.ConcurrentDictionary<string, string> attemptIdentities = new();
     readonly HttpClient http;
+    readonly HttpMessageHandler? accountHandler;
     readonly string userHome;
     readonly string? alternateAuthFile;
     readonly bool encodedAuth;
     readonly Func<string, string, CancellationToken, Task<string?>> credentialReader;
+    readonly Func<CancellationToken, IReadOnlyList<AntigravityEndpoint>> antigravityDiscovery;
     readonly string codexHome;
     readonly string claudeHome;
     readonly string cursorDatabase;
     readonly Action<string, string> log;
     readonly System.Collections.Concurrent.ConcurrentDictionary<string, DateTimeOffset> cooldowns = new();
-    public ProviderService(string codexHome, string claudeHome, HttpMessageHandler? handler = null, Action<string, string>? log = null, TimeSpan? requestTimeout = null, string? cursorDatabase = null, APIKeyStore? keys = null, string? userHome = null, Func<string, string, CancellationToken, Task<string?>>? credentialReader = null, string? alternateAuthFile = null, bool encodedAuth = false)
+    public ProviderService(string codexHome, string claudeHome, HttpMessageHandler? handler = null, Action<string, string>? log = null, TimeSpan? requestTimeout = null, string? cursorDatabase = null, APIKeyStore? keys = null, string? userHome = null, Func<string, string, CancellationToken, Task<string?>>? credentialReader = null, string? alternateAuthFile = null, bool encodedAuth = false, Func<CancellationToken, IReadOnlyList<AntigravityEndpoint>>? antigravityDiscovery = null)
     {
         Keys = keys ?? new();
+        accountHandler = handler;
+        this.antigravityDiscovery = antigravityDiscovery ?? (handler == null ? AntigravityLocalService.Discover : _ => []);
         this.alternateAuthFile = alternateAuthFile; this.encodedAuth = encodedAuth;
         this.userHome = userHome ?? Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
         this.credentialReader = credentialReader ?? SystemCredentialStore.Read;
@@ -31,7 +35,7 @@ public sealed partial class ProviderService : IDisposable
         this.log = log ?? DiagnosticLog.Write;
         var timeout = requestTimeout ?? TimeSpan.FromSeconds(20);
         if (timeout <= TimeSpan.Zero || timeout > TimeSpan.FromSeconds(20)) throw new ArgumentOutOfRangeException(nameof(requestTimeout));
-        http = new HttpClient(handler ?? new HttpClientHandler { AllowAutoRedirect = false }) { Timeout = timeout };
+        http = new HttpClient(handler ?? new HttpClientHandler { AllowAutoRedirect = false }, disposeHandler: handler == null) { Timeout = timeout };
         http.DefaultRequestHeaders.UserAgent.ParseAdd("TokenPlan/desktop");
     }
     public async Task<ProviderResult> Refresh(string id, CancellationToken cancellationToken)
@@ -42,8 +46,9 @@ public sealed partial class ProviderService : IDisposable
         deadline.CancelAfter(http.Timeout);
         var operationToken = deadline.Token;
         string? fingerprint = null;
+        var metadata = id == "claude" && alternateAuthFile == null ? ClaudeAccountMetadata.Read(claudeHome, userHome) : null;
         attemptIdentities.TryRemove(id, out _);
-        ProviderResult Fail(string key) { log(id, key); return new(id, name, null, key, fingerprint ?? attemptIdentities.GetValueOrDefault(id)); }
+        ProviderResult Fail(string key) { log(id, key); return new(id, name, null, key, fingerprint ?? attemptIdentities.GetValueOrDefault(id), AccountEmail: metadata?.Email, AccountIdentity: metadata?.Identity); }
         try
         {
             if (id == "grok") return await RefreshGrok(operationToken);
@@ -117,7 +122,9 @@ public sealed partial class ProviderService : IDisposable
             var usageJSON = await Fetch(request, cooldownKey, operationToken);
             if (id == "codex") usageJSON = await WithCodexResetCredits(usageJSON, token, UsageParser.String(tokens, "account_id"), cooldownKey, operationToken);
             var snapshot = UsageParser.Parse(id, usageJSON, DateTimeOffset.UtcNow);
-            return new(id, name, snapshot, null, fingerprint);
+            if (id == "claude" && snapshot.Plan == null && UsageParser.String(tokens, "subscriptionType") is { Length: > 0 } plan)
+                snapshot = snapshot with { Plan = plan.ToLowerInvariant() switch { "pro" => "Pro", "max" => "Max", "team" => "Team", "enterprise" => "Enterprise", "free" => "Free", _ => plan } };
+            return new(id, name, snapshot, null, fingerprint, AccountEmail: metadata?.Email, AccountIdentity: metadata?.Identity);
         }
         catch (ProviderFailure e) { return Fail(e.Message == "Your session has expired. Sign in with the CLI again." && id == "cursor" ? "Your Cursor session has expired. Sign in with Cursor again." : e.Message); }
         catch (Microsoft.Data.Sqlite.SqliteException) { return Fail(id == "cursor" ? "Cursor login could not be read. Open Cursor and sign in again." : "Usage or login data could not be read. Sign in again."); }

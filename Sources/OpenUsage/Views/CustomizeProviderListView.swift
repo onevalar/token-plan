@@ -21,6 +21,14 @@ struct CustomizeProviderListView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: density.sectionSpacing) {
+            Text("Usage Overview").font(.subheadline.weight(.semibold)).padding(.horizontal, 8)
+            if layout.hasSpendCapableProvider {
+                TotalSpendCard()
+            } else {
+                Text("Enable a service with usage history to see totals here.")
+                    .font(.subheadline).foregroundStyle(.secondary).padding(.horizontal, 8)
+            }
+
             VStack(alignment: .leading, spacing: 0) {
                 Text("Enabled Services")
                     .font(.caption.weight(.semibold)).foregroundStyle(.secondary)

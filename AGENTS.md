@@ -12,7 +12,7 @@ AGENTS.md is the source of truth for agent instructions in this repository. CLAU
 
 ## Releases
 
-Pushing a `v*` tag on `main` runs `.github/workflows/release.yml` (build, sign, notarize, GitHub Release, Sparkle appcast on `gh-pages`). `.github/workflows/desktop-release.yml` runs on the same tag and attaches the Windows installer and the Linux `.deb`. Plain tags are stable; `-beta.N` tags go to the beta channel. Version numbers are the owner's decision — propose one before tagging. Never leave a release in Draft or with blank notes.
+Pushing an approved stable `vX.Y.Z` tag on `main` runs `.github/workflows/release.yml`: macOS signing/notarization and Windows/Linux installer builds, followed by publication to the public `onevalar/apps` repository under `tokenplan-vX.Y.Z`. Update feeds live in `tokenplan/` on its main branch. Source remains private. The desktop-only workflow is a manual packaging check and does not publish. Version numbers are the owner's decision; confirm before tagging. Require nonempty approved `release/X.Y.Z.md` notes. Never leave a release in Draft or replace published binaries. See `docs/updates.md` for required cloud credentials.
 
 ## Architecture
 

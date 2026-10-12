@@ -11,7 +11,7 @@ struct HeaderView: View {
         if screen == .dashboard {
             Menu {
                 Button { toggle(.customize) } label: {
-                    Label("Services & Subscriptions", systemImage: "rectangle.stack")
+                    Label("Subscription Services", systemImage: "rectangle.stack")
                 }
                 Divider()
                 ForEach(SettingsPage.dashboardPages, id: \.self) { page in
@@ -24,10 +24,12 @@ struct HeaderView: View {
                 }
                 .keyboardShortcut(",")
                 Divider()
-                Button { updater.checkForUpdates() } label: {
-                    Label("Check for Updates…", systemImage: "arrow.triangle.2.circlepath")
+                if updater.isActive {
+                    Button { updater.checkForUpdates() } label: {
+                        Label("Check for Updates…", systemImage: "arrow.triangle.2.circlepath")
+                    }
+                    .disabled(!updater.canCheckForUpdates)
                 }
-                .disabled(!updater.canCheckForUpdates)
                 Button { AboutPanel.present() } label: {
                     Label("About", systemImage: "info.circle")
                 }

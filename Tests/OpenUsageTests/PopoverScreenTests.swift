@@ -91,11 +91,11 @@ final class PopoverScreenTests: XCTestCase {
         XCTAssertNil(store.displayedCustomizeProviderID)
 
         store.screen = .settings
-        store.openSettingsPage(.appearance)
-        XCTAssertEqual(store.displayedSettingsPage, .appearance)
+        store.openSettingsPage(.notifications)
+        XCTAssertEqual(store.displayedSettingsPage, .notifications)
         store.screen = .dashboard // Cmd-, exits even from a secondary Settings page.
         XCTAssertNil(store.settingsPage)
-        XCTAssertEqual(store.displayedSettingsPage, .appearance,
+        XCTAssertEqual(store.displayedSettingsPage, .notifications,
                       "The outgoing Appearance page must not become main Settings before sliding away")
         store.screen = .settings
         XCTAssertNil(store.displayedSettingsPage, "A new visit starts at main Settings")
@@ -107,7 +107,7 @@ final class PopoverScreenTests: XCTestCase {
 
     func testEveryDashboardSettingsDestinationReturnsDirectlyHome() {
         let store = makeStore("DirectSettings")
-        for page in SettingsPage.dashboardPages {
+        for page in SettingsPage.generalPages {
             store.openSettingsPage(page)
             XCTAssertEqual(store.settingsPage, page)
             XCTAssertEqual(store.screen, .settings)
@@ -137,16 +137,24 @@ final class PopoverScreenTests: XCTestCase {
         XCTAssertEqual(store.screen, .dashboard)
 
         store.openSettingsPage(.advanced, from: .generalSettings)
-        store.openSettingsPage(.appearance) // A direct entry replaces the old return path.
+        store.openSettingsPage(.notifications) // A direct entry replaces the old return path.
         store.goBack()
         XCTAssertEqual(store.screen, .dashboard)
     }
 
     func testSettingsDestinationsHaveNoDuplicateMenuEntries() {
-        XCTAssertEqual(SettingsPage.dashboardPages, [.appearance, .history],
-                       "Menu-bar controls belong inside Appearance, not in a separate destination")
-        XCTAssertTrue(Set(SettingsPage.dashboardPages).isDisjoint(with: SettingsPage.generalPages))
-        XCTAssertEqual(Set(SettingsPage.dashboardPages + SettingsPage.generalPages), Set(SettingsPage.allCases))
+        XCTAssertTrue(SettingsPage.dashboardPages.isEmpty)
+        XCTAssertEqual(SettingsPage.generalPages, [.notifications, .advanced])
+        let store = makeStore("MergedDestinations")
+        store.openSettingsPage(.appearance)
+        XCTAssertEqual(store.screen, .settings)
+        XCTAssertNil(store.settingsPage)
+        store.screen = .dashboard
+        store.openSettingsPage(.history)
+        XCTAssertEqual(store.screen, .customize)
+        XCTAssertNil(store.customizeProviderID)
+        store.goBack()
+        XCTAssertEqual(store.screen, .dashboard)
     }
 
     private func makeStore(_ name: String) -> LayoutStore {

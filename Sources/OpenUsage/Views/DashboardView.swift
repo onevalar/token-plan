@@ -423,15 +423,6 @@ struct DashboardView: View {
                     )
                 }
             }
-            .pinnedFooter(spacing: 0) {
-                if includeChrome && screen == .settings {
-                    PopoverFooter(
-                        horizontalPadding: Self.footerHorizontalPadding
-                    ) { height in
-                        heightCoordinator.setFooter(height, for: .settings)
-                    }
-                }
-            }
             .overlay(alignment: .bottom) {
                 if screen == .dashboard, let notice = layout.pinLimitNotice {
                     TransientPill(

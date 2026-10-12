@@ -72,6 +72,7 @@ final class StatusItemImageUpdater {
             style: style,
             plan: { container.dataStore.plan(for: $0) },
             accountNumbers: container.layout.menuBarAccountNumbers,
+            pinnedMetricIDs: container.layout.pinnedMetricIDs,
             data: { container.dataStore.data(for: $0) }
         )
         return MenuBarStripRenderer.image(for: content, style: style)

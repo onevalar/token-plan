@@ -20,15 +20,18 @@ struct DashboardContentView: View {
         PopoverScrollView {
             VStack(alignment: .leading, spacing: 0) {
                 HStack(spacing: 10) {
-                    Image(nsImage: NSApplication.shared.applicationIconImage)
-                        .resizable()
-                        .interpolation(.high)
-                        .frame(width: 30, height: 30)
-                        .accessibilityHidden(true)
-                    Text(verbatim: AppInfo.displayName)
-                        .font(.title3.weight(.semibold))
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.85)
+                    HStack(spacing: 4) {
+                        Image(nsImage: AppInfo.icon)
+                            .resizable()
+                            .interpolation(.high)
+                            .scaledToFit()
+                            .frame(width: 20, height: 20)
+                            .accessibilityHidden(true)
+                        Text(verbatim: AppInfo.displayName)
+                            .font(.title3.weight(.semibold))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.85)
+                    }
                     Spacer(minLength: 8)
                     Button(action: onRefresh) {
                         HStack(spacing: 5) {
@@ -85,7 +88,7 @@ struct DashboardContentView: View {
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
-                Button("Services & Subscriptions") {
+                Button("Subscription Services") {
                     withAnimation(Motion.modeSwitch) { layout.screen = .customize }
                 }
                 .controlSize(.small)

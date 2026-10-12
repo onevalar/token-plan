@@ -4,17 +4,27 @@ import Foundation
 struct Provider: Identifiable, Hashable {
     let id: String
     let displayName: String
+    /// Concise account identity for rows beneath a shared service heading.
+    let accountLabel: String?
     let icon: IconSource
     /// Per-provider quick links (e.g. "Status", "Console") shown as buttons in the card's expanded area.
     /// Declared inline by each provider; mirrors the legacy Tauri `PluginMeta.links`. Empty by default so
     /// providers without links and the existing `Provider(id:displayName:icon:)` call sites need no change.
     let links: [ProviderLink]
 
-    init(id: String, displayName: String, icon: IconSource, links: [ProviderLink] = []) {
+    init(id: String, displayName: String, icon: IconSource, links: [ProviderLink] = [], accountLabel: String? = nil) {
         self.id = id
         self.displayName = displayName
+        self.accountLabel = accountLabel
         self.icon = icon
         self.links = links
+    }
+
+    var menuBarEntryLabel: String {
+        guard let accountLabel else { return displayName }
+        let family = ProviderAccountID.family(of: id)
+        let service = family == "claude" ? "Claude" : family == "codex" ? "Codex" : displayName
+        return "\(service)-\(accountLabel)"
     }
 
     /// Links safe to render: trimmed, non-empty label and URL, and an `http(s)` scheme only. Mirrors the

@@ -15,9 +15,8 @@ enum MenuBarIcon {
     private static func render() -> NSImage? {
         guard let mark = ProviderMarks.mark(for: "tokenplan") else { return nil }
         let renderer = ImageRenderer(
-            // Smaller inset than the provider default so the brand mark keeps its prior menu-bar size
-            // (its art already carries ~8% margin inside the source viewBox).
-            content: ProviderIconShape(mark: mark, inset: 0.08)
+            // The SVG already has safe margins; do not shrink the capsule a second time.
+            content: ProviderIconShape(mark: mark, inset: 0)
                 .fill(Color.black)
                 .frame(width: side, height: side)
         )

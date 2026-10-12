@@ -4,13 +4,15 @@ using System.Text;
 namespace TokenPlan.Core;
 
 /// Read only the named application's credential. Never enumerate or modify other entries.
+public sealed class SystemCredentialException(string message) : IOException(message);
+
 public static class SystemCredentialStore
 {
     public static async Task<string?> Read(string service, string account, CancellationToken cancellation)
     {
         if (OperatingSystem.IsWindows()) return ReadWindows(service + ":" + account);
         if (!OperatingSystem.IsLinux()) return null;
-        if (!File.Exists("/usr/bin/secret-tool")) throw new IOException("System credential reader unavailable");
+        if (!File.Exists("/usr/bin/secret-tool")) throw new SystemCredentialException("The system credential reader is missing. Install libsecret-tools, or open Antigravity and refresh.");
         var start = new ProcessStartInfo("/usr/bin/secret-tool") { UseShellExecute = false, RedirectStandardOutput = true, RedirectStandardError = true };
         foreach (var arg in new[] { "lookup", "service", service, "username", account }) start.ArgumentList.Add(arg);
         using var process = Process.Start(start) ?? throw new IOException();
@@ -19,7 +21,7 @@ public static class SystemCredentialStore
             var output = ReadBounded(process.StandardOutput, cancellation);
             var error = ReadBounded(process.StandardError, cancellation);
             await Task.WhenAll(output, error, process.WaitForExitAsync(cancellation));
-            if (process.ExitCode != 0 && !string.IsNullOrWhiteSpace(error.Result)) throw new IOException("Credential store unavailable");
+            if (process.ExitCode != 0 && !string.IsNullOrWhiteSpace(error.Result)) throw new SystemCredentialException("System credentials could not be read. Open Antigravity and refresh, or check your login keyring.");
             return string.IsNullOrWhiteSpace(output.Result) ? null : output.Result.Trim();
         }
         finally { if (!process.HasExited) process.Kill(true); }

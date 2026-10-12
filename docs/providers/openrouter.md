@@ -19,7 +19,7 @@ TokenPlan shows the reported tier (such as "Pay as you go" or "Free tier") besid
 
 Unlike the other providers, OpenRouter has no companion app or CLI that leaves a credential on your
 machine, so you supply an API key. Create one at [openrouter.ai/keys](https://openrouter.ai/keys),
-then add it in **Services & Subscriptions → OpenRouter → Settings → API Key** (recommended): expand OpenRouter, paste the key, and Save.
+then add it in **Subscription Services → OpenRouter → Settings → API Key** (recommended): expand OpenRouter, paste the key, and Save.
 The key is stored at `~/.config/tokenplan/openrouter.json` and picked up on the next refresh.
 
 You can also provide the key directly (checked in this order, first match wins):
@@ -43,7 +43,7 @@ the saved key falls back to the environment key, or to none.
 
 ## Troubleshooting
 
-- **"No OpenRouter API key"** — add the key in Services & Subscriptions → OpenRouter → Settings → API Key (or the config file / env var), then refresh.
+- **"No OpenRouter API key"** — add the key in Subscription Services → OpenRouter → Settings → API Key (or the config file / env var), then refresh.
 - **"API key invalid"** — the key was rejected (401/403). Check or recreate it at openrouter.ai/keys.
 
 ## Under the hood

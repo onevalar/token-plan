@@ -59,3 +59,5 @@ Best source first: the local language server discovered by scanning for the `lan
 Thanks to [FelixIsaac](https://github.com/FelixIsaac) for identifying the conversation-database source and contributing the original SQLite/protobuf implementation in [issue #1120](https://github.com/onevalar/token-plan/issues/1120) and [pull request #1058](https://github.com/onevalar/token-plan/pull/1058).
 
 > Reverse-engineered from the app and language-server binary; endpoints and storage may change without notice.
+
+Cloud queries first resolve the signed-in account’s project with Antigravity product and platform metadata, then include that project in quota requests. A permission-denied response (403) is not treated as an expired login and does not trigger repeated token refreshes.

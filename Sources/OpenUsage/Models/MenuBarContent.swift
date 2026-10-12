@@ -50,14 +50,15 @@ struct MenuBarContent: Equatable {
 
 @MainActor
 enum MenuBarContentBuilder {
-    /// Percentage receives pinnedGroups. Ring receives all supported metrics of visible, enabled
-    /// services so its primary quota does not depend on stars or dashboard placement. Plan comes
+    /// Both styles receive all selected accounts. Percentage prefers pinned metrics and falls back
+    /// to the same primary reading as Ring when no pinned reading is available. Plan comes
     /// from the existing snapshot, never a second authentication or network lookup.
     static func build(
         groups: [ProviderMetrics],
         style: MenuBarStyle = .percentage,
         plan: (String) -> String? = { _ in nil },
         accountNumbers: [String: Int] = [:],
+        pinnedMetricIDs: Set<String>? = nil,
         data: (WidgetDescriptor) -> WidgetData
     ) -> MenuBarContent {
         if style == .ring {
@@ -90,9 +91,13 @@ enum MenuBarContentBuilder {
             return MenuBarContent(groups: selected)
         }
         let resolvedGroups = groups.compactMap { group -> MenuBarContent.Group? in
-            let metrics = group.metrics.compactMap { descriptor -> MenuBarContent.Metric? in
+            let metrics = group.metrics.filter { pinnedMetricIDs?.contains($0.id) ?? true }.compactMap { descriptor -> MenuBarContent.Metric? in
                 let value = data(descriptor)
                 return value.hasData ? resolve(descriptor, value) : nil
+            }
+            if metrics.isEmpty, pinnedMetricIDs != nil {
+                return build(groups: [group], style: .ring, plan: plan,
+                             accountNumbers: accountNumbers, data: data).groups.first
             }
             guard !metrics.isEmpty else { return nil }
             return MenuBarContent.Group(

@@ -65,7 +65,9 @@ static class ClaudeTokenChecks
         var preferences = Path.Combine(root, "claude-token-preferences.json");
         (new Preferences(TokenProvider: "claude", TokenDays: 30)).Save(preferences);
         check(Preferences.Load(preferences).TokenProvider == "claude" && Preferences.Load(preferences).TokenDays == 30, "Token source and date range survive restart");
-        check(!Preferences.Load(preferences).KeepRunningWhenClosed, "Existing and new settings close normally until background mode is explicitly enabled");
+        check(Preferences.Load(preferences).KeepRunningWhenClosed, "New installations keep refreshing in the tray by default");
+        (Preferences.Load(preferences) with { KeepRunningWhenClosed = false }).Save(preferences);
+        check(!Preferences.Load(preferences).KeepRunningWhenClosed, "Explicit existing opt-out survives restart");
         (Preferences.Load(preferences) with { KeepRunningWhenClosed = true }).Save(preferences);
         check(Preferences.Load(preferences).KeepRunningWhenClosed, "The explicit background-mode preference survives restart");
     }

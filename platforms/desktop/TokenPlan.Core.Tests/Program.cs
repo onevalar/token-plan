@@ -28,6 +28,13 @@ Throws(() => UsageParser.Parse("claude", """{"five_hour":{"utilization":-1}}""",
 var claude = UsageParser.Parse("claude", """{"five_hour":{"utilization":101,"resets_at":"2026-10-07T05:00:00Z"},"seven_day":{"utilization":null}}""", now);
 Check(claude.Windows.Count == 1 && claude.Windows[0].RemainingPercent == 0, "Over-limit usage retains its actual value; missing windows stay absent");
 SettingsChecks.Run(now, Check);
+DesktopUpdateChecks.Run(Check, Throws);
+var trayAccount = new ProviderResult("claude", "Claude", new("claude", "Claude", "Pro", [new("Weekly", 99, null), new("Session", 12, null)], now), null);
+Check(TrayReadings.Select(trayAccount, []).Single().Label == "Session", "Unpinned Claude falls back to its primary session");
+Check(TrayReadings.Select(trayAccount, ["Missing"]).Single().Label == "Session", "Unavailable pins fall back without hiding an account");
+Check(TrayReadings.Select(trayAccount, ["Weekly"]).Single().Label == "Weekly", "Available explicit pins retain priority");
+Check(TrayReadings.Select(trayAccount with { Snapshot = null }, []).Count == 0, "No fabricated quota when an account has no data");
+await ClaudeAccountChecks.Run(Check);
 var root = Path.Combine(Path.GetTempPath(), "tokenplan-core-" + Guid.NewGuid().ToString("N"));
 Directory.CreateDirectory(root);
 try
@@ -125,8 +132,10 @@ try
     await ServiceContractChecks.Run(root, Check);
     await AmpProcessChecks.Run(root, Check);
     await AdvancedServiceChecks.Run(root, Check);
+    await AntigravityLocalChecks.Run(root, Check);
     await ClaudeTokenChecks.Run(root, now, Check);
     await CursorTokenChecks.Run(root, now, Check);
+    PricingRefreshChecks.Run(Check);
 }
 finally { Directory.Delete(root, true); }
 Console.WriteLine($"PASS: {checks} desktop core checks");

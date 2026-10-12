@@ -8,15 +8,15 @@ public sealed partial class MainWindow
     Control MetricSettings(string id, UsageSnapshot? snapshot)
     {
         var body = Stack(8);
-        var pins = preferences.PinnedMetrics.GetValueOrDefault(id) ?? [];
+        var pins = preferences.PinnedMetrics.GetValueOrDefault(id) ?? snapshot?.Windows.Take(2).Select(w => w.Label).ToArray() ?? [];
         var heading = new Grid { ColumnDefinitions = new("*,Auto") };
         Add(heading, Text(L.T("Display Content"), 18));
         Add(heading, Text(L.T("System Tray") + $"  {pins.Length}/2", 12, true), 0, 1); body.Children.Add(heading);
         if (snapshot == null) { body.Children.Add(Text(L.T("No usage yet. Refresh after signing in."), 13, true)); return body; }
         var rows = Stack(6);
         Grid Row() => new() { ColumnDefinitions = new("*,150,52,64"), MinHeight = preferences.Compact ? 36 : 44 };
-        var labels = Row(); Add(labels, Text(L.T("Content Item"), 12, true)); Add(labels, Text(L.T("Status"), 12, true), 0, 1); Add(labels, Text(L.T("System Tray"), 11, true), 0, 2); rows.Children.Add(labels);
-        if (pins.Length >= 2) rows.Children.Add(Note(L.T("Limit reached. Deselect an item to choose another.")));
+        var labels = Row(); Add(labels, Text(L.T("Content Item"), 12, true)); var locationLabel = Text(L.T("Display Configuration"), 12, true); locationLabel.HorizontalAlignment = HorizontalAlignment.Center; Add(labels, locationLabel, 0, 1); Add(labels, Text(L.T("System Tray"), 11, true), 0, 2); rows.Children.Add(labels);
+        body.Children.Add(Text(L.T("Choose where each item appears. System Tray shows up to two values; uncheck one before choosing a replacement."), 12, true));
         var metrics = preferences.OrderedMetrics(id, snapshot.Windows);
         foreach (var metric in metrics)
         {
@@ -24,13 +24,13 @@ public sealed partial class MainWindow
             var placement = preferences.Placement(id, metric.Label);
             var lastHome = placement == MetricPlacement.Home && metrics.Count(w => preferences.Placement(id, w.Label) == MetricPlacement.Home) == 1;
             var values = lastHome ? new[] { MetricPlacement.Home } : Enum.GetValues<MetricPlacement>();
-            var status = new ComboBox { Name = "metric-status-" + metric.Label, ItemsSource = values.Select(p => L.T(p switch { MetricPlacement.Home => "Show on Home", MetricPlacement.Details => "Details Only", _ => "Hidden" })).ToArray(), SelectedIndex = Array.IndexOf(values, placement), MinWidth = 138, MaxWidth = 144 };
-            Avalonia.Automation.AutomationProperties.SetName(status, L.T("Status") + ": " + L.T(metric.Label));
+            var status = new ComboBox { Name = "metric-status-" + metric.Label, ItemsSource = values.Select(p => L.T(p switch { MetricPlacement.Home => "Show on Home", MetricPlacement.Details => "Details Only", _ => "Hidden" })).ToArray(), SelectedIndex = Array.IndexOf(values, placement), Width = 138, MinWidth = 138, MaxWidth = 138 };
+            Avalonia.Automation.AutomationProperties.SetName(status, L.T("Display Configuration") + ": " + L.T(metric.Label));
             status.SelectionChanged += (_, _) => { if (status.SelectedIndex < 0) return; preferences = preferences.PlaceMetric(id, metric.Label, values[status.SelectedIndex], metrics); Save(); Render(); };
             Add(row, status, 0, 1);
             var pin = new CheckBox { Name = "metric-pin-" + metric.Label, IsChecked = pins.Contains(metric.Label), IsEnabled = pins.Contains(metric.Label) || pins.Length < 2, HorizontalAlignment = HorizontalAlignment.Center };
             Avalonia.Automation.AutomationProperties.SetName(pin, L.T("System Tray") + ": " + L.T(metric.Label));
-            pin.IsCheckedChanged += (_, _) => { preferences = preferences.Pin(id, metric.Label, pin.IsChecked == true); Save(); Render(); }; Add(row, pin, 0, 2);
+            pin.IsCheckedChanged += (_, _) => { preferences = (preferences with { PinnedMetrics = new(preferences.PinnedMetrics) { [id] = pins } }).Pin(id, metric.Label, pin.IsChecked == true); Save(); Render(); }; Add(row, pin, 0, 2);
             var order = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 2 };
             foreach (var delta in new[] { -1, 1 })
             {

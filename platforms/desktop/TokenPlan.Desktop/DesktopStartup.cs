@@ -21,14 +21,14 @@ static class DesktopStartup
         if (OperatingSystem.IsWindows())
         {
             using var key = Registry.CurrentUser.CreateSubKey(RunKey);
-            if (enabled) key.SetValue("TokenPlan", "\"" + executable + "\""); else key.DeleteValue("TokenPlan", false);
+            if (enabled) key.SetValue("TokenPlan", "\"" + executable + "\" --background"); else key.DeleteValue("TokenPlan", false);
         }
         else if (OperatingSystem.IsLinux())
         {
             if (!enabled) { File.Delete(LinuxFile); return; }
             Directory.CreateDirectory(Path.GetDirectoryName(LinuxFile)!);
             var quoted = executable.Replace("\\", "\\\\").Replace("\"", "\\\"").Replace("`", "\\`").Replace("$", "\\$").Replace("%", "%%");
-            File.WriteAllText(LinuxFile, "[Desktop Entry]\nType=Application\nName=TokenPlan\nExec=\"" + quoted + "\"\nIcon=tokenplan\nTerminal=false\n");
+            File.WriteAllText(LinuxFile, "[Desktop Entry]\nType=Application\nName=TokenPlan\nExec=\"" + quoted + "\" --background\nIcon=tokenplan\nTerminal=false\n");
         }
     }
 }

@@ -18,6 +18,6 @@
     <EmbeddedResource Include="../../../Localization/ko.lproj/Localizable.strings" LogicalName="TokenPlan.ko.lproj.Localizable.strings" />
     <EmbeddedResource Include="../../../Sources/OpenUsage/Resources/ProviderIcons/*.svg" LogicalName="TokenPlan.Icons.%(Filename)%(Extension)" />
     <None Include="../THIRD-PARTY-NOTICES.txt" Link="THIRD-PARTY-NOTICES.txt" CopyToOutputDirectory="PreserveNewest" />
-    <EmbeddedResource Include="../../../assets/AppIcon-1024.png" LogicalName="TokenPlan.AppIcon.png" />
+    <EmbeddedResource Include="../../../assets/AppIcon-desktop.png" LogicalName="TokenPlan.AppIcon.png" />
   </ItemGroup>
 </Project>

@@ -8,6 +8,9 @@ struct SettingsAppearanceSection: View {
     @AppStorage(DensitySetting.key) private var density = DensitySetting.regular
     @AppStorage(ReduceAnimationsSetting.key) private var reduceAnimations = ReduceAnimationsSetting.fallback
 
+    @AppStorage(LanguageSetting.key) private var language = LanguageSetting.fallback
+    @State private var launchLanguage = LanguageSetting.current
+
     var body: some View {
         VStack(alignment: .leading, spacing: density.sectionSpacing) {
             section("Usage Display") { usageSection }
@@ -41,6 +44,22 @@ struct SettingsAppearanceSection: View {
     private var appearanceSection: some View {
         @Bindable var transparency = self.transparency
         return VStack(spacing: 0) {
+            row("Language") {
+                picker($language, options: LanguageSetting.allCases, label: \.label)
+                    .onChange(of: language) { _, newValue in LanguageSetting.apply(newValue) }
+            }
+            if language != launchLanguage {
+                HStack(spacing: 8) {
+                    Text("Restart TokenPlan to change the language.")
+                        .font(.caption)
+                        .foregroundStyle(Theme.notice)
+                    Spacer(minLength: 8)
+                    Button("Restart Now") { LanguageSetting.relaunch() }
+                        .controlSize(.small)
+                }
+                .padding(.horizontal, 12)
+                .padding(.bottom, 8)
+            }
             row("Theme") {
                 picker($appearance, options: AppearanceSetting.allCases, label: \.label)
                     .onChange(of: appearance) { AppearanceSetting.applyCurrent() }

@@ -9,8 +9,6 @@ name: Desktop installers
 # tag, run this workflow manually (Actions → Desktop installers → Run workflow): it builds the same
 # files and keeps them as a downloadable run artifact for 14 days; nothing is published.
 on:
-  push:
-    tags: ["v*"]
   workflow_dispatch:
     inputs:
       version:
@@ -20,7 +18,7 @@ on:
         type: string
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: desktop-installers-${{ github.ref }}
@@ -77,22 +75,3 @@ jobs:
           path: dist/installers/*
           if-no-files-found: error
           retention-days: 14
-
-      # The macOS release workflow publishes the same tag; whichever job gets there first creates the
-      # release and the other just attaches its files.
-      - name: Attach installers to the GitHub Release
-        if: github.event_name == 'push'
-        env:
-          GH_TOKEN: ${{ github.token }}
-          TAG: ${{ github.ref_name }}
-          VERSION: ${{ steps.meta.outputs.version }}
-          PRERELEASE: ${{ steps.meta.outputs.prerelease }}
-        run: |
-          flags=()
-          [ "$PRERELEASE" = "true" ] && flags+=(--prerelease)
-          if ! gh release view "$TAG" >/dev/null 2>&1; then
-            gh release create "$TAG" --verify-tag --title "TokenPlan $VERSION" "${flags[@]}" \
-              --notes "TokenPlan $VERSION. Windows: TokenPlan-Setup-$VERSION.exe (per-user installer, no administrator rights). Linux: tokenplan_${VERSION}_amd64.deb (Debian/Ubuntu x64). Verify downloads with SHA256SUMS.txt. The installers are not code-signed yet, so Windows SmartScreen may ask for confirmation." \
-              || gh release view "$TAG" >/dev/null
-          fi
-          gh release upload "$TAG" dist/installers/* --clobber

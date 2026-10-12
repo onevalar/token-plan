@@ -16,11 +16,12 @@ public sealed partial class MainWindow
     static string ProviderName(string id) => ProviderCatalog.Get(id).Name;
     Control ProvidersPage()
     {
-        var body = Stack(20); body.Margin = new Thickness(32, 28); body.MaxWidth = 780;
-        body.Children.Add(Text(L.T("Providers"), 28));
+        var body = UtilityBody("Subscription Services");
+        body.Children.Add(SpendOverview());
+        if (selectedSpendDate != null) return new ScrollViewer { Content = body };
+        body.Children.Add(Text(L.T("Manage Providers"), 18));
         body.Children.Add(Text(L.T("Choose which accounts appear in your overview and refresh automatically."), 13, true));
         if (Program.Fixture) body.Children.Add(Note(L.T("Interface review uses example data. No accounts are connected.")));
-        if (notice != null) body.Children.Add(Note(L.T(notice)));
         foreach (var id in preferences.OrderedProviders)
         {
             var result = results.GetValueOrDefault(id);
@@ -58,13 +59,22 @@ public sealed partial class MainWindow
                 card.Children.Add(Text(L.T(result.ErrorKey == null ? "Updated" : "Last Successful Update") + " " + snapshot.FetchedAt.ToLocalTime().ToString("g"), 11, true));
             body.Children.Add(new Border { Background = Surface, BorderBrush = Line, BorderThickness = new Thickness(1), CornerRadius = new CornerRadius(8), Padding = new Thickness(20), Child = card });
         }
+        foreach (var account in additionalAccounts.Values.SelectMany(v => v).Where(a => preferences.IsEnabled(a.Id)))
+        {
+            var row = Stack(8);
+            var visible = Switch(preferences.AccountVisibility.GetValueOrDefault(account.SettingsKey, true), value => { preferences = preferences with { AccountVisibility = new(preferences.AccountVisibility) { [account.SettingsKey] = value } }; Save(); Render(); });
+            visible.Name = "account-visible-" + account.SettingsKey;
+            row.Children.Add(SettingRow(account.AccountEmail ?? account.Name, visible));
+            row.Children.Add(Action("Settings", () => { OpenAccountDetail(account); detailSettings = true; Render(); }));
+            body.Children.Add(Section("Account", row));
+        }
         body.Children.Add(Note(L.T("Disabling a provider stops its requests. Its existing login remains unchanged.")));
         return new ScrollViewer { Content = body, HorizontalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Disabled };
     }
 
     Control QuotaHistoryPage()
     {
-        var body = new Grid { RowDefinitions = new RowDefinitions("Auto,Auto,Auto,Auto,*"), Margin = new Thickness(32, 28), MaxWidth = 780 };
+        var body = new Grid { RowDefinitions = new RowDefinitions("Auto,Auto,Auto,Auto,*"), Margin = new Thickness(20, 16), MaxWidth = 780 };
         var heading = Stack(8);
         heading.Children.Add(Action("Back", () => Navigate(settingsOrigin)));
         heading.Children.Add(Text(L.T("History"), 28));

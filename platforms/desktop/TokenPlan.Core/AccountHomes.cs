@@ -15,6 +15,15 @@ public static class AccountHomes
         }
         if (family == "claude")
         {
+            if (Directory.Exists(home))
+                foreach (var directory in Directory.EnumerateDirectories(home).Order(StringComparer.Ordinal))
+                {
+                    var name = Path.GetFileName(directory);
+                    if (name != ".claude" && !name.StartsWith(".claude-", StringComparison.Ordinal)) continue;
+                    if ((File.GetAttributes(directory) & FileAttributes.ReparsePoint) != 0) continue;
+                    if (ClaudeAccountMetadata.Read(directory, home) is { } metadata)
+                        candidates.Add(new(directory, metadata.Email ?? name));
+                }
             var vault = Path.Combine(home, ".claude-swap-backup"); var sequence = Path.Combine(vault, "sequence.json");
             if (File.Exists(sequence))
             {
@@ -26,7 +35,7 @@ public static class AccountHomes
                     if (account.Name.Length == 0 || !account.Name.All(char.IsAsciiDigit) || string.IsNullOrWhiteSpace(email) || email.IndexOfAny(new[] { '/', '\\', '\0' }) >= 0) continue;
                     if (!Guid.TryParse(UsageParser.String(account.Value, "uuid"), out _) || !Guid.TryParse(UsageParser.String(account.Value, "organizationUuid"), out _)) continue;
                     var credential = Path.Combine(vault, "credentials", ".creds-" + account.Name + "-" + email + ".enc");
-                    if (File.Exists(credential)) candidates.Add(new(vault, UsageParser.String(account.Value, "organizationName") ?? email, credential, true));
+                    if (File.Exists(credential)) candidates.Add(new(vault, email, credential, true));
                 }
             }
         }

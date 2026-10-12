@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 namespace TokenPlan.Core;
 
 /// Uses the same bundled catalogs as macOS. Unknown models stay unpriced, never $0.
-public static class ModelPricing
+public static partial class ModelPricing
 {
     sealed record Rate(double Input, double Output, double Read, double Write, double? LongInput = null, double? LongOutput = null, double? LongRead = null, double? LongWrite = null, bool ExplicitRead = true);
     static readonly Dictionary<string, Rate> rates = new(StringComparer.OrdinalIgnoreCase);
@@ -22,6 +22,7 @@ public static class ModelPricing
                 if (Optional(v, "fast") is { } multiplier) fast[model.Name] = multiplier;
             }
         }
+        foreach (var (key, value) in rates) bundled[key] = value;
         using var supplement = typeof(ModelPricing).Assembly.GetManifestResourceStream("TokenPlan.pricing_supplement.json")!;
         using var data = JsonDocument.Parse(supplement);
         foreach (var model in data.RootElement.GetProperty("pricing").EnumerateObject())
@@ -31,15 +32,23 @@ public static class ModelPricing
         }
         foreach (var rule in data.RootElement.GetProperty("alias_rules").EnumerateArray()) aliases.Add((new Regex(rule.GetProperty("pattern").GetString()!, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant, TimeSpan.FromMilliseconds(50)), rule.GetProperty("canonical").GetString()!));
         foreach (var rule in data.RootElement.GetProperty("fast_multipliers").EnumerateObject()) fast[rule.Name] = rule.Value.GetDouble();
+        ApplyFeed("supplement", data.RootElement.GetRawText());
     }
     static double? Optional(JsonElement value, string key) => KeyUsageParser.Number(value, key);
     static double Number(JsonElement v, string key) => v.TryGetProperty(key, out var value) && value.TryGetDouble(out var n) ? n : 0;
     public static double? Estimate(string? model, TokenCounts tokens, bool fastMode = false, long oneHourWrites = 0, bool applyLongContext = true, string? provider = null)
     {
+        lock (sync)
+        {
+        if (string.IsNullOrWhiteSpace(model)) model = provider == "codex" ? fallbackModel : null;
         if (string.IsNullOrWhiteSpace(model)) return null;
         var key = model.Trim();
         foreach (var rule in aliases) if (rule.Pattern.IsMatch(key)) { key = rule.Canonical; break; }
-        if (!rates.TryGetValue(key, out var rate)) return null;
+        if (!rates.TryGetValue(key, out var rate))
+        {
+            if (provider != "codex" || fallbackModel == null || !fallbackModels.Contains(fallbackModel) || !rates.TryGetValue(fallbackModel, out rate)) return null;
+            key = fallbackModel;
+        }
         if (tokens.Other > 0) return null;
         if (applyLongContext && tokens.Input + tokens.CacheRead + tokens.CacheWrite > 200_000)
             rate = rate with { Input = rate.LongInput ?? rate.Input, Output = rate.LongOutput ?? rate.Output, Read = rate.LongRead ?? rate.Read, Write = rate.LongWrite ?? rate.Write };
@@ -47,6 +56,7 @@ public static class ModelPricing
         oneHourWrites = Math.Clamp(oneHourWrites, 0, tokens.CacheWrite);
         var multiplier = fastMode ? fast.GetValueOrDefault(key, 1) : 1;
         return (tokens.Input * rate.Input + tokens.Output * rate.Output + tokens.CacheRead * rate.Read + (tokens.CacheWrite - oneHourWrites) * rate.Write + oneHourWrites * rate.Input * 2) / 1_000_000d * multiplier;
+        }
     }
 }
 public record CostTotal(double Dollars = 0, int Unpriced = 0, int Priced = 0)

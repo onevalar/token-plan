@@ -188,11 +188,34 @@ extension LayoutStore {
         return numbers
     }
 
-    /// Numeric pins and automatic primary rings share the same service/account visibility policy.
-    var menuBarGroups: [ProviderMetrics] {
-        menuBarStyle == .percentage ? pinnedGroups : customizeGroups.filter {
-            isMenuBarServiceVisible($0.provider.id) && isMenuBarAccountVisible($0.provider.id)
+    /// The settings list and rendered strip share one order, keeping sibling accounts adjacent.
+    var menuBarEntries: [Provider] {
+        menuBarServices.flatMap { menuBarAccounts(for: $0.id) }
+    }
+
+    func isMenuBarEntrySelected(_ providerID: String) -> Bool {
+        isMenuBarServiceVisible(providerID) && isMenuBarAccountVisible(providerID)
+    }
+
+    /// Convert an old hidden-family preference to individual choices without revealing siblings.
+    func setMenuBarEntrySelected(_ visible: Bool, for providerID: String) {
+        if !isMenuBarServiceVisible(providerID) {
+            let family = ProviderAccountID.family(of: providerID)
+            for provider in orderedProviders() where ProviderAccountID.family(of: provider.id) == family {
+                setMenuBarAccountVisible(false, for: provider.id)
+            }
+            setMenuBarServiceVisible(true, for: providerID)
         }
+        setMenuBarAccountVisible(visible, for: providerID)
+    }
+
+    /// Numeric pins and automatic primary rings share visibility and the settings list's order.
+    var menuBarGroups: [ProviderMetrics] {
+        let groups = customizeGroups.filter {
+            isMenuBarEntrySelected($0.provider.id)
+        }
+        let byID = Dictionary(uniqueKeysWithValues: groups.map { ($0.id, $0) })
+        return menuBarEntries.compactMap { byID[$0.id] }
     }
 
     /// Pinned metrics grouped by provider, in the user's Customize order (provider order, then each

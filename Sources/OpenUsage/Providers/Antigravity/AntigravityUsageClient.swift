@@ -68,11 +68,21 @@ struct AntigravityUsageClient: Sendable {
         return try? await lsHTTP.send(request)
     }
 
-    /// POST a Cloud Code endpoint, trying each base URL in turn. A 401/403 short-circuits to `.authFailed`
+    /// POST a Cloud Code endpoint, trying each base URL in turn. A 401 short-circuits to `.authFailed`
     /// (same token would fail on the other base); other non-2xx / transport errors fall through to the
     /// next base and finally `.unavailable`.
     func cloudCode(path: String, token: String, userAgent: String, body: [String: String]) async -> CloudCodeOutcome {
-        let payload = (try? JSONSerialization.data(withJSONObject: body)) ?? Data("{}".utf8)
+        // Account bootstrap needs the product identity to resolve the consumer project.
+        var requestBody: [String: Any] = body
+        if path == Self.loadCodeAssistPath {
+            #if arch(arm64)
+            let platform = "DARWIN_ARM64"
+            #else
+            let platform = "DARWIN_AMD64"
+            #endif
+            requestBody["metadata"] = ["ideType": "ANTIGRAVITY", "pluginType": "GEMINI", "platform": platform]
+        }
+        let payload = (try? JSONSerialization.data(withJSONObject: requestBody)) ?? Data("{}".utf8)
         for base in Self.cloudCodeURLs {
             guard let url = URL(string: base + path) else { continue }
             let request = HTTPRequest(
@@ -88,7 +98,10 @@ struct AntigravityUsageClient: Sendable {
                 timeout: 15
             )
             guard let response = try? await http.send(request) else { continue }
-            if response.statusCode == 401 || response.statusCode == 403 { return .authFailed }
+            if response.statusCode == 401 { return .authFailed }
+            if response.statusCode == 403 {
+                AppLog.warn(LogTag.plugin("antigravity"), "Cloud Code \(path) permission denied; trying next endpoint")
+            }
             if (200..<300).contains(response.statusCode) { return .ok(response.body) }
         }
         return .unavailable
