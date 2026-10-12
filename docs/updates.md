@@ -29,7 +29,7 @@ Everyone always receives stable releases — the beta option only *adds* pre-rel
 ## Where updates come from
 
 Update builds are published on TokenPlan's GitHub releases, and the list of available versions (the
-"appcast") is served from `https://onevalar.github.io/token-plan/appcast.xml`. Each download is
+"appcast") is served from `https://onevalar.github.io/apps/tokenplan/appcast.xml`. Each download is
 signed two ways — Apple notarization plus TokenPlan's own signature — and the app refuses anything that
 doesn't match. This is only available in the official signed release build, not in local developer
 builds.
@@ -101,61 +101,16 @@ this does not prevent live quota refresh.
 
 Local development and standalone builds without an update feed omit the Check for Updates menu item instead of showing an unusable disabled command. About remains available.
 
-## Local signed update pipeline (1.0.1 preparation)
+## Local preparation
 
-Public publication is **disabled at the owner's request**. The source repository is private.
-The proposed distribution destination in `release/update-config.json` is reserved configuration,
-not an existing deployment: `https://onevalar.github.io/tokenplan-updates/appcast.xml`.
-No public repository or release was created. Current installed development builds remain unchanged
-and do not update from this URL. Do not install the private candidate as a working updater until
-the public URL and its download have passed the checks below.
+`python3 script/prepare_update.py <approved-version>` can prepare signed, notarized Mac
+artifacts locally without publishing. Cloud builds are the normal release path described below.
+The Sparkle signing key is backed up in the local Keychain and configured in the private source
+repository's Actions secrets; keep the same key across releases.
 
-The private Sparkle key is held in the macOS Keychain under the `tokenplan` account. Only its
-public key is in the configuration. Apple Developer ID and the `TokenPlan-Notary` profile stay
-on this Mac; no signing credentials are uploaded to GitHub. Keep a secure backup of the Sparkle
-key before relying on this update channel; do not rotate the key for each release.
-
-### Prepare privately
-
-After approving the version and adding its notes to `release/<version>.md`, run:
-
-```sh
-python3 script/prepare_update.py 1.0.1
-```
-
-This builds the universal production app, signs it with Developer ID, notarizes and staples the
-app and DMG, generates an EdDSA-signed Sparkle enclosure, verifies the archive signature, preserves
-existing feed versions, and records verification results under `dist/updates/<version>/`.
-Nothing is uploaded, tagged, or installed by this command. Existing output is never overwritten.
-Build numbers use Unix timestamps so local and cloud builds share an increasing number space.
-
-### Enable publication later
-
-Only after the owner authorizes public downloads:
-
-1. Create the public `onevalar/tokenplan-updates` distribution repository with an initial README.
-   Keep the application source repository private. The distribution repository contains only
-   release packages, notes, and the feed.
-2. Confirm the destination in `release/update-config.json`, then set `publication_enabled` to true.
-3. Run `python3 script/publish_update.py 1.0.1`. This rechecks artifact hashes and the Sparkle
-   signature, publishes release notes and the DMG, pushes the feed without force, and enables
-   branch-based Pages hosting if needed. It refuses private download repositories and existing
-   release versions; it does not overwrite published packages.
-4. Wait for Pages deployment. Fetch the feed without authentication; check that its version,
-   build number, archive URL, length, and signature match the verified local candidate. Download
-   that URL without authentication and verify its SHA-256 and Sparkle signature.
-5. Install the production app and test Check for Updates. To test actual replacement, publish
-   another owner-approved higher build and verify an upgrade from the preceding signed version.
-   Reading a feed alone is not proof that an installation succeeded.
-
-A development build has a different bundle identifier. The first move from `.dev` to production
-requires a manual installation and explicit preservation of the active settings domain; Sparkle
-must not be used to cross-update these bundle identities.
-
-The legacy cloud release workflow is opt-in through `TOKENPLAN_CLOUD_RELEASES_ENABLED=true`.
-It is not configured for the separate distribution repository and must remain off for this local
-release route. The local pipeline is the supported route until cloud signing and destination
-configuration are explicitly provisioned and tested.
+A development build has a different bundle identifier. Moving from `.dev` to production requires
+manual installation and preservation of the active settings domain. Sparkle does not cross-update
+these bundle identities.
 
 ## Public distribution and cloud releases
 
