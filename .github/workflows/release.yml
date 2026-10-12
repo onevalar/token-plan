@@ -142,8 +142,57 @@ jobs:
             dist/installers/*.deb
           if-no-files-found: error
           retention-days: 7
+  installer-tests:
+    needs: [validate, desktop]
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.validate.outputs.tag }}
+          persist-credentials: false
+      - uses: actions/setup-dotnet@v5
+        with:
+          global-json-file: platforms/desktop/global.json
+      - uses: actions/download-artifact@v4
+        with:
+          name: tokenplan-desktop-public
+          path: ${{ runner.temp }}/installers
+      - name: Install Linux UI fonts
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y fonts-noto-cjk
+      - name: Test core logic and UI on the target OS
+        shell: bash
+        run: |
+          dotnet run --project platforms/desktop/TokenPlan.Core.Tests
+          dotnet run --project platforms/desktop/TokenPlan.Desktop.Tests
+      - name: Install, upgrade, launch and uninstall on Windows
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: ./script/ci/check_windows_installer.ps1
+      - name: Install, launch and uninstall on Linux
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb fonts-noto-cjk "$RUNNER_TEMP"/installers/tokenplan_*_amd64.deb
+          test -x /usr/bin/tokenplan
+          test -f /opt/tokenplan/THIRD-PARTY-NOTICES.txt
+          set +e
+          xvfb-run -a timeout 12s /usr/bin/tokenplan --fixture > "$RUNNER_TEMP/installed-fixture.log" 2>&1
+          result=$?
+          set -e
+          cat "$RUNNER_TEMP/installed-fixture.log"
+          test "$result" -eq 124
+          sudo apt-get install -y --reinstall "$RUNNER_TEMP"/installers/tokenplan_*_amd64.deb
+          sudo apt-get remove -y tokenplan
+          test ! -e /opt/tokenplan/TokenPlan.Desktop
   publish:
-    needs: [validate, mac, desktop]
+    needs: [validate, mac, desktop, installer-tests]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
