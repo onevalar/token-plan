@@ -5,9 +5,17 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: 'Approved stable source tag, e.g. v1.0.2'
+        description: 'Approved stable source tag; main is allowed for verification only'
         required: true
         type: string
+      verify_only:
+        description: 'Build, notarize and validate without publishing any release or feed'
+        type: boolean
+        default: false
+      verification_version:
+        description: 'Already approved version for a main-branch verification build'
+        type: string
+        default: '1.0.1'
 permissions:
   contents: read
 concurrency:
@@ -27,14 +35,22 @@ jobs:
       - id: meta
         env:
           REQUESTED_TAG: ${{ inputs.tag || github.ref_name }}
+          VERIFY_ONLY: ${{ inputs.verify_only }}
+          VERIFY_VERSION: ${{ inputs.verification_version }}
         run: |
-          [[ "$REQUESTED_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo 'An approved stable version tag is required'; exit 1; }
-          git rev-parse --verify "refs/tags/$REQUESTED_TAG"
-          git merge-base --is-ancestor "refs/tags/$REQUESTED_TAG" origin/main
-          version="${REQUESTED_TAG#v}"
-          git show "refs/tags/$REQUESTED_TAG:release/$version.md" > /tmp/notes
+          if [[ "$VERIFY_ONLY" == 'true' && "$REQUESTED_TAG" == 'main' ]]; then
+            [[ "$VERIFY_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || exit 1
+            version="$VERIFY_VERSION"
+            source_ref=$(git rev-parse origin/main)
+          else
+            [[ "$REQUESTED_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo 'An approved stable version tag is required'; exit 1; }
+            source_ref=$(git rev-parse --verify "refs/tags/$REQUESTED_TAG^{commit}")
+            git merge-base --is-ancestor "$source_ref" origin/main
+            version="${REQUESTED_TAG#v}"
+          fi
+          git show "$source_ref:release/$version.md" > /tmp/notes
           test -s /tmp/notes
-          echo "tag=$REQUESTED_TAG" >> "$GITHUB_OUTPUT"
+          echo "tag=$source_ref" >> "$GITHUB_OUTPUT"
           echo "version=$version" >> "$GITHUB_OUTPUT"
   mac:
     needs: validate
@@ -89,6 +105,7 @@ jobs:
       - name: Verify and sign public update feed
         env:
           SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
+          TOKENPLAN_VERIFY_ONLY: ${{ inputs.verify_only }}
         run: python3 script/finalize_cloud_update.py
       - uses: actions/upload-artifact@v4
         with:
@@ -151,6 +168,10 @@ jobs:
         env:
           GH_TOKEN: ${{ steps.app.outputs.token }}
           VERSION: ${{ needs.validate.outputs.version }}
+          VERIFY_ONLY: ${{ inputs.verify_only }}
         run: |
           gh auth setup-git
-          python3 script/publish_update.py "$VERSION" --folder dist/public --build "$(cat dist/public/build.txt)"
+          options=()
+          if [[ "$VERIFY_ONLY" == 'true' ]]; then options+=(--prepare-only); fi
+          python3 script/publish_update.py "$VERSION" --folder dist/public --build "$(cat dist/public/build.txt)" "${options[@]}"
+          gh api repos/onevalar/apps --jq '{private, permissions}'

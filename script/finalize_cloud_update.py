@@ -8,7 +8,8 @@ import plistlib
 import shutil
 import subprocess
 import sys
-from prepare_update import ROOT, run, validate_feed
+import xml.etree.ElementTree as ET
+from prepare_update import ROOT, NS, run, validate_feed
 
 version = os.environ['TOKENPLAN_VERSION']
 config = json.loads((ROOT/'release/update-config.json').read_text())
@@ -21,6 +22,12 @@ for target in [app,archive]: run('xcrun','stapler','validate',str(target))
 run('codesign','--verify','--deep','--strict','-R=notarized',str(app))
 shutil.copy2(archive,folder/archive.name)
 run('curl','--fail','--silent','--show-error','--location',config['feed_url'],'--output',str(folder/'appcast.xml'))
+# A verification run can rebuild an already-published version, but its feed is never published.
+if os.environ.get('TOKENPLAN_VERIFY_ONLY') == 'true':
+    tree = ET.parse(folder/'appcast.xml'); channel = tree.getroot().find('channel')
+    for item in list(channel.findall('item')):
+        if item.findtext(NS+'shortVersionString') == version: channel.remove(item)
+    tree.write(folder/'appcast.xml', encoding='utf-8', xml_declaration=True)
 (folder/f'{archive.stem}.html').write_text('<pre>'+html.escape((ROOT/f'release/{version}.md').read_text())+'</pre>')
 bins = ROOT/'.build/artifacts/sparkle/Sparkle/bin'
 prefix = f'https://github.com/onevalar/apps/releases/download/tokenplan-v{version}/'

@@ -184,3 +184,8 @@ Private source repository Actions configuration:
 The first public release may be prepared locally using `prepare_update.py` and `publish_update.py`.
 Cloud release readiness is established only after a successful cloud run; merely adding this workflow
 or some credentials is not evidence that cloud signing/notarization works.
+
+For cloud verification without a release, dispatch Publish TokenPlan with `tag=main`,
+`verify_only=true` and an already approved `verification_version`. It builds, signs, notarizes,
+validates update metadata and checks the App token. Artifacts stay in private Actions storage;
+no public release or update feed is changed. The selected source commit is pinned across jobs.

@@ -45,7 +45,7 @@ VERSION="$TOKENPLAN_VERSION"
 # monotonic build number below), not this string, and Developer ID notarization does not require it to
 # be numeric. (Sparkle's own docs use a beta short version, e.g. "2.0b1".)
 BUILD="${TOKENPLAN_BUILD:-$(date +%s)}"
-FEED_URL="${FEED_URL:-https://onevalar.github.io/token-plan/appcast.xml}"
+FEED_URL="${FEED_URL:-https://onevalar.github.io/apps/tokenplan/appcast.xml}"
 DMG_NAME="$APP_NAME-$VERSION.dmg"
 
 DIST_DIR="${TOKENPLAN_DIST_DIR:-$ROOT_DIR/dist}"
