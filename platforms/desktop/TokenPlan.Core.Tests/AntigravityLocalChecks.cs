@@ -27,6 +27,10 @@ static class AntigravityLocalChecks
                 }
                 var headers = Encoding.ASCII.GetString(bytes.ToArray());
                 check(headers.Contains("POST /exa.language_server_pb.LanguageServerService/RetrieveUserQuotaSummary") && headers.Contains("x-codeium-csrf-token: test-csrf"), "Local RPC receives expected path and CSRF header");
+                // Drain the request before closing the socket. Windows resets a connection
+                // closed with unread request bytes, which can discard the response in this fixture.
+                var contentLength = headers.Split("\r\n").First(h => h.StartsWith("Content-Length:", StringComparison.OrdinalIgnoreCase));
+                await stream.ReadExactlyAsync(new byte[int.Parse(contentLength.Split(':', 2)[1].Trim())], deadline.Token);
                 var body = """{"response":{"groups":[{"buckets":[{"bucketId":"gemini-5h","remainingFraction":0.7}]}]}}""";
                 var payload = Encoding.UTF8.GetBytes(body);
                 await stream.WriteAsync(Encoding.ASCII.GetBytes($"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: {payload.Length}\r\nConnection: close\r\n\r\n"), deadline.Token);
