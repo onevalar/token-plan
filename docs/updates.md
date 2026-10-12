@@ -144,3 +144,22 @@ For cloud verification without a release, dispatch Publish TokenPlan with `tag=m
 `verify_only=true` and an already approved `verification_version`. It builds, signs, notarizes,
 validates update metadata and checks the App token. Artifacts stay in private Actions storage;
 no public release or update feed is changed. The selected source commit is pinned across jobs.
+
+## Cloud release validation — 1.0.2 (2026-10-13)
+
+Cloud run `38279425689` passed macOS tests, signing and Apple notarization, desktop builds,
+and native Windows/Linux core, UI and installer checks. It published the three installers and
+checksums to `onevalar/apps` as `tokenplan-v1.0.2`. GitHub Pages serves both production feeds;
+the Mac feed retains 1.0.1. The source repository remains private.
+
+On the owner's Mac, Sparkle's official command-line driver used the installed app's framework,
+production feed and public key to download, verify and install 1.0.2 over 1.0.1. The app restarted
+from `/Applications/TokenPlan.app`, with one running instance, valid code signature and stapled
+notarization ticket. A subsequent check reported no newer update. The driver had to use the same
+Developer ID team as the installer for Sparkle's authenticated IPC; an ad-hoc test driver was
+rejected. The native check-update button was not exercised because UI automation could not attach.
+
+The Windows/Linux updater implementation detected 1.0.2 from 1.0.1, downloaded both real public
+installers, verified size and SHA-256, and did not offer the same version again. Cloud native tests
+installed/reinstalled, launched fixture mode and uninstalled the packages; they did not exercise
+an interactive end-user update click sequence or live provider credentials.
