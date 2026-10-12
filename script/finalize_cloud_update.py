@@ -27,6 +27,9 @@ if os.environ.get('TOKENPLAN_VERIFY_ONLY') == 'true':
     tree = ET.parse(folder/'appcast.xml'); channel = tree.getroot().find('channel')
     for item in list(channel.findall('item')):
         if item.findtext(NS+'shortVersionString') == version: channel.remove(item)
+    ET.register_namespace('sparkle', NS[1:-1])
+    if not any(str(e.tag).startswith(NS) or any(k.startswith(NS) for k in e.attrib) for e in tree.iter()):
+        tree.getroot().set('xmlns:sparkle', NS[1:-1])
     tree.write(folder/'appcast.xml', encoding='utf-8', xml_declaration=True)
 (folder/f'{archive.stem}.html').write_text('<pre>'+html.escape((ROOT/f'release/{version}.md').read_text())+'</pre>')
 bins = ROOT/'.build/artifacts/sparkle/Sparkle/bin'
