@@ -1,12 +1,3 @@
-# Publishes the pricing supplement to GitHub Pages whenever it changes on main.
-#
-# Installed apps fetch https://onevalar.github.io/token-plan/pricing_supplement.json on their daily
-# pricing refresh, so merging a change to the supplement updates Cursor-native model pricing (auto,
-# composer-*, github_bugbot), fast multipliers, and model alias rules in the field within ~a day —
-# no tag, no release, no Sparkle involvement.
-#
-# Shares the release workflow's concurrency group: both publish to gh-pages with keep_files, so
-# serializing them prevents lost updates from concurrent pushes to the branch.
 name: Publish pricing supplement
 
 on:
@@ -18,11 +9,11 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: release-appcast
+  group: tokenplan-public-release
   cancel-in-progress: false
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   publish:
@@ -57,15 +48,28 @@ jobs:
                 f"{len(supplement['alias_rules'])} alias rules.")
           PY
 
-      - name: Assemble Pages directory
-        run: |
-          mkdir -p public
-          cp Sources/OpenUsage/Resources/pricing_supplement.json public/pricing_supplement.json
-
-      - name: Publish to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
+      - name: Authorize public metadata publication
+        id: app
+        uses: actions/create-github-app-token@v3.2.0
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_branch: gh-pages
-          publish_dir: ./public
-          keep_files: true
+          app-id: ${{ vars.APPS_APP_ID }}
+          private-key: ${{ secrets.APPS_APP_PRIVATE_KEY }}
+          owner: onevalar
+          repositories: apps
+          permission-contents: write
+      - name: Publish pricing metadata to download repository main
+        env:
+          GH_TOKEN: ${{ steps.app.outputs.token }}
+        run: |
+          gh auth setup-git
+          gh repo clone onevalar/apps "$RUNNER_TEMP/apps" -- --depth 1 --branch main
+          mkdir -p "$RUNNER_TEMP/apps/tokenplan"
+          cp Sources/OpenUsage/Resources/pricing_supplement.json "$RUNNER_TEMP/apps/tokenplan/pricing_supplement.json"
+          cd "$RUNNER_TEMP/apps"
+          git config user.name 'Onevalar Apps Publisher'
+          git config user.email 'apps-publisher@users.noreply.github.com'
+          git add tokenplan/pricing_supplement.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'Update TokenPlan pricing metadata'
+            git push origin main
+          fi

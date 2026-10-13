@@ -1,39 +1,59 @@
 name: Private packages
-# A unique snapshot branch is created by automation.py. Never publishes a Release.
+# Build a pinned commit on main without creating a temporary branch.
+run-name: Private package ${{ inputs.request_id }}
 on:
-  push:
-    branches: ['tokenplan-package/**']
+  workflow_dispatch:
+    inputs:
+      version:
+        required: true
+        type: string
+      commit:
+        required: true
+        type: string
+      request_id:
+        required: true
+        type: string
 permissions:
   contents: read
 concurrency:
-  group: private-package-${{ github.ref }}
+  group: private-package-${{ inputs.request_id }}
   cancel-in-progress: false
 jobs:
+  validate:
+    runs-on: ubuntu-latest
+    outputs:
+      commit: ${{ steps.check.outputs.commit }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: main
+          fetch-depth: 0
+      - id: check
+        env:
+          COMMIT: ${{ inputs.commit }}
+          VERSION: ${{ inputs.version }}
+        run: |
+          [[ "$COMMIT" =~ ^[0-9a-f]{40}$ ]]
+          [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-beta\.[0-9]+)?$ ]]
+          git merge-base --is-ancestor "$COMMIT" origin/main
+          echo "commit=$COMMIT" >> "$GITHUB_OUTPUT"
   desktop:
+    needs: validate
     runs-on: ubuntu-latest
     timeout-minutes: 35
     steps:
       - uses: actions/checkout@v7
         with:
           persist-credentials: false
+          ref: ${{ needs.validate.outputs.commit }}
       - uses: actions/setup-dotnet@v5
         with:
           global-json-file: platforms/desktop/global.json
-      - name: Resolve package request
-        id: request
-        run: |
-          python3 - <<'PY'
-          import json, re, os
-          request = json.load(open('.tokenplan-package-request.json'))
-          version = request['version']
-          assert re.fullmatch(r'[0-9]+\.[0-9]+\.[0-9]+(?:-beta\.[0-9]+)?', version)
-          with open(os.environ['GITHUB_OUTPUT'], 'a') as f: f.write(f'version={version}\n')
-          PY
       - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends nsis
       - run: script/build_desktop.sh test
       - name: Build Windows and Linux installers
         env:
-          VERSION: ${{ steps.request.outputs.version }}
+          VERSION: ${{ inputs.version }}
         run: script/build_desktop_installers.sh "$VERSION"
       - uses: actions/upload-artifact@v4
         with:
@@ -42,6 +62,7 @@ jobs:
           if-no-files-found: error
           retention-days: 14
   native-tests:
+    needs: validate
     strategy:
       fail-fast: false
       matrix:
@@ -50,6 +71,8 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.validate.outputs.commit }}
       - uses: actions/setup-dotnet@v5
         with:
           global-json-file: platforms/desktop/global.json
@@ -72,7 +95,7 @@ jobs:
           if-no-files-found: warn
           retention-days: 14
   installer-checks:
-    needs: desktop
+    needs: [validate, desktop]
     strategy:
       fail-fast: false
       matrix:
@@ -81,6 +104,8 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.validate.outputs.commit }}
       - uses: actions/download-artifact@v4
         with:
           name: desktop-installers

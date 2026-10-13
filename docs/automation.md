@@ -9,7 +9,7 @@
 
 需要 macOS、Xcode 命令行工具、Python 3.11+ 和已登录的 GitHub CLI。Windows/Linux 在 GitHub Actions 上编译，不要求本机安装 Windows、Linux 或 .NET。Mac 在本机签名公证，因此运行期间请保持电脑唤醒和网络连接。需要至少 5 GB 可用空间。
 
-打包会保存当前 Git 管理的代码和未忽略的新文件为独立快照，推送到当前 origin 的 `tokenplan-package/…` 分支。遵循 `.gitignore`，不会提交本地环境文件、安装包或输出目录；准备提交的新文件也应遵守仓库的凭据管理要求。不会修改工作分支、暂存区或创建发布标签，也不会发布公开 Release。快照分支保留用于追溯与重试。
+打包前需要将测试通过的代码提交并推送到 `main`。流程直接触发 GitHub Actions，并固定使用这次 main 提交，不再创建或推送临时分支。未提交、未推送或与已测试代码不一致时会停止。不会创建发布标签，也不会发布公开 Release。
 
 本地测试后如又修改代码，打包会要求重新测试。三个包使用同一份快照：Mac 为 universal DMG（Apple Silicon / Intel），Windows 为 x64 EXE（目前未签名），Linux 为 Debian/Ubuntu x64 DEB。Windows/Linux 还会在各自系统运行核心测试。
 

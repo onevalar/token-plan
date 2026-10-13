@@ -91,21 +91,16 @@ def package(version):
 
 def submit_snapshot(version, tree, statefile):
     state = json.loads(Path(statefile).read_text())
-    unique = Path(state['folder']).name
-    # Add a request file to a new commit without changing the checkout/index/branch.
-    with tempfile.TemporaryDirectory() as temp:
-        env = dict(os.environ, GIT_INDEX_FILE=str(Path(temp) / 'index'))
-        run('git', 'read-tree', tree, env=env)
-        request = Path(temp) / 'request.json'
-        save(request, {'version': version, 'sourceTree': tree})
-        blob = run('git', 'hash-object', '-w', str(request), capture=True).strip()
-        run('git', 'update-index', '--add', '--cacheinfo', f'100644,{blob},.tokenplan-package-request.json', env=env)
-        package_tree = run('git', 'write-tree', capture=True, env=env).strip()
-        parent = run('git', 'rev-parse', 'HEAD', capture=True).strip()
-        commit = run('git', 'commit-tree', package_tree, '-p', parent, '-m', f'build: private package {version}', capture=True).strip()
-    state.update(commit=commit, branch=f'tokenplan-package/{version}/{unique}')
+    run('git', 'fetch', 'origin', 'main')
+    commit = run('git', 'rev-parse', 'origin/main', capture=True).strip()
+    published_tree = run('git', 'rev-parse', 'origin/main^{tree}', capture=True).strip()
+    if tree != published_tree:
+        raise ValueError('请先将测试通过的修改提交并推送到 main，再打包；不再创建临时分支。')
+    request_id = Path(state['folder']).name
+    state.update(commit=commit, branch='main', requestID=request_id)
+    run('gh', 'workflow', 'run', 'package-private.yml', '--ref', 'main',
+        '-f', f'version={version}', '-f', f'commit={commit}', '-f', f'request_id={request_id}')
     save(statefile, state)
-    run('git', 'push', 'origin', f'{commit}:refs/heads/{state["branch"]}')
     return state
 
 
@@ -116,7 +111,7 @@ def build_mac(statefile, identity=None, profile=None):
     if identity is None: identity, profile = prerequisites()
     folder, version, commit = Path(state['folder']), state['version'], state['commit']
     # Build the same immutable snapshot locally; source edits cannot contaminate it.
-    work = STATE / state['branch'].split('/')[-1]
+    work = STATE / Path(state['folder']).name
     if not work.exists(): run('git', 'worktree', 'add', '--detach', str(work), commit)
     env = dict(os.environ, CODESIGN_IDENTITY=identity, ICLOUD_PROVISIONING_PROFILE=profile,
                NOTARY_KEYCHAIN_PROFILE='TokenPlan-Notary', DISABLE_UPDATES='1', TOKENPLAN_VERSION=version,
@@ -140,8 +135,10 @@ def finish(statefile):
     print('等待 Windows / Linux 云端构建，可按 Ctrl+C 中断等待，稍后使用 resume 继续。', flush=True)
     deadline = time.monotonic() + 3600
     while time.monotonic() < deadline:
-        runs = json.loads(run('gh', 'run', 'list', '--branch', state['branch'], '--commit', state['commit'], '--json', 'databaseId,status,conclusion,workflowName,url', capture=True))
-        matches = [r for r in runs if r['workflowName'] == 'Private packages']
+        commit_filter = [] if state.get('requestID') else ['--commit', state['commit']]
+        runs = json.loads(run('gh', 'run', 'list', '--branch', state['branch'], '--workflow', 'package-private.yml', '--limit', '100', *commit_filter, '--json', 'databaseId,status,conclusion,workflowName,url,displayTitle', capture=True))
+        matches = [r for r in runs if r['workflowName'] == 'Private packages' and
+                   (not state.get('requestID') or r['displayTitle'] == f"Private package {state['requestID']}")]
         if matches:
             latest = max(matches, key=lambda r: r['databaseId'])
             state.update(run=latest['databaseId'], url=latest['url'])
@@ -185,7 +182,7 @@ def main():
             if not statefile: raise ValueError('没有未完成的打包任务。')
             saved = json.loads(Path(statefile).read_text())
             if 'commit' not in saved: submit_snapshot(saved['version'], saved['tree'], Path(statefile))
-            else: run('git', 'push', 'origin', f"{saved['commit']}:refs/heads/{saved['branch']}")
+            # Existing runs can be resumed without recreating a remote branch.
             build_mac(statefile)
             finish(statefile)
         else: package(args.value or input('本次版本号（确认本地测试通过后输入）：').strip())

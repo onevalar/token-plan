@@ -59,6 +59,31 @@ class Artifacts(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, '不一致'): automation.package('1.0.0')
                 prerequisites.assert_not_called()
 
+    def test_private_package_dispatches_main_without_push(self):
+        with tempfile.TemporaryDirectory() as directory:
+            statefile = Path(directory) / 'state.json'
+            statefile.write_text(json.dumps({'folder': '/tmp/package-unique'}))
+            calls = []
+            def fake_run(*args, **kwargs):
+                calls.append(args)
+                if args[:2] == ('git', 'rev-parse'):
+                    return 'tree\n' if args[2].endswith('^{tree}') else 'a' * 40 + '\n'
+            with patch.object(automation, 'run', side_effect=fake_run):
+                result = automation.submit_snapshot('1.0.2', 'tree', statefile)
+            self.assertEqual(result['branch'], 'main')
+            self.assertEqual(result['requestID'], 'package-unique')
+            self.assertTrue(any(c[:3] == ('gh', 'workflow', 'run') for c in calls))
+            self.assertFalse(any(c[:2] == ('git', 'push') for c in calls))
+
+    def test_private_package_rejects_unpublished_changes(self):
+        with tempfile.TemporaryDirectory() as directory:
+            statefile = Path(directory) / 'state.json'
+            statefile.write_text(json.dumps({'folder': '/tmp/package-unique'}))
+            with patch.object(automation, 'run', return_value='published') as run:
+                with self.assertRaisesRegex(ValueError, 'main'):
+                    automation.submit_snapshot('1.0.2', 'unpublished', statefile)
+            self.assertFalse(any(c.args[0] == 'gh' for c in run.call_args_list))
+
     def test_version_cannot_inject_paths_or_shell(self):
         for version in ['../../a', '1.0.0;id', '1.0.0\n', '', 'v1.0.0']:
             with self.assertRaises(ValueError): automation.package(version)
