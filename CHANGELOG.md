@@ -1,5 +1,13 @@
 # Changelog
 
+## v1.0.4
+
+### Improvements
+- 优化蓝色胶囊图标的边缘高光及小尺寸显示，同步三平台资源。by @onevalar
+- 改进 macOS「关于」页的图标缩放质量。by @onevalar
+
+---
+
 ## v1.0.3
 
 ### Improvements
