@@ -6,7 +6,7 @@ namespace TokenPlan.Core;
 public record DesktopUpdate(string Version, string Url, string Sha256, long Size);
 public static class DesktopUpdates
 {
-    public const string Feed = "https://onevalar.github.io/apps/tokenplan/latest.json";
+    public const string Feed = "https://raw.githubusercontent.com/onevalar/apps/main/tokenplan/latest.json";
     public static DesktopUpdate? Parse(string json, string installed, string platform)
     {
         if (platform is not ("windows-x64" or "linux-x64")) return null;

@@ -29,7 +29,7 @@ Everyone always receives stable releases — the beta option only *adds* pre-rel
 ## Where updates come from
 
 Update builds are published on TokenPlan's GitHub releases, and the list of available versions (the
-"appcast") is served from `https://onevalar.github.io/apps/tokenplan/appcast.xml`. Each download is
+"appcast") is served from `https://raw.githubusercontent.com/onevalar/apps/main/tokenplan/appcast.xml`. Each download is
 signed two ways — Apple notarization plus TokenPlan's own signature — and the app refuses anything that
 doesn't match. This is only available in the official signed release build, not in local developer
 builds.
@@ -117,8 +117,8 @@ these bundle identities.
 Source stays private in `onevalar/token-plan`. Public downloads and update metadata live in
 `onevalar/apps`, under release tags `tokenplan-vX.Y.Z` and the `tokenplan/` directory. Only three
 installers and their checksums are release assets; application source is never pushed there.
-macOS uses `https://onevalar.github.io/apps/tokenplan/appcast.xml` and Sparkle signatures.
-Windows and Linux check `https://onevalar.github.io/apps/tokenplan/latest.json` at startup and every
+macOS uses `https://raw.githubusercontent.com/onevalar/apps/main/tokenplan/appcast.xml` and Sparkle signatures.
+Windows and Linux check `https://raw.githubusercontent.com/onevalar/apps/main/tokenplan/latest.json` at startup and every
 12 hours. A new release appears on the overview and in General Settings/About. Download size and
 SHA-256 are verified before opening the installer. The user completes the platform installer;
 these two platforms do not silently replace the running application.
@@ -163,3 +163,17 @@ The Windows/Linux updater implementation detected 1.0.2 from 1.0.1, downloaded b
 installers, verified size and SHA-256, and did not offer the same version again. Cloud native tests
 installed/reinstalled, launched fixture mode and uninstalled the packages; they did not exercise
 an interactive end-user update click sequence or live provider credentials.
+
+
+## Update feed connectivity (2026-10-13)
+
+The update entry points now use GitHub raw content from the same public `onevalar/apps`
+main branch. This removes GitHub Pages deployment as a dependency for update checks.
+The Pages copies remain available for older installations. Installer downloads still use
+GitHub Releases, with the existing Sparkle signatures and desktop SHA-256 checks.
+
+On the owner's Mac, the Pages endpoint failed TLS negotiation through the configured local
+proxy while the raw endpoint returned the same published feed and detected 1.0.4. The installed
+1.0.3 build was repaired by setting its `SUFeedURL` preference to the raw URL, without modifying
+its signed bundle or installing an update. This preference persists across app upgrades.
+The URL change in source applies to subsequent releases; published 1.0.4 binaries remain immutable.

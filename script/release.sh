@@ -15,7 +15,7 @@ set -euo pipefail
 #   TOKENPLAN_VERSION     human version, e.g. 0.7.0 (CFBundleShortVersionString)
 # Optional env:
 #   TOKENPLAN_BUILD       CFBundleVersion (monotonic). Default: Unix timestamp.
-#   FEED_URL              appcast URL baked into the app. Default: GitHub Pages project URL.
+#   FEED_URL              appcast URL baked into the app. Default: public download repository raw feed URL.
 #   NOTARY_APPLE_ID / NOTARY_APP_PASSWORD / NOTARY_TEAM_ID   Apple ID, app-specific password, and team
 #                         ID for notarytool. When all three are set, the app and DMG are notarized + stapled.
 #   DISABLE_UPDATES=1  Build a standalone package without a configured Sparkle feed/key.
@@ -45,7 +45,7 @@ VERSION="$TOKENPLAN_VERSION"
 # monotonic build number below), not this string, and Developer ID notarization does not require it to
 # be numeric. (Sparkle's own docs use a beta short version, e.g. "2.0b1".)
 BUILD="${TOKENPLAN_BUILD:-$(date +%s)}"
-FEED_URL="${FEED_URL:-https://onevalar.github.io/apps/tokenplan/appcast.xml}"
+FEED_URL="${FEED_URL:-https://raw.githubusercontent.com/onevalar/apps/main/tokenplan/appcast.xml}"
 DMG_NAME="$APP_NAME-$VERSION.dmg"
 
 DIST_DIR="${TOKENPLAN_DIST_DIR:-$ROOT_DIR/dist}"

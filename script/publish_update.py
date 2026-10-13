@@ -49,7 +49,7 @@ def main():
     config = json.loads((ROOT / 'release/update-config.json').read_text())
     if not config['publication_enabled'] or config['distribution_repository'] != 'onevalar/apps':
         parser.error('Public distribution is not enabled for onevalar/apps')
-    if config['feed_url'] != 'https://onevalar.github.io/apps/tokenplan/appcast.xml': raise ValueError('Unexpected feed destination')
+    if config['feed_url'] != 'https://raw.githubusercontent.com/onevalar/apps/main/tokenplan/appcast.xml': raise ValueError('Unexpected feed destination')
     notes = ROOT / f'release/{args.version}.md'
     if not notes.is_file() or not notes.read_text().strip(): raise ValueError('Approved nonempty release notes required')
     folder = args.folder

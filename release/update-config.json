@@ -1,7 +1,7 @@
 {
   "publication_enabled": true,
   "distribution_repository": "onevalar/apps",
-  "feed_url": "https://onevalar.github.io/apps/tokenplan/appcast.xml",
+  "feed_url": "https://raw.githubusercontent.com/onevalar/apps/main/tokenplan/appcast.xml",
   "sparkle_account": "tokenplan",
   "sparkle_public_key": "YTX65u7BPZbjy9Dz5o1EhtPcZpw22WJnu7S+6x2ZRqE=",
   "notary_keychain_profile": "TokenPlan-Notary"
