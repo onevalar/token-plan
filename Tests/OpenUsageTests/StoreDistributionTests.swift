@@ -1,3 +1,4 @@
+import AppKit
 import Foundation
 import XCTest
 @testable import OpenUsage
@@ -7,6 +8,14 @@ final class StoreDistributionTests: XCTestCase {
         let resources = Bundle.openUsageResources
         XCTAssertNotNil(resources.url(forResource: "deepseek", withExtension: "svg", subdirectory: "ProviderIcons"))
         XCTAssertNotNil(resources.url(forResource: "pricing_supplement", withExtension: "json"))
+    }
+
+    func testInterfaceIconIsBundledAndTransparent() throws {
+        let url = try XCTUnwrap(Bundle.openUsageResources.url(
+            forResource: "AppIcon-capsule-refined", withExtension: "png"))
+        let bitmap = try XCTUnwrap(NSBitmapImageRep(data: Data(contentsOf: url)))
+        XCTAssertTrue(bitmap.hasAlpha)
+        XCTAssertEqual(bitmap.colorAt(x: 0, y: 0)?.alphaComponent, 0)
     }
 
     func testAbsolutePathsAreNotRewritten() {
