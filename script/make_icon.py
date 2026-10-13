@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Package the approved blue icon without redrawing it.
 
-Source: assets/AppIcon-capsule.png. Requires Pillow and macOS iconutil.
+Source: assets/AppIcon-capsule-refined.png. Requires Pillow and macOS iconutil.
 Produces macOS and desktop assets from the transparent capsule.
 """
 from pathlib import Path
@@ -13,7 +13,7 @@ from PIL import Image
 ROOT = Path(__file__).resolve().parent.parent
 ASSETS = ROOT / "assets"
 
-with Image.open(ASSETS / "AppIcon-capsule.png") as source:
+with Image.open(ASSETS / "AppIcon-capsule-refined.png") as source:
     if source.width != source.height:
         raise ValueError("The app icon source must be square")
     image = source.convert("RGBA")
@@ -35,7 +35,7 @@ with tempfile.TemporaryDirectory() as temporary:
         "iconutil", "-c", "icns", str(iconset), "-o", str(ASSETS / "AppIcon.icns")
     ], check=True)
 
-with Image.open(ASSETS / "AppIcon-capsule.png") as source:
+with Image.open(ASSETS / "AppIcon-capsule-refined.png") as source:
     image = source.convert("RGBA")
 
 resized(1024).save(ASSETS / "AppIcon-desktop.png")

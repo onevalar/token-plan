@@ -27,6 +27,7 @@ private struct AboutContent: View {
         VStack(spacing: 14) {
             VStack(spacing: 8) {
                 Image(nsImage: AppInfo.icon).resizable()
+                    .interpolation(.high)
                     .scaledToFit().frame(width: 32, height: 40)
                 VStack(spacing: 3) {
                     Text(AppInfo.displayName).font(.title2.bold())

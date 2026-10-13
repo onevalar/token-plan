@@ -1,0 +1,11 @@
+TokenPlan icon refinement — 2026-10-13
+
+Tool: built-in image_gen (transparent image editing), two passes.
+Original retained: AppIcon-capsule.png.
+Selected master: AppIcon-capsule-refined.png.
+Packaging: python3 script/make_icon.py.
+Review: compared original/refined images at 20, 32 and 64 CSS pixels on light and dark backgrounds.
+No automatic sharpening or contrast boost applied during packaging.
+
+Final edit prompt:
+Precise-object-edit, second cleanup pass on attached blue glass capsule app icon. Keep composition, shape, blue liquid half full and upper translucent glass unchanged. Essential correction: erase the ragged electric-blue/cyan pixel fringe outside the entire capsule, especially bottom edge and right edge. Replace the perimeter with one flawlessly smooth continuous clean alpha silhouette, like a precise rounded vector path, no outer glow or halo. Reduce the glass perimeter thickness/reflections to one simple dark-blue outline and one restrained pale highlight, rather than multiple concentric rings. This is a small UI icon: fewer reflections, stronger silhouette, clean at 20px. Preserve the inside colors, liquid meniscus and proportions. Fully transparent outside the capsule, no specks, no shadow, no base, no border tile, no text. One square PNG asset.

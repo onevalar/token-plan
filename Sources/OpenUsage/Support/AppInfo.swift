@@ -9,7 +9,7 @@ import AppKit
 enum AppInfo {
     /// The interface uses the English product name in every language.
     @MainActor static let icon: NSImage = {
-        guard let url = Bundle.module.url(forResource: "AppIcon-capsule", withExtension: "png"),
+        guard let url = Bundle.module.url(forResource: "AppIcon-capsule-refined", withExtension: "png"),
               let image = NSImage(contentsOf: url) else { return NSApplication.shared.applicationIconImage }
         return image
     }()
