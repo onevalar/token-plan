@@ -1,5 +1,14 @@
 # Changelog
 
+## v1.0.3
+
+### Improvements
+- 将「订阅服务」统一更名为「服务配置」，同步三平台。by @onevalar
+- 统一 macOS 多账号与普通服务的详情箭头尺寸、右侧间距。by @onevalar
+- 更新价格补充数据地址，改为基于 main 的无临时分支打包流程。by @onevalar
+
+---
+
 ## v1.0.2
 
 ### Chores
