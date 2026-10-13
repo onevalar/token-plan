@@ -38,6 +38,16 @@ def assemble(version, folder, build):
     return names + ['SHA256SUMS.txt']
 
 
+def update_readme_downloads(text, version):
+    """Update only the maintained download block, preserving installation/history prose."""
+    if not re.fullmatch(r'\d+\.\d+\.\d+', version):
+        raise ValueError('Stable version required for download links')
+    pattern = r'(<!-- download-links:start -->)(.*?)(<!-- download-links:end -->)'
+    if len(re.findall(pattern, text, flags=re.S)) != 1:
+        raise ValueError('README must contain exactly one download-links block')
+    return re.sub(pattern, lambda match: match[1] + re.sub(r'(?<![\d.])\d+\.\d+\.\d+(?!\d|\.\d)', version, match[2]) + match[3], text, flags=re.S)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('version')
@@ -101,8 +111,10 @@ def main():
             previous = json.loads(current_manifest.read_text())['version']
             if tuple(map(int,previous.split('.'))) > tuple(map(int,args.version.split('.'))): raise ValueError('Refusing to downgrade the update manifest')
         for name in ['appcast.xml','latest.json']: shutil.copy2(folder/name,target/name)
+        readme = Path(directory) / 'README.md'
+        readme.write_text(update_readme_downloads(readme.read_text(), args.version))
         git('config','user.name','TokenPlan Publisher'); git('config','user.email','tokenplan-publisher@users.noreply.github.com')
-        git('add','updates/appcast.xml','updates/latest.json')
+        git('add','updates/appcast.xml','updates/latest.json','README.md')
         if git('diff','--cached','--name-only').strip():
             git('commit','-m',f'Publish TokenPlan {args.version} update metadata')
             git('push','origin','main')

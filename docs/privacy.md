@@ -3,7 +3,16 @@
 TokenPlan has **no analytics, no daily-activity ping and no crash reporting**. It makes no network requests
 except the ones listed below, and it has no account or telemetry identifier.
 
-## Credentials stored on this Mac
+## Credentials stored locally
+
+Windows/Linux also read supported local CLI credentials. Renewable independent Claude/Codex
+logins are saved back after renewal; shared switcher snapshots remain read-only. API keys saved
+on Windows use current-user DPAPI protection; Linux uses files restricted to the current user.
+Network diagnostic logs exclude credentials and response bodies. See [desktop behavior](desktop-clients.md).
+
+The following Keychain and local scan-cache details describe macOS.
+
+### macOS credentials
 
 TokenPlan primarily reads credentials that provider tools already keep on your Mac. When it writes a
 user-supplied API key or saves a refreshed credential, the file is replaced atomically and restricted to
@@ -17,7 +26,7 @@ Desktop's rotating refresh token and never modifies Desktop's config, cookies, o
 
 ## Other network requests
 
-Besides the provider API calls the vendor's own tools would make, TokenPlan fetches public [model price lists](pricing.md) about once an hour (from `raw.githubusercontent.com`, `models.dev`, and this project's GitHub Pages). These are plain downloads of public data — they carry no usage, log, or account information, and they run regardless of the analytics toggle. The spend tiles are computed from local CLI logs entirely on your Mac; no log data ever leaves it.
+Besides the provider API calls the vendor's own tools would make, TokenPlan fetches public [model price lists](pricing.md) about once an hour (from `raw.githubusercontent.com` and `models.dev`, including the project’s public pricing supplement). These are plain downloads of public data — they carry no usage, log, or account information, and no analytics setting is required. The spend tiles are computed from local CLI logs entirely on your Mac; no log data ever leaves it.
 
 To avoid re-reading unchanged Claude, Codex, and pi logs after every relaunch, TokenPlan keeps their
 parsed usage events in `~/Library/Application Support/TokenPlan/log-scan-cache/`. These records contain
@@ -30,6 +39,9 @@ the cache is read, so its computed aggregates and totals are not persisted in th
 If you explicitly turn on [iCloud Sync](icloud-sync.md), TokenPlan writes normalized daily tokens,
 spend, and model totals to its private iCloud container so your own Macs can show one combined summary.
 Credentials, account limits, provider responses, and raw logs are never written there. iCloud Sync defaults off and uses your own iCloud account.
+
+Application update checks and installer downloads use this project’s public GitHub release
+metadata and assets. They do not upload usage history or provider credentials.
 
 ## The local HTTP API
 

@@ -2,9 +2,23 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
-from publish_update import assemble
+from publish_update import assemble, update_readme_downloads
 
 class PublicReleaseTests(unittest.TestCase):
+    def test_download_links_follow_release_without_rewriting_migration_notes(self):
+        source = (Path(__file__).resolve().parent.parent / 'README.md').read_text()
+        updated = update_readme_downloads(source, '1.2.3')
+        before, block = updated.split('<!-- download-links:start -->')
+        block, after = block.split('<!-- download-links:end -->')
+        self.assertIn('/v1.2.3/TokenPlan-1.2.3.dmg', block)
+        self.assertIn('/v1.2.3/TokenPlan-Setup-1.2.3.exe', block)
+        self.assertIn('/v1.2.3/tokenplan_1.2.3_amd64.deb', block)
+        self.assertEqual(before, source.split('<!-- download-links:start -->')[0])
+        self.assertEqual(after, source.split('<!-- download-links:end -->')[1])
+        self.assertIn('1.0.5', after)
+        self.assertEqual(update_readme_downloads(updated, '1.2.3'), updated)
+        with self.assertRaises(ValueError): update_readme_downloads('no markers', '1.2.3')
+
     def test_source_repository_downloads_and_checksums(self):
         with tempfile.TemporaryDirectory() as directory:
             folder = Path(directory)

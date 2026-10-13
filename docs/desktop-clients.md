@@ -8,10 +8,10 @@ translations and pricing resources; platform behavior still needs native testing
 
 The tray opens a compact panel containing overview, service details, service settings,
 usage history and general settings. The overview has Refresh and Options beside the app name;
-Options contains Subscription Services, General Settings, About and Quit.
-Subscription Services starts with the usage overview and history filters, followed by service management.
+Options contains Service Configuration, General Settings, About and Quit.
+Service Configuration starts with the usage overview and history filters, followed by service management.
 General Settings includes appearance, language, usage display and system tray preferences.
-About shows the build version, platform, privacy information and project/support links. There is no
+About shows the build version and project/support links. There is no
 separate overview heading, navigation strip or available-service counter. Management pages
 return through Back. The native tray menu also provides direct access
 to these pages, refresh and quit. The first two available metrics are shown in the
@@ -121,7 +121,7 @@ confirmation dialogs, close/reopen, OS shutdown, monitor scaling, login startup,
 shortcut conflicts, Linux tray-host loss/recovery, notifications and real Antigravity
 quota. The user performs these checks with the new packages.
 
-iCloud remains Mac-specific. Desktop automatic app updates, all Mac account-source
+iCloud remains Mac-specific. Silent unattended update installation, all Mac account-source
 variants, arbitrary shortcut recording and Antigravity's legacy per-model RPCs are
 not implemented here. Do not describe the clients as fully equivalent on every OS.
 
@@ -129,7 +129,7 @@ not implemented here. Do not describe the clients as fully equivalent on every O
 
 A primary tray activation opens the panel; repeated activation leaves it open. Right-click
 uses the native tray menu where the desktop exports it. For hosts that call the SNI
-ContextMenu method instead, a compact menu provides Show, Subscription Services,
+ContextMenu method instead, a compact menu provides Show, Service Configuration,
 General Settings, Refresh and Quit. Both exit paths terminate the process.
 
 The pinned Avalonia 12.1.3 backend leaves SNI ContextMenu and SecondaryActivate empty.

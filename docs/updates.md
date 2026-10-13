@@ -119,6 +119,9 @@ Source, installers and update metadata now live in the public MIT-licensed
 nonempty owner-approved `release/X.Y.Z.md` notes are required. macOS signing/notarization,
 Windows/Linux builds, and native installer tests must all pass before publication.
 Published binaries are immutable; a retry only accepts identical asset checksums.
+Publication also updates the README’s `download-links` block to the released version;
+keep that single marker pair when editing the homepage. Installation and migration
+notes outside it are left unchanged.
 
 macOS uses `https://raw.githubusercontent.com/onevalar/token-plan/main/updates/appcast.xml`.
 Windows/Linux use `https://raw.githubusercontent.com/onevalar/token-plan/main/updates/latest.json`.

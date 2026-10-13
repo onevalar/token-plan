@@ -1,6 +1,10 @@
 # Proxy
 
-TokenPlan can route all provider requests through an optional proxy.
+This page describes the **macOS** app’s dedicated proxy configuration. Windows/Linux
+use their runtime/platform default proxy configuration; they do not read this file.
+See [desktop network diagnostics](desktop-clients.md#claude--codex-renewal-and-connection-diagnostics).
+
+On macOS, TokenPlan can route provider requests through an optional proxy.
 
 - Supported: `socks5://`, `http://`, `https://`
 - Config file: `~/.tokenplan/config.json`

@@ -2,6 +2,9 @@
 
 What the app does and how it behaves. These pages describe **behavior, not visuals**, and they are updated together with any change to that behavior — if the app and a page here disagree, that's a bug.
 
+For installation and first use on all three platforms, start with the [project homepage](../README.md).
+Most native feature pages describe macOS; consult [Windows/Linux clients](desktop-clients.md) for platform differences.
+
 ## The app
 
 - [Dashboard](dashboard.md) — the popover: rows, toggles, reordering, keyboard shortcuts
