@@ -2,7 +2,7 @@
 <rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
     <channel>
         <title>TokenPlan Updates</title>
-        <link>https://github.com/onevalar/apps</link>
+        <link>https://github.com/onevalar/token-plan</link>
         <description>TokenPlan macOS updates</description>
         <item>
             <title>1.0.5</title>
