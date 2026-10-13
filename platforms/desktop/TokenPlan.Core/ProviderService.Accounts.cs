@@ -17,7 +17,7 @@ public sealed partial class ProviderService
             var key = family + "\0" + (source.AuthFile ?? source.Home);
             if (!accountServices.TryGetValue(key, out var service))
             {
-                service = new(family == "codex" ? source.Home : codexHome, family == "claude" ? source.Home : claudeHome, handler: accountHandler, log: log, keys: Keys, userHome: userHome, alternateAuthFile: source.AuthFile, encodedAuth: source.Encoded);
+                service = new(family == "codex" ? source.Home : codexHome, family == "claude" ? source.Home : claudeHome, handler: accountHandler, log: log, keys: Keys, userHome: userHome, alternateAuthFile: source.AuthFile, encodedAuth: source.Encoded, requestTimeout: http.Timeout, allowAuthRefresh: allowAuthRefresh && source.CanRefresh);
                 accountServices[key] = service;
             }
             var result = await service.Refresh(family, cancellation);

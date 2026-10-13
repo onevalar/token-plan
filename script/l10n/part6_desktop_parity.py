@@ -138,3 +138,37 @@ T.update({
     'Display Configuration': ('显示配置', '顯示設定', '表示設定', '표시 설정'),
     'Display Configuration: %@': ('显示配置：%@', '顯示設定：%@', '表示設定：%@', '표시 설정: %@'),
 })
+
+# Desktop OAuth renewal and safe network diagnostics.
+T.update({
+ 'This login cannot renew automatically. Open the CLI for this account to refresh its login, then retry.': (
+ '此登录信息无法自动续期。请打开该账号的 CLI 更新登录状态后重试。', '此登入資訊無法自動續期。請開啟該帳號的 CLI 更新登入狀態後重試。', 'このログインは自動更新できません。このアカウントの CLI でログイン状態を更新して再試行してください。', '이 로그인은 자동 갱신할 수 없습니다. 해당 계정의 CLI에서 로그인 상태를 갱신한 후 다시 시도하세요.'),
+ 'This saved account shares its login with a CLI. Open it in your account switcher to renew safely, then retry.': (
+ '此保存账号与 CLI 共用登录凭据。请在账号切换工具中打开该账号以安全续期，然后重试。', '此儲存帳號與 CLI 共用登入憑證。請在帳號切換工具中開啟該帳號以安全續期，然後重試。', 'この保存済みアカウントは CLI と認証情報を共有しています。アカウント切替ツールで開いて安全に更新し、再試行してください。', '저장된 계정이 CLI와 로그인 정보를 공유합니다. 계정 전환 도구에서 해당 계정을 열어 안전하게 갱신한 후 다시 시도하세요.'),
+ 'The provider rejected the renewal credential. Sign in to this account again.': (
+ '服务商已拒绝续期凭据，请重新登录此账号。', '服務商已拒絕續期憑證，請重新登入此帳號。', 'サービスが更新用の認証情報を拒否しました。このアカウントに再ログインしてください。', '서비스에서 갱신 인증 정보를 거부했습니다. 해당 계정에 다시 로그인하세요.'),
+ 'The provider could not renew the login. Check the connection and try again.': (
+ '服务商未能完成登录续期，请检查网络连接后重试。', '服務商未能完成登入續期，請檢查網路連線後重試。', 'サービスがログインを更新できませんでした。接続を確認して再試行してください。', '서비스에서 로그인을 갱신하지 못했습니다. 연결을 확인한 후 다시 시도하세요.'),
+ 'The login changed during refresh. Try refreshing again.': (
+ '刷新期间登录信息发生变化，请再次刷新。', '重新整理期間登入資訊發生變化，請再次重新整理。', '更新中にログイン情報が変更されました。再度更新してください。', '새로 고침 중 로그인 정보가 변경되었습니다. 다시 새로 고침하세요.'),
+ 'The renewed login could not be saved. Check credential file permissions before retrying.': (
+ '无法写入续期后的登录信息，请检查凭据文件的写入权限后重试。', '無法寫入續期後的登入資訊，請檢查憑證檔案的寫入權限後重試。', '更新したログイン情報を保存できません。認証ファイルの書き込み権限を確認して再試行してください。', '갱신된 로그인 정보를 저장할 수 없습니다. 인증 파일의 쓰기 권한을 확인한 후 다시 시도하세요.'),
+ 'The renewed login was rejected by the usage service. Check account access before signing in again.': (
+ '登录已续期，但用量接口仍拒绝访问。请先检查账号访问权限。', '登入已續期，但用量介面仍拒絕存取。請先檢查帳號存取權限。', 'ログインは更新されましたが、使用量サービスがアクセスを拒否しました。アカウントの権限を確認してください。', '로그인은 갱신되었지만 사용량 서비스에서 접근을 거부했습니다. 계정 접근 권한을 확인하세요.'),
+ 'The provider denied access (403). Check account permissions or network restrictions; signing in again may not help.': (
+ '服务商拒绝访问（403）。请检查账号权限或网络限制，重新登录不一定能解决。', '服務商拒絕存取（403）。請檢查帳號權限或網路限制，重新登入不一定能解決。', 'サービスがアクセスを拒否しました（403）。アカウント権限やネットワーク制限を確認してください。再ログインでは解決しない場合があります。', '서비스가 접근을 거부했습니다(403). 계정 권한이나 네트워크 제한을 확인하세요. 재로그인으로 해결되지 않을 수 있습니다.'),
+ 'The proxy requires authentication. Check the desktop app\'s proxy settings.': (
+ '代理服务器要求认证，请检查桌面应用使用的代理设置。', '代理伺服器要求驗證，請檢查桌面應用程式使用的代理設定。', 'プロキシ認証が必要です。デスクトップアプリが使用するプロキシ設定を確認してください。', '프록시 인증이 필요합니다. 데스크톱 앱에서 사용하는 프록시 설정을 확인하세요.'),
+ 'The connection timed out. Check whether the desktop app can use your proxy or VPN, then retry.': (
+ '连接超时，请检查桌面应用是否能使用代理或 VPN 后重试。', '連線逾時，請檢查桌面應用程式是否能使用代理或 VPN 後重試。', '接続がタイムアウトしました。デスクトップアプリからプロキシや VPN を利用できるか確認して再試行してください。', '연결 시간이 초과되었습니다. 데스크톱 앱에서 프록시나 VPN을 사용할 수 있는지 확인한 후 다시 시도하세요.'),
+ 'The provider address could not be resolved. Check DNS and proxy settings.': (
+ '无法解析服务商地址，请检查 DNS 和代理设置。', '無法解析服務商位址，請檢查 DNS 和代理設定。', 'サービスのアドレスを解決できません。DNS とプロキシ設定を確認してください。', '서비스 주소를 확인할 수 없습니다. DNS 및 프록시 설정을 확인하세요.'),
+ 'A secure connection could not be established. Check the system clock, certificates, and HTTPS proxy.': (
+ '无法建立安全连接，请检查系统时间、证书和 HTTPS 代理。', '無法建立安全連線，請檢查系統時間、憑證和 HTTPS 代理。', '安全な接続を確立できません。システム時刻、証明書、HTTPS プロキシを確認してください。', '보안 연결을 설정할 수 없습니다. 시스템 시간, 인증서 및 HTTPS 프록시를 확인하세요.'),
+ 'The proxy connection failed. Check proxy access and authentication.': (
+ '代理连接失败，请检查代理是否可用及其认证设置。', '代理連線失敗，請檢查代理是否可用及其驗證設定。', 'プロキシ接続に失敗しました。プロキシへの接続と認証設定を確認してください。', '프록시 연결에 실패했습니다. 프록시 접근 및 인증 설정을 확인하세요.'),
+ 'Cannot reach the provider. Check the desktop app\'s network, proxy, or VPN connection.': (
+ '无法连接服务商，请检查桌面应用的网络、代理或 VPN 连接。', '無法連接服務商，請檢查桌面應用程式的網路、代理或 VPN 連線。', 'サービスに接続できません。デスクトップアプリのネットワーク、プロキシ、VPN 接続を確認してください。', '서비스에 연결할 수 없습니다. 데스크톱 앱의 네트워크, 프록시 또는 VPN 연결을 확인하세요.'),
+})
+
+T['Usage or login data could not be read. Check credential file permissions and format, then retry.'] = ('无法读取用量或登录信息，请检查凭据文件的权限与格式后重试。', '無法讀取用量或登入資訊，請檢查憑證檔案的權限與格式後重試。', '使用量またはログイン情報を読み取れません。認証ファイルの権限と形式を確認して再試行してください。', '사용량 또는 로그인 정보를 읽을 수 없습니다. 인증 파일의 권한과 형식을 확인한 후 다시 시도하세요.')

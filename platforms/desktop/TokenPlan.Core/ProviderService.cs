@@ -14,6 +14,7 @@ public sealed partial class ProviderService : IDisposable
     readonly string userHome;
     readonly string? alternateAuthFile;
     readonly bool encodedAuth;
+    readonly bool allowAuthRefresh;
     readonly Func<string, string, CancellationToken, Task<string?>> credentialReader;
     readonly Func<CancellationToken, IReadOnlyList<AntigravityEndpoint>> antigravityDiscovery;
     readonly string codexHome;
@@ -21,9 +22,10 @@ public sealed partial class ProviderService : IDisposable
     readonly string cursorDatabase;
     readonly Action<string, string> log;
     readonly System.Collections.Concurrent.ConcurrentDictionary<string, DateTimeOffset> cooldowns = new();
-    public ProviderService(string codexHome, string claudeHome, HttpMessageHandler? handler = null, Action<string, string>? log = null, TimeSpan? requestTimeout = null, string? cursorDatabase = null, APIKeyStore? keys = null, string? userHome = null, Func<string, string, CancellationToken, Task<string?>>? credentialReader = null, string? alternateAuthFile = null, bool encodedAuth = false, Func<CancellationToken, IReadOnlyList<AntigravityEndpoint>>? antigravityDiscovery = null)
+    public ProviderService(string codexHome, string claudeHome, HttpMessageHandler? handler = null, Action<string, string>? log = null, TimeSpan? requestTimeout = null, string? cursorDatabase = null, APIKeyStore? keys = null, string? userHome = null, Func<string, string, CancellationToken, Task<string?>>? credentialReader = null, string? alternateAuthFile = null, bool encodedAuth = false, Func<CancellationToken, IReadOnlyList<AntigravityEndpoint>>? antigravityDiscovery = null, bool allowAuthRefresh = true)
     {
         Keys = keys ?? new();
+        this.allowAuthRefresh = allowAuthRefresh;
         accountHandler = handler;
         this.antigravityDiscovery = antigravityDiscovery ?? (handler == null ? AntigravityLocalService.Discover : _ => []);
         this.alternateAuthFile = alternateAuthFile; this.encodedAuth = encodedAuth;
@@ -43,7 +45,7 @@ public sealed partial class ProviderService : IDisposable
         var name = ProviderCatalog.Get(id).Name;
         // ResponseHeadersRead ends HttpClient's timeout at the headers; bound the body too.
         using var deadline = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-        deadline.CancelAfter(http.Timeout);
+        deadline.CancelAfter(id is "claude" or "codex" ? TimeSpan.FromMilliseconds(http.Timeout.TotalMilliseconds * 4 + 3000) : http.Timeout);
         var operationToken = deadline.Token;
         string? fingerprint = null;
         var metadata = id == "claude" && alternateAuthFile == null ? ClaudeAccountMetadata.Read(claudeHome, userHome) : null;
@@ -97,43 +99,16 @@ public sealed partial class ProviderService : IDisposable
                 }
                 return new(id, name, cursorSnapshot, null, fingerprint);
             }
-            var filename = alternateAuthFile ?? Path.Combine(id == "codex" ? codexHome : claudeHome, id == "codex" ? "auth.json" : ".credentials.json");
-            if (!File.Exists(filename)) return Fail(id == "codex" ? "Sign in with the Codex CLI, then refresh." : "Sign in with Claude Code, then refresh.");
-            var file = new FileInfo(filename);
-            if (file.Length > 2 * 1024 * 1024) throw new InvalidDataException();
-            byte[] authBytes;
-            // Release the login file before networking; CLI login/rotation must remain possible.
-            await using (var authStream = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete, 8192, FileOptions.Asynchronous | FileOptions.SequentialScan))
-                authBytes = await ReadBounded(authStream, operationToken);
-            if (encodedAuth) authBytes = Convert.FromBase64String(Encoding.UTF8.GetString(authBytes).Trim());
-            using var auth = JsonDocument.Parse(authBytes);
-            var key = id == "codex" ? "tokens" : "claudeAiOauth";
-            if (auth.RootElement.ValueKind != JsonValueKind.Object || !auth.RootElement.TryGetProperty(key, out var tokens) || tokens.ValueKind != JsonValueKind.Object) throw new InvalidDataException();
-            var token = UsageParser.String(tokens, id == "codex" ? "access_token" : "accessToken");
-            if (string.IsNullOrWhiteSpace(token)) throw new InvalidDataException();
-            fingerprint = Fingerprint(token + "\0" + UsageParser.String(tokens, "account_id"));
-            var cooldownKey = id + fingerprint;
-            CheckCooldown(cooldownKey);
-            using var request = new HttpRequestMessage(HttpMethod.Get, id == "codex" ? "https://chatgpt.com/backend-api/wham/usage" : "https://api.anthropic.com/api/oauth/usage");
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
-            request.Headers.Accept.ParseAdd("application/json");
-            if (id == "codex" && UsageParser.String(tokens, "account_id") is { Length: > 0 } account) request.Headers.Add("ChatGPT-Account-Id", account);
-            if (id == "claude") request.Headers.Add("anthropic-beta", "oauth-2025-04-20");
-            var usageJSON = await Fetch(request, cooldownKey, operationToken);
-            if (id == "codex") usageJSON = await WithCodexResetCredits(usageJSON, token, UsageParser.String(tokens, "account_id"), cooldownKey, operationToken);
-            var snapshot = UsageParser.Parse(id, usageJSON, DateTimeOffset.UtcNow);
-            if (id == "claude" && snapshot.Plan == null && UsageParser.String(tokens, "subscriptionType") is { Length: > 0 } plan)
-                snapshot = snapshot with { Plan = plan.ToLowerInvariant() switch { "pro" => "Pro", "max" => "Max", "team" => "Team", "enterprise" => "Enterprise", "free" => "Free", _ => plan } };
-            return new(id, name, snapshot, null, fingerprint, AccountEmail: metadata?.Email, AccountIdentity: metadata?.Identity);
+            return await RefreshOAuth(id, operationToken);
         }
         catch (ProviderFailure e) { return Fail(e.Message == "Your session has expired. Sign in with the CLI again." && id == "cursor" ? "Your Cursor session has expired. Sign in with Cursor again." : e.Message); }
         catch (Microsoft.Data.Sqlite.SqliteException) { return Fail(id == "cursor" ? "Cursor login could not be read. Open Cursor and sign in again." : "Usage or login data could not be read. Sign in again."); }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
-        catch (OperationCanceledException) { return Fail("The connection timed out. Try again later."); }
-        catch (HttpRequestException) { return Fail("Cannot reach the provider. Check your connection."); }
+        catch (OperationCanceledException) { return Fail(id is "claude" or "codex" ? NetworkTimeout : "The connection timed out. Try again later."); }
+        catch (HttpRequestException e) { return Fail(NetworkError(e)); }
         catch (Exception e) when (e is JsonException or InvalidDataException or FormatException or ArgumentException or IOException or UnauthorizedAccessException or InvalidOperationException or CryptographicException)
         {
-            return Fail("Usage or login data could not be read. Sign in again.");
+            return Fail(id is "claude" or "codex" ? "Usage or login data could not be read. Check credential file permissions and format, then retry." : "Usage or login data could not be read. Sign in again.");
         }
     }
     CancellationTokenSource OptionalMetadataDeadline(CancellationToken cancellation)
@@ -149,20 +124,21 @@ public sealed partial class ProviderService : IDisposable
     }
     async Task<string> Fetch(HttpRequestMessage request, string cooldownKey, CancellationToken operationToken, bool allowMissing = false)
     {
-            using var response = await http.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, operationToken);
-            if (allowMissing && response.StatusCode == HttpStatusCode.NotFound) return "{}";
-            if (response.StatusCode is HttpStatusCode.Unauthorized or HttpStatusCode.Forbidden) throw new ProviderFailure("Your session has expired. Sign in with the CLI again.");
-            if (response.StatusCode == HttpStatusCode.TooManyRequests)
-            {
-                var next = response.Headers.RetryAfter?.Date ?? DateTimeOffset.UtcNow.Add(response.Headers.RetryAfter?.Delta ?? TimeSpan.FromMinutes(5));
-                cooldowns[cooldownKey] = next > DateTimeOffset.UtcNow.AddMinutes(1) ? next : DateTimeOffset.UtcNow.AddMinutes(1);
-                throw new ProviderFailure("Rate limited. Wait before refreshing again.");
-            }
-            if (!response.IsSuccessStatusCode) throw new ProviderFailure("The provider could not return usage. Try again later.");
-            if (response.Content.Headers.ContentLength > 2 * 1024 * 1024) throw new InvalidDataException();
-            await using var stream = await response.Content.ReadAsStreamAsync(operationToken);
-            return Encoding.UTF8.GetString(await ReadBounded(stream, operationToken));
+        var response = await SendReadDiagnosed(request, operationToken);
+        if (allowMissing && response.Status == HttpStatusCode.NotFound) return "{}";
+        if (response.Status == HttpStatusCode.Unauthorized) throw new ProviderFailure("Your session has expired. Sign in with the CLI again.", response.Status);
+        if (response.Status == HttpStatusCode.Forbidden) throw new ProviderFailure(AccessDenied, response.Status);
+        if (response.Status == HttpStatusCode.ProxyAuthenticationRequired) throw new ProviderFailure(ProxyDenied, response.Status);
+        if (response.Status == HttpStatusCode.TooManyRequests)
+        {
+            var next = response.RetryAfter ?? DateTimeOffset.UtcNow.AddMinutes(5);
+            cooldowns[cooldownKey] = next > DateTimeOffset.UtcNow.AddMinutes(1) ? next : DateTimeOffset.UtcNow.AddMinutes(1);
+            throw new ProviderFailure("Rate limited. Wait before refreshing again.", response.Status);
+        }
+        if ((int)response.Status is < 200 or >= 300) throw new ProviderFailure("The provider could not return usage. Try again later.", response.Status);
+        return response.Body;
     }
+
     static async Task<byte[]> ReadBounded(Stream stream, CancellationToken cancellationToken)
     {
         using var buffer = new MemoryStream();
@@ -176,5 +152,5 @@ public sealed partial class ProviderService : IDisposable
         return buffer.ToArray();
     }
     public void Dispose() { http.Dispose(); foreach (var service in accountServices.Values) service.Dispose(); accountServices.Clear(); }
-    sealed class ProviderFailure(string key) : Exception(key);
+    sealed class ProviderFailure(string key, HttpStatusCode? status = null) : Exception(key) { public HttpStatusCode? Status { get; } = status; }
 }

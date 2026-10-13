@@ -68,6 +68,14 @@ final class UpdaterController {
             AppLog.info(.updates, "disabled: no SUFeedURL (unbundled or dev build)")
             return
         }
+        // Retire only our former production overrides; preserve intentional custom feeds.
+        let legacyFeeds: Set<String> = [
+            "https://raw.githubusercontent.com/onevalar/apps/main/tokenplan/appcast.xml",
+            "https://onevalar.github.io/apps/tokenplan/appcast.xml"
+        ]
+        if let override = UserDefaults.standard.string(forKey: "SUFeedURL"), legacyFeeds.contains(override) {
+            UserDefaults.standard.removeObject(forKey: "SUFeedURL")
+        }
         // The driver delegate's callbacks run on the main thread but the delegate itself is
         // nonisolated (see below); these hops publish the banner state back onto this controller.
         userDriverDelegate.onUpdateFound = { [weak self] version in

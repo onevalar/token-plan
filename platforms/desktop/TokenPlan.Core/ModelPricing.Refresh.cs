@@ -87,7 +87,7 @@ public static partial class ModelPricing
             if (DateTimeOffset.UtcNow < nextRefresh) return true;
             nextRefresh = DateTimeOffset.UtcNow.AddMinutes(30);
             Directory.CreateDirectory(directory);
-            var sources = new[] { ("models_dev", "https://models.dev/api.json"), ("litellm", "https://raw.githubusercontent.com/BerriAI/litellm/main/model_prices_and_context_window.json"), ("supplement", "https://onevalar.github.io/apps/tokenplan/pricing_supplement.json") };
+            var sources = new[] { ("models_dev", "https://models.dev/api.json"), ("litellm", "https://raw.githubusercontent.com/BerriAI/litellm/main/model_prices_and_context_window.json"), ("supplement", "https://raw.githubusercontent.com/onevalar/token-plan/main/Sources/OpenUsage/Resources/pricing_supplement.json") };
             using var client = new HttpClient(new HttpClientHandler { AllowAutoRedirect = false }) { Timeout = TimeSpan.FromSeconds(8) };
             var success = true;
             foreach (var (source, url) in sources)

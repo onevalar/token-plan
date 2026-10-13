@@ -1,4 +1,4 @@
-name: Publish pricing supplement
+name: Validate pricing supplement
 
 on:
   push:
@@ -47,29 +47,3 @@ jobs:
           print(f"Supplement OK: {len(supplement['pricing'])} models, "
                 f"{len(supplement['alias_rules'])} alias rules.")
           PY
-
-      - name: Authorize public metadata publication
-        id: app
-        uses: actions/create-github-app-token@v3.2.0
-        with:
-          app-id: ${{ vars.APPS_APP_ID }}
-          private-key: ${{ secrets.APPS_APP_PRIVATE_KEY }}
-          owner: onevalar
-          repositories: apps
-          permission-contents: write
-      - name: Publish pricing metadata to download repository main
-        env:
-          GH_TOKEN: ${{ steps.app.outputs.token }}
-        run: |
-          gh auth setup-git
-          gh repo clone onevalar/apps "$RUNNER_TEMP/apps" -- --depth 1 --branch main
-          mkdir -p "$RUNNER_TEMP/apps/tokenplan"
-          cp Sources/OpenUsage/Resources/pricing_supplement.json "$RUNNER_TEMP/apps/tokenplan/pricing_supplement.json"
-          cd "$RUNNER_TEMP/apps"
-          git config user.name 'Onevalar Apps Publisher'
-          git config user.email 'apps-publisher@users.noreply.github.com'
-          git add tokenplan/pricing_supplement.json
-          if ! git diff --cached --quiet; then
-            git commit -m 'Update TokenPlan pricing metadata'
-            git push origin main
-          fi

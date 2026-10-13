@@ -6,7 +6,7 @@ namespace TokenPlan.Core;
 public record DesktopUpdate(string Version, string Url, string Sha256, long Size);
 public static class DesktopUpdates
 {
-    public const string Feed = "https://raw.githubusercontent.com/onevalar/apps/main/tokenplan/latest.json";
+    public const string Feed = "https://raw.githubusercontent.com/onevalar/token-plan/main/updates/latest.json";
     public static DesktopUpdate? Parse(string json, string installed, string platform)
     {
         if (platform is not ("windows-x64" or "linux-x64")) return null;
@@ -20,7 +20,7 @@ public static class DesktopUpdates
         var hash = asset.GetProperty("sha256").GetString() ?? throw new InvalidDataException();
         var size = asset.GetProperty("size").GetInt64();
         var filename = platform == "windows-x64" ? $"TokenPlan-Setup-{version}.exe" : $"tokenplan_{version}_amd64.deb";
-        if (url != $"https://github.com/onevalar/apps/releases/download/tokenplan-v{version}/{filename}"
+        if (url != $"https://github.com/onevalar/token-plan/releases/download/v{version}/{filename}"
             || !Regex.IsMatch(hash, "^[a-fA-F0-9]{64}$") || size <= 0 || size > 2147483648L) throw new InvalidDataException();
         return new(version, url, hash, size);
     }

@@ -105,7 +105,7 @@ def main():
         raise ValueError('Packaged update configuration mismatch')
     shutil.copy2(archive, feed_dir / archive.name)
     (feed_dir / f'{archive.stem}.html').write_text('<pre>' + html.escape(notes.read_text()) + '</pre>')
-    prefix = f'https://github.com/{config["distribution_repository"]}/releases/download/tokenplan-v{args.version}/'
+    prefix = f'https://github.com/{config["distribution_repository"]}/releases/download/v{args.version}/'
     run(str(bins / 'generate_appcast'), '--account', config['sparkle_account'],
         '--download-url-prefix', prefix, '--maximum-versions', '0', '--embed-release-notes', str(feed_dir))
     feed = feed_dir / 'appcast.xml'

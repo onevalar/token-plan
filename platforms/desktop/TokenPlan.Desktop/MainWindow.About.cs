@@ -16,9 +16,9 @@ public sealed partial class MainWindow
         versionLabel.HorizontalAlignment = HorizontalAlignment.Center;
         body.Children.Add(versionLabel);
         var links = Stack(8); links.HorizontalAlignment = HorizontalAlignment.Center;
-        links.Children.Add(AboutLink("Project Website", "https://github.com/onevalar/apps#tokenplan"));
-        links.Children.Add(AboutLink("Report an Issue", "https://github.com/onevalar/apps/issues"));
-        links.Children.Add(AboutLink("Privacy Policy", "https://github.com/onevalar/apps/blob/main/tokenplan/privacy.md"));
+        links.Children.Add(AboutLink("Project Website", "https://github.com/onevalar/token-plan"));
+        links.Children.Add(AboutLink("Report an Issue", "https://github.com/onevalar/token-plan/issues"));
+        links.Children.Add(AboutLink("Privacy Policy", "https://github.com/onevalar/token-plan/blob/main/docs/privacy.md"));
         links.Children.Add(AboutLink("Open-Source Licenses", new Uri(Path.Combine(AppContext.BaseDirectory, "THIRD-PARTY-NOTICES.txt")).AbsoluteUri));
         body.Children.Add(links);
         body.Children.Add(UpdateControls());

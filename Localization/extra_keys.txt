@@ -183,3 +183,19 @@ Cursor token history needs a valid desktop session. Sign in with Cursor again.
 Cursor token history could not be loaded. Try refreshing again.
 Cursor token export is too large to load. View the full history in Cursor.
 Cursor login changed during refresh. Refresh again for the current account.
+
+This login cannot renew automatically. Open the CLI for this account to refresh its login, then retry.
+This saved account shares its login with a CLI. Open it in your account switcher to renew safely, then retry.
+The provider rejected the renewal credential. Sign in to this account again.
+The provider could not renew the login. Check the connection and try again.
+The login changed during refresh. Try refreshing again.
+The renewed login could not be saved. Check credential file permissions before retrying.
+The provider denied access (403). Check account permissions or network restrictions; signing in again may not help.
+The proxy requires authentication. Check the desktop app's proxy settings.
+The connection timed out. Check whether the desktop app can use your proxy or VPN, then retry.
+The provider address could not be resolved. Check DNS and proxy settings.
+A secure connection could not be established. Check the system clock, certificates, and HTTPS proxy.
+The proxy connection failed. Check proxy access and authentication.
+Cannot reach the provider. Check the desktop app's network, proxy, or VPN connection.
+The renewed login was rejected by the usage service. Check account access before signing in again.
+Usage or login data could not be read. Check credential file permissions and format, then retry.

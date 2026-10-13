@@ -40,6 +40,7 @@
 "30 Days" = "30 天";
 "A reset credit expires within 48 hours" = "有重置額度將在 48 小時內到期";
 "A reset credit expires within 7 days" = "有重置額度將在 7 天內到期";
+"A secure connection could not be established. Check the system clock, certificates, and HTTPS proxy." = "無法建立安全連線，請檢查系統時間、憑證和 HTTPS 代理。";
 "AI Usage" = "AI 用量";
 "AI subscription usage, balances and spending in your menu bar." = "在選單列中查看 AI 訂閱用量、餘額與費用。";
 "AI subscription usage, balances and spending in your system tray." = "在系統匣中查看 AI 訂閱用量、餘額與費用。";
@@ -93,6 +94,7 @@
 "Cache Read" = "快取讀取";
 "Cache Write" = "快取寫入";
 "Cancel" = "取消";
+"Cannot reach the provider. Check the desktop app's network, proxy, or VPN connection." = "無法連接服務商，請檢查桌面應用程式的網路、代理或 VPN 連線。";
 "Cannot reach the provider. Check your connection." = "無法連接服務，請檢查網路連線。";
 "Cash" = "現金";
 "Chat" = "聊天";
@@ -569,11 +571,21 @@
 "The API key was rejected. Check the key in service settings." = "API 金鑰遭拒，請在服務設定中檢查金鑰。";
 "The browser could not be opened." = "無法開啟瀏覽器。";
 "The bundled terminal helper couldn't be found. Reinstall TokenPlan and try again." = "找不到內建的終端機輔助工具。請重新安裝 TokenPlan 後再試。";
+"The connection timed out. Check whether the desktop app can use your proxy or VPN, then retry." = "連線逾時，請檢查桌面應用程式是否能使用代理或 VPN 後重試。";
 "The connection timed out. Try again later." = "連線逾時，請稍後重試。";
 "The global shortcut could not be registered. Check system keyboard settings." = "無法註冊全域快速鍵，請檢查系統鍵盤設定。";
 "The link could not be opened. Try again from your system browser or file manager." = "無法開啟連結，請透過系統瀏覽器或檔案管理員重試。";
 "The log folder could not be opened." = "無法開啟日誌資料夾。";
+"The login changed during refresh. Try refreshing again." = "重新整理期間登入資訊發生變化，請再次重新整理。";
+"The provider address could not be resolved. Check DNS and proxy settings." = "無法解析服務商位址，請檢查 DNS 和代理設定。";
+"The provider could not renew the login. Check the connection and try again." = "服務商未能完成登入續期，請檢查網路連線後重試。";
 "The provider could not return usage. Try again later." = "服務未能傳回用量，請稍後重試。";
+"The provider denied access (403). Check account permissions or network restrictions; signing in again may not help." = "服務商拒絕存取（403）。請檢查帳號權限或網路限制，重新登入不一定能解決。";
+"The provider rejected the renewal credential. Sign in to this account again." = "服務商已拒絕續期憑證，請重新登入此帳號。";
+"The proxy connection failed. Check proxy access and authentication." = "代理連線失敗，請檢查代理是否可用及其驗證設定。";
+"The proxy requires authentication. Check the desktop app's proxy settings." = "代理伺服器要求驗證，請檢查桌面應用程式使用的代理設定。";
+"The renewed login could not be saved. Check credential file permissions before retrying." = "無法寫入續期後的登入資訊，請檢查憑證檔案的寫入權限後重試。";
+"The renewed login was rejected by the usage service. Check account access before signing in again." = "登入已續期，但用量介面仍拒絕存取。請先檢查帳號存取權限。";
 "The saved API key could not be read. Enter it again." = "無法讀取已儲存的 API 金鑰，請重新輸入。";
 "The synced Mac identity is invalid." = "同步的 Mac 識別無效。";
 "The synced account appears more than once." = "同步的帳號出現多次。";
@@ -592,8 +604,10 @@
 "This account does not expose a personal quota. Organization billing requires billing permissions." = "此帳號不提供個人額度，組織帳單需要帳單管理權限。";
 "This desktop preview does not yet include spending history, iCloud sync or automatic updates." = "此桌面預覽版暫不支援費用歷史、iCloud 同步和自動更新。";
 "This desktop preview does not yet include spending history, tray integration, iCloud sync or automatic updates." = "此桌面預覽版暫不包含費用記錄、系統匣整合、iCloud 同步和自動更新。";
+"This login cannot renew automatically. Open the CLI for this account to refresh its login, then retry." = "此登入資訊無法自動續期。請開啟該帳號的 CLI 更新登入狀態後重試。";
 "This model's pricing is unavailable. Choose another model or None." = "此模型的定價無法使用。請選擇其他模型或「無」。";
 "This period used a model with unknown pricing" = "這段期間使用了價格未知的模型";
+"This saved account shares its login with a CLI. Open it in your account switcher to renew safely, then retry." = "此儲存帳號與 CLI 共用登入憑證。請在帳號切換工具中開啟該帳號以安全續期，然後重試。";
 "This service integration is not available in this build." = "此版本尚未支援這項服務。";
 "Time Format" = "時間格式";
 "Today" = "今天";
@@ -651,6 +665,7 @@
 "Usage history could not be read. New readings will start a fresh history." = "無法讀取歷史記錄，新的讀數將重新建立記錄。";
 "Usage history could not be saved. Check the app data folder permissions." = "無法儲存歷史記錄，請檢查應用程式資料目錄的權限。";
 "Usage not available for API key." = "使用 API 金鑰登入時無法查看用量。";
+"Usage or login data could not be read. Check credential file permissions and format, then retry." = "無法讀取用量或登入資訊，請檢查憑證檔案的權限與格式後重試。";
 "Usage or login data could not be read. Sign in again." = "無法讀取用量或登入資訊，請重新登入。";
 "Usage request failed (HTTP %lld). Try again later." = "用量請求失敗（HTTP %lld），請稍後再試。";
 "Usage request failed after refresh. Try again." = "重新整理後用量請求仍然失敗，請重試。";

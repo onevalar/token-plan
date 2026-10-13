@@ -148,3 +148,39 @@ Published Windows/Linux builds check the public TokenPlan version feed at startu
 General Settings and About also offer Check for Updates. New versions can be downloaded, verified by
 size and SHA-256, and opened in the platform installer. Installation remains a user-confirmed system
 step. The updater supports Windows x64 and Debian/Ubuntu x64; see [updates](updates.md).
+
+## Claude / Codex renewal and connection diagnostics
+
+Windows and Linux now share the same OAuth renewal flow. For writable, independent CLI
+logins, TokenPlan renews a token near its known expiry, or renews once after a usage
+request returns 401, then retries usage. It saves rotated credentials privately and
+preserves unrelated fields. It reloads a login changed by the CLI, instead of knowingly
+overwriting it or showing one account's quota with another account's identity.
+TokenPlan refreshes sharing a file are serialized; CLI programs do not participate in
+that lock, so generation checks are made before and after networking and before saving.
+
+Claude Swap exports and Codex Swap registry accounts remain read-only: rotating their
+shared refresh tokens could break the active CLI login. An expired saved account asks
+the user to activate and renew it through their switcher. Independent configured homes
+can renew normally. Missing refresh credentials and provider-revoked credentials have
+separate recovery messages. A failed save retains the new credential in memory until a
+retry can save it, without rotating again; fix permissions before closing the app.
+
+403 is a permission/network restriction, not proof of an expired login. DNS failures,
+TLS/certificate failures, proxy authentication and timeouts have separate messages.
+Each network request, including its response body, is bounded; OAuth workflows allow
+additional time for renewal and retry. Codex's optional reset-credit request has a
+shorter deadline and its failure retains the primary quota result.
+
+The app uses .NET's default proxy selection (environment/system configuration supported
+by that platform). It does not import shell configuration or change a proxy/VPN. A Linux
+desktop launcher may not inherit a terminal's proxy variables. In General Settings →
+Advanced, open the log folder: network entries include destination host, HTTP status,
+stage, elapsed time, and whether a proxy is selected. They exclude credentials, account
+identities, headers, response bodies, proxy addresses and raw exception messages.
+
+Mocked regression tests cover renewal, rotation, concurrent CLI changes, repeated 401,
+403/407, rate limits, failed saves, body timeouts and redacted DNS/TLS/proxy diagnostics.
+Actual Ubuntu and Windows account connectivity still requires testing on the user's
+machine; these changes cannot by themselves establish why a particular network blocks
+an upstream service.

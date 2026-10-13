@@ -8,6 +8,12 @@ TokenPlan shows how much of your AI plans you've used — session and weekly lim
 
 > TokenPlan is a fork of the MIT-licensed [OpenUsage](https://github.com/robinebers/openusage) by Robin Ebers, with its own name, icon, update feed and a different feature set. It is not affiliated with or endorsed by the OpenUsage project. See [LICENSE](LICENSE).
 
+## Downloads
+
+[Download the latest release](https://github.com/onevalar/token-plan/releases/latest) for macOS (`.dmg`), Windows (`.exe`) or Debian/Ubuntu (`.deb`). Source and releases are maintained together in this MIT-licensed repository.
+
+From 1.0.6, downloads and updates come from this repository. Existing Mac installations can use **Check for Updates**. Windows/Linux 1.0.5 and earlier require one manual installation of 1.0.6 because those builds restrict downloads to the former repository; subsequent updates use the new feed.
+
 ## Supported services
 
 **Subscriptions and coding plans** (read from credentials already on your Mac)

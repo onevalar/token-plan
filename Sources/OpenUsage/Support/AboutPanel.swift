@@ -36,12 +36,12 @@ private struct AboutContent: View {
             }
             VStack(spacing: 8) {
                 HStack(spacing: 16) {
-                    Link("Project Website", destination: URL(string: "https://github.com/onevalar/apps#tokenplan")!)
-                    Link("Report an Issue", destination: URL(string: "https://github.com/onevalar/apps/issues")!)
+                    Link("Project Website", destination: URL(string: "https://github.com/onevalar/token-plan")!)
+                    Link("Report an Issue", destination: URL(string: "https://github.com/onevalar/token-plan/issues")!)
                 }
                 HStack(spacing: 16) {
-                    Link("Privacy Policy", destination: URL(string: "https://github.com/onevalar/apps/blob/main/tokenplan/privacy.md")!)
-                    Link("License", destination: URL(string: "https://github.com/onevalar/apps/blob/main/tokenplan/third-party-notices.txt")!)
+                    Link("Privacy Policy", destination: URL(string: "https://github.com/onevalar/token-plan/blob/main/docs/privacy.md")!)
+                    Link("License", destination: URL(string: "https://github.com/onevalar/token-plan/blob/main/LICENSE")!)
                 }
             }.font(.subheadline)
         }

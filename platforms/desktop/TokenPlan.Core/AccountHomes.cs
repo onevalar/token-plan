@@ -1,7 +1,7 @@
 using System.Text.Json;
 namespace TokenPlan.Core;
 
-public record AccountHome(string Home, string Label, string? AuthFile = null, bool Encoded = false);
+public record AccountHome(string Home, string Label, string? AuthFile = null, bool Encoded = false, bool CanRefresh = true);
 public static class AccountHomes
 {
     public static IReadOnlyList<AccountHome> Discover(string family, string home, string defaultHome, Func<string, string?>? environment = null)
@@ -52,12 +52,13 @@ public static class AccountHomes
                 foreach (var account in json.RootElement.GetProperty("accounts").EnumerateArray())
                 {
                     var path = UsageParser.String(account, "home");
-                    if (!string.IsNullOrWhiteSpace(path) && Path.IsPathFullyQualified(path)) candidates.Add(new(path, UsageParser.String(account, "alias") ?? Path.GetFileName(path)));
+                    if (!string.IsNullOrWhiteSpace(path) && Path.IsPathFullyQualified(path)) candidates.Add(new(path, UsageParser.String(account, "alias") ?? Path.GetFileName(path), CanRefresh: false));
                 }
             }
         }
         var comparer = OperatingSystem.IsWindows() ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
         return candidates.Where(c => !comparer.Equals(Path.GetFullPath(c.Home).TrimEnd(Path.DirectorySeparatorChar), Path.GetFullPath(defaultHome).TrimEnd(Path.DirectorySeparatorChar)))
-            .DistinctBy(c => Path.GetFullPath(c.AuthFile ?? c.Home), comparer).Take(20).ToArray();
+            .GroupBy(c => Path.GetFullPath(c.AuthFile ?? c.Home), comparer)
+            .Select(group => group.OrderBy(c => c.CanRefresh).First()).Take(20).ToArray();
     }
 }

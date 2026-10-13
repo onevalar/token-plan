@@ -39,3 +39,6 @@ appcast.xml
 # Local build diagnostics and packaging requests
 output/
 .tokenplan-package-request.json
+
+# Production metadata is source-controlled, unlike local generated feeds.
+!updates/appcast.xml

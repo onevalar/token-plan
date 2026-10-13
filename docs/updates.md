@@ -29,7 +29,7 @@ Everyone always receives stable releases — the beta option only *adds* pre-rel
 ## Where updates come from
 
 Update builds are published on TokenPlan's GitHub releases, and the list of available versions (the
-"appcast") is served from `https://raw.githubusercontent.com/onevalar/apps/main/tokenplan/appcast.xml`. Each download is
+"appcast") is served from `https://raw.githubusercontent.com/onevalar/token-plan/main/updates/appcast.xml`. Each download is
 signed two ways — Apple notarization plus TokenPlan's own signature — and the app refuses anything that
 doesn't match. This is only available in the official signed release build, not in local developer
 builds.
@@ -105,7 +105,7 @@ Local development and standalone builds without an update feed omit the Check fo
 
 `python3 script/prepare_update.py <approved-version>` can prepare signed, notarized Mac
 artifacts locally without publishing. Cloud builds are the normal release path described below.
-The Sparkle signing key is backed up in the local Keychain and configured in the private source
+The Sparkle signing key is backed up in the local Keychain and configured in the source
 repository's Actions secrets; keep the same key across releases.
 
 A development build has a different bundle identifier. Moving from `.dev` to production requires
@@ -114,36 +114,40 @@ these bundle identities.
 
 ## Public distribution and cloud releases
 
-Source stays private in `onevalar/token-plan`. Public downloads and update metadata live in
-`onevalar/apps`, under release tags `tokenplan-vX.Y.Z` and the `tokenplan/` directory. Only three
-installers and their checksums are release assets; application source is never pushed there.
-macOS uses `https://raw.githubusercontent.com/onevalar/apps/main/tokenplan/appcast.xml` and Sparkle signatures.
-Windows and Linux check `https://raw.githubusercontent.com/onevalar/apps/main/tokenplan/latest.json` at startup and every
-12 hours. A new release appears on the overview and in General Settings/About. Download size and
-SHA-256 are verified before opening the installer. The user completes the platform installer;
-these two platforms do not silently replace the running application.
+Source, installers and update metadata now live in the public MIT-licensed
+`onevalar/token-plan` repository. A stable `vX.Y.Z` tag on main runs `Publish TokenPlan`;
+nonempty owner-approved `release/X.Y.Z.md` notes are required. macOS signing/notarization,
+Windows/Linux builds, and native installer tests must all pass before publication.
+Published binaries are immutable; a retry only accepts identical asset checksums.
 
-A stable source tag `vX.Y.Z` on main runs `Publish TokenPlan`. It requires an approved nonempty
-`release/X.Y.Z.md`. Both platform builds must succeed before publishing. Release binaries are immutable;
-a retry only accepts existing assets with identical checksums. Feed publication preserves older Mac
-entries and never replaces another software's directory. GitHub Pages publishes from apps/main.
+macOS uses `https://raw.githubusercontent.com/onevalar/token-plan/main/updates/appcast.xml`.
+Windows/Linux use `https://raw.githubusercontent.com/onevalar/token-plan/main/updates/latest.json`.
+Desktop checks run at startup and every 12 hours; downloads verify size and SHA-256,
+then open the installer for the user to complete. Mac updates retain the existing
+Sparkle signing key and Apple signing identity.
 
-Private source repository Actions configuration:
-- Variable `APPS_APP_ID`: 5288559 (Onevalar Apps Publisher).
-- Secret `APPS_APP_PRIVATE_KEY`: App private key. Installed only on onevalar/apps, Contents write,
-  mandatory Metadata read. Publishing creates a short-lived installation token.
-- Secrets `APPLE_CERTIFICATE` (base64 Developer ID .p12), `APPLE_CERTIFICATE_PASSWORD`,
-  `APPLE_DEVELOPER_ID_ICLOUD_PROFILE` (base64 profile), `SPARKLE_PRIVATE_KEY`.
-- Secrets `APPLE_ID` and `APPLE_PASSWORD` (app-specific notarization password); team H4982D35ZR.
+The publication job uses this repository's temporary `GITHUB_TOKEN` with Contents write.
+Build jobs have read-only repository permissions. A cross-repository GitHub App is no
+longer needed. Signing credentials stay in Actions secrets, never in the source tree:
+`APPLE_CERTIFICATE`, `APPLE_CERTIFICATE_PASSWORD`, `APPLE_DEVELOPER_ID_ICLOUD_PROFILE`,
+`SPARKLE_PRIVATE_KEY`, `APPLE_ID`, `APPLE_PASSWORD`. Apple team: H4982D35ZR.
 
-The first public release may be prepared locally using `prepare_update.py` and `publish_update.py`.
-Cloud release readiness is established only after a successful cloud run; merely adding this workflow
-or some credentials is not evidence that cloud signing/notarization works.
+To verify without publishing, dispatch with `tag=main`, `verify_only=true`, and an
+approved `verification_version`. Verification builds remain Actions artifacts. This
+public repository's workflow logs/artifacts must never contain private credentials.
 
-For cloud verification without a release, dispatch Publish TokenPlan with `tag=main`,
-`verify_only=true` and an already approved `verification_version`. It builds, signs, notarizes,
-validates update metadata and checks the App token. Artifacts stay in private Actions storage;
-no public release or update feed is changed. The selected source commit is pinned across jobs.
+### Migration in 1.0.6
+
+All new installers are published here, not in `onevalar/apps`. The former Mac appcast
+gets a final compatibility entry pointing to the signed 1.0.6 DMG here. After upgrading,
+1.0.6 uses the new feed and removes known former production `SUFeedURL` overrides.
+Custom feed overrides are preserved. Historical release assets remain untouched.
+
+Windows/Linux 1.0.5 and earlier enforce the old repository in their download validator.
+They require a one-time manual installation of 1.0.6 from this repository; publishing
+a new URL in their old JSON would fail validation. The old JSON is therefore left at
+its last usable release, and the old download page points users to the new location.
+From 1.0.6 onward, in-app update checks and downloads use this repository.
 
 ## Cloud release validation — 1.0.2 (2026-10-13)
 
@@ -165,7 +169,7 @@ installed/reinstalled, launched fixture mode and uninstalled the packages; they 
 an interactive end-user update click sequence or live provider credentials.
 
 
-## Update feed connectivity (2026-10-13)
+## Historical update feed connectivity before 1.0.6 (2026-10-13)
 
 The update entry points now use GitHub raw content from the same public `onevalar/apps`
 main branch. This removes GitHub Pages deployment as a dependency for update checks.

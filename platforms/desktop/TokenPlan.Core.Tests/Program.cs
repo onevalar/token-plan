@@ -35,6 +35,7 @@ Check(TrayReadings.Select(trayAccount, ["Missing"]).Single().Label == "Session",
 Check(TrayReadings.Select(trayAccount, ["Weekly"]).Single().Label == "Weekly", "Available explicit pins retain priority");
 Check(TrayReadings.Select(trayAccount with { Snapshot = null }, []).Count == 0, "No fabricated quota when an account has no data");
 await ClaudeAccountChecks.Run(Check);
+await OAuthRenewalChecks.Run(Check);
 var root = Path.Combine(Path.GetTempPath(), "tokenplan-core-" + Guid.NewGuid().ToString("N"));
 Directory.CreateDirectory(root);
 try
@@ -96,7 +97,7 @@ try
         {
             await File.WriteAllTextAsync(authFile, invalid);
             var failed = await service.Refresh("codex", CancellationToken.None);
-            Check(failed.ErrorKey == "Usage or login data could not be read. Sign in again." && failed.CredentialFingerprint == null && failed.PreserveLastSuccess(previous).Snapshot == null, "Malformed login clears prior-account usage: " + invalid);
+            Check(failed.ErrorKey == "Usage or login data could not be read. Check credential file permissions and format, then retry." && failed.CredentialFingerprint == null && failed.PreserveLastSuccess(previous).Snapshot == null, "Malformed login clears prior-account usage: " + invalid);
         }
         Check(invalidAuthRequests == 0, "Malformed login does not dispatch a request");
         await File.WriteAllTextAsync(authFile, original);
@@ -105,7 +106,7 @@ try
     {
         var watch = System.Diagnostics.Stopwatch.StartNew();
         var timedOut = await service.Refresh("codex", CancellationToken.None);
-        Check(timedOut.ErrorKey == "The connection timed out. Try again later." && watch.Elapsed < TimeSpan.FromSeconds(5), "Deadline includes stalled response bodies after headers arrive");
+        Check(timedOut.ErrorKey == "The connection timed out. Check whether the desktop app can use your proxy or VPN, then retry." && watch.Elapsed < TimeSpan.FromSeconds(5), "Deadline includes stalled response bodies after headers arrive");
     }
     using (var service = new ProviderService(root, root, new Stub(async (_, token) => { await Task.Delay(30000, token); throw new Exception(); }), (_, _) => {}))
     {

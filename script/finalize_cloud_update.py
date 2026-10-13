@@ -35,7 +35,7 @@ if os.environ.get('TOKENPLAN_VERIFY_ONLY') == 'true':
     tree.write(folder/'appcast.xml', encoding='utf-8', xml_declaration=True)
 (folder/f'{archive.stem}.html').write_text('<pre>'+html.escape((ROOT/f'release/{version}.md').read_text())+'</pre>')
 bins = ROOT/'.build/artifacts/sparkle/Sparkle/bin'
-prefix = f'https://github.com/onevalar/apps/releases/download/tokenplan-v{version}/'
+prefix = f'https://github.com/onevalar/token-plan/releases/download/v{version}/'
 subprocess.run([str(bins/'generate_appcast'),'--ed-key-file','-','--download-url-prefix',prefix,'--maximum-versions','0','--embed-release-notes',str(folder)],input=os.environ['SPARKLE_PRIVATE_KEY'],text=True,check=True)
 signature=validate_feed(folder/'appcast.xml',folder/archive.name,version,info['CFBundleVersion'],prefix)
 # Verify the generated archive signature before any publication.

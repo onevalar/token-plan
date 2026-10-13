@@ -32,6 +32,8 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
+      - name: Validate publication metadata code
+        run: python3 -m unittest discover -s script -p 'test_*update.py'
       - id: meta
         env:
           REQUESTED_TAG: ${{ inputs.tag || github.ref_name }}
@@ -193,6 +195,8 @@ jobs:
           sudo apt-get remove -y tokenplan
           test ! -e /opt/tokenplan/TokenPlan.Desktop
   publish:
+    permissions:
+      contents: write
     needs: [validate, mac, desktop, installer-tests]
     runs-on: ubuntu-latest
     steps:
@@ -205,18 +209,9 @@ jobs:
           pattern: tokenplan-*-public
           merge-multiple: true
           path: dist/public
-      - name: Obtain short-lived token for only the public download repository
-        id: app
-        uses: actions/create-github-app-token@v3.2.0
-        with:
-          app-id: ${{ vars.APPS_APP_ID }}
-          private-key: ${{ secrets.APPS_APP_PRIVATE_KEY }}
-          owner: onevalar
-          repositories: apps
-          permission-contents: write
       - name: Publish installers and update metadata
         env:
-          GH_TOKEN: ${{ steps.app.outputs.token }}
+          GH_TOKEN: ${{ github.token }}
           VERSION: ${{ needs.validate.outputs.version }}
           VERIFY_ONLY: ${{ inputs.verify_only }}
         run: |
@@ -224,4 +219,4 @@ jobs:
           options=()
           if [[ "$VERIFY_ONLY" == 'true' ]]; then options+=(--prepare-only); fi
           python3 script/publish_update.py "$VERSION" --folder dist/public --build "$(cat dist/public/build.txt)" "${options[@]}"
-          gh api repos/onevalar/apps --jq '{private, permissions}'
+          gh api repos/onevalar/token-plan --jq '{private, permissions}'
