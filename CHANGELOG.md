@@ -1,5 +1,13 @@
 # Changelog
 
+## v1.0.5
+
+### Bug Fixes
+- 修复 macOS 透明图标漏包及灰色底回退，增加三平台最终安装资源校验。by @onevalar
+- 将更新入口改为公开仓库文件直链，保留签名和完整性校验。by @onevalar
+
+---
+
 ## v1.0.4
 
 ### Improvements

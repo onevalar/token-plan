@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Verify the cloud-built Mac app and sign its public Sparkle feed."""
+from verify_packaged_icon import verify as verify_icon
 import html
 import json
 import os
@@ -18,10 +19,7 @@ app = ROOT/'dist/TokenPlan.app'; archive = ROOT/f'dist/TokenPlan-{version}.dmg'
 info = plistlib.loads((app/'Contents/Info.plist').read_bytes())
 if (info['CFBundleIdentifier'],info['CFBundleShortVersionString'],info['SUFeedURL'],info['SUPublicEDKey']) != ('com.onevalar.tokenplan',version,config['feed_url'],config['sparkle_public_key']):
     raise ValueError('Signed application configuration mismatch')
-icon_name = 'AppIcon-capsule-refined.png'
-icons = list((app/'Contents/Resources').rglob(icon_name))
-if len(icons) != 1 or icons[0].read_bytes() != (ROOT/'Sources/OpenUsage/Resources'/icon_name).read_bytes():
-    raise ValueError('Packaged interface icon is missing or does not match the source')
+verify_icon(app, 'mac')
 for target in [app,archive]: run('xcrun','stapler','validate',str(target))
 run('codesign','--verify','--deep','--strict','-R=notarized',str(app))
 shutil.copy2(archive,folder/archive.name)

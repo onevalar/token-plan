@@ -182,6 +182,7 @@ jobs:
           sudo apt-get install -y xvfb fonts-noto-cjk "$RUNNER_TEMP"/installers/tokenplan_*_amd64.deb
           test -x /usr/bin/tokenplan
           test -f /opt/tokenplan/THIRD-PARTY-NOTICES.txt
+          python3 script/verify_packaged_icon.py desktop /opt/tokenplan
           set +e
           xvfb-run -a timeout 12s /usr/bin/tokenplan --fixture > "$RUNNER_TEMP/installed-fixture.log" 2>&1
           result=$?

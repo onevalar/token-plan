@@ -7,6 +7,8 @@ foreach ($round in 1..2) {
     foreach ($file in @('TokenPlan.Desktop.exe', 'TokenPlan.Core.dll', 'THIRD-PARTY-NOTICES.txt', 'Uninstall.exe')) {
         if (!(Test-Path (Join-Path $target $file))) { throw "Missing installed file: $file" }
     }
+    python script/verify_packaged_icon.py desktop "$target"
+    if ($LASTEXITCODE -ne 0) { throw 'Installed transparent icon verification failed' }
     $app = Start-Process -FilePath (Join-Path $target 'TokenPlan.Desktop.exe') -ArgumentList '--fixture' -PassThru
     Start-Sleep -Seconds 8
     $app.Refresh()
