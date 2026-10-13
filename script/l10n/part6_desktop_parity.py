@@ -103,7 +103,7 @@ T['Account'] = ('账号', '帳號', 'アカウント', '계정')
 T["Assign tokenplan --toggle in your desktop's keyboard settings."] = ('可在桌面的键盘设置中为 tokenplan --toggle 分配快捷键。', '可在桌面的鍵盤設定中為 tokenplan --toggle 指派快速鍵。', 'デスクトップのキーボード設定で tokenplan --toggle にショートカットを割り当ててください。', '데스크톱 키보드 설정에서 tokenplan --toggle에 단축키를 지정하세요.')
 
 T.update({
- 'Subscription Services': ('订阅服务', '訂閱服務', 'サブスクリプションサービス', '구독 서비스'),
+ 'Service Configuration': ('服务配置', '服務設定', 'サービス設定', '서비스 설정'),
  'Usage Overview': ('用量总览', '用量總覽', '使用量の概要', '사용량 개요'),
  'AI subscription usage, balances and spending in your system tray.': ('在系统托盘中查看 AI 订阅用量、余额与费用。', '在系統匣中查看 AI 訂閱用量、餘額與費用。', 'システムトレイで AI サブスクリプションの使用量、残高、費用を確認できます。', '시스템 트레이에서 AI 구독 사용량, 잔액 및 비용을 확인하세요.'),
  'Application': ('应用信息', '應用程式資訊', 'アプリ情報', '앱 정보'),
@@ -122,7 +122,7 @@ T.update({
 
 T.update({
     'AI subscription usage, balances and spending in your menu bar.': ('在菜单栏中查看 AI 订阅用量、余额与费用。', '在選單列中查看 AI 訂閱用量、餘額與費用。', 'メニューバーで AI サブスクリプションの使用量、残高、費用を確認。', '메뉴 막대에서 AI 구독 사용량, 잔액 및 비용을 확인하세요.'),
-    'Enable services in Subscription Services to configure their menu-bar visibility.': ('在订阅服务中启用服务，即可配置其菜单栏显示。', '在訂閱服務中啟用服務，即可設定其選單列顯示。', 'サブスクリプションサービスでサービスを有効にして、メニューバーの表示を設定します。', '구독 서비스에서 서비스를 활성화하여 메뉴 막대 표시를 설정하세요.'),
+    'Enable services in Service Configuration to configure their menu-bar visibility.': ('在服务配置中启用服务，即可配置其菜单栏显示。', '在服務設定中啟用服務，即可設定其選單列顯示。', 'サービス設定でサービスを有効にして、メニューバーの表示を設定します。', '서비스 설정에서 서비스를 활성화하여 메뉴 막대 표시를 설정하세요.'),
 })
 
 T.update({

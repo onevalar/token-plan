@@ -209,8 +209,8 @@
 "Enable Codex in Providers to read its local token logs." = "제공업체에서 Codex를 사용하면 로컬 토큰 로그를 읽을 수 있습니다.";
 "Enable a provider to view token history." = "제공업체를 사용하면 토큰 기록을 볼 수 있습니다.";
 "Enable a service with usage history to see totals here." = "사용 내역을 지원하는 서비스를 켜면 여기에서 합계를 볼 수 있습니다.";
+"Enable services in Service Configuration to configure their menu-bar visibility." = "서비스 설정에서 서비스를 활성화하여 메뉴 막대 표시를 설정하세요.";
 "Enable services in Services & Subscriptions to configure their menu-bar visibility." = "'서비스 및 구독'에서 서비스를 켜면 메뉴 막대 표시를 설정할 수 있습니다.";
-"Enable services in Subscription Services to configure their menu-bar visibility." = "구독 서비스에서 서비스를 활성화하여 메뉴 막대 표시를 설정하세요.";
 "Enabled" = "사용";
 "Enabled Services" = "활성화된 서비스";
 "Enter API Key" = "API 키 입력";
@@ -508,6 +508,7 @@
 "Save" = "저장";
 "Saved" = "저장됨";
 "Saved in App" = "앱에 저장됨";
+"Service Configuration" = "서비스 설정";
 "Services & Subscriptions" = "서비스 및 구독";
 "Session" = "세션";
 "Session expired. Run `claude` to log in again." = "세션이 만료되었습니다. `claude`를 실행해 다시 로그인하세요.";
@@ -549,7 +550,6 @@
 "Stop" = "중지";
 "Subscription" = "구독";
 "Subscription Details" = "구독 상세";
-"Subscription Services" = "구독 서비스";
 "Support & Acknowledgments" = "지원 및 감사의 말";
 "Sync Across Macs" = "Mac 간 동기화";
 "Syncing usage history" = "사용 기록 동기화 중";

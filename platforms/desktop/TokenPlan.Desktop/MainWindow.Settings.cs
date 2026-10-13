@@ -16,7 +16,7 @@ public sealed partial class MainWindow
         button.Name = "tokenplan-options"; button.Content = "⋯";
         Avalonia.Automation.AutomationProperties.SetName(button, L.T("Options"));
         var menu = new ContextMenu();
-        foreach (var (label, target) in new[] { ("Subscription Services", "providers"), ("General Settings", "settings"), ("About", "about") })
+        foreach (var (label, target) in new[] { ("Service Configuration", "providers"), ("General Settings", "settings"), ("About", "about") })
         {
             var item = new MenuItem { Header = L.T(label) }; item.Click += (_, _) => OpenUtility(target); menu.Items.Add(item);
         }

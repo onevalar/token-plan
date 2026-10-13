@@ -209,8 +209,8 @@
 "Enable Codex in Providers to read its local token logs." = "在提供方中啟用 Codex，即可讀取本機 Token 日誌。";
 "Enable a provider to view token history." = "啟用一個提供方，即可查看 Token 歷史。";
 "Enable a service with usage history to see totals here." = "啟用支援用量記錄的服務後，可在此查看彙總。";
+"Enable services in Service Configuration to configure their menu-bar visibility." = "在服務設定中啟用服務，即可設定其選單列顯示。";
 "Enable services in Services & Subscriptions to configure their menu-bar visibility." = "在「服務與訂閱」中啟用服務，即可設定它們在選單列中的顯示。";
-"Enable services in Subscription Services to configure their menu-bar visibility." = "在訂閱服務中啟用服務，即可設定其選單列顯示。";
 "Enabled" = "已啟用";
 "Enabled Services" = "已啟用服務";
 "Enter API Key" = "輸入 API Key";
@@ -508,6 +508,7 @@
 "Save" = "儲存";
 "Saved" = "已儲存";
 "Saved in App" = "已儲存在 App 中";
+"Service Configuration" = "服務設定";
 "Services & Subscriptions" = "服務與訂閱";
 "Session" = "工作階段";
 "Session expired. Run `claude` to log in again." = "登入已過期。請執行 `claude` 重新登入。";
@@ -549,7 +550,6 @@
 "Stop" = "停止";
 "Subscription" = "訂閱";
 "Subscription Details" = "訂閱詳情";
-"Subscription Services" = "訂閱服務";
 "Support & Acknowledgments" = "支援與致謝";
 "Sync Across Macs" = "跨 Mac 同步";
 "Syncing usage history" = "正在同步用量記錄";

@@ -78,10 +78,11 @@ struct WidgetGroupedListView: View {
                             }
                         }
                         Spacer(minLength: 8)
-                        Image(systemName: "chevron.right").foregroundStyle(.secondary)
+                        ProviderDetailsChevron()
                     }
                     .contentShape(Rectangle())
-                    .padding(.horizontal, 14)
+                    .padding(.leading, 14)
+                    .padding(.trailing, 16)
                     .padding(.vertical, 6)
                 }
                 .buttonStyle(.plain)

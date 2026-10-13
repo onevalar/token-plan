@@ -11,7 +11,7 @@ struct HeaderView: View {
         if screen == .dashboard {
             Menu {
                 Button { toggle(.customize) } label: {
-                    Label("Subscription Services", systemImage: "rectangle.stack")
+                    Label("Service Configuration", systemImage: "rectangle.stack")
                 }
                 Divider()
                 ForEach(SettingsPage.dashboardPages, id: \.self) { page in

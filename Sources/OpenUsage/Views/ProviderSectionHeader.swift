@@ -97,9 +97,7 @@ struct ProviderSectionHeader: View {
             Spacer(minLength: 8)
             if let onOpenDetails {
                 Button(action: onOpenDetails) {
-                    Image(systemName: "chevron.right")
-                        .font(.system(size: 12, weight: .semibold))
-                        .frame(width: 26, height: 26)
+                    ProviderDetailsChevron()
                         .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
@@ -136,5 +134,14 @@ struct ReorderGrip: View {
             .foregroundStyle(.tertiary)
             .frame(width: 16, height: 22)
             .contentShape(Rectangle())
+    }
+}
+
+/// Shared visual footprint for single-service and multi-account detail links.
+struct ProviderDetailsChevron: View {
+    var body: some View {
+        Image(systemName: "chevron.right")
+            .font(.system(size: 12, weight: .semibold))
+            .frame(width: 26, height: 26)
     }
 }

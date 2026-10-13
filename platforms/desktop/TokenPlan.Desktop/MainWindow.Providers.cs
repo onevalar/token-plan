@@ -16,7 +16,7 @@ public sealed partial class MainWindow
     static string ProviderName(string id) => ProviderCatalog.Get(id).Name;
     Control ProvidersPage()
     {
-        var body = UtilityBody("Subscription Services");
+        var body = UtilityBody("Service Configuration");
         body.Children.Add(SpendOverview());
         if (selectedSpendDate != null) return new ScrollViewer { Content = body };
         body.Children.Add(Text(L.T("Manage Providers"), 18));

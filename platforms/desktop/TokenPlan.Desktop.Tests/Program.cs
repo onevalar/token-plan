@@ -174,12 +174,12 @@ try
     Check(!homeText.Contains("Overview") && !homeText.Any(t => t?.StartsWith("Available Usage") == true), "Overview has no duplicate title or service counter");
     Check(!window.GetVisualDescendants().OfType<Avalonia.Controls.Primitives.TabStrip>().Any(), "Overview has no destination tabs");
     var options = window.GetVisualDescendants().OfType<Button>().Single(b => b.Name == "tokenplan-options");
-    var services = options.ContextMenu!.Items.OfType<MenuItem>().Single(item => (string?)item.Header == "Subscription Services");
+    var services = options.ContextMenu!.Items.OfType<MenuItem>().Single(item => (string?)item.Header == "Service Configuration");
     services.RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent));
     Check((string)Get("page")! == "providers", "Options opens service management");
     Back(); Check((string)Get("page")! == "overview", "Service management returns to overview");
     var menuLabels = options.ContextMenu.Items.OfType<MenuItem>().Select(item => (string?)item.Header).ToArray();
-    Check(menuLabels.SequenceEqual(new[] { "Subscription Services", "General Settings", "About", "Quit" }), "Options has only merged destinations");
+    Check(menuLabels.SequenceEqual(new[] { "Service Configuration", "General Settings", "About", "Quit" }), "Options has only merged destinations");
     Call("Navigate", "settings");
     window.Measure(new Size(560,720)); window.Arrange(new Rect(0,0,560,720)); Dispatcher.UIThread.RunJobs();
     var settingLabels = window.GetVisualDescendants().OfType<TextBlock>().Select(t => t.Text).ToArray();

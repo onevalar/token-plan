@@ -22,7 +22,7 @@ struct SettingsMenuBarSection: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal, 12).padding(.top, 10).padding(.bottom, 4)
             if layout.menuBarServices.isEmpty {
-                Text("Enable services in Subscription Services to configure their menu-bar visibility.")
+                Text("Enable services in Service Configuration to configure their menu-bar visibility.")
                     .font(.caption).foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.horizontal, 12).padding(.bottom, 8)

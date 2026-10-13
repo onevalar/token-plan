@@ -88,7 +88,7 @@ struct DashboardContentView: View {
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
-                Button("Subscription Services") {
+                Button("Service Configuration") {
                     withAnimation(Motion.modeSwitch) { layout.screen = .customize }
                 }
                 .controlSize(.small)
