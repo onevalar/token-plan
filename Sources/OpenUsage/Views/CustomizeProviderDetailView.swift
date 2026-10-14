@@ -233,22 +233,13 @@ struct CustomizeProviderDetailView: View {
     private func placement(of metric: WidgetDescriptor) -> MetricPlacement {
         guard layout.isMetricEnabled(metric.id) else { return .hidden }
         if metric.sample.isChart || metric.sample.isUsagePeriod || metric.sample.showsResetExpiries { return .details }
-        // Keep saved placements editable even when the whole service is off. Match the overview's
-        // all-On-Demand promotion without relying on its enabled-service-only list.
+        // Keep saved placements editable even when the whole service is off.
         let visible = layout.customizeDetail(for: providerID)?.alwaysShownMetrics
             .filter { layout.isMetricEnabled($0.id) } ?? []
-        return visible.isEmpty || visible.contains { $0.id == metric.id } ? .visible : .details
+        return visible.contains { $0.id == metric.id } ? .visible : .details
     }
 
     private func setPlacement(_ placement: MetricPlacement, for metric: WidgetDescriptor) {
-        if placement == .details && !metric.sample.isChart && !metric.sample.isUsagePeriod && !metric.sample.showsResetExpiries {
-            let otherVisible = layout.customizeDetail(for: providerID)?.alwaysShownMetrics
-                .contains { $0.id != metric.id && !$0.sample.isChart && !$0.sample.isUsagePeriod && !$0.sample.showsResetExpiries && layout.isMetricEnabled($0.id) } == true
-            guard otherVisible else {
-                layout.presentCustomizationNotice("Keep at least one metric in the overview.", tone: .notice)
-                return
-            }
-        }
         layout.recordingUndoStep {
             layout.setMetricEnabled(metric.id, placement != .hidden)
             guard placement != .hidden else { return }

@@ -57,10 +57,11 @@ extension LayoutStore {
     }
 
     /// Enabled (and provider-enabled) widgets grouped by provider, in the user's provider order, each
-    /// provider's metrics kept in the provider's custom metric order. Drives the grouped dashboard list; providers with
-    /// no visible metric are dropped so the dashboard only shows groups that have something to show.
+    /// provider's metrics kept in the provider's custom metric order. Enabled providers retain their
+    /// heading and details entry even without overview metrics.
     var displayGroups: [ProviderGroup] {
         orderedProviders().compactMap { provider in
+            guard isProviderEnabled(provider.id) else { return nil }
             let widgetsByDescriptor = Dictionary(
                 visiblePlaced
                     .filter { providerID(of: $0) == provider.id }
@@ -68,19 +69,8 @@ extension LayoutStore {
                 uniquingKeysWith: { first, _ in first }
             )
             let widgets = metricOrder(for: provider.id).compactMap { widgetsByDescriptor[$0] }
-            guard !widgets.isEmpty else { return nil }
             let alwaysShown = widgets.filter { isAlwaysShownMetric($0.descriptorID) }
             let expanded = widgets.filter { !isAlwaysShownMetric($0.descriptorID) }
-            // Promote quota/balance rows when all are set to Details, never history or reset credits.
-            // A details-only service keeps its heading as an entry without a blank overview row.
-            if alwaysShown.isEmpty {
-                let promoted = expanded.filter {
-                    let sample = registry.descriptor(id: $0.descriptorID)!.sample
-                    return !sample.isChart && !sample.isUsagePeriod && !sample.showsResetExpiries
-                }
-                return ProviderGroup(provider: provider, alwaysShownWidgets: promoted,
-                                     expandedWidgets: expanded.filter { !promoted.contains($0) })
-            }
             return ProviderGroup(provider: provider, alwaysShownWidgets: alwaysShown, expandedWidgets: expanded)
         }
     }

@@ -60,3 +60,5 @@ Detection rides the system's own "an app is capturing the screen" signal — the
 ## What the strip shows
 
 The strip only renders real data from selected accounts of enabled services whose menu-bar switch is on. Percentage skips stars without fetched data and falls back to the primary reading. Both styles skip accounts with no eligible data. There are no orphan logos or placeholder quota circles. When nothing has data, the strip falls back to the app icon. Stars follow your saved metric order and placement. A metric can be starred whether it appears in the overview or only in subscription details.
+
+Account number badges appear only when multiple accounts of the same service are actually rendered. Disabled, menu-bar-hidden, or unavailable siblings do not leave a badge on the sole visible account. When multiple accounts return, their existing account numbers are preserved. Ring and percentage modes use the same rule.

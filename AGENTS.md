@@ -30,7 +30,7 @@ Conventions for the per-provider modules under `Sources/OpenUsage/Providers/<Nam
 - **Default order:** Claude, Codex, Cursor first (the established providers, in that order), then every other provider alphabetically by display name (Antigravity, Copilot, DeepSeek, Devin, Grok, Kimi, MiniMax, …). The order is the array order in `AppContainer`, which seeds `LayoutStore`'s default provider order (and `resetToDefault`). A new provider slots into the alphabetical tail.
 - **Metric placement defaults:** when adding or changing a metric, choose these four defaults deliberately (and record the choice in the PR/docs):
   1. enabled on/off (`DefaultLayout.metricIDs`),
-  2. Always Visible vs. On Demand — above the fold vs. behind the per-provider caret (`DefaultLayout.expandedMetricIDs`). Note: a provider always keeps at least one Always Visible row — the dashboard promotes all metrics when every one is marked On Demand, so a fully On Demand provider isn't possible; leave one metric Always Visible for the caret to appear,
+  2. Always Visible vs. On Demand — above the fold vs. behind the per-provider caret (`DefaultLayout.expandedMetricIDs`). A provider may have no Always Visible rows: keep its account heading and details entry, and never promote On Demand metrics onto the dashboard,
   3. pinned to the menu bar (`DefaultLayout.pinnedMetricIDs`),
   4. order (within a provider, the `widgetDescriptors` declaration order).
 

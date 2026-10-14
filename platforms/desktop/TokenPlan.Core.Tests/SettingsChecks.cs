@@ -7,7 +7,7 @@ static class SettingsChecks
         var p = new Preferences { ProviderNotes = new() { ["claude"] = "keep" } };
         p = p.PlaceMetric("claude","Weekly",MetricPlacement.Details,metrics).PlaceMetric("claude","Sonnet",MetricPlacement.Hidden,metrics);
         check(p.Placement("claude","Weekly") == MetricPlacement.Details && p.Placement("claude","Sonnet") == MetricPlacement.Hidden,"Detail-only and hidden are distinct placements");
-        check(p.PlaceMetric("claude","Session",MetricPlacement.Hidden,metrics).Placement("claude","Session") == MetricPlacement.Home,"Cannot remove last home metric");
+        check(p.PlaceMetric("claude","Session",MetricPlacement.Hidden,metrics).Placement("claude","Session") == MetricPlacement.Hidden,"Can hide the last home metric without removing the account");
         p = p.MoveMetric("claude","Weekly",-1,metrics).Pin("claude","Session",true);
         check(p.OrderedMetrics("claude",metrics)[0].Label == "Weekly","Metric order is applied to displayed rows");
         p = p.RestoreMetrics("claude");

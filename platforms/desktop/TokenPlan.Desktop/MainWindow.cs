@@ -209,7 +209,6 @@ public sealed partial class MainWindow : Window
             if (snapshot.Windows.Count == 0) body.Children.Add(Text(L.T("No quota data is available."), 12, true));
             var metrics = preferences.OrderedMetrics(result.SettingsKey, snapshot.Windows).Where(w => preferences.Placement(result.SettingsKey, w.Label) != MetricPlacement.Hidden).ToArray();
             var primary = detail ? metrics : metrics.Where(w => preferences.Placement(result.SettingsKey, w.Label) == MetricPlacement.Home).ToArray();
-            if (!detail && primary.Length == 0) primary = metrics.Take(1).ToArray();
             foreach (var metric in primary) body.Children.Add(MetricRow(metric));
             if (detail && result.AccountKey == null && ProviderCatalog.TokenLogProviders.Contains(result.Id)) body.Children.Add(ServiceSpendRows(result.Id));
             body.Children.Add(Text(L.T(result.ErrorKey == null ? "Updated" : "Last Successful Update") + " " + snapshot.FetchedAt.ToLocalTime().ToString("g"), 11, true));

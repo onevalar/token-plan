@@ -69,7 +69,9 @@ quota summary remains unavailable data rather than becoming zero usage.
 ## Usage, pricing and settings
 
 Quota percentages, reset times, display order, visibility and pinned metrics can be
-configured. Labels and values occupy a separate line from progress bars. Cards retain
+configured. Every metric may be moved to Details Only or Hidden; an enabled account keeps
+its heading and details action without promoting a quota back onto the overview. Details Only
+preserves the metric in details; Hidden removes it from both views. Labels and values occupy a separate line from progress bars. Cards retain
 their natural height rather than stretching to a neighbor's content. Privacy mode
 masks values, progress and expiry values in both panel and tray summaries.
 

@@ -22,8 +22,7 @@ public sealed partial class MainWindow
         {
             var row = Row(); var label = Text(L.T(metric.Label), 13); label.VerticalAlignment = VerticalAlignment.Center; Add(row, label);
             var placement = preferences.Placement(id, metric.Label);
-            var lastHome = placement == MetricPlacement.Home && metrics.Count(w => preferences.Placement(id, w.Label) == MetricPlacement.Home) == 1;
-            var values = lastHome ? new[] { MetricPlacement.Home } : Enum.GetValues<MetricPlacement>();
+            var values = Enum.GetValues<MetricPlacement>();
             var status = new ComboBox { Name = "metric-status-" + metric.Label, ItemsSource = values.Select(p => L.T(p switch { MetricPlacement.Home => "Show on Home", MetricPlacement.Details => "Details Only", _ => "Hidden" })).ToArray(), SelectedIndex = Array.IndexOf(values, placement), Width = 138, MinWidth = 138, MaxWidth = 138 };
             Avalonia.Automation.AutomationProperties.SetName(status, L.T("Display Configuration") + ": " + L.T(metric.Label));
             status.SelectionChanged += (_, _) => { if (status.SelectedIndex < 0) return; preferences = preferences.PlaceMetric(id, metric.Label, values[status.SelectedIndex], metrics); Save(); Render(); };

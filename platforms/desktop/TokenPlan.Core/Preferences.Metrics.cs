@@ -10,7 +10,6 @@ public partial record Preferences
     }
     public Preferences PlaceMetric(string id, string label, MetricPlacement placement, IReadOnlyList<UsageWindow> metrics)
     {
-        if (placement != MetricPlacement.Home && Placement(id, label) == MetricPlacement.Home && !metrics.Any(w => w.Label != label && Placement(id, w.Label) == MetricPlacement.Home)) return this;
         var hidden = (HiddenMetrics.GetValueOrDefault(id) ?? []).ToHashSet();
         var details = (ExpandedMetrics.GetValueOrDefault(id) ?? []).ToHashSet();
         hidden.Remove(label); details.Remove(label);

@@ -88,7 +88,7 @@ enum MenuBarContentBuilder {
                     metrics: [resolve(reading.descriptor, reading.data)], accountBadge: accountNumbers[group.provider.id]
                 ))
             }
-            return MenuBarContent(groups: selected)
+            return contentWithAccountBadges(selected, numbers: accountNumbers)
         }
         let resolvedGroups = groups.compactMap { group -> MenuBarContent.Group? in
             let metrics = group.metrics.filter { pinnedMetricIDs?.contains($0.id) ?? true }.compactMap { descriptor -> MenuBarContent.Metric? in
@@ -108,7 +108,18 @@ enum MenuBarContentBuilder {
                 accountBadge: accountNumbers[group.provider.id]
             )
         }
-        return MenuBarContent(groups: resolvedGroups)
+        return contentWithAccountBadges(resolvedGroups, numbers: accountNumbers)
+    }
+
+    /// Badge only families with multiple rendered accounts. Preserve stable account numbers when
+    /// siblings reappear, and apply after no-data filtering in both styles (including fallbacks).
+    private static func contentWithAccountBadges(_ groups: [MenuBarContent.Group], numbers: [String: Int]) -> MenuBarContent {
+        let counts = Dictionary(grouping: groups, by: { ProviderAccountID.family(of: $0.providerID) })
+        return MenuBarContent(groups: groups.map { group in
+            MenuBarContent.Group(providerID: group.providerID, displayName: group.displayName, icon: group.icon,
+                metrics: group.metrics,
+                accountBadge: counts[ProviderAccountID.family(of: group.providerID)]!.count > 1 ? numbers[group.providerID] : nil)
+        })
     }
 
     private static func resolve(_ descriptor: WidgetDescriptor, _ data: WidgetData) -> MenuBarContent.Metric {

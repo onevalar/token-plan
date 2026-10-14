@@ -1018,7 +1018,7 @@ final class LayoutStoreTests: XCTestCase {
         XCTAssertEqual(group?.expandedWidgets.compactMap { store.descriptor(for: $0)?.id }, ["claude.weekly"])
     }
 
-    func testProviderWithOnlyExpandedMetricsStillShowsRows() {
+    func testProviderWithOnlyExpandedMetricsKeepsHeadingAndDetails() {
         // Only session + weekly enabled, both primary to start, so expanding both makes the whole
         // provider expanded — independent of DefaultLayout's seeding.
         let store = LayoutStore(
@@ -1033,8 +1033,8 @@ final class LayoutStoreTests: XCTestCase {
 
         let group = store.displayGroups.first { $0.provider.id == "claude" }
         XCTAssertNotNil(group)
-        XCTAssertFalse(group?.alwaysShownWidgets.isEmpty ?? true, "all-expanded metrics are promoted so the card is never empty")
-        XCTAssertTrue(group?.expandedWidgets.isEmpty ?? false)
+        XCTAssertTrue(group?.alwaysShownWidgets.isEmpty ?? false, "Details-only accounts retain a heading without quota rows")
+        XCTAssertEqual(group?.expandedWidgets.count, 2)
     }
 
     func testResetProviderRestoresOneProviderAndLeavesOthersAndOrderUntouched() {
@@ -1142,6 +1142,27 @@ final class LayoutStoreTests: XCTestCase {
         XCTAssertEqual(detail?.alwaysShownMetrics.map(\.id), ["claude.session", "claude.extra", "claude.today"])
     }
 
+    func testAllHiddenMetricsKeepEnabledAccountAndPersistDetailsOnlyPlacement() throws {
+        let defaults = makeDefaults("HeadingOnly")
+        var enabled = true
+        let store = LayoutStore(registry: .mock, defaults: defaults, storageKey: "layout",
+            defaultMetricIDs: ["claude.session", "claude.weekly"], defaultExpandedMetricIDs: [],
+            isProviderEnabled: { $0 == "claude" && enabled })
+        XCTAssertTrue(moveMetric("claude.session", expanded: true, in: store))
+        XCTAssertTrue(moveMetric("claude.weekly", expanded: true, in: store))
+        let restored = LayoutStore(registry: .mock, defaults: defaults, storageKey: "layout",
+            defaultMetricIDs: ["claude.session", "claude.weekly"], defaultExpandedMetricIDs: [])
+        XCTAssertTrue(try XCTUnwrap(restored.displayGroups.first { $0.id == "claude" }).alwaysShownWidgets.isEmpty)
+        for id in ["claude.session", "claude.weekly"] { store.setMetricEnabled(id, false) }
+        XCTAssertEqual(store.displayGroups.map(\.id), ["claude"])
+        XCTAssertTrue(try XCTUnwrap(store.displayGroups.first).widgets.isEmpty)
+        XCTAssertNotNil(store.customizeDetail(for: "claude"))
+        enabled = false
+        XCTAssertTrue(store.displayGroups.isEmpty)
+        enabled = true
+        XCTAssertEqual(store.displayGroups.map(\.id), ["claude"])
+    }
+
     func testCustomizeDetailIsNilForUnknownProvider() {
         let store = makeStore("DetailUnknown")
         XCTAssertNil(store.customizeDetail(for: "nope"))
@@ -1159,7 +1180,7 @@ final class LayoutStoreTests: XCTestCase {
         for allDetails in [false, true] {
             store.expandedMetricIDs = allDetails ? Set(runtime.widgetDescriptors.map(\.id)) : []
             let group = try XCTUnwrap(store.displayGroups.first)
-            XCTAssertEqual(group.alwaysShownWidgets.map(\.descriptorID), ["claude.session"])
+            XCTAssertEqual(group.alwaysShownWidgets.map(\.descriptorID), allDetails ? [] : ["claude.session"])
             XCTAssertTrue(historyIDs.isSubset(of: Set(group.expandedWidgets.map(\.descriptorID))))
             XCTAssertTrue(historyIDs.allSatisfy { store.isMetricEnabled($0) }, "Moving history does not erase the user's selection")
         }
@@ -1182,8 +1203,8 @@ final class LayoutStoreTests: XCTestCase {
             for expanded in [Set<String>(), Set([sessionID, resetID])] {
                 store.expandedMetricIDs = expanded
                 let group = try XCTUnwrap(store.displayGroups.first)
-                XCTAssertEqual(group.alwaysShownWidgets.map(\.descriptorID), [sessionID])
-                XCTAssertEqual(group.expandedWidgets.map(\.descriptorID), [resetID])
+                XCTAssertEqual(group.alwaysShownWidgets.map(\.descriptorID), expanded.isEmpty ? [sessionID] : [])
+                XCTAssertEqual(group.expandedWidgets.map(\.descriptorID), expanded.isEmpty ? [resetID] : [sessionID, resetID])
                 XCTAssertTrue(store.isMetricEnabled(resetID), "Moving details preserves the saved selection")
             }
             store.setMetricEnabled(sessionID, false)

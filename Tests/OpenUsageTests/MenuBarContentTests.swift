@@ -208,6 +208,23 @@ final class MenuBarContentTests: XCTestCase {
         }
     }
 
+    func testOnlyMultipleRenderedSiblingAccountsHaveBadgesInBothStyles() {
+        let first = group("claude", percent("claude.session", "Session", 70))
+        let second = group("claude@work", percent("claude@work.session", "Session", 12))
+        let missing = group("claude@work", noDataPercent("claude@work.session", "Session"))
+        let other = group("codex", percent("codex.weekly", "Weekly", 35))
+        for style: MenuBarStyle in [.ring, .percentage] {
+            for accounts in [[first, other], [second, other], [first, missing, other]] {
+                let result = MenuBarContentBuilder.build(groups: accounts, style: style,
+                    accountNumbers: ["claude": 1, "claude@work": 2], pinnedMetricIDs: [], data: { $0.sample })
+                XCTAssertTrue(result.groups.allSatisfy { $0.accountBadge == nil })
+            }
+            let restored = MenuBarContentBuilder.build(groups: [first, second, other], style: style,
+                accountNumbers: ["claude": 1, "claude@work": 2], pinnedMetricIDs: [], data: { $0.sample })
+            XCTAssertEqual(restored.groups.map(\.accountBadge), [1, 2, nil])
+        }
+    }
+
     private func group(_ providerID: String, _ metrics: WidgetDescriptor...) -> ProviderMetrics {
         let provider = Provider(
             id: providerID,
