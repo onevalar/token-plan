@@ -68,7 +68,6 @@ public sealed partial class MainWindow
         }
         if (trends.Any(t => t.Partial || t.ErrorKey != null)) body.Children.Add(Note(L.T("Some local token logs were skipped or could not be read. Totals may be incomplete.")));
         body.Children.Add(Text(L.T("Estimated from model token rates, not your subscription bill."), 12, true));
-        if (preferences.CodexFallbackModel != null) body.Children.Add(Text(L.T("Unknown Codex models use the selected fallback price.") + " " + preferences.CodexFallbackModel, 12, true));
         return body;
     }
     string SpendColor(string id) => id switch {

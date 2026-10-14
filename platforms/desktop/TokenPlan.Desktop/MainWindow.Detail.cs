@@ -44,7 +44,6 @@ public sealed partial class MainWindow
         else
         {
             if (ProviderCatalog.Get(id).EnvironmentKey != null) body.Children.Add(CredentialEditor(id));
-            if (id == "codex" && detailAccount == null) body.Children.Add(CodexPricingSettings());
             body.Children.Add(MetricSettings(scope, result?.Snapshot));
             var notes = new TextBox { Name = "tokenplan-note-" + id, PlaceholderText = L.T("Note (Optional)"), Text = noteDrafts.GetValueOrDefault(scope) ?? preferences.ProviderNotes.GetValueOrDefault(scope) ?? "", AcceptsReturn = true, MinHeight = 70, MaxLength = 2000 };
             notes.TextChanged += (_, _) => noteDrafts[scope] = notes.Text ?? "";

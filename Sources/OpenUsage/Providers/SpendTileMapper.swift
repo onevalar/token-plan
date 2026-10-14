@@ -92,7 +92,7 @@ enum SpendTileMapper {
         guard !points.isEmpty else { return }
         let days = Set(usage.daily.compactMap { dayKey(fromUsageDate: $0.date) })
             .intersection(UsageHistoryWindow.dayKeys(through: now))
-        let sourceNote = PricingFallbackOption.sourceNote(note, modelsByDay: fallbackPricingModelsByDay, days: days)
+        let sourceNote = LegacyPricingEstimateNote.sourceNote(note, modelsByDay: fallbackPricingModelsByDay, days: days)
         lines.append(.chart(label: "Usage Trend", points: points, note: sourceNote))
     }
 
@@ -317,7 +317,7 @@ enum SpendTileMapper {
             totalTokens: totalTokens,
             totalCostUSD: totalCostUSD,
             models: folded,
-            sourceNote: PricingFallbackOption.sourceNote(sourceNote, modelsByDay: fallbackPricingModelsByDay, days: days)
+            sourceNote: LegacyPricingEstimateNote.sourceNote(sourceNote, modelsByDay: fallbackPricingModelsByDay, days: days)
         )
     }
 

@@ -1,8 +1,7 @@
 import Foundation
 
 /// Event pricing stays separate from parsing: changing a preference reuses cached token events.
-/// Known rates always win; only unresolved, named events can use an explicitly selected reference.
-/// Unpriced usage remains excluded and warned about when no usable reference is selected.
+/// Unpriced usage remains excluded and is reported as unknown.
 extension CodexLogUsageScanner {
     // MARK: - Aggregation
 
@@ -18,12 +17,8 @@ extension CodexLogUsageScanner {
     }
 
     static func aggregate(
-        events: [Event], since: Date, pricing: ModelPricing, fallbackModel: String? = nil
+        events: [Event], since: Date, pricing: ModelPricing
     ) -> LogUsageScan {
-        let fallbackRates = fallbackModel.flatMap { pricing.fallbackRates(model: $0, providerID: "codex") }
-        if fallbackModel != nil && fallbackRates == nil {
-            AppLog.warn(LogTag.plugin("codex"), "Selected fallback pricing is unavailable; unpriced usage remains excluded.")
-        }
         var seen: Set<EventKey> = []
         var accumulator = DailyUsageAccumulator()
 
@@ -44,22 +39,12 @@ extension CodexLogUsageScanner {
             }
             let pricingModel = event.pricingModel ?? model
             let resolution = CodexUsagePricing.resolveRates(pricing: pricing, model: pricingModel)
-            var rateModel = resolution.rateModel
-            var resolvedRates = resolution.rates
-            var appliesCodexFastTier = resolution.isFastAlias ? resolution.hasBaseRates : event.isFast
-            var appliesUltrafastTier = event.isUltrafast && (!resolution.isFastAlias || resolution.hasBaseRates)
-            var usedFallback: String?
-            // A reference can estimate the cost without making the model's own price known.
-            // Keep the existing warning independently of whether an estimate can be included.
+            let rateModel = resolution.rateModel
+            let resolvedRates = resolution.rates
+            let appliesCodexFastTier = resolution.isFastAlias ? resolution.hasBaseRates : event.isFast
+            let appliesUltrafastTier = event.isUltrafast && (!resolution.isFastAlias || resolution.hasBaseRates)
             if resolvedRates == nil, event.total > 0 {
                 accumulator.addUnknownModel(day: day, model: model)
-            }
-            if resolvedRates == nil, let fallbackModel, let fallbackRates {
-                resolvedRates = fallbackRates
-                rateModel = fallbackModel
-                appliesCodexFastTier = resolution.isFastAlias || event.isFast
-                appliesUltrafastTier = event.isUltrafast
-                usedFallback = fallbackModel
             }
             guard let rates = resolvedRates else { continue }
             let eventCost = cost(
@@ -67,8 +52,7 @@ extension CodexLogUsageScanner {
                 ultrafastTier: appliesUltrafastTier
             )
             accumulator.add(
-                day: day, tokens: event.total, cost: eventCost, model: model,
-                fallbackPricingModel: usedFallback
+                day: day, tokens: event.total, cost: eventCost, model: model
             )
         }
 

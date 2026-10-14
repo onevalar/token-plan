@@ -75,7 +75,6 @@ public sealed partial class MainWindow : Window
         try { preferences = Preferences.Load(preferencesFile); }
         catch (Exception e) when (e is IOException or System.Text.Json.JsonException or InvalidDataException or UnauthorizedAccessException) { notice = "Preferences could not be read. Changes can be saved again in Settings."; DiagnosticLog.Write("settings", notice); }
         L.Use(preferences.Language);
-        if (!Program.Fixture) ModelPricing.SetCodexFallback(preferences.CodexFallbackModel);
         try { history = Program.Fixture ? ExampleHistory() : UsageHistory.Load(historyFile, DateTimeOffset.UtcNow); }
         catch (Exception e) when (e is IOException or System.Text.Json.JsonException or InvalidDataException or UnauthorizedAccessException) { notice = "Usage history could not be read. New readings will start a fresh history."; DiagnosticLog.Write("history", notice); }
         DiagnosticLog.Level = preferences.LogLevel;

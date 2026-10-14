@@ -99,16 +99,15 @@ actor CodexLogUsageScanner {
 
     /// Scan the last `daysBack` days of rollouts in every Codex home.
     func scan(
-        daysBack: Int = 30, now: Date = Date(), pricing: ModelPricing, fallbackModel: String? = nil
+        daysBack: Int = 30, now: Date = Date(), pricing: ModelPricing
     ) async -> LogUsageScan? {
-        await scan(homes: allHomes(), daysBack: daysBack, now: now, pricing: pricing, fallbackModel: fallbackModel)
+        await scan(homes: allHomes(), daysBack: daysBack, now: now, pricing: pricing)
     }
 
     /// Scan the last `daysBack` days of rollouts in `homes`. Returns `nil` when no session files exist
     /// (the spend tiles then render "No data").
     func scan(
-        homes: CodexLogHomes, daysBack: Int = 30, now: Date = Date(), pricing: ModelPricing,
-        fallbackModel: String? = nil
+        homes: CodexLogHomes, daysBack: Int = 30, now: Date = Date(), pricing: ModelPricing
     ) async -> LogUsageScan? {
         let since = JSONLScanning.sinceDate(daysBack: daysBack, now: now)
         let identityPaths = Set(homes.cache.map { $0.resolvingSymlinksInPath().standardizedFileURL.path })
@@ -129,7 +128,7 @@ actor CodexLogUsageScanner {
             initialState: CodexLogFileParser(),
             parse: { data, state in state.parse(data) }
         ), !Task.isCancelled else { return nil }
-        return Self.aggregate(events: events, since: since, pricing: pricing, fallbackModel: fallbackModel)
+        return Self.aggregate(events: events, since: since, pricing: pricing)
     }
 
     // MARK: - Discovery

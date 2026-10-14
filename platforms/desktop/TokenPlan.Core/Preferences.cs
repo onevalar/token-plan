@@ -7,7 +7,6 @@ public partial record Preferences(string Appearance = "system", string Language 
 {
     public Dictionary<string, bool> TrayAccounts { get; init; } = new();
     public Dictionary<string, bool> AccountVisibility { get; init; } = new();
-    public string? CodexFallbackModel { get; init; }
     public bool GlobalShortcut { get; init; }
     public int LogLevel { get; init; } = 2;
     public bool ReduceAnimations { get; init; }

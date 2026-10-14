@@ -21,7 +21,6 @@ final class CodexProvider: ProviderRuntime {
     let openCodeUsageScanner: OpenCodeCodexUsageScanner
     let now: @Sendable () -> Date
     let pricing: @Sendable () async -> ModelPricing
-    let fallbackModel: @MainActor () -> String?
 
     init(
         localHistoryWait: Duration = .seconds(5),
@@ -33,8 +32,7 @@ final class CodexProvider: ProviderRuntime {
         openCodeUsageScanner: OpenCodeCodexUsageScanner = OpenCodeCodexUsageScanner(),
         historyScope: CodexHistoryScope = .allHomes,
         now: @escaping @Sendable () -> Date = Date.init,
-        pricing: @escaping @Sendable () async -> ModelPricing = { await ModelPricingStore.shared.current() },
-        fallbackModel: @escaping @MainActor () -> String? = { CodexFallbackModelSetting.current() }
+        pricing: @escaping @Sendable () async -> ModelPricing = { await ModelPricingStore.shared.current() }
     ) {
         self.localHistoryWait = localHistoryWait
         self.provider = provider
@@ -46,7 +44,6 @@ final class CodexProvider: ProviderRuntime {
         self.openCodeUsageScanner = openCodeUsageScanner
         self.now = now
         self.pricing = pricing
-        self.fallbackModel = fallbackModel
     }
 
     var widgetDescriptors: [WidgetDescriptor] {
@@ -173,12 +170,12 @@ final class CodexProvider: ProviderRuntime {
         // pi logs name a provider family, not an account card.
         let piCardID = ProviderAccountID.family(of: provider.id)
         let history = await localHistory.value(wait: localHistoryWait) {
-            [pricing, fallbackModel, historyScope, authStore, logUsageScanner, piUsageScanner,
+            [pricing, historyScope, authStore, logUsageScanner, piUsageScanner,
              openCodeUsageScanner, now] in
             let claims = await Self.historyClaims(scope: historyScope, authStore: authStore,
                                                   logUsageScanner: logUsageScanner)
             return await Self.scanLocalHistory(
-                claims: claims, claimsPiUsage: historyScope.claimsPiUsage, piCardID: piCardID, pricing: pricing, fallbackModel: fallbackModel, logUsageScanner: logUsageScanner,
+                claims: claims, claimsPiUsage: historyScope.claimsPiUsage, piCardID: piCardID, pricing: pricing, logUsageScanner: logUsageScanner,
                 piUsageScanner: piUsageScanner, openCodeUsageScanner: openCodeUsageScanner, now: now
             )
         }
@@ -228,7 +225,6 @@ final class CodexProvider: ProviderRuntime {
         claimsPiUsage: Bool,
         piCardID: String,
         pricing: @Sendable () async -> ModelPricing,
-        fallbackModel: @MainActor () -> String?,
         logUsageScanner: CodexLogUsageScanner,
         piUsageScanner: PiUsageScanner,
         openCodeUsageScanner: OpenCodeCodexUsageScanner,
@@ -237,9 +233,8 @@ final class CodexProvider: ProviderRuntime {
         let pricing = await pricing()
         // Three independent local sources: reading rollout files, pi's JSONL, and OpenCode's SQLite
         // concurrently keeps the slowest one — not their sum — on the background scan's path.
-        let selectedFallbackModel = fallbackModel()
         async let native = logUsageScanner.scan(
-            homes: claims.logHomes, now: now(), pricing: pricing, fallbackModel: selectedFallbackModel
+            homes: claims.logHomes, now: now(), pricing: pricing
         )
         async let pi = claimsPiUsage ? piUsageScanner.scan(
             cardID: piCardID, now: now(), pricing: pricing,

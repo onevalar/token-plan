@@ -71,12 +71,6 @@ struct CustomizeProviderDetailView: View {
                     }
                     metricSections(group).simultaneousGesture(metricDragGesture())
                     SubscriptionNoteSection(providerID: providerID)
-                    if ProviderAccountID.family(of: providerID) == "codex" {
-                        DetailDisclosure(title: "Cost Estimates") {
-                            CodexPricingSection(providerIDs: container.registry.providers
-                                .map(\.id).filter { ProviderAccountID.family(of: $0) == "codex" })
-                        }
-                    }
                     Button("Restore Defaults…") { isPresentingResetConfirm = true }
                         .buttonStyle(.plain).font(.caption).foregroundStyle(.secondary)
                         .padding(.horizontal, 8)

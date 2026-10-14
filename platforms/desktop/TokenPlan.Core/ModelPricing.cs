@@ -40,15 +40,10 @@ public static partial class ModelPricing
     {
         lock (sync)
         {
-        if (string.IsNullOrWhiteSpace(model)) model = provider == "codex" ? fallbackModel : null;
         if (string.IsNullOrWhiteSpace(model)) return null;
         var key = model.Trim();
         foreach (var rule in aliases) if (rule.Pattern.IsMatch(key)) { key = rule.Canonical; break; }
-        if (!rates.TryGetValue(key, out var rate))
-        {
-            if (provider != "codex" || fallbackModel == null || !fallbackModels.Contains(fallbackModel) || !rates.TryGetValue(fallbackModel, out rate)) return null;
-            key = fallbackModel;
-        }
+        if (!rates.TryGetValue(key, out var rate)) return null;
         if (tokens.Other > 0) return null;
         if (applyLongContext && tokens.Input + tokens.CacheRead + tokens.CacheWrite > 200_000)
             rate = rate with { Input = rate.LongInput ?? rate.Input, Output = rate.LongOutput ?? rate.Output, Read = rate.LongRead ?? rate.Read, Write = rate.LongWrite ?? rate.Write };

@@ -9,16 +9,9 @@ public static partial class ModelPricing
     static readonly Dictionary<string, Dictionary<string, Rate>> live = new();
     static readonly Dictionary<string, Rate> bundled = new(StringComparer.OrdinalIgnoreCase);
     static readonly Dictionary<string, Rate> supplementRates = new(StringComparer.OrdinalIgnoreCase);
-    static string[] fallbackModels = [];
-    static string? fallbackModel;
     static int revision;
     static DateTimeOffset nextRefresh;
     public static int Revision => Volatile.Read(ref revision);
-    public static string[] FallbackModels { get { lock (sync) return fallbackModels.Where(rates.ContainsKey).ToArray(); } }
-    public static void SetCodexFallback(string? model)
-    {
-        lock (sync) { model = model != null && fallbackModels.Contains(model) ? model : null; if (fallbackModel == model) return; fallbackModel = model; Interlocked.Increment(ref revision); }
-    }
     public static void ApplyFeed(string source, string json)
     {
         using var document = JsonDocument.Parse(json);
@@ -38,12 +31,11 @@ public static partial class ModelPricing
             var rules = root.GetProperty("alias_rules").EnumerateArray().Take(1000).Select(r => (new Regex(r.GetProperty("pattern").GetString()!, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant, TimeSpan.FromMilliseconds(50)), r.GetProperty("canonical").GetString()!)).ToArray();
             var multipliers = root.GetProperty("fast_multipliers").EnumerateObject().ToDictionary(p => p.Name, p => p.Value.GetDouble());
             if (multipliers.Values.Any(v => !double.IsFinite(v) || v <= 0) || parsed.Count == 0) throw new InvalidDataException();
-            var models = root.TryGetProperty("fallback_models", out var choices) && choices.TryGetProperty("codex", out var codex) ? codex.EnumerateArray().Select(v => v.GetString()!).Where(v => !string.IsNullOrWhiteSpace(v)).Distinct().ToArray() : [];
             lock (sync)
             {
                 supplementRates.Clear(); foreach (var (key, value) in parsed) supplementRates[key] = value;
                 aliases.Clear(); aliases.AddRange(rules); foreach (var (key, value) in multipliers) fast[key] = value;
-                fallbackModels = models; Rebuild();
+                Rebuild();
             }
             return;
         }
