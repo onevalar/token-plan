@@ -160,7 +160,7 @@ jobs:
       - uses: actions/setup-dotnet@v5
         with:
           global-json-file: platforms/desktop/global.json
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: tokenplan-desktop-public
           path: ${{ runner.temp }}/installers
@@ -204,7 +204,7 @@ jobs:
         with:
           ref: ${{ needs.validate.outputs.tag }}
           persist-credentials: false
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           pattern: tokenplan-*-public
           merge-multiple: true
