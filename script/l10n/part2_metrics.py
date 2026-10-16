@@ -81,6 +81,7 @@ T = {
 "Weekly limit": ("每周上限", "每週上限", "週間の上限", "주간 한도"),
 "Extra usage balance": ("额外用量余额", "額外用量餘額", "追加使用量の残高", "추가 사용량 잔액"),
 "Extra usage spent": ("额外用量已花费", "額外用量已花費", "追加使用量の支出", "추가 사용량 지출"),
+"Argon Weekly": ("Argon 每周", "Argon 每週", "Argon 週間", "Argon 주간"),
 "Claude Weekly": ("Claude 每周", "Claude 每週", "Claude 週間", "Claude 주간"),
 "Gemini Pro": ("Gemini Pro", "Gemini Pro", "Gemini Pro", "Gemini Pro"),
 "Gemini Weekly": ("Gemini 每周", "Gemini 每週", "Gemini 週間", "Gemini 주간"),

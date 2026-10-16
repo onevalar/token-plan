@@ -23,6 +23,8 @@ static class ParityChecks
         check(alerts.Observe(Reading(99) with { ErrorKey = "stale" }, 90).Count == 0, "Stale usage never triggers alert");
         var login = AntigravityUsage.ParseLogin("go-keyring-base64:" + Convert.ToBase64String(Encoding.UTF8.GetBytes("""{"token":{"access_token":"fixture-only","refresh_token":"refresh-only","expiry":"2026-10-11T00:00:00Z"}}""")));
         check(login.AccessToken == "fixture-only" && login.RefreshToken == "refresh-only", "Antigravity unwraps shared native credential format");
+        var argon = AntigravityUsage.Parse("""{"groups":[{"buckets":[{"bucketId":"gemini-argon-wtu-weekly","window":"weekly","remainingFraction":0.28380427,"resetTime":"2026-10-23T02:51:52Z"},{"bucketId":"gemini-5h","remainingFraction":0.99715096}]}]}""", now);
+        check(argon.Windows.Count == 2 && argon.Windows[1].Label == "Argon Weekly" && argon.Windows[1].UsedPercent == 72 && argon.Windows[1].ResetsAt == DateTimeOffset.Parse("2026-10-23T02:51:52Z"), "Argon weekly stays independent and uses server reset without invented five-hour quota");
         var ag = AntigravityUsage.Parse("""{"groups":[{"buckets":[{"bucketId":"gemini-5h","remainingFraction":0.7},{"bucketId":"gemini-image-5h","remainingFraction":0.01},{"bucketId":"3p-weekly","remainingFraction":1},{"bucketId":"3p-5h"}]}]}""", now);
         check(ag.Windows.Count == 2 && ag.Windows[0].UsedPercent == 30 && ag.Windows[1].UsedPercent == 0, "Antigravity exact pools; missing quota is not fabricated as zero");
         var ollama = OllamaUsage.Parse("""{"limits":{"session":{"usage":0.349},"weekly":{"usage":0}},"activity":{"cost":"1.25"}}""", now);

@@ -39,6 +39,25 @@ final class AntigravityQuotaSummaryTests: XCTestCase {
 
     // MARK: - Parser
 
+    func testArgonWeeklyIsIndependentAndUsesServerReset() {
+        let json = #"{"groups":[{"displayName":"Gemini 4 Argon","buckets":[{"bucketId":"gemini-argon-wtu-weekly","window":"weekly","remainingFraction":0.28380427,"resetTime":"2026-10-23T02:51:52Z"}]},{"buckets":[{"bucketId":"gemini-5h","remainingFraction":0.99715096}]}]}"#
+        let lines = AntigravityUsageMapper.parseQuotaSummary(Data(json.utf8))!
+        XCTAssertEqual(lines.map(\.label), ["Session", "Argon Weekly"])
+        XCTAssertEqual(used(lines.last)!, 72) // existing percent display rounds to whole percent
+        XCTAssertEqual(resetsAt(lines.last), OpenUsageISO8601.date(from: "2026-10-23T02:51:52Z"))
+        XCTAssertEqual(periodMs(lines.last), MetricPeriod.weekMs)
+        XCTAssertEqual(AntigravityUsageMapper.parseQuotaSummary(Data(#"{"groups":[]}"#.utf8)), [])
+    }
+
+    func testLegacyArgonNeverPollutesGeminiFiveHourPool() {
+        let lines = AntigravityUsageMapper.buildLines([
+            AntigravityModelConfig(label: "Gemini 4 Argon", modelID: "gemini-4-argon-medium", remainingFraction: 0.1, resetTime: nil),
+            AntigravityModelConfig(label: "Gemini Flash", modelID: "gemini-flash", remainingFraction: 0.8, resetTime: nil)
+        ])
+        XCTAssertEqual(lines.map(\.label), ["Session"])
+        XCTAssertEqual(used(lines.first), 20)
+    }
+
     func testWrappedAndBarePayloadsProduceIdenticalFourLines() {
         let bare = AntigravityUsageMapper.parseQuotaSummary(Data("{\(fullGroupsJSON)}".utf8))
         let wrapped = AntigravityUsageMapper.parseQuotaSummary(Data("{\"response\":{\(fullGroupsJSON)}}".utf8))
@@ -154,7 +173,7 @@ final class AntigravityQuotaSummaryTests: XCTestCase {
         XCTAssertEqual(Set(AntigravityUsageMapper.summaryBuckets.map(\.label)), descriptorLabels)
 
         let summaryLines = AntigravityUsageMapper.parseQuotaSummary(Data("{\(fullGroupsJSON)}".utf8)) ?? []
-        XCTAssertEqual(Set(summaryLines.map(\.label)), descriptorLabels)
+        XCTAssertEqual(Set(summaryLines.map(\.label)), descriptorLabels.subtracting(["Argon Weekly"]))
 
         // The legacy path emits the two 5h pool labels — a strict subset of the descriptors.
         let legacyLabels = Set(AntigravityUsageMapper.buildLines([
@@ -235,6 +254,32 @@ final class AntigravityQuotaSummaryTests: XCTestCase {
             discovery: LanguageServerDiscovery(processRunner: FakeLSProcessRunner()),
             dbUsageScanner: AntigravityDbUsageScanner(conversationsDirectories: { ["/nonexistent-antigravity-tests"] })
         )
+    }
+
+    @MainActor
+    func testOldLocalSummaryIsReplacedByCompleteCLIQuota() async {
+        let routing = RoutingHTTPClient { request in
+            if request.url.host == "127.0.0.1" {
+                let body = request.url.path.hasSuffix("/RetrieveUserQuotaSummary")
+                    ? #"{"response":{"groups":[{"buckets":[{"bucketId":"gemini-5h","remainingFraction":0.1}]}]}}"#
+                    : #"{"userStatus":{}}"#
+                return HTTPResponse(statusCode: 200, headers: [:], body: Data(body.utf8))
+            }
+            XCTAssertEqual(request.headers["User-Agent"], AntigravityUsageClient.quotaUserAgent)
+            let body = request.url.path.contains("loadCodeAssist") ? #"{"paidTier":{"name":"Google AI Pro"}}"#
+                : #"{"groups":[{"buckets":[{"bucketId":"gemini-argon-wtu-weekly","remainingFraction":0.28,"resetTime":"2026-10-23T02:51:52Z"}]}]}"#
+            return HTTPResponse(statusCode: 200, headers: [:], body: Data(body.utf8))
+        }
+        let provider = AntigravityProvider(
+            authStore: AntigravityAuthStore(keychain: FakeKeychain(#"{"token":{"access_token":"fixture","expiry":"2099-01-01T00:00:00Z"}}"#), files: FakeFiles()),
+            usageClient: AntigravityUsageClient(lsHTTP: routing, http: routing),
+            discovery: LanguageServerDiscovery(processRunner: FakeLSProcessRunner()),
+            dbUsageScanner: AntigravityDbUsageScanner(conversationsDirectories: { ["/nonexistent-antigravity-tests"] })
+        )
+        let snapshot = await provider.refresh()
+        XCTAssertEqual(snapshot.lines.map(\.label), ["Argon Weekly"])
+        XCTAssertEqual(used(snapshot.lines.first), 72)
+        XCTAssertEqual(snapshot.plan, "Pro")
     }
 
     @MainActor

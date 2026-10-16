@@ -23,7 +23,7 @@ public static class AntigravityUsage
         if (root.TryGetProperty("response", out var response)) root = response;
         if (!root.TryGetProperty("groups", out var groups) || groups.ValueKind != JsonValueKind.Array) throw new InvalidDataException();
         var values = new Dictionary<string, UsageWindow>();
-        var labels = new[] { ("gemini-5h", "Session"), ("gemini-weekly", "Weekly"), ("3p-5h", "Claude"), ("3p-weekly", "Claude Weekly") };
+        var labels = new[] { ("gemini-5h", "Session"), ("gemini-weekly", "Weekly"), ("3p-5h", "Claude"), ("3p-weekly", "Claude Weekly"), ("gemini-argon-wtu-weekly", "Argon Weekly") };
         foreach (var group in groups.EnumerateArray())
         {
             if (!group.TryGetProperty("buckets", out var buckets) || buckets.ValueKind != JsonValueKind.Array) continue;

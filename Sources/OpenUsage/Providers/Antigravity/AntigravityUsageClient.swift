@@ -20,6 +20,9 @@ enum TokenRefreshOutcome: Sendable {
 /// Google Cloud Code endpoints, and the Google OAuth token refresh.
 struct AntigravityUsageClient: Sendable {
     static let lsService = "exa.language_server_pb.LanguageServerService"
+    // The /cli product marker selects the CLI quota pools, including paid Pro Argon.
+    static let quotaUserAgent = "antigravity/cli/1.3.6"
+
     static let cloudCodeURLs = [
         "https://daily-cloudcode-pa.googleapis.com",
         "https://cloudcode-pa.googleapis.com"

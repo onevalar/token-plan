@@ -4,7 +4,7 @@ Tracks pool quotas for Antigravity (Google's AI IDE) using credentials the app o
 
 ## What it tracks
 
-Antigravity has two shared quota pools, and each pool has two windows — a rolling 5-hour window and a weekly window:
+Antigravity reports Gemini and third-party pools with five-hour and weekly windows. Paid Pro accounts can also have a separate Argon weekly pool:
 
 | Metric | Meaning |
 |---|---|
@@ -12,6 +12,7 @@ Antigravity has two shared quota pools, and each pool has two windows — a roll
 | Weekly | The same Gemini pool's weekly window |
 | Claude | The shared non-Gemini pool (Claude, GPT-OSS, …), rolling 5-hour window |
 | Claude Weekly | The same non-Gemini pool's weekly window |
+| Argon Weekly | Separate Gemini 4 Argon weekly quota, only when reported by the service |
 | Usage Trend | Daily token usage from local Antigravity conversations |
 | Today / Yesterday / Last 30 Days | Local token usage and estimated API-equivalent spend |
 
@@ -61,3 +62,11 @@ Thanks to [FelixIsaac](https://github.com/FelixIsaac) for identifying the conver
 > Reverse-engineered from the app and language-server binary; endpoints and storage may change without notice.
 
 Cloud queries first resolve the signed-in account’s project with Antigravity product and platform metadata, then include that project in quota requests. A permission-denied response (403) is not treated as an expired login and does not trigger repeated token refreshes.
+
+## Argon quota (October 2026)
+
+The live CLI summary reports `gemini-argon-wtu-weekly`, with its own `remainingFraction` and `resetTime`. TokenPlan converts remaining quota into used percent and displays the returned reset timestamp; it does not calculate a new weekly deadline or invent an Argon five-hour limit. Google describes this pool as separate for paid Pro accounts; Ultra may include Argon in the larger Gemini pool instead.
+
+Mac, Windows and Linux use the CLI product marker `antigravity/cli/1.3.6` against Cloud Code. The former `antigravity` marker can return an older, incomplete quota view even with the same account credential. When a local language server omits Argon, TokenPlan tries the credential-backed CLI summary and replaces the entire snapshot (never merges accounts); if unavailable it keeps the local result.
+
+On Mac, Argon Weekly is enabled by default in details, after Claude Weekly, and is not pinned. Existing users can move it to the home page or menu bar. Windows/Linux show returned quota rows in their existing default home layout. Accounts without this independent bucket receive no fabricated Argon value. Legacy per-model responses cannot establish Argon's window and are excluded from Gemini/Claude pooling.

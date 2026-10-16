@@ -14,13 +14,14 @@ static class ProviderBoundaryChecks
         using (var service = new ProviderService(home, home, new Handler(request => {
             calls.Add(request.RequestUri!.Host + request.RequestUri.AbsolutePath);
             check(request.Headers.Authorization?.Parameter == "fixture-access", "Antigravity uses only scoped OAuth credential");
-            var body = request.RequestUri.AbsolutePath.EndsWith("loadCodeAssist") ? """{"cloudaicompanionProject":"fixture-project","paidTier":{"name":"Pro"}}""" : """{"groups":[{"buckets":[{"bucketId":"gemini-weekly","remainingFraction":0.8}]}]}""";
+            check(request.Headers.GetValues("User-Agent").Single() == "antigravity/cli/1.3.6", "CLI product marker selects independent Argon quota");
+            var body = request.RequestUri.AbsolutePath.EndsWith("loadCodeAssist") ? """{"cloudaicompanionProject":"fixture-project","paidTier":{"name":"Pro"}}""" : """{"groups":[{"buckets":[{"bucketId":"gemini-argon-wtu-weekly","remainingFraction":0.8}]}]}""";
             return new(HttpStatusCode.OK) { Content = new StringContent(body) };
         }), (_, _) => {}, userHome: home, credentialReader: (_, _, _) => Task.FromResult<string?>(login)))
         {
             var result = await service.Refresh("antigravity", default);
-            check(result.ErrorKey == null && result.Snapshot?.Windows.Single().UsedPercent == 20 && result.Snapshot.Plan == "Pro", "Antigravity credential through HTTP through quota mapping");
-            check(calls.All(c => c.StartsWith("cloudcode-pa.googleapis.com/")), "OAuth token never leaves fixed Google endpoint");
+            check(result.ErrorKey == null && result.Snapshot?.Windows.Single().UsedPercent == 20 && result.Snapshot.Windows.Single().Label == "Argon Weekly" && result.Snapshot.Plan == "Pro", "Antigravity credential through HTTP through quota mapping");
+            check(calls.All(c => c.StartsWith("daily-cloudcode-pa.googleapis.com/")), "OAuth token never leaves fixed Google endpoint");
         }
         foreach (var code in new[] { HttpStatusCode.Unauthorized, HttpStatusCode.TooManyRequests, HttpStatusCode.InternalServerError })
         {

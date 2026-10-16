@@ -22,7 +22,7 @@ enum DefaultLayout {
 
     static let metricIDs: [String] = [
         "amp.agent", "amp.orb", "amp.balance",
-        "antigravity.geminiPro", "antigravity.geminiWeekly", "antigravity.claude", "antigravity.claudeWeekly",
+        "antigravity.geminiPro", "antigravity.geminiWeekly", "antigravity.claude", "antigravity.claudeWeekly", "antigravity.argonWeekly",
         "antigravity.trend", "antigravity.today", "antigravity.yesterday", "antigravity.last30",
 
         "claude.session", "claude.weekly", "claude.fable", "claude.trend",
@@ -104,7 +104,7 @@ enum DefaultLayout {
         "amp.balance",
         // Antigravity: the Gemini pool pair and usage trend stay above the fold; the non-Gemini
         // pool pair and spend-history rows sit below the caret, matching the other local scanners.
-        "antigravity.claude", "antigravity.claudeWeekly",
+        "antigravity.claude", "antigravity.claudeWeekly", "antigravity.argonWeekly",
         "antigravity.today", "antigravity.yesterday", "antigravity.last30",
         // Claude's core meters (Session, Weekly, Fable, Extra, Usage Trend) stay above the fold;
         // optional Sonnet, reset grants, and spend-history rows sit below the caret.

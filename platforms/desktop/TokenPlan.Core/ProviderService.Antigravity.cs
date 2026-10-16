@@ -7,7 +7,17 @@ public sealed partial class ProviderService
     readonly Dictionary<string, (string Token, DateTimeOffset Expiry)> antigravityTokens = new();
     async Task<ProviderResult> RefreshAntigravity(CancellationToken cancellation)
     {
-        if (await RefreshAntigravityLocal(cancellation) is { } local) return local;
+        var local = await RefreshAntigravityLocal(cancellation);
+        if (local?.Snapshot?.Windows.Any(w => w.Label == "Argon Weekly") == true) return local;
+        try { return await RefreshAntigravityCloud(cancellation); }
+        catch (Exception e) when (local != null && e is ProviderFailure or SystemCredentialException or IOException or JsonException or HttpRequestException or InvalidDataException)
+        {
+            log("antigravity", "CLI quota unavailable; retaining local language-server quota.");
+            return local;
+        }
+    }
+    async Task<ProviderResult> RefreshAntigravityCloud(CancellationToken cancellation)
+    {
         string? raw;
         try { raw = await credentialReader("gemini", "antigravity", cancellation); }
         catch (SystemCredentialException e) { throw new ProviderFailure(e.Message); }
@@ -32,9 +42,9 @@ public sealed partial class ProviderService
         }
         async Task<string> Call(string path, string body, CancellationToken? metadataToken = null)
         {
-            using var request = new HttpRequestMessage(HttpMethod.Post, "https://cloudcode-pa.googleapis.com/v1internal:" + path);
+            using var request = new HttpRequestMessage(HttpMethod.Post, "https://daily-cloudcode-pa.googleapis.com/v1internal:" + path);
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", access);
-            request.Headers.UserAgent.ParseAdd(path == "loadCodeAssist" ? "agy" : "antigravity");
+            request.Headers.TryAddWithoutValidation("User-Agent", "antigravity/cli/1.3.6");
             request.Content = new StringContent(body, Encoding.UTF8, "application/json");
             return await Fetch(request, metadataToken.HasValue ? cooldown + ":metadata" : cooldown, metadataToken ?? cancellation);
         }

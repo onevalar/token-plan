@@ -1,8 +1,8 @@
 import Foundation
 
 /// Tracks pool quota for Antigravity (Google's Codeium/Windsurf-derived AI IDE). Quotas are
-/// fraction-based and shown as up to four percent meters: the shared Gemini pool and the shared
-/// non-Gemini pool (Claude, GPT-OSS), each with a rolling 5-hour and a weekly window.
+/// fraction-based and shown as up to five percent meters: the shared Gemini pool and the shared
+/// non-Gemini pool (Claude, GPT-OSS), each with a rolling 5-hour and a weekly window, plus the separate Argon weekly quota.
 ///
 /// Probe order, best source first:
 /// 1. Antigravity language server (running app) — richest, gives the authoritative plan.
@@ -51,6 +51,8 @@ final class AntigravityProvider: ProviderRuntime {
                 .exportingLimit("nonGeminiSession", unit: "percent"),
             .percent(id: AntigravityMetric.claudeWeeklyID, provider: provider, title: AntigravityMetric.claudeWeeklyLabel)
                 .exportingLimit("nonGeminiWeekly", unit: "percent"),
+            .percent(id: AntigravityMetric.argonWeeklyID, provider: provider, title: AntigravityMetric.argonWeeklyLabel)
+                .exportingLimit("argonWeekly", unit: "percent"),
             .usageTrend(provider: provider)
                 .exportingHistory(
                     scope: .machineLocal,
@@ -130,12 +132,23 @@ final class AntigravityProvider: ProviderRuntime {
             csrfFlag: "--csrf_token",
             portFlag: "--extension_server_port"
         ) {
-            return result
+            return await completeCLIQuota(local: result)
         }
         if let result = await probeLS(processName: "agy", markers: [], csrfFlag: "", portFlag: nil) {
-            return result
+            return await completeCLIQuota(local: result)
         }
         return try await probeCloudCode()
+    }
+
+    private func completeCLIQuota(local: StrategyResult) async -> StrategyResult {
+        guard !local.lines.contains(where: { $0.label == AntigravityMetric.argonWeeklyLabel }) else { return local }
+        // Older IDE servers can omit the CLI-specific quota. Replace the complete snapshot;
+        // never combine two sources that might belong to different signed-in accounts.
+        do { return try await probeCloudCode() }
+        catch {
+            AppLog.info(LogTag.plugin("antigravity"), "CLI quota unavailable; retaining local language-server quota")
+            return local
+        }
     }
 
     // MARK: - Language server
@@ -288,7 +301,7 @@ final class AntigravityProvider: ProviderRuntime {
         // Missing project can return 403 even when the OAuth credential is valid.
         var plan: String?
         var project: String?
-        switch await usageClient.cloudCode(path: AntigravityUsageClient.loadCodeAssistPath, token: token, userAgent: "antigravity", body: [:]) {
+        switch await usageClient.cloudCode(path: AntigravityUsageClient.loadCodeAssistPath, token: token, userAgent: AntigravityUsageClient.quotaUserAgent, body: [:]) {
         case .authFailed: return .authFailed
         case .ok(let data):
             plan = AntigravityUsageMapper.parseLoadCodeAssistPlan(data)
@@ -300,7 +313,7 @@ final class AntigravityProvider: ProviderRuntime {
         // even one with zero usable buckets — is the answer and must never fall into the legacy chain
         // below, which fabricates "fully used" from missing quota info. A 404 (build without the RPC)
         // reads as `.unavailable` and falls through.
-        switch await usageClient.cloudCode(path: AntigravityUsageClient.quotaSummaryPath, token: token, userAgent: "antigravity", body: project.map { ["project": $0] } ?? [:]) {
+        switch await usageClient.cloudCode(path: AntigravityUsageClient.quotaSummaryPath, token: token, userAgent: AntigravityUsageClient.quotaUserAgent, body: project.map { ["project": $0] } ?? [:]) {
         case .authFailed:
             return .authFailed
         case .ok(let data):
@@ -313,7 +326,7 @@ final class AntigravityProvider: ProviderRuntime {
         }
 
         // Legacy: fetchAvailableModels — the full Antigravity model set (Gemini + Claude + GPT-OSS).
-        switch await usageClient.cloudCode(path: AntigravityUsageClient.fetchModelsPath, token: token, userAgent: "antigravity", body: project.map { ["project": $0] } ?? [:]) {
+        switch await usageClient.cloudCode(path: AntigravityUsageClient.fetchModelsPath, token: token, userAgent: AntigravityUsageClient.quotaUserAgent, body: project.map { ["project": $0] } ?? [:]) {
         case .authFailed:
             return .authFailed
         case .ok(let data):

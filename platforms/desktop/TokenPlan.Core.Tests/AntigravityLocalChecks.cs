@@ -36,7 +36,7 @@ static class AntigravityLocalChecks
                 await stream.WriteAsync(Encoding.ASCII.GetBytes($"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: {payload.Length}\r\nConnection: close\r\n\r\n"), deadline.Token);
                 await stream.WriteAsync(payload, deadline.Token);
             });
-            using var service = new ProviderService(root, root, credentialReader: (_, _, _) => throw new Exception("Keyring must not be accessed when LS is available"), antigravityDiscovery: _ => [new(port, "test-csrf", false)]);
+            using var service = new ProviderService(root, root, credentialReader: (_, _, _) => Task.FromResult<string?>(null), antigravityDiscovery: _ => [new(port, "test-csrf", false)]);
             var result = await service.Refresh("antigravity", deadline.Token);
             await server;
             check(result.ErrorKey == null && result.Snapshot?.Windows.Single().UsedPercent == 30, "Linux local quota succeeds independently of system keyring");

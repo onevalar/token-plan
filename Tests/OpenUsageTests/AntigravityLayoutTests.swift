@@ -12,7 +12,7 @@ final class AntigravityLayoutTests: XCTestCase {
         // Every quota, trend, and spend metric is enabled in provider declaration order.
         XCTAssertEqual(store.placed.map(\.descriptorID), [
             "antigravity.geminiPro", "antigravity.geminiWeekly",
-            "antigravity.claude", "antigravity.claudeWeekly", "antigravity.trend",
+            "antigravity.claude", "antigravity.claudeWeekly", "antigravity.argonWeekly", "antigravity.trend",
             "antigravity.today", "antigravity.yesterday", "antigravity.last30"
         ])
 
@@ -25,7 +25,7 @@ final class AntigravityLayoutTests: XCTestCase {
             "antigravity.geminiPro", "antigravity.geminiWeekly"
         ])
         XCTAssertEqual(group?.expandedMetrics.map(\.id), [
-            "antigravity.claude", "antigravity.claudeWeekly", "antigravity.trend",
+            "antigravity.claude", "antigravity.claudeWeekly", "antigravity.argonWeekly", "antigravity.trend",
             "antigravity.today", "antigravity.yesterday", "antigravity.last30"
         ])
         XCTAssertEqual(store.spendCapableProviders.map(\.id), ["antigravity"])

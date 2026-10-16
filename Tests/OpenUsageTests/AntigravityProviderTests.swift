@@ -352,7 +352,7 @@ final class AntigravityProviderTests: XCTestCase {
             if request.url.path.contains("loadCodeAssist") {
                 XCTAssertEqual((body?["metadata"] as? [String: String])?["ideType"], "ANTIGRAVITY")
                 XCTAssertTrue(((body?["metadata"] as? [String: String])?["platform"] ?? "").hasPrefix("DARWIN_"))
-                XCTAssertEqual(request.headers["User-Agent"], "antigravity")
+                XCTAssertEqual(request.headers["User-Agent"], AntigravityUsageClient.quotaUserAgent)
                 return HTTPResponse(statusCode: 200, headers: [:], body: Data(#"{"cloudaicompanionProject":"consumer-project","paidTier":{"name":"Google AI Pro"}}"#.utf8))
             }
             XCTAssertEqual(body?["project"] as? String, "consumer-project")

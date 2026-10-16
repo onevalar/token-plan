@@ -11,7 +11,7 @@ public sealed class UsageHistory
     const int MaximumBytes = 2 * 1024 * 1024;
     const int MaximumReadings = 2400;
     static readonly HashSet<string> Providers = ProviderCatalog.All.Select(p => p.Id).ToHashSet();
-    static readonly HashSet<string> Metrics = new() { "Session", "Weekly", "Sonnet", "Total usage", "Cursor Models", "Other Models", "Balance", "Topped Up", "Granted", "Cash", "Voucher", "Gift", "Credits", "Today", "This Week", "This Month", "Key Limit", "Web Searches", "Agent Usage", "Orb Usage", "Monthly", "Chat", "Completions", "Daily quota", "Weekly quota", "Extra usage balance", "Claude", "Claude Weekly", "Last 4 Weeks", "Fable", "Extra usage spent", "Reset Credits", "Rate Limit Resets", "Spark", "Spark Weekly", "Org Credits", "Org Spend" };
+    static readonly HashSet<string> Metrics = new() { "Session", "Weekly", "Sonnet", "Total usage", "Cursor Models", "Other Models", "Balance", "Topped Up", "Granted", "Cash", "Voucher", "Gift", "Credits", "Today", "This Week", "This Month", "Key Limit", "Web Searches", "Agent Usage", "Orb Usage", "Monthly", "Chat", "Completions", "Daily quota", "Weekly quota", "Extra usage balance", "Claude", "Claude Weekly", "Argon Weekly", "Last 4 Weeks", "Fable", "Extra usage spent", "Reset Credits", "Rate Limit Resets", "Spark", "Spark Weekly", "Org Credits", "Org Spend" };
     HistoryDocument document = new(1, new(), new());
 
     public static UsageHistory Load(string file, DateTimeOffset now)
