@@ -38,6 +38,7 @@
 "1w" = "1週";
 "24-hour" = "24 時間制";
 "30 Days" = "30 日間";
+"5 Hours" = "5時間";
 "A reset credit expires within 48 hours" = "48 時間以内に期限切れになるリセットクレジットがあります";
 "A reset credit expires within 7 days" = "7 日以内に期限切れになるリセットクレジットがあります";
 "A secure connection could not be established. Check the system clock, certificates, and HTTPS proxy." = "安全な接続を確立できません。システム時刻、証明書、HTTPS プロキシを確認してください。";
@@ -598,6 +599,7 @@
 "The synced provider identifier is invalid." = "同期されたプロバイダー識別子が無効です。";
 "The system credential reader is missing. Install libsecret-tools, or open Antigravity and refresh." = "資格情報ツールがありません。libsecret-tools をインストールするか、Antigravity を開いて更新してください。";
 "Theme" = "テーマ";
+"These three readings share one allowance. More expensive models use it up faster. They are not each model's own remaining amount." = "この3つは同じ利用枠です。高いモデルほど早く消費され、モデルごとの残りではありません。";
 "This Mac" = "この Mac";
 "This Mac wrote a newer usage-history format. Update TokenPlan." = "この Mac はより新しい使用履歴の形式で書き込みました。TokenPlan を更新してください。";
 "This Month" = "今月";

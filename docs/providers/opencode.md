@@ -8,7 +8,7 @@ OpenCode's logs already on your Mac.
 
 | Metric | Meaning |
 |---|---|
-| Session | Go usage in the rolling 5-hour window, as a percent, with the reset countdown |
+| 5 Hours | Go usage in the rolling 5-hour window, as a percent, with the reset countdown |
 | Weekly | Go usage this week, as a percent (resets Monday UTC) |
 | Monthly | Go usage this billing cycle, as a percent |
 | Today / Yesterday / Last 30 Days | Local cost and tokens across all your OpenCode-hosted usage (Go + Zen) |
@@ -16,8 +16,10 @@ OpenCode's logs already on your Mac.
 
 When you have the Go subscription, TokenPlan shows "Go" beside the provider name.
 
-The Session / Weekly / Monthly meters are **account-wide** — the same percents the OpenCode dashboard
-shows, including usage from other machines. If you only use the Zen pay-as-you-go gateway (no Go
+The 5 Hours / Weekly / Monthly meters are **one shared allowance**, not a separate remaining amount
+for each model. They are the same percents the OpenCode dashboard shows, including usage from other
+machines. More expensive models use that shared allowance up faster. Subscription details say so;
+the overview does not. If you only use the Zen pay-as-you-go gateway (no Go
 subscription), the cap meters are hidden and you'll just see the spend tiles.
 
 ## Where credentials come from
@@ -45,14 +47,15 @@ Codex / Cursor. Those dollars come straight from the per-message cost OpenCode r
 gateways on this Mac, so they can be lower than account-wide Go usage. A period with no recorded local
 usage reads "No data" rather than a misleading `$0.00`. No log data leaves your Mac.
 
-While the rolling 5-hour session window has no usage in it, the Session row shows **Not started** on
-the trailing label; hover explains that the session begins after your first message. Once the window is
+While the rolling 5-hour window has no usage in it, the 5 Hours row shows **Not started** on
+the trailing label; hover explains that the window begins after your first message. Once the window is
 running the row shows the countdown to its reset — including when OpenCode's whole-percent numbers
-still read 0% because less than 1% has been used.
+still read 0% because less than 1% has been used. If OpenCode marks a window as already blocking
+requests, that row reads used up even when the reported percent is still below 100.
 
 ## Troubleshooting
 
-- **No Session / Weekly / Monthly meters** — those are Go-plan windows. You'll see them when you're
+- **No 5 Hours / Weekly / Monthly meters** — those are Go-plan windows. You'll see them when you're
   logged into OpenCode Go and the key has an active subscription.
   Zen-only users see the spend tiles instead.
 - **"OpenCode Go key was rejected"** — the local key was not accepted. Log into OpenCode Go again. If
@@ -71,8 +74,9 @@ still read 0% because less than 1% has been used.
 ## Under the hood
 
 Go windows: `GET https://opencode.ai/zen/go/v1/usage` with the `opencode-go` key as `Authorization:
-Bearer …`. The response is `{ usage: { rolling, weekly, monthly } }`, each with `percent` and
-`resetsAt`. A 401 is a rejected key; a 403 `EntitlementError` means no Go subscription.
+Bearer …`. The response is `{ usage: { rolling, weekly, monthly } }`, each with `percent`, `resetsAt`, and
+`status`. `rolling` is shown as **5 Hours**. A `rate-limited` status is shown as used up. A 401 is a
+rejected key; a 403 `EntitlementError` means no Go subscription.
 
 Spend tiles and trend: assistant-message `cost` and token fields from every `opencode*.db` in the data
 directory (OpenCode partitions its database by release channel — stable is `opencode.db`, the preview
@@ -82,3 +86,9 @@ completed context compactions count too. OpenCode 2 copies old messages into the
 same ID, so each message is counted once. Read-only.
 
 If Go quota retrieval or credential reading fails while local usage remains available, the local totals remain visible with a warning explaining the failure. A failed local scan similarly keeps available Go meters with a warning. A local database without hosted Go/Zen usage is not a successful quota verification.
+
+The five-hour label, exhausted-window handling, and details explanation apply to macOS, Windows,
+and Linux. Existing metric IDs and Windows/Linux preference keys are retained, so saved visibility,
+order, and menu-bar/tray selections survive the label change. Placement defaults are unchanged:
+all three quota windows are enabled on the home page, the first two are pinned by default, and the
+order remains five-hour, weekly, monthly.

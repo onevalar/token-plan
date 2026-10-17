@@ -23,6 +23,8 @@ static class LocalServiceChecks
             check(LocalServiceAuth.OpenCode(directory) == "database-key", "OpenCode reads active database credentials");
         }
         var opencode = LocalServiceUsage.Parse("opencode", """{"usage":{"rolling":{"percent":0,"resetsAt":"2026-10-07T05:00:00Z"},"weekly":{"percent":40,"resetsAt":"2026-10-09T00:00:00Z"},"monthly":{"percent":60,"resetsAt":"2026-11-01T00:00:00Z"}}}""", now);
+        var limited = LocalServiceUsage.Parse("opencode", """{"usage":{"rolling":{"status":"rate-limited","percent":0,"resetsAt":"2026-10-07T05:00:00Z"},"weekly":{"status":"ok","percent":40,"resetsAt":"2026-10-09T00:00:00Z"},"monthly":{"status":"rate-limited","percent":62,"resetsAt":"2026-11-01T00:00:00Z"}}}""", now);
+        check(limited.Windows[0].UsedPercent == 100 && limited.Windows[0].ResetsAt != null && limited.Windows[1].UsedPercent == 40 && limited.Windows[2].UsedPercent == 100, "Rate-limited OpenCode windows remain exhausted with real reset time");
         check(opencode.Windows.Count == 3 && opencode.Windows[0].ResetsAt == null && opencode.Windows[1].UsedPercent == 40, "OpenCode drops only the untouched session placeholder reset");
         var copilot = LocalServiceUsage.Parse("copilot", """{"copilot_plan":"pro","quota_snapshots":{"premium_interactions":{"entitlement":100,"remaining":65},"chat":{"unlimited":true,"remaining":-1}}}""", now);
         check(copilot.Windows.Count == 1 && copilot.Windows[0].UsedPercent == 35, "Copilot suppresses unlimited buckets");

@@ -13,7 +13,7 @@ final class OpenCodeUsageMapperTests: XCTestCase {
 
     func testMeterLinesMatchDashboardPercentsAndResets() throws {
         let lines = try OpenCodeUsageMapper.meterLines(body: sampleBody)
-        XCTAssertEqual(lines.map(\.label), ["Session", "Weekly", "Monthly"])
+        XCTAssertEqual(lines.map(\.label), ["5 Hours", "Weekly", "Monthly"])
 
         guard case let .progress(_, sessionUsed, sessionLimit, sessionFormat, sessionReset, sessionPeriod, _) = lines[0] else {
             return XCTFail("session is not a progress line")
@@ -58,7 +58,7 @@ final class OpenCodeUsageMapperTests: XCTestCase {
     }
 
     /// An untouched rolling window has nothing to roll off, so the API answers `resetsAt = now + 5h`
-    /// and slides it forward every request. That placeholder is dropped at capture time so the Session
+    /// and slides it forward every request. That placeholder is dropped at capture time so the 5 Hours
     /// row reads "Not started" off the missing reset rather than counting down to a moving target.
     func testUntouchedRollingWindowDropsPlaceholderReset() throws {
         let capturedAt = Date(timeIntervalSince1970: 1_800_000_000)
@@ -219,6 +219,30 @@ final class OpenCodeUsageMapperTests: XCTestCase {
                 XCTAssertEqual(error as? OpenCodeUsageError, .invalidResponse)
             }
         }
+    }
+
+    func testRateLimitedWindowReadsUsedUpAndKeepsReset() throws {
+        let capturedAt = Date(timeIntervalSince1970: 1_800_000_000)
+        let placeholder = capturedAt.addingTimeInterval(5 * 3600)
+        let reset = OpenUsageISO8601.string(from: placeholder)
+        let body: [String: Any] = [
+            "usage": [
+                "rolling": ["status": "rate-limited", "percent": 62, "resetsAt": reset],
+                "weekly": ["status": "ok", "percent": 10, "resetsAt": "2026-07-13T00:00:00.000Z"],
+                "monthly": ["status": "rate-limited", "percent": 40, "resetsAt": "2026-08-04T00:00:00.000Z"]
+            ]
+        ]
+        let lines = try OpenCodeUsageMapper.meterLines(body: body, capturedAt: capturedAt)
+        guard case let .progress(_, rollingUsed, _, _, rollingReset, _, _) = lines[0],
+              case let .progress(_, weeklyUsed, _, _, _, _, _) = lines[1],
+              case let .progress(_, monthlyUsed, _, _, monthlyReset, _, _) = lines[2] else {
+            return XCTFail("expected progress lines")
+        }
+        XCTAssertEqual(rollingUsed, 100)
+        XCTAssertEqual(rollingReset, placeholder)
+        XCTAssertEqual(weeklyUsed, 10)
+        XCTAssertEqual(monthlyUsed, 100)
+        XCTAssertNotNil(monthlyReset)
     }
 
     func testPercentIsClamped() throws {

@@ -28,7 +28,7 @@ enum OpenCodeUsageMapper {
             throw OpenCodeUsageError.invalidResponse
         }
         return [
-            try window(usage["rolling"], label: "Session", periodMs: MetricPeriod.sessionMs,
+            try window(usage["rolling"], label: "5 Hours", periodMs: MetricPeriod.sessionMs,
                        capturedAt: capturedAt, dropsPlaceholderReset: true),
             try window(usage["weekly"], label: "Weekly", periodMs: MetricPeriod.weekMs, capturedAt: capturedAt),
             try window(usage["monthly"], label: "Monthly", periodMs: MetricPeriod.monthMs, capturedAt: capturedAt)
@@ -49,7 +49,7 @@ enum OpenCodeUsageMapper {
     /// One window. `dropsPlaceholderReset` is for the rolling session only: with no calls inside the
     /// window there is nothing to roll off, so the API answers `resetsAt = now + 5h` and re-derives it
     /// on every request rather than reporting a real instant. That placeholder means "if you started
-    /// now", so it is dropped to `nil` here and the Session row renders "Not started" off the missing
+    /// now", so it is dropped to `nil` here and the 5 Hours row renders "Not started" off the missing
     /// reset. Doing it at capture time is what makes it sound: the full-period comparison is exact only
     /// at the instant the snapshot is taken, and drifts every second afterwards, so it must not be
     /// re-run at render time.
@@ -73,7 +73,11 @@ enum OpenCodeUsageMapper {
         else {
             throw OpenCodeUsageError.invalidResponse
         }
-        let used = ProviderParse.clampPercent(percent)
+        // `rate-limited` means the window is already blocking requests, even when the whole-percent
+        // field has not reached 100. Treat that as used up and keep the reset countdown.
+        let exhausted = (object["status"] as? String)?
+            .trimmingCharacters(in: .whitespacesAndNewlines) == "rate-limited"
+        let used = exhausted ? 100 : ProviderParse.clampPercent(percent)
         var resetsAt: Date? = reportedReset
         if dropsPlaceholderReset, used == 0 {
             let period = TimeInterval(periodMs) / 1000

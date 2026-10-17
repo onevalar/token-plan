@@ -46,7 +46,7 @@ public sealed partial class MainWindow : Window
     public IEnumerable<string> TraySummaries() => TrayAccountEntries()
         .Where(result => TrayAccountSelected(result) && preferences.AccountVisibility.GetValueOrDefault(result.SettingsKey, true))
         .SelectMany(result => TrayReadings.Select(result, preferences.PinnedMetrics.GetValueOrDefault(result.SettingsKey))
-            .Select(metric => TrayAccountLabel(result) + " · " + L.T(metric.Label) + " " + MetricValue(metric)
+            .Select(metric => TrayAccountLabel(result) + " · " + MetricTitle(result.Id, metric.Label) + " " + MetricValue(metric)
                 + (result.ErrorKey != null ? " · " + L.T("Needs Attention") : "")));
     readonly Dictionary<string, Vector> scrollPositions = new();
     ScrollViewer? pageScroll;
@@ -208,7 +208,7 @@ public sealed partial class MainWindow : Window
             if (snapshot.Windows.Count == 0) body.Children.Add(Text(L.T("No quota data is available."), 12, true));
             var metrics = preferences.OrderedMetrics(result.SettingsKey, snapshot.Windows).Where(w => preferences.Placement(result.SettingsKey, w.Label) != MetricPlacement.Hidden).ToArray();
             var primary = detail ? metrics : metrics.Where(w => preferences.Placement(result.SettingsKey, w.Label) == MetricPlacement.Home).ToArray();
-            foreach (var metric in primary) body.Children.Add(MetricRow(metric));
+            foreach (var metric in primary) body.Children.Add(MetricRow(metric, result.Id));
             if (detail && result.AccountKey == null && ProviderCatalog.TokenLogProviders.Contains(result.Id)) body.Children.Add(ServiceSpendRows(result.Id));
             body.Children.Add(Text(L.T(result.ErrorKey == null ? "Updated" : "Last Successful Update") + " " + snapshot.FetchedAt.ToLocalTime().ToString("g"), 11, true));
         }

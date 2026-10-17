@@ -63,6 +63,10 @@ final class OpenCodeProvider: ProviderRuntime {
     /// measured, not imputed.
     private let sourceNote = "From your OpenCode logs"
 
+    /// Shown on subscription details only. The usage API returns one shared percent, not a remaining
+    /// allowance for each model.
+    static let sharedAllowanceNote = "These three readings share one allowance. More expensive models use it up faster. They are not each model's own remaining amount."
+
     /// Edge-triggers the auth-read-failure log so a persistently unreadable `auth.json` warns once per
     /// run, not once per 5-minute refresh.
     private var loggedAuthReadFailure = false
@@ -80,10 +84,10 @@ final class OpenCodeProvider: ProviderRuntime {
     }
 
     var widgetDescriptors: [WidgetDescriptor] {
-        // Go plan windows from `/zen/go/v1/usage` (Session/Weekly/Monthly + trend above the fold);
+        // Go plan windows from `/zen/go/v1/usage` (5 Hours/Weekly/Monthly + trend above the fold);
         // the spend tiles below sum combined OpenCode-hosted (Go + Zen) spend from local logs.
         [
-            .percent(id: "opencode.session", provider: provider, title: "Session", sessionStartSignal: .missingResetDate)
+            .percent(id: "opencode.session", provider: provider, title: "5 Hours", sessionStartSignal: .missingResetDate)
                 .exportingLimit("session", unit: "percent"),
             .percent(id: "opencode.weekly", provider: provider, title: "Weekly")
                 .exportingLimit("weekly", unit: "percent"),

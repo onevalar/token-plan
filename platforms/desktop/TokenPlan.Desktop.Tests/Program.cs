@@ -71,6 +71,18 @@ try
         window.Measure(new Size(680, 500)); window.Arrange(new Rect(0, 0, 680, 500)); Dispatcher.UIThread.RunJobs();
         Check(window.GetVisualDescendants().OfType<CheckBox>().Any(), "Detail controls available at minimum window size");
     }
+    results["opencode"] = new("opencode", "OpenCode", new("opencode", "OpenCode", "Go", new[] { new UsageWindow("Session", 100, DateTimeOffset.UtcNow.AddHours(2)) }, DateTimeOffset.UtcNow), null);
+    var metricTitle = typeof(MainWindow).GetMethod("MetricTitle", BindingFlags.Static | BindingFlags.NonPublic)!;
+    Check((string)metricTitle.Invoke(null, new object[] { "opencode", "Session" })! == L.T("5 Hours"), "OpenCode display label explicitly identifies five hours");
+    Set("preferences", new Preferences().PlaceMetric("opencode", "Session", MetricPlacement.Hidden, results["opencode"].Snapshot!.Windows));
+    Check(((Preferences)Get("preferences")!).Placement("opencode", "Session") == MetricPlacement.Hidden, "OpenCode keeps existing metric preference identity");
+    Call("OpenDetail", "opencode"); Call("Render");
+    window.Measure(new Size(680, 500)); window.Arrange(new Rect(0, 0, 680, 500)); Dispatcher.UIThread.RunJobs();
+    var allowance = L.T("These three readings share one allowance. More expensive models use it up faster. They are not each model's own remaining amount.");
+    Check(!window.GetVisualDescendants().OfType<TextBlock>().Any(t => t.Text == allowance), "Hidden OpenCode quota does not leave a misleading allowance note");
+    Set("preferences", new Preferences()); Call("Render");
+    window.Measure(new Size(680, 500)); window.Arrange(new Rect(0, 0, 680, 500)); Dispatcher.UIThread.RunJobs();
+    Check(window.GetVisualDescendants().OfType<TextBlock>().Any(t => t.Text == allowance), "OpenCode details show the localized shared allowance note");
     Set("preferences", new Preferences().Pin("claude", "Session", true).Pin("claude", "Weekly", true));
     Call("OpenDetail", "claude"); Set("detailSettings", true); Call("Render");
     window.Measure(new Size(560, 720)); window.Arrange(new Rect(0, 0, 560, 720)); Dispatcher.UIThread.RunJobs();

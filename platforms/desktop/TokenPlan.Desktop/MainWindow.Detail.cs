@@ -39,6 +39,8 @@ public sealed partial class MainWindow
         if (!detailSettings)
         {
             body.Children.Add(Card(result ?? new(id, ProviderName(id), null, "No usage yet. Refresh after signing in."), detail: true));
+            if (id == "opencode" && result?.Snapshot?.Windows.Any(w => w.Label is "Session" or "Weekly" or "Monthly" && preferences.Placement(scope, w.Label) != MetricPlacement.Hidden) == true)
+                body.Children.Add(Text(L.T("These three readings share one allowance. More expensive models use it up faster. They are not each model's own remaining amount."), 12, true));
             if (result?.AccountKey != null) { if (result.AccountEmail == null) body.Children.Add(Text(result.Name, 14, true)); body.Children.Add(AccountHistory(result)); }
         }
         else

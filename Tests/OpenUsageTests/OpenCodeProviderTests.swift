@@ -90,8 +90,8 @@ final class OpenCodeProviderTests: XCTestCase {
         XCTAssertEqual(http.requests.first?.url, OpenCodeUsageClient.usageURL)
         XCTAssertEqual(http.requests.first?.headers["Authorization"], "Bearer sk-test")
 
-        guard case let .progress(_, used, limit, format, _, _, _)? = snapshot.line(label: "Session") else {
-            return XCTFail("expected a Session meter")
+        guard case let .progress(_, used, limit, format, _, _, _)? = snapshot.line(label: "5 Hours") else {
+            return XCTFail("expected a 5 Hours meter")
         }
         XCTAssertEqual(used, 12)
         XCTAssertEqual(limit, 100)
@@ -148,6 +148,7 @@ final class OpenCodeProviderTests: XCTestCase {
         XCTAssertEqual(data.resetsAt, activeReset)
         XCTAssertFalse(data.isFreshSessionWindow(now: fixedNow))
         XCTAssertEqual(data.boundedTrailingText(now: fixedNow), "5h")
+        XCTAssertEqual(data.overviewTitle, tr("5 Hours"))
     }
 
     func testUntouchedSessionRendersNotStartedThroughProviderAndStore() async throws {
@@ -213,7 +214,7 @@ final class OpenCodeProviderTests: XCTestCase {
         ).refresh()
         XCTAssertNil(snapshot.errorCategory)
         XCTAssertEqual(snapshot.plan, "Go")
-        XCTAssertNotNil(snapshot.line(label: "Session"))
+        XCTAssertNotNil(snapshot.line(label: "5 Hours"))
         XCTAssertNil(snapshot.line(label: "Today"))
     }
 
@@ -227,7 +228,7 @@ final class OpenCodeProviderTests: XCTestCase {
         ).refresh()
         XCTAssertNil(snapshot.errorCategory)
         XCTAssertEqual(snapshot.plan, "Go")
-        XCTAssertNotNil(snapshot.line(label: "Session"))
+        XCTAssertNotNil(snapshot.line(label: "5 Hours"))
         XCTAssertNil(snapshot.line(label: "Today"))
     }
 
@@ -240,7 +241,7 @@ final class OpenCodeProviderTests: XCTestCase {
             )
         ).refresh()
         XCTAssertEqual(snapshot.errorCategory, .credentialAccess)
-        XCTAssertNil(snapshot.line(label: "Session"))
+        XCTAssertNil(snapshot.line(label: "5 Hours"))
     }
 
     func testRefreshSurfacesUnreadableAuthFileInsteadOfNotLoggedIn() async {
@@ -274,7 +275,7 @@ final class OpenCodeProviderTests: XCTestCase {
         }
         XCTAssertFalse(values.contains(where: \.estimated))
         XCTAssertNil(snapshot.plan)
-        XCTAssertNil(snapshot.line(label: "Session"))
+        XCTAssertNil(snapshot.line(label: "5 Hours"))
     }
 
     func testUnauthorizedKeyFailsLoudly() async {
@@ -319,7 +320,7 @@ final class OpenCodeProviderTests: XCTestCase {
         ).refresh()
         XCTAssertNil(snapshot.errorCategory)
         XCTAssertNil(snapshot.plan)
-        XCTAssertNil(snapshot.line(label: "Session"))
+        XCTAssertNil(snapshot.line(label: "5 Hours"))
         XCTAssertNotNil(snapshot.line(label: "Today"))
     }
 
@@ -365,7 +366,7 @@ final class OpenCodeProviderTests: XCTestCase {
             XCTAssertNil(snapshot.errorCategory)
             XCTAssertNil(snapshot.plan)
             XCTAssertNotNil(snapshot.warning)
-            XCTAssertNil(snapshot.line(label: "Session"))
+            XCTAssertNil(snapshot.line(label: "5 Hours"))
             XCTAssertNotNil(snapshot.line(label: "Today"))
         }
     }

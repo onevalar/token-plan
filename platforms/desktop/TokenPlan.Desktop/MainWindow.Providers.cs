@@ -121,7 +121,7 @@ public sealed partial class MainWindow
         foreach (var window in reading.Windows)
         {
             var line = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto") };
-            Add(line, Text(L.T(window.Label), 12, true));
+            Add(line, Text(MetricTitle(reading.Provider, window.Label), 12, true));
             Add(line, Text(MetricValue(window), 12), 0, 1); row.Children.Add(line);
             if (window.ResetsAt is { } reset) row.Children.Add(Text(L.T("Resets") + " " + reset.ToLocalTime().ToString("g"), 11, true));
         }

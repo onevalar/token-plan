@@ -125,7 +125,7 @@ enum DefaultLayout {
         // Ollama: Session, Weekly, and Monthly stay above the fold; the rolling four-week spend total
         // (always $0.00 on a subscription, real only for pay-as-you-go) sits below the caret.
         "ollama.last4Weeks",
-        // OpenCode: the three Go caps (Session/Weekly/Monthly) and Usage Trend stay above the fold —
+        // OpenCode: the three Go caps (5 Hours/Weekly/Monthly) and Usage Trend stay above the fold —
         // matching every other provider — with the spend tiles (Today/Yesterday/Last 30 Days) below.
         "opencode.today", "opencode.yesterday", "opencode.last30",
         // OpenRouter: Credits meter + Balance stay above the fold; period spend and the per-key cap

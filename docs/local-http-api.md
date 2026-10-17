@@ -99,9 +99,11 @@ For bounded progress resources, `unit` follows the provider's live metric format
 `totalUsage` is `percent` on percentage-based plans, `requests` on request-based Enterprise plans, and
 `usd` when Cursor reports a dollar pool. Copilot `premiumCredits` is `percent` on paid plans and a
 `credits` count on org-managed seats that only report personal `credits_used`. OpenCode `session`,
-`weekly`, and `monthly` are `percent`. An untouched OpenCode `session` omits `resetsAt`; the field appears
+`weekly`, and `monthly` are `percent`. The app shows the rolling window as **5 Hours**; the resource
+key stays `session`. An untouched OpenCode `session` omits `resetsAt`; the field appears
 with the anchored reset instant after the first model call starts the rolling window, even while `used`
-is still 0 because OpenCode reports whole percentages.
+is still 0 because OpenCode reports whole percentages. A window OpenCode marks as blocking requests
+is reported as fully used.
 
 ### Public resources
 

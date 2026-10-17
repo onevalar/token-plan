@@ -20,15 +20,15 @@ public sealed partial class MainWindow
         var metrics = preferences.OrderedMetrics(id, snapshot.Windows);
         foreach (var metric in metrics)
         {
-            var row = Row(); var label = Text(L.T(metric.Label), 13); label.VerticalAlignment = VerticalAlignment.Center; Add(row, label);
+            var row = Row(); var label = Text(MetricTitle(id, metric.Label), 13); label.VerticalAlignment = VerticalAlignment.Center; Add(row, label);
             var placement = preferences.Placement(id, metric.Label);
             var values = Enum.GetValues<MetricPlacement>();
             var status = new ComboBox { Name = "metric-status-" + metric.Label, ItemsSource = values.Select(p => L.T(p switch { MetricPlacement.Home => "Show on Home", MetricPlacement.Details => "Details Only", _ => "Hidden" })).ToArray(), SelectedIndex = Array.IndexOf(values, placement), Width = 138, MinWidth = 138, MaxWidth = 138 };
-            Avalonia.Automation.AutomationProperties.SetName(status, L.T("Display Configuration") + ": " + L.T(metric.Label));
+            Avalonia.Automation.AutomationProperties.SetName(status, L.T("Display Configuration") + ": " + MetricTitle(id, metric.Label));
             status.SelectionChanged += (_, _) => { if (status.SelectedIndex < 0) return; preferences = preferences.PlaceMetric(id, metric.Label, values[status.SelectedIndex], metrics); Save(); Render(); };
             Add(row, status, 0, 1);
             var pin = new CheckBox { Name = "metric-pin-" + metric.Label, IsChecked = pins.Contains(metric.Label), IsEnabled = pins.Contains(metric.Label) || pins.Length < 2, HorizontalAlignment = HorizontalAlignment.Center };
-            Avalonia.Automation.AutomationProperties.SetName(pin, L.T("System Tray") + ": " + L.T(metric.Label));
+            Avalonia.Automation.AutomationProperties.SetName(pin, L.T("System Tray") + ": " + MetricTitle(id, metric.Label));
             pin.IsCheckedChanged += (_, _) => { preferences = (preferences with { PinnedMetrics = new(preferences.PinnedMetrics) { [id] = pins } }).Pin(id, metric.Label, pin.IsChecked == true); Save(); Render(); }; Add(row, pin, 0, 2);
             var order = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 2 };
             foreach (var delta in new[] { -1, 1 })
@@ -36,7 +36,7 @@ public sealed partial class MainWindow
                 var move = Action(delta < 0 ? "Move Up" : "Move Down", () => { preferences = preferences.MoveMetric(id, metric.Label, delta, metrics); Save(); Render(); });
                 move.Content = delta < 0 ? "↑" : "↓"; move.Padding = new Thickness(6, 4); move.MinHeight = 30;
                 move.IsEnabled = delta < 0 ? metric != metrics.First() : metric != metrics.Last();
-                Avalonia.Automation.AutomationProperties.SetName(move, L.T(delta < 0 ? "Move Up" : "Move Down") + ": " + L.T(metric.Label)); order.Children.Add(move);
+                Avalonia.Automation.AutomationProperties.SetName(move, L.T(delta < 0 ? "Move Up" : "Move Down") + ": " + MetricTitle(id, metric.Label)); order.Children.Add(move);
             }
             Add(row, order, 0, 3); rows.Children.Add(row);
         }

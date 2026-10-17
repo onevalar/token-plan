@@ -38,6 +38,7 @@
 "1w" = "1周";
 "24-hour" = "24 小时制";
 "30 Days" = "30 天";
+"5 Hours" = "5 小时";
 "A reset credit expires within 48 hours" = "有重置额度将在 48 小时内到期";
 "A reset credit expires within 7 days" = "有重置额度将在 7 天内到期";
 "A secure connection could not be established. Check the system clock, certificates, and HTTPS proxy." = "无法建立安全连接，请检查系统时间、证书和 HTTPS 代理。";
@@ -598,6 +599,7 @@
 "The synced provider identifier is invalid." = "同步的服务商标识无效。";
 "The system credential reader is missing. Install libsecret-tools, or open Antigravity and refresh." = "缺少系统凭据读取工具。请安装 libsecret-tools，或打开 Antigravity 后刷新。";
 "Theme" = "主题";
+"These three readings share one allowance. More expensive models use it up faster. They are not each model's own remaining amount." = "这三条是同一份额度。贵的模型会更快用完，不是每个模型各自的剩余量。";
 "This Mac" = "这台 Mac";
 "This Mac wrote a newer usage-history format. Update TokenPlan." = "这台 Mac 写入了更新的用量历史格式。请更新 TokenPlan。";
 "This Month" = "本月";

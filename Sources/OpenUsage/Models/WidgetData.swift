@@ -272,6 +272,7 @@ struct WidgetData: Hashable {
     var overviewTitle: String {
         guard isBounded, let periodDurationMs,
               let period = Formatters.periodLabel(milliseconds: periodDurationMs) else { return title }
+        if title == tr("5 Hours") { return title }
         if [tr("Session"), tr("Weekly"), tr("Daily"), tr("Monthly")].contains(title) { return period }
         // Model-scoped weekly labels already name the cadence; show it only once.
         let scope: String

@@ -38,6 +38,7 @@
 "1w" = "1주";
 "24-hour" = "24시간제";
 "30 Days" = "30일";
+"5 Hours" = "5시간";
 "A reset credit expires within 48 hours" = "48시간 이내에 만료되는 초기화 크레딧이 있습니다";
 "A reset credit expires within 7 days" = "7일 이내에 만료되는 초기화 크레딧이 있습니다";
 "A secure connection could not be established. Check the system clock, certificates, and HTTPS proxy." = "보안 연결을 설정할 수 없습니다. 시스템 시간, 인증서 및 HTTPS 프록시를 확인하세요.";
@@ -598,6 +599,7 @@
 "The synced provider identifier is invalid." = "동기화된 제공업체 식별자가 올바르지 않습니다.";
 "The system credential reader is missing. Install libsecret-tools, or open Antigravity and refresh." = "자격 증명 도구가 없습니다. libsecret-tools를 설치하거나 Antigravity를 열고 새로 고침하세요.";
 "Theme" = "테마";
+"These three readings share one allowance. More expensive models use it up faster. They are not each model's own remaining amount." = "이 세 항목은 같은 한도입니다. 비싼 모델일수록 더 빨리 소진되며, 모델별 잔여량이 아닙니다.";
 "This Mac" = "이 Mac";
 "This Mac wrote a newer usage-history format. Update TokenPlan." = "이 Mac이 더 새로운 사용 기록 형식으로 기록했습니다. TokenPlan을 업데이트하세요.";
 "This Month" = "이번 달";

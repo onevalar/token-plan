@@ -5,11 +5,12 @@ using TokenPlan.Core;
 namespace TokenPlan.Desktop;
 public sealed partial class MainWindow
 {
-    Control MetricRow(UsageWindow metric)
+    static string MetricTitle(string? id, string label) => L.T(id == "opencode" && label == "Session" ? "5 Hours" : label);
+    Control MetricRow(UsageWindow metric, string? providerId = null)
     {
         var body = Stack(6);
         var row = new Grid { ColumnDefinitions = new(metric.IsBalance ? "*,Auto" : "*,Auto,88"), MinHeight = preferences.Compact ? 22 : 26 };
-        var label = Text(L.T(metric.Label), 13); label.VerticalAlignment = VerticalAlignment.Center; label.TextWrapping = Avalonia.Media.TextWrapping.NoWrap; label.TextTrimming = Avalonia.Media.TextTrimming.CharacterEllipsis; label.Margin = new Thickness(0, 0, 6, 0); Add(row, label);
+        var label = Text(MetricTitle(providerId, metric.Label), 13); label.VerticalAlignment = VerticalAlignment.Center; label.TextWrapping = Avalonia.Media.TextWrapping.NoWrap; label.TextTrimming = Avalonia.Media.TextTrimming.CharacterEllipsis; label.Margin = new Thickness(0, 0, 6, 0); Add(row, label);
         var value = Text(preferences.HideValues ? "•••" : metric.Amount != null ? metric.FormattedAmount : (preferences.ShowRemaining ? metric.RemainingPercent : metric.UsedPercent).ToString("0.#") + "%", 13);
         value.MinWidth = 54; value.Margin = new Thickness(8, 0, 0, 0); value.TextWrapping = Avalonia.Media.TextWrapping.NoWrap;
         value.HorizontalAlignment = HorizontalAlignment.Right; value.VerticalAlignment = VerticalAlignment.Center;
@@ -17,7 +18,7 @@ public sealed partial class MainWindow
         else
         {
             var progress = new ProgressBar { Minimum = 0, Maximum = 100, Value = preferences.HideValues ? 0 : Math.Clamp(preferences.ShowRemaining ? metric.RemainingPercent : metric.UsedPercent, 0, 100), Height = 6, MinHeight = 0, MaxHeight = 6, Background = Line, Foreground = metric.UsedPercent >= 90 ? Avalonia.Media.Brush.Parse("#DE7650") : Accent, CornerRadius = new CornerRadius(3), ClipToBounds = true, VerticalAlignment = VerticalAlignment.Center };
-            Avalonia.Automation.AutomationProperties.SetName(progress, L.T(metric.Label)); body.Children.Add(progress); Add(row, value, 0, 1);
+            Avalonia.Automation.AutomationProperties.SetName(progress, MetricTitle(providerId, metric.Label)); body.Children.Add(progress); Add(row, value, 0, 1);
             var reset = Text(preferences.HideValues ? "•••" : ResetLabel(metric.ResetsAt), 11, true); reset.HorizontalAlignment = HorizontalAlignment.Right; reset.VerticalAlignment = VerticalAlignment.Center; Add(row, reset, 0, 2);
         }
         body.Children.Insert(0, row);

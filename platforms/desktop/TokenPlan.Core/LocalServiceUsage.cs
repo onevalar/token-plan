@@ -20,6 +20,7 @@ public static class LocalServiceUsage
                 var window = Field(usage, key);
                 var percent = Number(window, "percent") ?? throw new InvalidDataException();
                 DateTimeOffset? reset = Date(window, "resetsAt") ?? throw new InvalidDataException();
+                if (UsageParser.String(window, "status")?.Trim() == "rate-limited") percent = 100;
                 if (key == "rolling" && percent == 0 && Math.Abs((reset.Value - now).TotalSeconds - 18000) <= 2) reset = null;
                 rows.Add(new(label, Math.Clamp(percent, 0, 100), reset));
             }

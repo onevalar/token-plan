@@ -96,6 +96,16 @@ struct CustomizeProviderDetailView: View {
         }
     }
 
+    private func showsOpenCodeAllowanceNote(in group: ProviderMetrics) -> Bool {
+        guard ProviderAccountID.family(of: providerID) == "opencode" else { return false }
+        let quotaIDs: Set<String> = ["opencode.session", "opencode.weekly", "opencode.monthly"]
+        return group.metrics.contains { metric in
+            quotaIDs.contains(metric.id)
+                && layout.isMetricEnabled(metric.id)
+                && dataStore.data(for: metric).hasData
+        }
+    }
+
     private func detailTab(_ title: LocalizedStringKey, settings: Bool) -> some View {
         Button { showsSettings = settings } label: {
             Text(title).font(.subheadline.weight(.medium))
@@ -124,6 +134,13 @@ struct CustomizeProviderDetailView: View {
                 }
             }
             .cardSurface()
+            if showsOpenCodeAllowanceNote(in: group) {
+                Text(tr(OpenCodeProvider.sharedAllowanceNote))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .padding(.horizontal, 8)
+            }
             ForEach(credits, id: \.id) { metric in
                 WidgetRowView(data: dataStore.data(for: metric), showsDetails: true)
                     .padding(.vertical, density.cardGutter)
