@@ -19,6 +19,12 @@ static class LocalServiceChecks
             db.Open(); using var command = db.CreateCommand();
             command.CommandText = "CREATE TABLE credential(id TEXT, integration_id TEXT, active INTEGER, time_updated INTEGER, value TEXT)"; command.ExecuteNonQuery();
             check(LocalServiceAuth.OpenCode(directory) == null, "OpenCode database logout cannot resurrect the stale legacy credential");
+            command.CommandText = "CREATE TABLE migration(id TEXT PRIMARY KEY, time_completed INTEGER)"; command.ExecuteNonQuery();
+            check(LocalServiceAuth.OpenCode(directory) == "legacy-key", "Empty credential table before import retains live file login");
+            command.CommandText = "INSERT INTO migration VALUES('20260805200742_import_legacy_credentials',1)"; command.ExecuteNonQuery();
+            check(LocalServiceAuth.OpenCode(directory) == null, "Completed credential import prevents stale file revival after logout");
+            command.CommandText = "DELETE FROM migration; INSERT INTO credential VALUES('inactive','opencode-go',0,1,'{\"key\":\"inactive-key\"}')"; command.ExecuteNonQuery();
+            check(LocalServiceAuth.OpenCode(directory) == null, "Inactive credential cannot fall back to an old file even without import marker");
             command.CommandText = "INSERT INTO credential VALUES('1','opencode-go',1,1,'{\"key\":\"database-key\"}')"; command.ExecuteNonQuery();
             check(LocalServiceAuth.OpenCode(directory) == "database-key", "OpenCode reads active database credentials");
         }

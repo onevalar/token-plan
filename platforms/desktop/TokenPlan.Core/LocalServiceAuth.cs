@@ -41,10 +41,14 @@ public static class LocalServiceAuth
             connection.Open();
             using var exists = connection.CreateCommand(); exists.CommandText = "SELECT 1 FROM sqlite_master WHERE type='table' AND name='credential'";
             if (exists.ExecuteScalar() == null) continue;
-            hasTable = true;
             using var command = connection.CreateCommand();
             command.CommandText = "SELECT json_extract(value,'$.key') FROM credential WHERE integration_id='opencode-go' AND (active IS NULL OR active=1) AND length(value)<=16384 ORDER BY active DESC,time_updated DESC,id DESC LIMIT 1";
             if (command.ExecuteScalar() is string key && !string.IsNullOrWhiteSpace(key)) return key.Trim();
+            using var migrationTable = connection.CreateCommand();
+            migrationTable.CommandText = "SELECT 1 FROM sqlite_master WHERE type='table' AND name='migration'";
+            if (migrationTable.ExecuteScalar() == null) { hasTable = true; continue; }
+            command.CommandText = "SELECT CASE WHEN NOT EXISTS (SELECT 1 FROM credential) AND NOT EXISTS (SELECT 1 FROM migration WHERE id='20260805200742_import_legacy_credentials') THEN 1 ELSE 0 END";
+            if (Convert.ToInt64(command.ExecuteScalar()) != 1) hasTable = true;
         }
         // Once imported, the old auth.json must not resurrect a logged-out database credential.
         if (hasTable) return null;

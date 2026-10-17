@@ -37,6 +37,14 @@ struct OpenCodeAuthStore: Sendable {
         LIMIT 1;
         """
 
+    /// Schema creation predates credential import. Only a proven empty, unimported database
+    /// can still use the legacy file. Unknown schemas remain database-authoritative.
+    static let credentialSQLLegacyFileIsLive = """
+        SELECT CASE WHEN NOT EXISTS (SELECT 1 FROM credential)
+        AND NOT EXISTS (SELECT 1 FROM migration WHERE id = '20260805200742_import_legacy_credentials')
+        THEN 1 ELSE 0 END;
+        """
+
     init(
         files: TextFileAccessing = LocalTextFileAccessor(),
         environment: EnvironmentReading = ProcessEnvironmentReader(),
@@ -61,7 +69,8 @@ struct OpenCodeAuthStore: Sendable {
 
     /// The non-empty `opencode-go` API key, or `nil` when the user has not logged into OpenCode Go.
     /// OpenCode 2 keeps it in each channel database's `credential` table; the first database holding
-    /// a key wins. `auth.json` stands in only when no database has that table — once one does, the
+    /// a key wins. `auth.json` stands in when no database has imported credentials; an empty pre-import table
+    /// is not a completed migration. Once import completes, the
     /// imported file is stale and a logout (which deletes the row) must not be revived by it. Reads
     /// only the `opencode-go` entry, tolerant of unrelated sibling entries. A present file or database
     /// that can't be read throws `credentialsUnreadable` so broken storage is never mistaken for logout.
@@ -77,9 +86,16 @@ struct OpenCodeAuthStore: Sendable {
         for path in paths {
             do {
                 let value = try sqlite.queryValue(path: path, sql: Self.credentialSQLGoKey)
-                hasCredentialTable = true
                 if let key = value?.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty {
                     return key
+                }
+                do {
+                    if try sqlite.queryValue(path: path, sql: Self.credentialSQLLegacyFileIsLive)?
+                        .trimmingCharacters(in: .whitespacesAndNewlines) != "1" {
+                        hasCredentialTable = true
+                    }
+                } catch where Self.isMissingTable(error) {
+                    hasCredentialTable = true
                 }
             } catch where Self.isMissingTable(error) {
                 continue

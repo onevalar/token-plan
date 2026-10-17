@@ -27,8 +27,8 @@ subscription), the cap meters are hidden and you'll just see the spend tiles.
 Use OpenCode as usual. TokenPlan reads the `opencode-go` API key from OpenCode's local data directory
 (`~/.local/share/opencode`, or `$OPENCODE_DATA_DIR` / `$XDG_DATA_HOME` if you've set them) and sends it
 as a Bearer token to the usage API. OpenCode 2 keeps that key in its local databases; OpenCode 1 keeps
-it in `auth.json`. OpenCode 2 leaves an old copy of `auth.json` behind after upgrading, so once the
-databases hold credentials, TokenPlan ignores that file — logging out of Go in OpenCode 2 is respected. There's no login prompt and no token to paste. Spend tiles
+it in `auth.json`. OpenCode 2 leaves an old copy of `auth.json` behind after upgrading, so once credential import has completed (or the database already holds credential rows),
+TokenPlan ignores that file — logging out of Go in OpenCode 2 is respected. There's no login prompt and no token to paste. Spend tiles
 still read the local SQLite logs in that same directory.
 
 When OpenCode uses its built-in ChatGPT Pro/Plus OAuth login, that usage belongs to the Codex
@@ -92,3 +92,11 @@ and Linux. Existing metric IDs and Windows/Linux preference keys are retained, s
 order, and menu-bar/tray selections survive the label change. Placement defaults are unchanged:
 all three quota windows are enabled on the home page, the first two are pinned by default, and the
 order remains five-hour, weekly, monthly.
+
+A schema upgrade can create an empty `credential` table before importing `auth.json`.
+On macOS, Windows and Linux, TokenPlan checks the `migration` entry
+`20260805200742_import_legacy_credentials` instead of treating table existence as logout.
+An empty table with a readable migration history and no import entry permits the file login;
+completed imports, existing credential rows (including inactive ones), unknown schemas, and
+unreadable databases do not revive an old file credential. This matches OpenCode's
+[credential import migration](https://github.com/anomalyco/opencode/blob/dev/packages/core/src/database/migration/20260805200742_import_legacy_credentials.ts).

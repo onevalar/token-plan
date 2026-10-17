@@ -70,6 +70,14 @@ final class OpenCodeAuthStoreTests: XCTestCase {
         }
     }
 
+    func testEmptyUnimportedTableKeepsLegacyLoginButCompletedImportDoesNot() throws {
+        let files = FakeFiles(["/oc/auth.json": staleAuth])
+        for state in ["1", "0", nil] as [String?] {
+            let store = openCodeAuthStore(files: files, sqlite: MigrationSQLite(state: state), databasePaths: [stable])
+            XCTAssertEqual(try store.goAPIKey(), state == "1" ? "sk-stale" : nil)
+        }
+    }
+
     func testReadsGoKey() throws {
         XCTAssertEqual(try store(#"{"opencode-go":{"type":"api","key":"sk-abc"}}"#).goAPIKey(), "sk-abc")
     }
@@ -222,4 +230,13 @@ final class UnreadableFiles: TextFileAccessing, @unchecked Sendable {
     }
     func writeText(_ path: String, _ text: String) throws {}
     func remove(_ path: String) throws {}
+}
+
+private struct MigrationSQLite: SQLiteAccessing {
+    let state: String?
+    func queryValue(path: String, sql: String) throws -> String? {
+        if sql == OpenCodeAuthStore.credentialSQLLegacyFileIsLive { return state }
+        return nil
+    }
+    func execute(path: String, sql: String) throws {}
 }
