@@ -5,6 +5,22 @@
         <link>https://github.com/onevalar/token-plan</link>
         <description>TokenPlan macOS updates</description>
         <item>
+            <title>1.0.9</title>
+            <pubDate>Sat, 17 Oct 2026 05:20:47 +0000</pubDate>
+            <sparkle:version>1792213978</sparkle:version>
+            <sparkle:shortVersionString>1.0.9</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+            <description><![CDATA[<pre># TokenPlan 1.0.9
+
+- 将 OpenCode Go 的“会话”明确显示为“5 小时”，保留原有显示配置、排序和菜单栏／托盘选择。
+- 修复 OpenCode 已限流时仍显示可用额度的问题，并保留服务端返回的重置倒计时。
+- 在 OpenCode 订阅详情补充共享额度说明，明确不同模型共同消耗额度；完善五种语言显示，并同步 macOS、Windows 和 Linux。
+
+升级说明：macOS 可通过“检查更新”升级；Windows / Linux 1.0.6 及更新版本可通过应用内更新下载安装包。Windows / Linux 1.0.5 及更早版本需从本仓库手动下载安装新版一次。
+</pre>]]></description>
+            <enclosure url="https://github.com/onevalar/token-plan/releases/download/v1.0.9/TokenPlan-1.0.9.dmg" length="19387872" type="application/octet-stream" sparkle:edSignature="F4cw+at1xQHi4yAGhrlq1sUh4LxTiPVEVY43XO52sqKXV35gOz2FoYRazzApTJF5AN6DSEJohYz0Ku2Jg86cAQ=="/>
+        </item>
+        <item>
             <title>1.0.8</title>
             <pubDate>Fri, 16 Oct 2026 08:23:28 +0000</pubDate>
             <sparkle:version>1792138520</sparkle:version>
