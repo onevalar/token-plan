@@ -49,6 +49,7 @@ final class ClaudeProvider: ProviderRuntime {
         var accessTokenFingerprint: Data
         /// `nil` when the lookup failed or the profile carried no organization; the stored plan is shown.
         var plan: String?
+        var email: String? = nil
     }
     private var livePlan: LivePlan?
 
@@ -334,7 +335,7 @@ final class ClaudeProvider: ProviderRuntime {
         }
 
         MetricLine.appendNoDataIfNeeded(&mapped.lines)
-        return ProviderSnapshot.make(
+        var snapshot = ProviderSnapshot.make(
             provider: provider,
             plan: mapped.plan,
             lines: mapped.lines,
@@ -342,6 +343,8 @@ final class ClaudeProvider: ProviderRuntime {
             usageHistory: usageHistory,
             warning: warning
         )
+        snapshot.accountEmail = livePlan?.email
+        return snapshot
     }
 
     private func fetchLiveUsage(
@@ -544,7 +547,8 @@ final class ClaudeProvider: ProviderRuntime {
         if plan == nil {
             AppLog.info(LogTag.plugin("claude"), "live profile carries no organization plan; showing the stored plan")
         }
-        livePlan = LivePlan(accessTokenFingerprint: Self.accessTokenFingerprint(credentials), plan: plan)
+        livePlan = LivePlan(accessTokenFingerprint: Self.accessTokenFingerprint(credentials), plan: plan,
+                            email: ProviderAccountAssembly.accountEmail(from: profile.account.email))
         return plan
     }
 

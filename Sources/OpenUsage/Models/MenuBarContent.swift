@@ -111,14 +111,16 @@ enum MenuBarContentBuilder {
         return contentWithAccountBadges(resolvedGroups, numbers: accountNumbers)
     }
 
-    /// Badge only families with multiple rendered accounts. Preserve stable account numbers when
-    /// siblings reappear, and apply after no-data filtering in both styles (including fallbacks).
+    /// Number only rendered siblings, consecutively in visual order, in both styles.
     private static func contentWithAccountBadges(_ groups: [MenuBarContent.Group], numbers: [String: Int]) -> MenuBarContent {
         let counts = Dictionary(grouping: groups, by: { ProviderAccountID.family(of: $0.providerID) })
+        var next: [String: Int] = [:]
         return MenuBarContent(groups: groups.map { group in
-            MenuBarContent.Group(providerID: group.providerID, displayName: group.displayName, icon: group.icon,
+            let family = ProviderAccountID.family(of: group.providerID)
+            next[family, default: 0] += 1
+            return MenuBarContent.Group(providerID: group.providerID, displayName: group.displayName, icon: group.icon,
                 metrics: group.metrics,
-                accountBadge: counts[ProviderAccountID.family(of: group.providerID)]!.count > 1 ? numbers[group.providerID] : nil)
+                accountBadge: counts[family]!.count > 1 ? next[family] : nil)
         })
     }
 

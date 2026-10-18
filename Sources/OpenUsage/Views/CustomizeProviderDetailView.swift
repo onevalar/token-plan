@@ -12,6 +12,7 @@ struct CustomizeProviderDetailView: View {
     @Binding var reorderLift: ReorderLift?
     let frameStore: ReorderFrameStore
 
+    @State private var confirmsRemoval = false
     @State private var showsSettings = false
     @State private var activeMetricID: String?
     @State private var isPresentingResetConfirm = false
@@ -22,7 +23,7 @@ struct CustomizeProviderDetailView: View {
             VStack(alignment: .leading, spacing: density.sectionSpacing) {
                 VStack(alignment: .leading, spacing: 8) {
                     HStack {
-                        if group.provider.accountLabel != nil {
+                        if dataStore.accountLabel(for: group.provider) != nil {
                             ProviderSectionHeader(provider: Provider(
                                 id: group.provider.id,
                                 displayName: ProviderAccountID.family(of: providerID) == "claude" ? "Claude" : group.provider.displayName,
@@ -44,7 +45,7 @@ struct CustomizeProviderDetailView: View {
                         .disabled(dataStore.refreshingProviderIDs.contains(providerID))
                         .accessibilityLabel("Refresh Usage")
                     }
-                    if let email = group.provider.accountLabel {
+                    if let email = dataStore.accountLabel(for: group.provider) {
                         HStack(alignment: .firstTextBaseline, spacing: 6) {
                             Text(verbatim: email)
                                 .font(.subheadline.weight(.medium))
@@ -71,6 +72,21 @@ struct CustomizeProviderDetailView: View {
                     }
                     metricSections(group).simultaneousGesture(metricDragGesture())
                     SubscriptionNoteSection(providerID: providerID)
+                    if container.accounts.records.contains(where: { $0.id == providerID && !$0.removedTombstone }) {
+                        Button("Remove Account…", role: .destructive) { confirmsRemoval = true }
+                            .buttonStyle(.plain).padding(.horizontal, 8)
+                            .alert("Remove Account?", isPresented: $confirmsRemoval) {
+                                Button("Remove Account", role: .destructive) {
+                                    container.accounts.remove(providerID)
+                                    container.enablement.setEnabled(false, for: providerID)
+                                    layout.customizeProviderID = nil
+                                }
+                                Button("Cancel", role: .cancel) {}
+                            } message: {
+                                Text("Remove this account from TokenPlan and stop adding it automatically. Your CLI login and saved usage history will not be deleted.")
+                            }
+                    }
+
                     Button("Restore Defaults…") { isPresentingResetConfirm = true }
                         .buttonStyle(.plain).font(.caption).foregroundStyle(.secondary)
                         .padding(.horizontal, 8)

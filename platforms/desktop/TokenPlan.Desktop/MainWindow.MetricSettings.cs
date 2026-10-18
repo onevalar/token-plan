@@ -43,12 +43,12 @@ public sealed partial class MainWindow
         body.Children.Add(new Border { Child = rows, Background = Surface, BorderBrush = Line, BorderThickness = new Thickness(1), CornerRadius = new CornerRadius(8), Padding = new Thickness(12) });
         return body;
     }
-    async void Confirm(string title, string message, Action confirmed)
+    async void Confirm(string title, string message, Action confirmed, string confirmLabel = "Restore")
     {
         var dialog = new Window { Title = L.T(title), Width = 440, Height = 230, CanResize = false, WindowStartupLocation = WindowStartupLocation.CenterOwner, Background = Surface, RequestedThemeVariant = ActualThemeVariant };
         var body = Stack(18); body.Margin = new Thickness(24); body.Children.Add(Text(L.T(message), 14));
         var buttons = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 10, HorizontalAlignment = HorizontalAlignment.Right };
-        buttons.Children.Add(Action("Cancel", () => dialog.Close(false))); buttons.Children.Add(Action("Restore", () => dialog.Close(true))); body.Children.Add(buttons); dialog.Content = body;
+        buttons.Children.Add(Action("Cancel", () => dialog.Close(false))); buttons.Children.Add(Action(confirmLabel, () => dialog.Close(true))); body.Children.Add(buttons); dialog.Content = body;
         if (await dialog.ShowDialog<bool>(this)) confirmed();
     }
 }

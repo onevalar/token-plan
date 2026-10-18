@@ -2,6 +2,7 @@ import SwiftUI
 
 /// Menu-bar presentation and account visibility, independent of dashboard placement and stars.
 struct SettingsMenuBarSection: View {
+    @Environment(WidgetDataStore.self) private var dataStore
     @Environment(LayoutStore.self) private var layout
     @AppStorage(DensitySetting.key) private var density = DensitySetting.regular
 
@@ -28,7 +29,9 @@ struct SettingsMenuBarSection: View {
                     .padding(.horizontal, 12).padding(.bottom, 8)
             }
             ForEach(layout.menuBarEntries) { account in
-                let label = account.menuBarEntryLabel
+                let family = ProviderAccountID.family(of: account.id)
+                let service = family == "claude" ? "Claude" : family == "codex" ? "Codex" : account.displayName
+                let label = dataStore.accountLabel(for: account).map { service + "-" + $0 } ?? account.menuBarEntryLabel
                 HStack(spacing: 10) {
                     Text(verbatim: label)
                         .font(.subheadline)

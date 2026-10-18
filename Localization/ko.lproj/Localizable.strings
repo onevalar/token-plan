@@ -465,6 +465,10 @@
 "Refreshing…" = "새로고침 중…";
 "Remaining" = "남음";
 "Remove" = "제거";
+"Remove Account" = "계정 제거";
+"Remove Account?" = "계정을 제거할까요?";
+"Remove Account…" = "계정 제거…";
+"Remove this account from TokenPlan and stop adding it automatically. Your CLI login and saved usage history will not be deleted." = "TokenPlan에서 이 계정을 제거하고 자동 추가를 중지합니다. CLI 로그인과 저장된 사용 기록은 삭제되지 않습니다.";
 "Removed from menu bar" = "메뉴 막대에서 제거됨";
 "Report an Issue" = "문제 신고";
 "Requests" = "요청";

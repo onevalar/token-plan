@@ -46,7 +46,7 @@ extension LayoutStore {
     }
 
     private func orderedProviders() -> [Provider] {
-        orderedProviderIDs().compactMap { registry.provider(id: $0) }
+        orderedProviderIDs().filter { !isProviderRemoved($0) }.compactMap { registry.provider(id: $0) }
     }
 
     /// History and reset credits live in details. Hide still wins; saved visibility is not erased.

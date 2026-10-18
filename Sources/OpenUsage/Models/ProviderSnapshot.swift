@@ -4,6 +4,7 @@ import Foundation
 struct ProviderSnapshot: Hashable, Sendable, Codable {
     let providerID: String
     let displayName: String
+    var accountEmail: String? = nil
     var plan: String?
     var lines: [MetricLine]
     var refreshedAt: Date

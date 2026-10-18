@@ -68,6 +68,12 @@ public sealed partial class ProviderService
     async Task<ProviderResult> QueryOAuth(string id, string path, CancellationToken ct)
     {
         var doc = await ReadOAuth(id, path, ct);
+        var metadata = id == "claude" && alternateAuthFile == null ? ClaudeAccountMetadata.Read(claudeHome, userHome) : null;
+        var accountIdentity = metadata?.Identity ?? accountIdentityHint ?? doc.Account;
+        var account = new ProviderResult(id, ProviderCatalog.Get(id).Name, null, null,
+            AccountEmail: metadata?.Email, AccountIdentity: accountIdentity);
+        if (IsAccountRemoved(account)) return account;
+
         if (PendingSaves.TryGetValue(path, out var pending))
         {
             if (pending.Original.AsSpan().SequenceEqual(doc.Bytes))
@@ -112,8 +118,7 @@ public sealed partial class ProviderService
         var snapshot = UsageParser.Parse(id, json, DateTimeOffset.UtcNow);
         if (id == "claude" && snapshot.Plan == null && TextValue(doc.Tokens, "subscriptionType") is { Length: > 0 } plan)
             snapshot = snapshot with { Plan = plan.ToLowerInvariant() switch { "pro" => "Pro", "max" => "Max", "team" => "Team", "enterprise" => "Enterprise", "free" => "Free", _ => plan } };
-        var metadata = id == "claude" && alternateAuthFile == null ? ClaudeAccountMetadata.Read(claudeHome, userHome) : null;
-        return new(id, ProviderCatalog.Get(id).Name, snapshot, null, Identity(), AccountEmail: metadata?.Email, AccountIdentity: metadata?.Identity);
+        return new(id, ProviderCatalog.Get(id).Name, snapshot, null, Identity(), AccountEmail: metadata?.Email, AccountIdentity: accountIdentity);
     }
     async Task<OAuthDocument> RenewOAuth(string id, string path, OAuthDocument old, CancellationToken ct)
     {

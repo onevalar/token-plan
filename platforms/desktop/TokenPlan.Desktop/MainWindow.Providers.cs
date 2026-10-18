@@ -59,7 +59,7 @@ public sealed partial class MainWindow
                 card.Children.Add(Text(L.T(result.ErrorKey == null ? "Updated" : "Last Successful Update") + " " + snapshot.FetchedAt.ToLocalTime().ToString("g"), 11, true));
             body.Children.Add(new Border { Background = Surface, BorderBrush = Line, BorderThickness = new Thickness(1), CornerRadius = new CornerRadius(8), Padding = new Thickness(20), Child = card });
         }
-        foreach (var account in additionalAccounts.Values.SelectMany(v => v).Where(a => preferences.IsEnabled(a.Id)))
+        foreach (var account in additionalAccounts.Values.SelectMany(v => v).Where(a => preferences.IsEnabled(a.Id) && !preferences.IsAccountRemoved(a)))
         {
             var row = Stack(8);
             var visible = Switch(preferences.AccountVisibility.GetValueOrDefault(account.SettingsKey, true), value => { preferences = preferences with { AccountVisibility = new(preferences.AccountVisibility) { [account.SettingsKey] = value } }; Save(); Render(); });

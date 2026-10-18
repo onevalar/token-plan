@@ -1,5 +1,6 @@
 import CryptoKit
 import Foundation
+import Observation
 
 /// Card-id helpers for the account-first model. The account occupying a family's default home when
 /// first observed keeps the bare family id (`claude`, `codex`) as its permanent record id — that is
@@ -53,7 +54,7 @@ struct ProviderAccountRecord: Codable, Equatable, Sendable {
     var identityKey: String
     var label: String?
     var sources: [ProviderAccountSource]
-    /// Set by a future "Remove Account…". A tombstoned account is never resurrected by rescans.
+    /// Set by "Remove Account…". A tombstoned account is never resurrected by rescans.
     var removedTombstone: Bool = false
 }
 
@@ -62,6 +63,7 @@ struct ProviderAccountRecord: Codable, Equatable, Sendable {
 /// from. With a single account per family (all Phase 1 can observe), the registry is bookkeeping the
 /// UI doesn't consult yet; multi-account rendering (Phase 2+) reads cards straight from these records.
 @MainActor
+@Observable
 final class ProviderAccountsStore {
     static let storageKey = "tokenplan.providerAccounts.v1"
 
@@ -82,8 +84,20 @@ final class ProviderAccountsStore {
         }
     }
 
+    func isRemoved(_ id: String) -> Bool {
+        records.contains { $0.id == id && $0.removedTombstone }
+    }
+
+    func remove(_ id: String) {
+        guard let index = records.firstIndex(where: { $0.id == id }),
+              !records[index].removedTombstone else { return }
+        records[index].removedTombstone = true
+        records[index].sources = []
+        persist()
+    }
+
     /// One account observed this launch, before reconciliation assigns (or re-finds) its record id.
-    struct Observation {
+    struct AccountObservation {
         var family: String
         var identityKey: String
         var label: String?
@@ -96,7 +110,7 @@ final class ProviderAccountsStore {
     /// — an account that went unobserved (logged out, unreadable identity) is simply left as it was,
     /// except that a newly observed default-home holder takes the default badge off every sibling.
     @discardableResult
-    func reconcile(with observations: [Observation]) -> [ProviderAccountRecord] {
+    func reconcile(with observations: [AccountObservation]) -> [ProviderAccountRecord] {
         var updated = records
         var changed = false
 
@@ -107,7 +121,11 @@ final class ProviderAccountsStore {
             if let index {
                 guard !updated[index].removedTombstone else { continue }
                 var record = updated[index]
-                record.label = observation.label ?? record.label
+                // Generic Desktop organization names must never overwrite a known email.
+                if ProviderAccountAssembly.accountEmail(from: observation.label) != nil
+                    || ProviderAccountAssembly.accountEmail(from: record.label) == nil {
+                    record.label = observation.label ?? record.label
+                }
                 record.sources = observation.sources
                 if record != updated[index] {
                     updated[index] = record
@@ -172,7 +190,7 @@ final class ProviderAccountsStore {
 
     /// The bare family id when free (the migration-killing rule: the first account observed at the
     /// default home IS the existing card), else an identity-derived `family@<hash8>` id.
-    private static func availableID(for observation: Observation, in records: [ProviderAccountRecord]) -> String {
+    private static func availableID(for observation: AccountObservation, in records: [ProviderAccountRecord]) -> String {
         if !records.contains(where: { $0.id == observation.family }) { return observation.family }
         let derived = ProviderAccountID.make(family: observation.family, identityKey: observation.identityKey)
         guard records.contains(where: { $0.id == derived }) else { return derived }

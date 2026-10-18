@@ -66,7 +66,7 @@ struct WidgetGroupedListView: View {
                 Button { openCustomize(for: group.id) } label: {
                     HStack {
                         HStack(alignment: .firstTextBaseline, spacing: 6) {
-                            Text(verbatim: group.provider.accountLabel ?? group.provider.displayName)
+                            Text(verbatim: dataStore.accountLabel(for: group.provider) ?? group.provider.displayName)
                                 .font(.subheadline.weight(.medium))
                                 .lineLimit(1)
                                 .truncationMode(.middle)

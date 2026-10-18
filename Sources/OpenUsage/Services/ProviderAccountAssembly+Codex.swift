@@ -81,7 +81,7 @@ extension ProviderAccountAssembly {
             )
         }
 
-        var observations: [ProviderAccountsStore.Observation] = []
+        var observations: [ProviderAccountsStore.AccountObservation] = []
         var identities: [CodexAccountIdentity] = []
         var labels: [String: String] = [:]
         var namedByTool = Set<String>()

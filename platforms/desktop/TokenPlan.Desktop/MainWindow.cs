@@ -170,8 +170,9 @@ public sealed partial class MainWindow : Window
         var cards = new ProviderGrid();
         foreach (var id in preferences.OrderedProviders.Where(preferences.IsEnabled))
         {
-            cards.Children.Add(Card(results.GetValueOrDefault(id) ?? new(id, ProviderName(id), null, "Waiting for the first update…")));
-            foreach (var account in additionalAccounts.GetValueOrDefault(id) ?? Array.Empty<ProviderResult>()) if (preferences.AccountVisibility.GetValueOrDefault(account.SettingsKey, true)) cards.Children.Add(Card(account));
+            var primary = results.GetValueOrDefault(id) ?? new(id, ProviderName(id), null, "Waiting for the first update…");
+            if (!preferences.IsAccountRemoved(primary)) cards.Children.Add(Card(primary));
+            foreach (var account in additionalAccounts.GetValueOrDefault(id) ?? Array.Empty<ProviderResult>()) if (!preferences.IsAccountRemoved(account) && preferences.AccountVisibility.GetValueOrDefault(account.SettingsKey, true)) cards.Children.Add(Card(account));
         }
         body.Children.Add(cards);
         if (!ProviderIDs.Any(preferences.IsEnabled)) { body.Children.Add(Note(L.T("No providers are enabled."))); body.Children.Add(Action("Manage Providers", () => Navigate("providers"))); }
@@ -225,6 +226,7 @@ public sealed partial class MainWindow : Window
         if (refresh != null) return;
         var pending = new CancellationTokenSource(); refresh = pending;
         Render();
+        providers.IsAccountRemoved = account => preferences.IsAccountRemoved(account);
         Task tokenWork = Task.CompletedTask;
         try
         {
@@ -235,7 +237,7 @@ public sealed partial class MainWindow : Window
                 var result = Program.Fixture ? Example(id) : await providers.Refresh(id, pending.Token);
                 DiagnosticLog.Write(id, result.ErrorKey == null ? "Usage refreshed" : "Usage refresh failed", result.ErrorKey == null ? 2 : 1);
                 if (!ready || pending.IsCancellationRequested) return;
-                if (!Program.Fixture)
+                if (!Program.Fixture && !preferences.IsAccountRemoved(result))
                 {
                     var alertBatch = usageAlerts.Evaluate(result, preferences, DateTimeOffset.UtcNow);
                     var alerts = alertBatch.Alerts;

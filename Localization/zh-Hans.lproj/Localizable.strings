@@ -465,6 +465,10 @@
 "Refreshing…" = "正在刷新…";
 "Remaining" = "剩余";
 "Remove" = "移除";
+"Remove Account" = "移除账号";
+"Remove Account?" = "移除账号？";
+"Remove Account…" = "移除账号…";
+"Remove this account from TokenPlan and stop adding it automatically. Your CLI login and saved usage history will not be deleted." = "从 TokenPlan 中移除此账号，并停止自动添加。不会退出命令行工具的登录，也不会删除已保存的用量历史。";
 "Removed from menu bar" = "已从菜单栏移除";
 "Report an Issue" = "反馈问题";
 "Requests" = "请求数";

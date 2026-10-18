@@ -98,7 +98,7 @@ struct ProviderAccountAssembly {
             : CodexAccountDiscovery()
         let codexCards = codex.cards
         var identityKeys = Dictionary(uniqueKeysWithValues: codexCards.map { ($0.id, $0.identity.key) })
-        var observations: [ProviderAccountsStore.Observation] = []
+        var observations: [ProviderAccountsStore.AccountObservation] = []
 
         let outcomes: [(family: String, outcome: DefaultAccountObserver.Outcome)] = [
             ("claude", { observer.observeClaude() }),
@@ -110,7 +110,7 @@ struct ProviderAccountAssembly {
             switch outcome {
             case .resolved(let identityKey, let label, let anchor):
                 identityKeys[family] = identityKey
-                observations.append(ProviderAccountsStore.Observation(
+                observations.append(ProviderAccountsStore.AccountObservation(
                     family: family,
                     identityKey: identityKey,
                     label: label,
@@ -135,6 +135,7 @@ struct ProviderAccountAssembly {
             let source = ProviderAccountSource(kind: .claudeHome, anchor: home.directory, holdsDefaultSource: false)
             if let index = observations.firstIndex(where: { $0.family == "claude" && $0.identityKey == home.identity }) {
                 observations[index].sources.append(source)
+                if Self.accountEmail(from: observations[index].label) == nil { observations[index].label = home.label ?? observations[index].label }
             } else {
                 observations.append(.init(family: "claude", identityKey: home.identity, label: home.label, sources: [source]))
             }
@@ -150,8 +151,9 @@ struct ProviderAccountAssembly {
                 $0.family == "claude" && $0.identityKey == account.identityKey
             }) {
                 observations[index].sources.append(source)
+                if Self.accountEmail(from: observations[index].label) == nil { observations[index].label = account.email }
             } else {
-                observations.append(ProviderAccountsStore.Observation(
+                observations.append(ProviderAccountsStore.AccountObservation(
                     family: "claude", identityKey: account.identityKey, label: "\(account.email) (\(account.organizationName ?? "Organization \(account.organizationID.prefix(8))"))", sources: [source]
                 ))
             }
@@ -181,7 +183,7 @@ struct ProviderAccountAssembly {
             }) {
                 observations[index].sources.append(source)
             } else {
-                observations.append(ProviderAccountsStore.Observation(
+                observations.append(ProviderAccountsStore.AccountObservation(
                     family: "claude", identityKey: organization.identityKey,
                     label: organization.label, sources: [source]
                 ))
@@ -277,6 +279,7 @@ struct ProviderAccountAssembly {
         for index in cards.indices {
             let label = observations.first { $0.family == "claude" && $0.identityKey == cards[index].identityKey }?.label
             cards[index].accountLabel = Self.accountEmail(from: label)
+                ?? Self.accountEmail(from: records.first { $0.id == cards[index].id }?.label)
 
             cards[index].additionalLogDirectories = swapAccounts.map(\.sessionDirectory)
         }

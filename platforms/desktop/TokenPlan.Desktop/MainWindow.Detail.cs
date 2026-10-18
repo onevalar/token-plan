@@ -58,6 +58,15 @@ public sealed partial class MainWindow
             if (notesExpanded.Contains(id)) noteSection.Children.Add(notes);
             body.Children.Add(new Border { Background = Surface, BorderBrush = Line, BorderThickness = new Thickness(1), CornerRadius = new CornerRadius(8), Padding = new Thickness(16), Child = noteSection });
             body.Children.Add(Action("Restore Defaults…", () => Confirm("Restore Defaults?", "Restores this subscription's metric visibility, order and tray selection. Other subscriptions are unchanged.", () => { preferences = preferences.RestoreMetrics(scope); Save(); Render(); })));
+            if (result != null && Preferences.AccountRemovalKey(result) != null && !preferences.IsAccountRemoved(result))
+            {
+                var remove = Action("Remove Account…", () => Confirm("Remove Account?",
+                    "Remove this account from TokenPlan and stop adding it automatically. Your CLI login and saved usage history will not be deleted.", () => {
+                        preferences = preferences.RemoveAccount(result); Save(); Navigate("providers");
+                    }, "Remove Account"));
+                remove.Name = "tokenplan-remove-account";
+                body.Children.Add(remove);
+            }
         }
         return new ScrollViewer { Content = body };
     }

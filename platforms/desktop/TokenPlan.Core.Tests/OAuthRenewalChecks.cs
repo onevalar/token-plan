@@ -22,6 +22,24 @@ static class OAuthRenewalChecks
                 var path = Path.Combine(root, family == "claude" ? ".credentials.json" : "auth.json");
                 string usage = family == "claude" ? ClaudeUsage : CodexUsage;
                 ProviderService Service(HttpMessageHandler handler, List<string>? logs = null, bool renewable = true, TimeSpan? timeout = null) => new(root,root,handler,(_,message)=>logs?.Add(message),timeout,userHome:root,allowAuthRefresh:renewable);
+                var accountMetadataPath = Path.Combine(root, ".claude.json");
+                if (family == "claude") await File.WriteAllTextAsync(accountMetadataPath, """{"oauthAccount":{"accountUuid":"11111111-1111-1111-1111-111111111111","emailAddress":"test@example.com"}}""");
+                var removedCredentials = Credentials(family, true);
+                await File.WriteAllTextAsync(path, removedCredentials);
+                using (var blockedHandler = new Stub((_, _) => throw new Exception("Removed account must not make requests")))
+                using (var removedService = Service(blockedHandler))
+                {
+                    ProviderResult? observed = null;
+                    removedService.IsAccountRemoved = account => { observed = account; return true; };
+                    var removedResult = await removedService.Refresh(family, CancellationToken.None);
+                    check(removedResult.AccountIdentity != null && removedResult.Snapshot == null, family + " removed account stops before renewal or usage request");
+                    var settings = new Preferences().RemoveAccount(observed!);
+                    var settingsFile = Path.Combine(root, "removed-settings.json"); settings.Save(settingsFile);
+                    check(Preferences.Load(settingsFile).IsAccountRemoved(removedResult), family + " account removal survives restart");
+                    check(!settings.IsAccountRemoved(removedResult with { AccountIdentity = "another-account" }), family + " removal does not block another login");
+                    check(await File.ReadAllTextAsync(path) == removedCredentials, family + " removal leaves CLI credentials untouched");
+                }
+                File.Delete(accountMetadataPath);
                 foreach (var proactive in new[] { true, false })
                 {
                     await File.WriteAllTextAsync(path, Credentials(family,proactive));

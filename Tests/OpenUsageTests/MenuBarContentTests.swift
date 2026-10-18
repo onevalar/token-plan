@@ -208,6 +208,19 @@ final class MenuBarContentTests: XCTestCase {
         }
     }
 
+    func testVisibleAccountsAreRenumberedAfterHiddenOrMissingSibling() {
+        let first = group("claude", percent("claude.session", "Session", 70))
+        let third = group("claude@third", percent("claude@third.session", "Session", 12))
+        let missing = group("claude@second", noDataPercent("claude@second.session", "Session"))
+        for style: MenuBarStyle in [.ring, .percentage] {
+            for groups in [[first, third], [first, missing, third], [third, first]] {
+                let result = MenuBarContentBuilder.build(groups: groups, style: style,
+                    accountNumbers: ["claude": 1, "claude@second": 2, "claude@third": 3], pinnedMetricIDs: [], data: { $0.sample })
+                XCTAssertEqual(result.groups.map(\.accountBadge), [1, 2])
+            }
+        }
+    }
+
     func testOnlyMultipleRenderedSiblingAccountsHaveBadgesInBothStyles() {
         let first = group("claude", percent("claude.session", "Session", 70))
         let second = group("claude@work", percent("claude@work.session", "Session", 12))

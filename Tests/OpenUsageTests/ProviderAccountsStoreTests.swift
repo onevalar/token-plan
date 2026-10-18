@@ -16,13 +16,38 @@ final class ProviderAccountsStoreTests: XCTestCase {
         identityKey: String,
         label: String? = nil,
         anchor: String = "/Users/dev/.claude"
-    ) -> ProviderAccountsStore.Observation {
-        ProviderAccountsStore.Observation(
+    ) -> ProviderAccountsStore.AccountObservation {
+        ProviderAccountsStore.AccountObservation(
             family: family,
             identityKey: identityKey,
             label: label,
             sources: [ProviderAccountSource(kind: .defaultHome, anchor: anchor, holdsDefaultSource: true)]
         )
+    }
+
+    func testRemovalPersistsAndRescansCannotRestoreIt() {
+        let defaults = makeScratchDefaults()
+        let store = ProviderAccountsStore(defaults: defaults)
+        let observations = ["a", "b", "c"].map { defaultHomeObservation(family: "claude", identityKey: $0) }
+        let records = store.reconcile(with: observations)
+        let removed = records[1].id
+        store.remove(removed)
+        XCTAssertTrue(store.isRemoved(removed))
+        XCTAssertFalse(store.isRemoved(records[0].id))
+        let reloaded = ProviderAccountsStore(defaults: defaults)
+        reloaded.reconcile(with: observations)
+        XCTAssertTrue(reloaded.isRemoved(removed))
+        XCTAssertTrue(reloaded.records[1].sources.isEmpty)
+        XCTAssertEqual(reloaded.records.filter { !$0.removedTombstone }.map(\.id), [records[0].id, records[2].id])
+        reloaded.remove(records[0].id)
+        XCTAssertNil(reloaded.defaultBadgeHolder(family: "claude").flatMap { $0.id == records[0].id ? $0 : nil })
+    }
+
+    func testGenericDesktopLabelCannotEraseKnownEmail() {
+        let store = ProviderAccountsStore(defaults: makeScratchDefaults())
+        store.reconcile(with: [defaultHomeObservation(family: "claude", identityKey: "a", label: "person@example.com (Personal)")])
+        store.reconcile(with: [defaultHomeObservation(family: "claude", identityKey: "a", label: "Personal")])
+        XCTAssertEqual(store.records.first?.label, "person@example.com (Personal)")
     }
 
     func testFirstAccountOfAFamilyGetsTheBareID() {

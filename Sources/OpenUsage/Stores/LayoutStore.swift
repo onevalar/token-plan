@@ -106,6 +106,7 @@ final class LayoutStore {
     private let defaultPinnedMetricIDs: [String]
     private let defaultExpandedMetricIDs: [String]
     var defaultExpandedOnEnableIDs: Set<String>
+    var isProviderRemoved: @MainActor (String) -> Bool = { _ in false }
     let isProviderEnabled: @MainActor (String) -> Bool
 
     init(

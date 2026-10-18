@@ -69,7 +69,8 @@ final class AppContainer {
         // The launch account pass: which account is signed in at each family's default home. Feeds
         // the snapshot cache's account stamp and reconciles the account registry.
         let accountAssembly = await ProviderAccountAssembly.make(waitsForLoginShell: true)
-        self.accounts = ProviderAccountsStore()
+        let accounts = ProviderAccountsStore()
+        self.accounts = accounts
 
         let providers = ProviderCatalog.make(
             claudeCards: accountAssembly.claudeCards,
@@ -88,12 +89,13 @@ final class AppContainer {
             defaultMetricIDs: accountDefaults(DefaultLayout.metricIDs),
             defaultPinnedMetricIDs: accountDefaults(DefaultLayout.pinnedMetricIDs),
             defaultExpandedMetricIDs: accountDefaults(DefaultLayout.expandedMetricIDs),
-            isProviderEnabled: { [enablement] in enablement.isEnabled($0) }
+            isProviderEnabled: { [enablement, accounts] in enablement.isEnabled($0) && !accounts.isRemoved($0) }
         )
+        layout.isProviderRemoved = { [accounts] in accounts.isRemoved($0) }
         let dataStore = WidgetDataStore(
             registry: registry,
             providers: providers,
-            isProviderEnabled: { [enablement] in enablement.isEnabled($0) },
+            isProviderEnabled: { [enablement, accounts] in enablement.isEnabled($0) && !accounts.isRemoved($0) },
             orderedDescriptors: { [layout] in layout.visiblePlaced.compactMap { layout.descriptor(for: $0) } },
             notificationSettings: { notificationSettings },
             providerIdentityKeys: accountAssembly.identityKeysByCard

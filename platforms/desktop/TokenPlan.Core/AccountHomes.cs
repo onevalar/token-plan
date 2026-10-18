@@ -1,7 +1,7 @@
 using System.Text.Json;
 namespace TokenPlan.Core;
 
-public record AccountHome(string Home, string Label, string? AuthFile = null, bool Encoded = false, bool CanRefresh = true);
+public record AccountHome(string Home, string Label, string? AuthFile = null, bool Encoded = false, bool CanRefresh = true, string? Identity = null);
 public static class AccountHomes
 {
     public static IReadOnlyList<AccountHome> Discover(string family, string home, string defaultHome, Func<string, string?>? environment = null)
@@ -35,7 +35,7 @@ public static class AccountHomes
                     if (account.Name.Length == 0 || !account.Name.All(char.IsAsciiDigit) || string.IsNullOrWhiteSpace(email) || email.IndexOfAny(new[] { '/', '\\', '\0' }) >= 0) continue;
                     if (!Guid.TryParse(UsageParser.String(account.Value, "uuid"), out _) || !Guid.TryParse(UsageParser.String(account.Value, "organizationUuid"), out _)) continue;
                     var credential = Path.Combine(vault, "credentials", ".creds-" + account.Name + "-" + email + ".enc");
-                    if (File.Exists(credential)) candidates.Add(new(vault, email, credential, true));
+                    if (File.Exists(credential)) candidates.Add(new(vault, email, credential, true, Identity: Guid.Parse(UsageParser.String(account.Value, "uuid")!).ToString("D") + "|" + Guid.Parse(UsageParser.String(account.Value, "organizationUuid")!).ToString("D")));
                 }
             }
         }

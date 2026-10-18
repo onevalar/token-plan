@@ -36,6 +36,7 @@ enum ClaudeUsageError: Error, LocalizedError, Equatable {
 struct ClaudeAccountProfile: Decodable, Hashable, Sendable {
     struct Account: Decodable, Hashable, Sendable {
         var uuid: String
+        var email: String? = nil
     }
 
     struct Organization: Decodable, Hashable, Sendable {

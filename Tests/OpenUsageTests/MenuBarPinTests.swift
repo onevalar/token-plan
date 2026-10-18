@@ -6,6 +6,15 @@ import XCTest
 /// disabled-provider handling, and persistence across relaunch.
 @MainActor
 final class MenuBarPinTests: XCTestCase {
+    func testRemovedAccountLeavesAllListsImmediately() {
+        let store = LayoutStore(registry: makeRegistry(providerIDs: ["claude", "claude@removed", "claude@third"]),
+                                defaults: makeDefaults("removed"), storageKey: "layout")
+        store.isProviderRemoved = { $0 == "claude@removed" }
+        XCTAssertEqual(store.customizeProviderRows.map(\.id), ["claude", "claude@third"])
+        XCTAssertEqual(store.menuBarEntries.map(\.id), ["claude", "claude@third"])
+        XCTAssertFalse(store.displayGroups.contains { $0.id == "claude@removed" })
+    }
+
     func testNoPinsByDefault() {
         let store = makeStore("default")
         XCTAssertTrue(store.pinnedMetricIDs.isEmpty)

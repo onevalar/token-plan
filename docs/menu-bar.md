@@ -33,7 +33,7 @@ Percentage uses your stars. Star a metric from any row's right-click menu, or fr
 - Hiding a service here only removes it from the menu bar. It stays enabled, keeps refreshing, and remains in the overview and subscription details.
 - Your metric stars, order, and layout stay saved. Showing a service again restores the same menu-bar selections.
 - Multi-account services show only account switches, without a redundant service switch. Claude labels use `Claude-email`. Each switch changes only that account. Older hidden-service settings remain hidden until changed; enabling one account keeps its siblings hidden.
-- Accounts of the same service carry small `1`, `2`, … badges in both styles. Numbers follow the saved account order and are assigned before hiding or missing-data filtering, so hiding account 1 does not rename account 2. The settings list and strip use the same grouped order, keeping accounts of each service adjacent. Settings labels omit number badges and organization metadata.
+- Accounts of the same service carry small `1`, `2`, … badges in both styles. Numbers follow the visible account order after hiding and missing-data filtering, so the remaining accounts are always numbered consecutively. The settings list and strip use the same grouped order, keeping accounts of each service adjacent. Settings labels omit number badges and organization metadata.
 - Services with no stars or data still have a switch, so you can configure them before usage arrives. Turning a service off in Subscription Services removes its switch until it is enabled again; its menu-bar choice stays saved.
 - You can hide every service. The menu bar then shows the app icon.
 - Restoring a subscription or all customization defaults resets stars and layout, but keeps these Settings-owned switches. **Reset All Settings** turns all of these switches back on.
@@ -61,4 +61,10 @@ Detection rides the system's own "an app is capturing the screen" signal — the
 
 The strip only renders real data from selected accounts of enabled services whose menu-bar switch is on. Percentage skips stars without fetched data and falls back to the primary reading. Both styles skip accounts with no eligible data. There are no orphan logos or placeholder quota circles. When nothing has data, the strip falls back to the app icon. Stars follow your saved metric order and placement. A metric can be starred whether it appears in the overview or only in subscription details.
 
-Account number badges appear only when multiple accounts of the same service are actually rendered. Disabled, menu-bar-hidden, or unavailable siblings do not leave a badge on the sole visible account. When multiple accounts return, their existing account numbers are preserved. Ring and percentage modes use the same rule.
+Account number badges appear only when multiple accounts of the same service are actually rendered. Disabled, menu-bar-hidden, or unavailable siblings do not leave a badge on the sole visible account. When multiple accounts are visible, they are numbered 1, 2, and so on in display order; these labels never change account identity or usage attribution. Ring and percentage modes use the same rule.
+
+### Removing an account
+
+Open the account’s subscription details → Settings → Remove Account. Confirming removes it from TokenPlan and prevents automatic rediscovery, including after restart. CLI login files and saved usage history remain untouched. Use the visibility switch instead when you only want to hide an account temporarily. macOS, Windows and Linux support removal of identified Claude and Codex accounts.
+
+Claude account headings prefer the email from the verified account profile, followed by the plan. Generic Desktop labels such as “Personal” no longer overwrite a saved email. The overview, details and menu-bar settings share the same email label.

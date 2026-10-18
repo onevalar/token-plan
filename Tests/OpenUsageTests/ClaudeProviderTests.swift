@@ -601,7 +601,7 @@ final class ClaudeProviderTests: XCTestCase {
                 let tokenOrganization = authorization == "Bearer foreign-token" ? wrongOrganization : organization
                 return HTTPResponse(
                     statusCode: 200, headers: [:],
-                    body: Data(#"{"account":{"uuid":"\#(account)"},"organization":{"uuid":"\#(tokenOrganization)"}}"#.utf8)
+                    body: Data(#"{"account":{"uuid":"\#(account)","email":"verified@example.com"},"organization":{"uuid":"\#(tokenOrganization)"}}"#.utf8)
                 )
             }
             XCTAssertEqual(request.url.path, "/api/oauth/usage")
@@ -619,6 +619,8 @@ final class ClaudeProviderTests: XCTestCase {
         let first = await provider.refresh()
         let second = await provider.refresh()
 
+        XCTAssertEqual(first.accountEmail, "verified@example.com")
+        XCTAssertEqual(second.accountEmail, "verified@example.com")
         XCTAssertEqual(Self.progress(first.lines, "Session")?.used, 42)
         XCTAssertEqual(Self.progress(second.lines, "Session")?.used, 42)
         XCTAssertEqual(httpClient.requests.filter {

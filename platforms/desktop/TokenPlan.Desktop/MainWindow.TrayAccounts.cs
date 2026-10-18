@@ -6,7 +6,7 @@ public sealed partial class MainWindow
     // One source for settings and tray order: provider order, then its individual accounts.
     IEnumerable<ProviderResult> TrayAccountEntries() => preferences.OrderedProviders.Where(preferences.IsEnabled)
         .SelectMany(id => new[] { results.GetValueOrDefault(id) ?? new ProviderResult(id, ProviderName(id), null, null) }
-            .Concat(additionalAccounts.GetValueOrDefault(id) ?? []));
+            .Concat(additionalAccounts.GetValueOrDefault(id) ?? [])).Where(a => !preferences.IsAccountRemoved(a));
 
     static string TrayAccountLabel(ProviderResult account) => account.AccountEmail is { Length: > 0 } email
         ? ProviderName(account.Id) + "-" + email : account.Name;

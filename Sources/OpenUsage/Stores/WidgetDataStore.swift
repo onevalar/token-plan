@@ -540,6 +540,10 @@ final class WidgetDataStore {
 
     /// The plan label for a provider's latest snapshot. `nil` until a snapshot exists or when the
     /// provider doesn't expose a plan. Provider section headers render this beside the provider name.
+    func accountLabel(for provider: Provider) -> String? {
+        snapshots[provider.id]?.accountEmail ?? provider.accountLabel
+    }
+
     func plan(for providerID: String) -> String? {
         snapshots[providerID]?.plan
     }

@@ -141,7 +141,7 @@ try
         }
     }
     var accounts = (Dictionary<string, IReadOnlyList<ProviderResult>>)Get("additionalAccounts")!;
-    var accountA = results["claude"] with { AccountKey = "claude:fixture-a", Name = "Claude · A", AccountEmail = "a-very-long-account-email@example.com" };
+    var accountA = results["claude"] with { AccountIdentity = "fixture-identity-a", AccountKey = "claude:fixture-a", Name = "Claude · A", AccountEmail = "a-very-long-account-email@example.com" };
     var accountB = results["claude"] with { AccountKey = "claude:fixture-b", Name = "Claude · B" };
     accounts["claude"] = new[] { accountA, accountB };
     Set("preferences", new Preferences { HiddenMetrics = new() { [accountA.SettingsKey] = new[] { "Sonnet" } }, ProviderNotes = new() { [accountA.SettingsKey] = "only A" } });
@@ -185,6 +185,19 @@ try
     accountSwitch.IsChecked = false;
     Check(!((Preferences)Get("preferences")!).AccountVisibility[accountA.SettingsKey], "Account visibility control persists independent preference");
     Check(!window.TraySummaries().Any(text => text.StartsWith(accountA.Name)), "Hidden account also leaves tray summaries");
+    Call("OpenAccountDetail", accountA); Set("detailSettings", true); Call("Render");
+    window.Measure(new Size(560,720)); window.Arrange(new Rect(0,0,560,720)); Dispatcher.UIThread.RunJobs();
+    var removeAccount = window.GetVisualDescendants().OfType<Button>().Single(b => b.Name == "tokenplan-remove-account");
+    removeAccount.RaiseEvent(new RoutedEventArgs(Button.ClickEvent)); Dispatcher.UIThread.RunJobs();
+    var removalDialog = window.OwnedWindows.Single();
+    var confirmRemoval = removalDialog.GetLogicalDescendants().OfType<Button>().Single(b => Equals(b.Content, L.T("Remove Account")));
+    confirmRemoval.RaiseEvent(new RoutedEventArgs(Button.ClickEvent)); Dispatcher.UIThread.RunJobs();
+    Check(((Preferences)Get("preferences")!).IsAccountRemoved(accountA), "Confirmed removal is persisted for this identity");
+    Check(Preferences.Load(Path.Combine(temp, "preferences.json")).IsAccountRemoved(accountA), "Removed identity survives restart");
+    Check(!window.TraySummaries().Any(text => text.Contains(accountA.AccountEmail!)), "Removed account is absent from tray summaries");
+    Call("Navigate", "providers");
+    window.Measure(new Size(560,720)); window.Arrange(new Rect(0,0,560,720)); Dispatcher.UIThread.RunJobs();
+    Check(!window.GetVisualDescendants().OfType<ToggleSwitch>().Any(t => t.Name == "account-visible-" + accountA.SettingsKey), "Removed account is absent from service configuration");
     L.Use("en"); Call("Navigate", "overview");
     window.Measure(new Size(560,720)); window.Arrange(new Rect(0,0,560,720)); Dispatcher.UIThread.RunJobs();
     var homeText = window.GetVisualDescendants().OfType<TextBlock>().Select(t => t.Text).ToArray();
