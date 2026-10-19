@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# Fast repair after an orb wakes: re-assert the toolchain entry points that `.agents/setup` created
+# outside $HOME. Never installs anything and never starts a download, so it finishes well inside the
+# 10 seconds Amp waits. A Mac orb has no SDK here; that is not a failure.
+set -euo pipefail
+
+dotnet_root="${TOKENPLAN_DOTNET_ROOT:-$HOME/.dotnet}"
+dotnet_link=/usr/local/bin/dotnet
+profile_file=/etc/profile.d/tokenplan-dotnet.sh
+profile_marker='# TokenPlan orb setup: keep the .NET CLI quiet for login shells and orb services.'
+
+[ -x "$dotnet_root/dotnet" ] || exit 0
+
+if [ ! -L "$dotnet_link" ] || [ "$(readlink "$dotnet_link" 2>/dev/null)" != "$dotnet_root/dotnet" ]; then
+  if [ -w "$(dirname "$dotnet_link")" ]; then
+    ln -sfn "$dotnet_root/dotnet" "$dotnet_link"
+  elif ! sudo -n ln -sfn "$dotnet_root/dotnet" "$dotnet_link"; then
+    printf 'Could not link %s; run .agents/setup to repair the toolchain.\n' "$dotnet_link" >&2
+  fi
+fi
+
+if [ -d /etc/profile.d ] && ! grep -Fqx "$profile_marker" "$profile_file" 2>/dev/null; then
+  printf '%s\nexport DOTNET_CLI_TELEMETRY_OPTOUT=1 DOTNET_NOLOGO=1 AVALONIA_TELEMETRY_OPTOUT=1\n' "$profile_marker" \
+    | sudo -n tee "$profile_file" >/dev/null || printf 'Could not write %s.\n' "$profile_file" >&2
+fi

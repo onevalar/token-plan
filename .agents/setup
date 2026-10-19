@@ -1,0 +1,120 @@
+#!/usr/bin/env bash
+# Prepares a fresh Amp orb for TokenPlan.
+#
+# Installs the Debian packages the desktop client needs, the .NET SDK pinned by
+# platforms/desktop/global.json, the NuGet packages from the desktop lockfiles, and a warm Debug
+# build, so a new orb can build and test without downloading the toolchain again. Idempotent: Amp
+# reruns this on a stale snapshot, and a warm run only re-checks state.
+#
+# The macOS client needs SwiftUI/AppKit, which Linux orbs do not have; Swift work belongs on a Mac
+# orb or runner. This script therefore prepares the cross-platform `.NET` client and the Python
+# helper scripts.
+set -euo pipefail
+
+repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+desktop_dir="$repo_root/platforms/desktop"
+dotnet_root="${TOKENPLAN_DOTNET_ROOT:-$HOME/.dotnet}"
+dotnet_link=/usr/local/bin/dotnet
+msbuild_options=(-m:2 /nodeReuse:false /p:UseSharedCompilation=false)
+
+started_at=$SECONDS
+step_started_at=$SECONDS
+step() { step_started_at=$SECONDS; printf '\n==> %s\n' "$1"; }
+finished_step() { printf '    %ss\n' "$((SECONDS - step_started_at))"; }
+as_root() { if [ "$(id -u)" -eq 0 ]; then "$@"; else sudo "$@"; fi; }
+
+# Keep CLI telemetry off for the commands below and for anything they spawn.
+export DOTNET_CLI_TELEMETRY_OPTOUT=1 DOTNET_NOLOGO=1 AVALONIA_TELEMETRY_OPTOUT=1
+export MSBUILDDISABLENODEREUSE=1
+
+# --- Debian packages -----------------------------------------------------------------------------
+# nsis: makensis builds the Windows installer from Linux (script/build_desktop_installers.sh).
+# xvfb: runs the Linux client itself, for fixture and visual checks.
+# fonts-noto-cjk: CJK text renders faithfully in desktop UI checks and screenshots.
+system_packages=(ca-certificates curl fonts-noto-cjk nsis xvfb)
+missing_packages=()
+for package in "${system_packages[@]}"; do
+  if [ "$(dpkg-query -W -f='${Status}' "$package" 2>/dev/null || true)" != "install ok installed" ]; then
+    missing_packages+=("$package")
+  fi
+done
+
+if [ ${#missing_packages[@]} -gt 0 ]; then
+  step "Installing system packages: ${missing_packages[*]}"
+  as_root apt-get update -qq
+  as_root env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends "${missing_packages[@]}"
+  finished_step
+else
+  printf '==> System packages already present\n'
+fi
+
+# --- .NET SDK ------------------------------------------------------------------------------------
+step "Checking the .NET SDK pinned by platforms/desktop/global.json"
+pinned_version="$(python3 -c 'import json, sys; print(json.load(open(sys.argv[1]))["sdk"]["version"])' "$desktop_dir/global.json")"
+
+if [ -x "$dotnet_root/dotnet" ] && "$dotnet_root/dotnet" --list-sdks 2>/dev/null | grep -q "^${pinned_version} "; then
+  printf '    %s already installed\n' "$pinned_version"
+else
+  printf '    installing %s into %s\n' "$pinned_version" "$dotnet_root"
+  installer="$(mktemp)"
+  curl -fsSL https://dot.net/v1/dotnet-install.sh -o "$installer"
+  bash "$installer" --version "$pinned_version" --install-dir "$dotnet_root" --no-path
+  rm -f "$installer"
+fi
+finished_step
+
+# Agent shells inherit the base template's PATH and do not read login profiles, so expose the SDK
+# where that PATH already looks. The muxer resolves its install root from the real binary.
+if [ ! -L "$dotnet_link" ] || [ "$(readlink "$dotnet_link")" != "$dotnet_root/dotnet" ]; then
+  if [ -w "$(dirname "$dotnet_link")" ]; then
+    ln -sfn "$dotnet_root/dotnet" "$dotnet_link"
+  else
+    as_root ln -sfn "$dotnet_root/dotnet" "$dotnet_link"
+  fi
+  printf '    linked %s -> %s/dotnet\n' "$dotnet_link" "$dotnet_root"
+fi
+
+# Login shells and supervised services do not necessarily inherit this script's environment.
+profile_file=/etc/profile.d/tokenplan-dotnet.sh
+profile_marker='# TokenPlan orb setup: keep the .NET CLI quiet for login shells and orb services.'
+if ! grep -Fqx "$profile_marker" "$profile_file" 2>/dev/null; then
+  printf '%s\nexport DOTNET_CLI_TELEMETRY_OPTOUT=1 DOTNET_NOLOGO=1 AVALONIA_TELEMETRY_OPTOUT=1\n' "$profile_marker" \
+    | as_root tee "$profile_file" >/dev/null
+  printf '    wrote %s\n' "$profile_file"
+fi
+
+# --- NuGet packages and a warm Debug build -------------------------------------------------------
+step "Restoring NuGet packages for the desktop client"
+cd "$desktop_dir"
+"$dotnet_root/dotnet" restore TokenPlan.Core.Tests --disable-parallel --configfile NuGet.Config
+"$dotnet_root/dotnet" restore TokenPlan.Desktop.Tests --disable-parallel --configfile NuGet.Config
+finished_step
+
+step "Warming the Debug build"
+"$dotnet_root/dotnet" build TokenPlan.Core.Tests --no-restore "${msbuild_options[@]}"
+"$dotnet_root/dotnet" build TokenPlan.Desktop.Tests --no-restore "${msbuild_options[@]}"
+"$dotnet_root/dotnet" build-server shutdown >/dev/null 2>&1 || true
+finished_step
+
+# --- Python helper dependency --------------------------------------------------------------------
+step "Checking Python tooling"
+if python3 -c 'import PIL' 2>/dev/null; then
+  printf '    Pillow already installed\n'
+else
+  python3 -m pip install --quiet --disable-pip-version-check --user pillow
+  printf '    installed Pillow for script/make_icon.py\n'
+fi
+finished_step
+
+# --- Verify --------------------------------------------------------------------------------------
+step "Verifying the toolchain from a clean login shell"
+cd "$desktop_dir"
+resolved_version="$(env -i HOME="$HOME" PATH=/usr/local/bin:/usr/bin:/bin bash -lc 'dotnet --version')"
+printf '    dotnet %s (expected %s)\n' "$resolved_version" "$pinned_version"
+if [ "$resolved_version" != "$pinned_version" ]; then
+  printf '!! global.json pins %s but a clean shell resolves %s\n' "$pinned_version" "$resolved_version" >&2
+  exit 1
+fi
+finished_step
+
+printf '\nOrb setup finished in %ss\n' "$((SECONDS - started_at))"

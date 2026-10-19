@@ -42,3 +42,6 @@ output/
 
 # Production metadata is source-controlled, unlike local generated feeds.
 !updates/appcast.xml
+
+# Orb runtime state (portal registrations)
+.amp/portals/

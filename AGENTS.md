@@ -42,6 +42,16 @@ All user-visible text ships in five languages (English, 简体中文, 繁體中�
 
 - There is no hot reload. The app is a long-lived menu-bar process, so **every code change requires a full rebuild and restart of the running app** to take effect — kill the running instance, rebuild, and relaunch before testing.
 
+## Orbs
+
+`.agents/setup` prepares a fresh Linux orb, and Amp snapshots the result: the Debian packages the desktop client needs (NSIS for the Windows installer, Xvfb, CJK fonts), the .NET SDK pinned by `platforms/desktop/global.json`, the NuGet packages from the desktop lockfiles, a warm Debug build, and Pillow for `script/make_icon.py`. `dotnet` is on `PATH` at `/usr/local/bin/dotnet`. `.agents/resume` re-asserts that link after an orb wakes. Keep both scripts idempotent: Amp reruns setup for orbs restored from a stale snapshot.
+
+The SwiftUI client cannot build in a Linux orb — SwiftUI and AppKit come from the macOS SDK. Use a Mac orb or a Mac runner for `swift build`, `swift test`, and macOS UI checks. In a Linux orb:
+
+- Desktop client: `script/build_desktop.sh test` runs the core checks and the localization check; `dotnet run --project platforms/desktop/TokenPlan.Desktop.Tests` runs the UI checks and saves screenshots when `TOKENPLAN_UI_CAPTURE` names a directory; `xvfb-run -a dotnet run --project platforms/desktop/TokenPlan.Desktop -- --fixture` launches the Linux client.
+- Shared logic: provider parsing, pricing and translations exist on both clients, so a change to one side usually needs the matching desktop or Python check to run here.
+- Localization: `script/generate_localizations.py --report` checks the Swift sources without a Swift toolchain.
+
 ## Pull Requests
 
 Every PR description must follow this structure so reviewers can skim it quickly:
