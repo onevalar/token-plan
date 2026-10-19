@@ -439,6 +439,7 @@
 "Quit" = "終了";
 "Quit TokenPlan" = "TokenPlan を終了";
 "Quota History" = "使用枠の履歴";
+"Quota Readings" = "クォータ記録";
 "Quota Style" = "使用量グラフ";
 "Rate Limit Resets" = "レート制限リセット";
 "Rate limit resets" = "レート制限リセット";

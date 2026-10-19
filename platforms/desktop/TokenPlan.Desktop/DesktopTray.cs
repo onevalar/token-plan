@@ -65,7 +65,7 @@ sealed class DesktopTray : IDisposable
         // Keep the native menu identity stable; replacing it breaks the macOS exporter.
         menu.Items.Clear();
         var show = new NativeMenuItem(L.T("Show TokenPlan")); show.Click += (_, _) => Show(); menu.Items.Add(show);
-        foreach (var (label, target) in new[] { ("Overview", "overview"), ("Service Configuration", "providers"), ("General Settings", "settings"), ("About", "about") })
+        foreach (var (label, target) in new[] { ("Overview", "overview"), ("Service Configuration", "providers"), ("Display & Appearance", "appearance"), ("Usage History", "history"), ("General Settings", "settings"), ("About", "about") })
         {
             var item = new NativeMenuItem(L.T(label));
             item.Click += (_, _) => { window.ConfigureTrayPanel(true); window.ShowTrayPage(target); };
@@ -91,7 +91,10 @@ sealed class DesktopTray : IDisposable
         }
         Item("Show TokenPlan", Show);
         Item("Service Configuration", () => window.ShowTrayPage("providers"));
+        Item("Display & Appearance", () => window.ShowTrayPage("appearance"));
+        Item("Usage History", () => window.ShowTrayPage("history"));
         Item("General Settings", () => window.ShowTrayPage("settings"));
+        Item("About", () => window.ShowTrayPage("about"));
         Item("Refresh", window.RefreshFromTray);
         Item("Quit", () => { quitting = true; lifetime.Shutdown(); });
         popup.Content = body;

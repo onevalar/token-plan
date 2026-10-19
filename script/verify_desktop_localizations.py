@@ -15,14 +15,17 @@ keys = set()
 for file in (root / 'platforms/desktop/TokenPlan.Desktop').glob('*.cs'):
     text = file.read_text()
     keys.update(re.findall(r'L\.T\("([^"]+)"\)', text))
-    keys.update(re.findall(r'(?:Section|UtilityBody|SettingRow|Confirm)\("([^"]+)"', text))
+    keys.update(re.findall(r'(?<![A-Za-z])(?:Section|ControlRow|Page|PlainRow|PlainAction|Pill|Note|Confirm)\("([^"]+)"', text))
     keys.update(re.findall(r'Action\("([^"]+)"', text))
+    keys.update(re.findall(r'Label\("([^"]+)", [^)]*T\.', text))
 keys.update(line for line in (root / 'Localization/extra_keys.txt').read_text().splitlines() if line and not line.startswith('#'))
 for file in (root / 'platforms/desktop/TokenPlan.Core').glob('*.cs'):
     text = file.read_text()
     keys.update(re.findall(r'Fail\("([^"]+)"', text))
     keys.update(re.findall(r'ProviderFailure\("([^"]+)"', text))
     keys.update(re.findall(r'Add\(windows, "([^"]+)"', text))
+# Glyphs such as the chevron and hourglass are drawn, never translated.
+keys = {key for key in keys if re.search(r'[A-Za-z]', key)}
 missing = sorted(key for key in keys if key not in table)
 assert not missing, f'Missing desktop translations: {missing}'
 assert all(len(table[key]) == 4 and all(table[key]) for key in keys)

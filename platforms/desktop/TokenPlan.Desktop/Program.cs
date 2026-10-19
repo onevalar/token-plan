@@ -27,7 +27,7 @@ public sealed class App : Application
     public override void Initialize()
     {
         Name = "TokenPlan";
-        Styles.Add(OperatingSystem.IsLinux() ? new SimpleTheme() : new FluentTheme());
+        Styles.Add(new FluentTheme());
         RequestedThemeVariant = ThemeVariant.Default;
     }
     public override void OnFrameworkInitializationCompleted()

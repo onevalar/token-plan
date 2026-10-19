@@ -54,17 +54,19 @@ public sealed partial class MainWindow : Window
     bool restoringFocus;
     int renderVersion;
     bool IsDark => ActualThemeVariant == ThemeVariant.Dark;
-    IBrush Surface => Brush.Parse(IsDark ? "#0F1010" : "#FFFFFF");
-    IBrush Canvas => Brush.Parse(IsDark ? "#08090A" : "#F4F5F6");
-    IBrush Ink => Brush.Parse(IsDark ? "#E4E4E7" : "#191B20");
-    IBrush Muted => Brush.Parse(IsDark ? "#8C919B" : "#515661");
-    IBrush Line => Brush.Parse(IsDark ? "#22242A" : "#DDDFE3");
-    IBrush Accent => Brush.Parse(IsDark ? "#4C8DFF" : "#2675E5");
+    IBrush Surface => T.Group;
+    IBrush Canvas => T.Canvas;
+    IBrush Ink => T.Ink;
+    IBrush Muted => T.Secondary;
+    IBrush Line => T.Separator;
+    IBrush Accent => T.Accent;
 
     public MainWindow()
     {
         Title = Program.Fixture ? "TokenPlan · Interface Review" : "TokenPlan";
-        Width = 560; Height = 720; MinWidth = 480; MinHeight = 360;
+        // The macOS popover is a 340pt-wide panel that sizes to its content; the window keeps that
+        // width so both clients read as the same app.
+        Width = 340; Height = 600; MinWidth = 320; MinHeight = 360;
         WindowStartupLocation = WindowStartupLocation.CenterScreen;
         ConfigureControls();
         using (var icon = typeof(MainWindow).Assembly.GetManifestResourceStream("TokenPlan.AppIcon.png")) Icon = new WindowIcon(icon!);
@@ -93,9 +95,13 @@ public sealed partial class MainWindow : Window
         Opened += (_, _) => { if (!timer.IsEnabled) { timer.Start(); ApplyShortcut(); _ = Refresh(); _ = CheckAppUpdate(false); } };
         Closed += (_, _) => { ready = false; shortcut?.Dispose(); timer.Stop(); refresh?.Cancel(); providers.Dispose(); };
         ActualThemeVariantChanged += (_, _) => { if (ready) Render(); };
+        SizeChanged += (_, _) => RepositionPanel();
         KeyDown += (_, e) => {
-            if (e.Key == Key.R && e.KeyModifiers.HasFlag(OperatingSystem.IsMacOS() ? KeyModifiers.Meta : KeyModifiers.Control)) { e.Handled = true; _ = Refresh(); }
-            if (e.Key == Key.Escape) { e.Handled = true; if (refresh != null) refresh.Cancel(); else if (IsTrayPanel) Hide(); }
+            var command = e.KeyModifiers.HasFlag(OperatingSystem.IsMacOS() ? KeyModifiers.Meta : KeyModifiers.Control);
+            if (e.Key == Key.R && command) { e.Handled = true; if (refresh == null) _ = Refresh(); }
+            if (e.Key == Key.OemComma && command) { e.Handled = true; GoBack(closeWhenHome: false); OpenUtility("settings"); }
+            if (e.Key == Key.Escape) { e.Handled = true; if (refresh != null) refresh.Cancel(); else GoBack(closeWhenHome: true); }
+            if (e.Key == Key.Enter) { e.Handled = true; if (refresh != null) return; if (page == "overview") OpenUtility("providers"); else GoBack(closeWhenHome: false); }
         };
         ready = true;
         GotFocus += (_, e) => {
@@ -106,18 +112,25 @@ public sealed partial class MainWindow : Window
     }
     void ApplyAppearance() => RequestedThemeVariant = preferences.Appearance switch { "light" => ThemeVariant.Light, "dark" => ThemeVariant.Dark, _ => ThemeVariant.Default };
     static void Add(Grid grid, Control child, int row = 0, int column = 0) { Grid.SetRow(child, row); Grid.SetColumn(child, column); grid.Children.Add(child); }
-    TextBlock Text(string text, double size = 14, bool muted = false) => new() { Text = text, FontSize = preferences.Compact ? Math.Max(11, size - 1) : size, Foreground = muted ? Muted : Ink, TextWrapping = TextWrapping.Wrap };
-    static StackPanel Stack(double spacing = 12) => new() { Spacing = spacing };
+    TextBlock Text(string text, double size = 13, bool muted = false) => new() { Text = text, FontSize = preferences.Compact ? Math.Max(11, size - 1) : size, Foreground = muted ? Muted : Ink, TextWrapping = TextWrapping.Wrap, VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center };
+    static StackPanel Stack(double spacing = 12) => new StretchStack { Spacing = spacing };
     Button Action(string label, Action action)
     {
-        var button = new Button { Content = L.T(label), Background = Brush.Parse(IsDark ? "#202228" : "#EEF0F3"), Foreground = Ink, BorderThickness = new Thickness(0), CornerRadius = new CornerRadius(7), MinHeight = 36, Padding = new Thickness(14, 7), HorizontalAlignment = HorizontalAlignment.Left };
-        if (label == "Back") button.Name = "tokenplan-back";
+        var button = new Button { Content = L.T(label), Background = T.SubtleFill, Foreground = Ink, BorderThickness = new Thickness(0), CornerRadius = new CornerRadius(6), MinHeight = 28, FontSize = D.RowLabelSize, Padding = new Thickness(10, 5), HorizontalAlignment = HorizontalAlignment.Left };
         button.Click += (_, _) => action();
         return button;
     }
     string ScrollKey(string pageID) => pageID == "detail" ? "detail/" + detailProvider + "/" + detailAccount + "/" + detailSettings : pageID;
-    static string CanonicalPage(string next) => next switch { "history" => "providers", "appearance" => "settings", _ => next };
+    static string CanonicalPage(string next) => next;
     void Navigate(string next) { page = CanonicalPage(next); Render(); }
+    /// <summary>Esc / Return / the top bar's chevron: one level back, closing the panel at the dashboard.</summary>
+    void GoBack(bool closeWhenHome)
+    {
+        if (page == "detail" && detailSettings) { detailSettings = false; Render(); return; }
+        if (page == "detail") { page = detailOrigin; Render(); return; }
+        if (page != "overview") { Navigate(utilityOrigins.GetValueOrDefault(page, settingsOrigin)); return; }
+        if (closeWhenHome && IsTrayPanel) Hide();
+    }
     void Render()
     {
         StateChanged?.Invoke();
@@ -130,7 +143,7 @@ public sealed partial class MainWindow : Window
         var offset = scrollPositions.GetValueOrDefault(ScrollKey(page));
         Background = Canvas;
         Foreground = Ink;
-        var content = page switch { "detail" => DetailPage(), "settings" => Settings(), "notifications" => NotificationPage(), "advanced" => AdvancedPage(), "about" => AboutPage(), "providers" => ProvidersPage(), _ => Overview() };
+        var content = page switch { "detail" => DetailPage(), "settings" => Settings(), "appearance" => AppearancePage(), "history" => HistoryPage(), "notifications" => NotificationPage(), "advanced" => AdvancedPage(), "about" => AboutPage(), "providers" => ProvidersPage(), _ => Overview() };
         var root = new Grid();
         Add(root, content);
         pageScroll = null;
@@ -153,69 +166,7 @@ public sealed partial class MainWindow : Window
             restoringFocus = false;
         }, DispatcherPriority.Loaded);
     }
-    Control Overview()
-    {
-        var body = Stack(20); body.Margin = new Thickness(20, 16); body.MaxWidth = 780;
-        var heading = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto") };
-        Add(heading, Brand(20));
-        var refreshAll = Action(refresh == null ? "Refresh" : "Stop", () => { if (refresh != null) refresh.Cancel(); else _ = Refresh(); });
-        refreshAll.Name = "tokenplan-refresh-all";
-        var actions = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
-        actions.Children.Add(refreshAll); actions.Children.Add(MoreMenu());
-        Add(heading, actions, 0, 1);
-        body.Children.Add(heading);
-        if (Program.Fixture) body.Children.Add(Note(L.T("Interface review uses example data. No accounts are connected.")));
-        if (notice != null) body.Children.Add(Note(L.T(notice)));
-        if (availableUpdate != null) body.Children.Add(Action("Update Available", () => Navigate("about")));
-        var cards = new ProviderGrid();
-        foreach (var id in preferences.OrderedProviders.Where(preferences.IsEnabled))
-        {
-            var primary = results.GetValueOrDefault(id) ?? new(id, ProviderName(id), null, "Waiting for the first update…");
-            if (!preferences.IsAccountRemoved(primary)) cards.Children.Add(Card(primary));
-            foreach (var account in additionalAccounts.GetValueOrDefault(id) ?? Array.Empty<ProviderResult>()) if (!preferences.IsAccountRemoved(account) && preferences.AccountVisibility.GetValueOrDefault(account.SettingsKey, true)) cards.Children.Add(Card(account));
-        }
-        body.Children.Add(cards);
-        if (!ProviderIDs.Any(preferences.IsEnabled)) { body.Children.Add(Note(L.T("No providers are enabled."))); body.Children.Add(Action("Manage Providers", () => Navigate("providers"))); }
-
-        return new ScrollViewer { Content = body, HorizontalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Disabled };
-    }
-    Control Brand(double size)
-    {
-        var panel = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 4, VerticalAlignment = VerticalAlignment.Center };
-        using var stream = typeof(MainWindow).Assembly.GetManifestResourceStream("TokenPlan.AppIcon.png")!;
-        panel.Children.Add(new Image { Source = new Avalonia.Media.Imaging.Bitmap(stream), Width = 20, Height = 20, VerticalAlignment = VerticalAlignment.Center });
-        var brandName = Text("TokenPlan", size); brandName.VerticalAlignment = VerticalAlignment.Center; panel.Children.Add(brandName); return panel;
-    }
-    Control Note(string message) => new Border { Background = Canvas, CornerRadius = new CornerRadius(8), Padding = new Thickness(12), BorderBrush = Line, BorderThickness = new Thickness(1), Child = Text(message, 12, true) };
-    Control Card(ProviderResult result, bool detail = false)
-    {
-        var body = Stack(10);
-        var header = new Grid { ColumnDefinitions = new ColumnDefinitions("Auto,*,Auto") };
-        var mark = new Border { Width = 32, Height = 32, CornerRadius = new CornerRadius(8), Background = Canvas, Child = ProviderMark(result.Id) };
-        Add(header, mark);
-        var title = Stack(2); title.Margin = new Thickness(10, 0, 0, 0); title.Children.Add(Text(result.AccountEmail != null ? ProviderName(result.Id) : result.Name, 16));
-        if (result.AccountEmail != null) title.Children.Add(AccountIdentityRow(result));
-        else if (result.Snapshot?.Plan is { Length: > 0 } plan) title.Children.Add(Text(plan, 11, true));
-        Add(header, title, 0, 1);
-        if (!detail)
-        {
-            var open = Action("Details", () => OpenAccountDetail(result)); open.Content = "›"; open.MinWidth = 32;
-            Avalonia.Automation.AutomationProperties.SetName(open, result.Name + " · " + L.T("Details"));
-            Add(header, open, 0, 2); body.Children.Add(header);
-        }
-        if (result.ErrorKey != null) body.Children.Add(Text(L.T(result.ErrorKey), 12, true));
-        if (result.Snapshot is { } snapshot)
-        {
-            if (snapshot.Windows.Count == 0) body.Children.Add(Text(L.T("No quota data is available."), 12, true));
-            var metrics = preferences.OrderedMetrics(result.SettingsKey, snapshot.Windows).Where(w => preferences.Placement(result.SettingsKey, w.Label) != MetricPlacement.Hidden).ToArray();
-            var primary = detail ? metrics : metrics.Where(w => preferences.Placement(result.SettingsKey, w.Label) == MetricPlacement.Home).ToArray();
-            foreach (var metric in primary) body.Children.Add(MetricRow(metric, result.Id));
-            if (detail && result.AccountKey == null && ProviderCatalog.TokenLogProviders.Contains(result.Id)) body.Children.Add(ServiceSpendRows(result.Id));
-            body.Children.Add(Text(L.T(result.ErrorKey == null ? "Updated" : "Last Successful Update") + " " + snapshot.FetchedAt.ToLocalTime().ToString("g"), 11, true));
-        }
-        return new Border { Background = Surface, BorderBrush = Line, BorderThickness = new Thickness(1), CornerRadius = new CornerRadius(8), Padding = new Thickness(preferences.Compact ? 12 : 20), Child = body };
-    }
-    ComboBox Choice(string[] labels, int index) => new() { ItemsSource = labels.Select(L.T).ToArray(), SelectedIndex = index, MinWidth = 240 };
+    ComboBox Choice(string[] labels, int index) => Field(new ComboBox { ItemsSource = labels.Select(L.T).ToArray(), SelectedIndex = index, MinWidth = 104 });
     void Save()
     {
         try { preferences.Save(preferencesFile); notice = null; }

@@ -104,6 +104,7 @@ T["Assign tokenplan --toggle in your desktop's keyboard settings."] = ('可在�
 
 T.update({
  'Service Configuration': ('服务配置', '服務設定', 'サービス設定', '서비스 설정'),
+ 'Quota Readings': ('配额记录', '配額記錄', 'クォータ記録', '할당량 기록'),
  'Usage Overview': ('用量总览', '用量總覽', '使用量の概要', '사용량 개요'),
  'AI subscription usage, balances and spending in your system tray.': ('在系统托盘中查看 AI 订阅用量、余额与费用。', '在系統匣中查看 AI 訂閱用量、餘額與費用。', 'システムトレイで AI サブスクリプションの使用量、残高、費用を確認できます。', '시스템 트레이에서 AI 구독 사용량, 잔액 및 비용을 확인하세요.'),
  'Application': ('应用信息', '應用程式資訊', 'アプリ情報', '앱 정보'),

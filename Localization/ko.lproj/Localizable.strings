@@ -439,6 +439,7 @@
 "Quit" = "종료";
 "Quit TokenPlan" = "TokenPlan 종료";
 "Quota History" = "할당량 기록";
+"Quota Readings" = "할당량 기록";
 "Quota Style" = "사용량 그래프";
 "Rate Limit Resets" = "한도 초기화";
 "Rate limit resets" = "한도 초기화";

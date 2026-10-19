@@ -439,6 +439,7 @@
 "Quit" = "退出";
 "Quit TokenPlan" = "退出 TokenPlan";
 "Quota History" = "额度记录";
+"Quota Readings" = "配额记录";
 "Quota Style" = "图形样式";
 "Rate Limit Resets" = "额度重置次数";
 "Rate limit resets" = "额度重置次数";

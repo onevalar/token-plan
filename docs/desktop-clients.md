@@ -93,9 +93,30 @@ Preferences also include language, theme, refresh interval, notifications, launc
 login and diagnostic logging. English, simplified/traditional Chinese, Japanese and
 Korean use the repository's translation tables.
 
+## Layout and navigation
+
+The window follows the macOS popover rather than a separate desktop design. It is a
+340-point-wide panel that grows and shrinks to its content (up to the screen height) and
+anchors to the tray pointer when a tray host is available; without one it stays a normal,
+resizable window with the same width and typography. Colours, accent, severity tints and the
+two density levels come from the macOS client's tokens.
+
+The dashboard has a header with the app name, a **Refresh** button and the **…** menu, then
+one flat section per service: service mark, name, plan and a chevron into details, followed by
+single-line readings (label, track, value, countdown). A hairline separates services; there are
+no per-service cards. Sub-screens use a 44-point bar with a back chevron and a centred title.
+**…** lists **Service Configuration**, **Display & Appearance**, **Usage History**,
+**General Settings**, **About** and **Quit**. Settings pages pair a caption with a rounded card
+of rows; Usage/Settings tabs and the history period are capsule segmented controls.
+
+Return opens Service Configuration from the dashboard and goes back elsewhere. Esc goes back one
+level and closes the panel from the dashboard. Ctrl+R (⌘R on macOS) refreshes; Ctrl+, (⌘,) opens
+General Settings.
+
 ## Build, test and installers
 
-Use the isolated .NET SDK specified by `platforms/desktop/global.json`:
+Use the isolated .NET SDK specified by `platforms/desktop/global.json` (an Amp orb's
+`.agents/setup` installs it at `~/.dotnet` and links `dotnet` onto `PATH`):
 
 ```sh
 TOKENPLAN_DOTNET=/path/to/dotnet script/build_desktop.sh build
@@ -132,7 +153,8 @@ not implemented here. Do not describe the clients as fully equivalent on every O
 A primary tray activation opens the panel; repeated activation leaves it open. Right-click
 uses the native tray menu where the desktop exports it. For hosts that call the SNI
 ContextMenu method instead, a compact menu provides Show, Service Configuration,
-General Settings, Refresh and Quit. Both exit paths terminate the process.
+Display & Appearance, Usage History, General Settings, About, Refresh and Quit. Both
+exit paths terminate the process.
 
 The pinned Avalonia 12.1.3 backend leaves SNI ContextMenu and SecondaryActivate empty.
 LinuxTrayInteraction isolates a compatibility adapter around its exported handler,

@@ -45,9 +45,9 @@ try
     foreach (var theme in new[] { ThemeVariant.Light, ThemeVariant.Dark })
     {
         window.RequestedThemeVariant = theme;
-        foreach (var page in new[] { "overview", "providers", "settings", "notifications", "advanced", "about" })
+        foreach (var page in new[] { "overview", "providers", "appearance", "history", "settings", "notifications", "advanced", "about" })
         {
-            Call("Navigate", page); window.Measure(new Size(560, 720)); window.Arrange(new Rect(0, 0, 560, 720)); Dispatcher.UIThread.RunJobs();
+            Call("Navigate", page); window.Measure(new Size(340, 720)); window.Arrange(new Rect(0, 0, 340, 720)); Dispatcher.UIThread.RunJobs();
             Check(window.Content is Grid, "Every page renders in " + theme + ": " + page);
             if (Environment.GetEnvironmentVariable("TOKENPLAN_UI_CAPTURE") is { Length: > 0 } capture)
             {
@@ -57,14 +57,27 @@ try
                 using var bitmap = window.CaptureRenderedFrame(); bitmap?.Save(Path.Combine(capture, theme + "-" + page + ".png"), Avalonia.Media.Imaging.PngBitmapEncoderOptions.Default);
             }
         }
+        foreach (var settings in new[] { false, true })
+        {
+            Call("OpenDetail", "claude"); Set("detailSettings", settings); Call("Render");
+            window.Measure(new Size(340, 640)); window.Arrange(new Rect(0, 0, 340, 640)); Dispatcher.UIThread.RunJobs();
+
+            if (Environment.GetEnvironmentVariable("TOKENPLAN_UI_CAPTURE") is { Length: > 0 } detailCapture)
+            {
+                foreach (var viewer in window.GetVisualDescendants().OfType<ScrollViewer>()) viewer.Offset = default;
+                Dispatcher.UIThread.RunJobs(); Avalonia.Headless.AvaloniaHeadlessPlatform.ForceRenderTimerTick();
+                using var bitmap = window.CaptureRenderedFrame();
+                bitmap?.Save(Path.Combine(detailCapture, theme + (settings ? "-detail-settings.png" : "-detail-usage.png")), Avalonia.Media.Imaging.PngBitmapEncoderOptions.Default);
+            }
+        }
         foreach (var provider in ProviderCatalog.All)
         {
             Call("OpenDetail", provider.Id); Set("detailSettings", true); Call("Render");
-            window.Measure(new Size(680, 500)); window.Arrange(new Rect(0, 0, 680, 500)); Dispatcher.UIThread.RunJobs();
+            window.Measure(new Size(340, 640)); window.Arrange(new Rect(0, 0, 340, 640)); Dispatcher.UIThread.RunJobs();
             if (!window.GetVisualDescendants().OfType<TextBox>().Any(t => t.Name == "tokenplan-note-" + provider.Id))
             {
                 window.GetVisualDescendants().OfType<Button>().First(b => b.Name == "tokenplan-note-disclosure-" + provider.Id).RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
-                window.Measure(new Size(680, 500)); window.Arrange(new Rect(0, 0, 680, 500)); Dispatcher.UIThread.RunJobs();
+                window.Measure(new Size(340, 640)); window.Arrange(new Rect(0, 0, 340, 640)); Dispatcher.UIThread.RunJobs();
             }
             Check(window.GetVisualDescendants().OfType<TextBox>().Any(t => t.Name == "tokenplan-note-" + provider.Id), "Every service settings page has usable notes: " + provider.Id + " " + theme);
             if (provider.EnvironmentKey != null) Check(window.GetVisualDescendants().OfType<TextBox>().Any(t => t.Name == "tokenplan-api-key-" + provider.Id), "API credential entry exists for " + provider.Id);
@@ -72,16 +85,16 @@ try
         foreach (var target in new[] { "history", "appearance", "settings", "about" })
         {
             Call("Navigate", "overview"); Call("OpenUtility", target);
-            window.Measure(new Size(560, 720)); window.Arrange(new Rect(0, 0, 560, 720)); Dispatcher.UIThread.RunJobs();
+            window.Measure(new Size(340, 720)); window.Arrange(new Rect(0, 0, 340, 720)); Dispatcher.UIThread.RunJobs();
             window.GetVisualDescendants().OfType<Button>().First(b => b.Name == "tokenplan-back").RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
             Check((string)Get("page")! == "overview", "Actual Back button returns home from " + target);
         }
         Call("Navigate", "overview"); Call("OpenUtility", "history");
         Check((string)Get("settingsOrigin")! == "overview", "History preserves home origin");
         Call("OpenDetail", "claude");
-        Check((string)Get("detailOrigin")! == "providers", "Detail preserves actual origin");
+        Check((string)Get("detailOrigin")! == "history", "Detail preserves actual origin");
         Set("detailSettings", true); Call("Render");
-        window.Measure(new Size(680, 500)); window.Arrange(new Rect(0, 0, 680, 500)); Dispatcher.UIThread.RunJobs();
+        window.Measure(new Size(340, 640)); window.Arrange(new Rect(0, 0, 340, 640)); Dispatcher.UIThread.RunJobs();
         Check(window.GetVisualDescendants().OfType<CheckBox>().Any(), "Detail controls available at minimum window size");
     }
     results["opencode"] = new("opencode", "OpenCode", new("opencode", "OpenCode", "Go", new[] { new UsageWindow("Session", 100, DateTimeOffset.UtcNow.AddHours(2)) }, DateTimeOffset.UtcNow), null);
@@ -90,50 +103,50 @@ try
     Set("preferences", new Preferences().PlaceMetric("opencode", "Session", MetricPlacement.Hidden, results["opencode"].Snapshot!.Windows));
     Check(((Preferences)Get("preferences")!).Placement("opencode", "Session") == MetricPlacement.Hidden, "OpenCode keeps existing metric preference identity");
     Call("OpenDetail", "opencode"); Call("Render");
-    window.Measure(new Size(680, 500)); window.Arrange(new Rect(0, 0, 680, 500)); Dispatcher.UIThread.RunJobs();
+    window.Measure(new Size(340, 640)); window.Arrange(new Rect(0, 0, 340, 640)); Dispatcher.UIThread.RunJobs();
     var allowance = L.T("These three readings share one allowance. More expensive models use it up faster. They are not each model's own remaining amount.");
     Check(!window.GetVisualDescendants().OfType<TextBlock>().Any(t => t.Text == allowance), "Hidden OpenCode quota does not leave a misleading allowance note");
     Set("preferences", new Preferences()); Call("Render");
-    window.Measure(new Size(680, 500)); window.Arrange(new Rect(0, 0, 680, 500)); Dispatcher.UIThread.RunJobs();
+    window.Measure(new Size(340, 640)); window.Arrange(new Rect(0, 0, 340, 640)); Dispatcher.UIThread.RunJobs();
     Check(window.GetVisualDescendants().OfType<TextBlock>().Any(t => t.Text == allowance), "OpenCode details show the localized shared allowance note");
     Set("preferences", new Preferences().Pin("claude", "Session", true).Pin("claude", "Weekly", true));
     Call("OpenDetail", "claude"); Set("detailSettings", true); Call("Render");
-    window.Measure(new Size(560, 720)); window.Arrange(new Rect(0, 0, 560, 720)); Dispatcher.UIThread.RunJobs();
+    window.Measure(new Size(340, 720)); window.Arrange(new Rect(0, 0, 340, 720)); Dispatcher.UIThread.RunJobs();
     var choices = window.GetVisualDescendants().OfType<CheckBox>().Where(c => c.Name?.StartsWith("metric-pin-") == true).ToArray();
     Check(choices.Length == 3 && choices[0].IsEnabled && choices[1].IsEnabled && !choices[2].IsEnabled, "Third tray choice visually and functionally disabled at cap in the actual detail table");
     Set("preferences", new Preferences { ExpandedMetrics = new() { ["claude"] = new[] { "Weekly", "Sonnet" } } });
     Call("OpenDetail", "claude"); Set("detailSettings", true); Call("Render");
-    window.Measure(new Size(560, 720)); window.Arrange(new Rect(0, 0, 560, 720)); Dispatcher.UIThread.RunJobs();
+    window.Measure(new Size(340, 720)); window.Arrange(new Rect(0, 0, 340, 720)); Dispatcher.UIThread.RunJobs();
     var sessionVisibility = window.GetVisualDescendants().OfType<ComboBox>().First(c => c.Name == "metric-status-Session");
     Check(sessionVisibility.ItemCount == 3, "Last home metric can be moved to details or hidden");
     Set("preferences", new Preferences { ExpandedMetrics = new() { ["claude"] = new[] { "Session", "Weekly", "Sonnet" } } });
     var accountCard = (Control)Call("Card", results["claude"], false)!;
-    Check(!accountCard.GetLogicalDescendants().OfType<ProgressBar>().Any(), "All-details account has no promoted overview quota");
+    Check(!accountCard.GetLogicalDescendants().OfType<QuotaMeter>().Any(), "All-details account has no promoted overview quota");
     Check(accountCard.GetLogicalDescendants().OfType<Button>().Any(), "Heading-only account retains its details action");
     Set("preferences", new Preferences { HideValues = true });
     Check((string)Call("MetricValue", new UsageWindow("Balance", 0, null, 1234, "USD"))! == "•••", "Privacy hides monetary amounts");
     Set("detailSettings", false); Call("OpenDetail", "claude");
-    window.Measure(new Size(560, 720)); window.Arrange(new Rect(0, 0, 560, 720)); Dispatcher.UIThread.RunJobs();
-    Check(window.GetVisualDescendants().OfType<ProgressBar>().Count() == 3, "Detail usage renders all three metrics expanded");
-    Check(window.GetVisualDescendants().OfType<ProgressBar>().All(p => p.Bounds.Height <= 6), "Platform themes preserve the compact six-pixel progress height");
-    Check(window.GetVisualDescendants().OfType<ProgressBar>().All(p => p.Value == 0), "Privacy masks progress lengths too");
+    window.Measure(new Size(340, 720)); window.Arrange(new Rect(0, 0, 340, 720)); Dispatcher.UIThread.RunJobs();
+    Check(window.GetVisualDescendants().OfType<QuotaMeter>().Count() == 3, "Detail usage renders all three metrics expanded");
+    Check(window.GetVisualDescendants().OfType<QuotaMeter>().All(p => p.Bounds.Height <= 6), "Both themes preserve the compact meter height");
+    Check(window.GetVisualDescendants().OfType<QuotaMeter>().All(p => p.Value == 0), "Privacy masks progress lengths too");
     var trends = (Dictionary<string, TokenTrend>)Get("tokenTrends")!;
     var today = DateOnly.FromDateTime(DateTime.Now);
     foreach (var id in new[] { "claude", "codex" }) trends[id] = new(new[] { new TokenDay(today, new(100, 20, 0), new(0.1, 0, 1)) }, false, DateTimeOffset.UtcNow);
     Set("historyProvider", "claude"); Set("selectedSpendDate", today); Call("Navigate", "history");
-    window.Measure(new Size(560, 720)); window.Arrange(new Rect(0, 0, 560, 720)); Dispatcher.UIThread.RunJobs();
+    window.Measure(new Size(340, 720)); window.Arrange(new Rect(0, 0, 340, 720)); Dispatcher.UIThread.RunJobs();
     var labels = window.GetVisualDescendants().OfType<TextBlock>().Select(t => t.Text).ToArray();
     Check(labels.Contains("Claude") && !labels.Contains("Codex"), "Daily history drill-down preserves selected service filter");
     Call("Navigate", "overview"); Call("OpenUtility", "settings"); Call("OpenUtility", "notifications");
-    void Back() { window.Measure(new Size(560,720)); window.Arrange(new Rect(0,0,560,720)); Dispatcher.UIThread.RunJobs(); window.GetVisualDescendants().OfType<Button>().First(b => b.Name == "tokenplan-back").RaiseEvent(new RoutedEventArgs(Button.ClickEvent)); }
+    void Back() { window.Measure(new Size(340, 720)); window.Arrange(new Rect(0, 0, 340, 720)); Dispatcher.UIThread.RunJobs(); window.GetVisualDescendants().OfType<Button>().First(b => b.Name == "tokenplan-back").RaiseEvent(new RoutedEventArgs(Button.ClickEvent)); }
     Back(); Check((string)Get("page")! == "settings", "Notifications returns to general settings");
     Back(); Check((string)Get("page")! == "overview", "Nested settings return does not overwrite home origin");
     Set("preferences", new Preferences { ExpandedMetrics = new() { ["claude"] = new[] { "Sonnet" } } });
-    Call("Navigate", "overview"); window.Measure(new Size(560,720)); window.Arrange(new Rect(0,0,560,720)); Dispatcher.UIThread.RunJobs();
+    Call("Navigate", "overview"); window.Measure(new Size(340, 720)); window.Arrange(new Rect(0, 0, 340, 720)); Dispatcher.UIThread.RunJobs();
     Check(!window.GetVisualDescendants().OfType<Expander>().Any(), "Details-only items are not hidden in home expanders");
     Set("preferences", new Preferences()); Set("selectedSpendDate", null!); Set("historyProvider", "claude");
     trends["claude"] = new(new[] { new TokenDay(today, new(100,20,0), null) }, false, DateTimeOffset.UtcNow);
-    Call("Navigate", "history"); window.Measure(new Size(560,720)); window.Arrange(new Rect(0,0,560,720)); Dispatcher.UIThread.RunJobs();
+    Call("Navigate", "history"); window.Measure(new Size(340, 720)); window.Arrange(new Rect(0, 0, 340, 720)); Dispatcher.UIThread.RunJobs();
     var costTexts = window.GetVisualDescendants().OfType<TextBlock>().Select(t => t.Text).ToArray();
     Check(costTexts.Contains("—") && !costTexts.Contains("$0.00"), "Unknown prices never masquerade as zero cost");
     var periodControl = window.GetVisualDescendants().OfType<Avalonia.Controls.Primitives.TabStrip>().First(t => t.Name == "spend-period");
@@ -144,12 +157,12 @@ try
         window.RequestedThemeVariant = theme; L.Use("zh-Hans");
         foreach (var settings in new[] { false, true })
         {
-            Call("OpenDetail", "claude"); Set("detailSettings", settings); Call("Render"); window.Measure(new Size(560,720)); window.Arrange(new Rect(0,0,560,720)); Dispatcher.UIThread.RunJobs();
+            Call("OpenDetail", "claude"); Set("detailSettings", settings); Call("Render"); window.Measure(new Size(340, 720)); window.Arrange(new Rect(0, 0, 340, 720)); Dispatcher.UIThread.RunJobs();
             if (Environment.GetEnvironmentVariable("TOKENPLAN_UI_CAPTURE") is { Length: > 0 } capture)
             {
                 foreach (var viewer in window.GetVisualDescendants().OfType<ScrollViewer>()) viewer.Offset = default;
                 Dispatcher.UIThread.RunJobs(); Avalonia.Headless.AvaloniaHeadlessPlatform.ForceRenderTimerTick();
-                using var bitmap = window.CaptureRenderedFrame(); bitmap?.Save(Path.Combine(capture, theme + (settings ? "-detail-settings.png" : "-detail-usage.png")), Avalonia.Media.Imaging.PngBitmapEncoderOptions.Default);
+                using var bitmap = window.CaptureRenderedFrame(); bitmap?.Save(Path.Combine(capture, theme + (settings ? "-detail-settings-zh.png" : "-detail-usage-zh.png")), Avalonia.Media.Imaging.PngBitmapEncoderOptions.Default);
             }
         }
     }
@@ -160,7 +173,7 @@ try
     Set("preferences", new Preferences { HiddenMetrics = new() { [accountA.SettingsKey] = new[] { "Sonnet" } }, ProviderNotes = new() { [accountA.SettingsKey] = "only A" } });
     Call("OpenAccountDetail", accountA); Set("detailSettings", true); Call("Render");
     Check((string)Get("detailAccount")! == accountA.AccountKey, "Account card opens that account's settings");
-    window.Measure(new Size(420,720)); window.Arrange(new Rect(0,0,420,720)); Dispatcher.UIThread.RunJobs();
+    window.Measure(new Size(340, 720)); window.Arrange(new Rect(0, 0, 340, 720)); Dispatcher.UIThread.RunJobs();
     var accountEmail = window.GetVisualDescendants().OfType<TextBlock>().Single(t => t.Name == "account-email-" + accountA.SettingsKey);
     Check(accountEmail.Text == accountA.AccountEmail && accountEmail.TextWrapping == Avalonia.Media.TextWrapping.NoWrap, "Details show a single-line email without organization metadata");
     Check(window.GetVisualDescendants().OfType<TextBlock>().Any(t => t.Text == "Pro"), "Details retain subscription level beside account email");
@@ -176,8 +189,8 @@ try
     // Two Claude accounts should mean exactly two tray switches, without a family switch.
     accounts["claude"] = new[] { accountA };
     Set("preferences", new Preferences { PinnedMetrics = new() { ["claude"] = new[] { "Session" }, [accountA.SettingsKey] = Array.Empty<string>() } });
-    Call("Navigate", "settings");
-    window.Measure(new Size(560,720)); window.Arrange(new Rect(0,0,560,720)); Dispatcher.UIThread.RunJobs();
+    Call("Navigate", "appearance");
+    window.Measure(new Size(340, 720)); window.Arrange(new Rect(0, 0, 340, 720)); Dispatcher.UIThread.RunJobs();
     var traySwitches = window.GetVisualDescendants().OfType<ToggleSwitch>().Where(t => t.Name?.StartsWith("tray-account-claude") == true).ToArray();
     Check(traySwitches.Length == 2, "Two Claude accounts have exactly two tray switches");
     var summaries = window.TraySummaries().ToArray();
@@ -193,13 +206,13 @@ try
     Set("preferences", new Preferences());
     accounts["claude"] = new[] { accountA, accountB };
     Call("Navigate", "providers");
-    window.Measure(new Size(560,720)); window.Arrange(new Rect(0,0,560,720)); Dispatcher.UIThread.RunJobs();
+    window.Measure(new Size(340, 720)); window.Arrange(new Rect(0, 0, 340, 720)); Dispatcher.UIThread.RunJobs();
     var accountSwitch = window.GetVisualDescendants().OfType<ToggleSwitch>().Single(t => t.Name == "account-visible-" + accountA.SettingsKey);
     accountSwitch.IsChecked = false;
     Check(!((Preferences)Get("preferences")!).AccountVisibility[accountA.SettingsKey], "Account visibility control persists independent preference");
     Check(!window.TraySummaries().Any(text => text.StartsWith(accountA.Name)), "Hidden account also leaves tray summaries");
     Call("OpenAccountDetail", accountA); Set("detailSettings", true); Call("Render");
-    window.Measure(new Size(560,720)); window.Arrange(new Rect(0,0,560,720)); Dispatcher.UIThread.RunJobs();
+    window.Measure(new Size(340, 720)); window.Arrange(new Rect(0, 0, 340, 720)); Dispatcher.UIThread.RunJobs();
     var removeAccount = window.GetVisualDescendants().OfType<Button>().Single(b => b.Name == "tokenplan-remove-account");
     removeAccount.RaiseEvent(new RoutedEventArgs(Button.ClickEvent)); Dispatcher.UIThread.RunJobs();
     var removalDialog = window.OwnedWindows.Single();
@@ -209,10 +222,10 @@ try
     Check(Preferences.Load(Path.Combine(temp, "preferences.json")).IsAccountRemoved(accountA), "Removed identity survives restart");
     Check(!window.TraySummaries().Any(text => text.Contains(accountA.AccountEmail!)), "Removed account is absent from tray summaries");
     Call("Navigate", "providers");
-    window.Measure(new Size(560,720)); window.Arrange(new Rect(0,0,560,720)); Dispatcher.UIThread.RunJobs();
+    window.Measure(new Size(340, 720)); window.Arrange(new Rect(0, 0, 340, 720)); Dispatcher.UIThread.RunJobs();
     Check(!window.GetVisualDescendants().OfType<ToggleSwitch>().Any(t => t.Name == "account-visible-" + accountA.SettingsKey), "Removed account is absent from service configuration");
     L.Use("en"); Call("Navigate", "overview");
-    window.Measure(new Size(560,720)); window.Arrange(new Rect(0,0,560,720)); Dispatcher.UIThread.RunJobs();
+    window.Measure(new Size(340, 720)); window.Arrange(new Rect(0, 0, 340, 720)); Dispatcher.UIThread.RunJobs();
     var homeText = window.GetVisualDescendants().OfType<TextBlock>().Select(t => t.Text).ToArray();
     Check(!homeText.Contains("Overview") && !homeText.Any(t => t?.StartsWith("Available Usage") == true), "Overview has no duplicate title or service counter");
     Check(!window.GetVisualDescendants().OfType<Avalonia.Controls.Primitives.TabStrip>().Any(), "Overview has no destination tabs");
@@ -222,23 +235,27 @@ try
     Check((string)Get("page")! == "providers", "Options opens service management");
     Back(); Check((string)Get("page")! == "overview", "Service management returns to overview");
     var menuLabels = options.ContextMenu.Items.OfType<MenuItem>().Select(item => (string?)item.Header).ToArray();
-    Check(menuLabels.SequenceEqual(new[] { "Service Configuration", "General Settings", "About", "Quit" }), "Options has only merged destinations");
+    Check(menuLabels.SequenceEqual(new[] { "Service Configuration", "Display & Appearance", "Usage History", "General Settings", "About", "Quit" }), "Options carries every destination the macOS menu carries");
     Call("Navigate", "settings");
-    window.Measure(new Size(560,720)); window.Arrange(new Rect(0,0,560,720)); Dispatcher.UIThread.RunJobs();
+    window.Measure(new Size(340, 720)); window.Arrange(new Rect(0, 0, 340, 720)); Dispatcher.UIThread.RunJobs();
     var settingLabels = window.GetVisualDescendants().OfType<TextBlock>().Select(t => t.Text).ToArray();
-    Check(settingLabels.Contains("Theme") && settingLabels.Contains("Language") && settingLabels.Contains("Refresh Interval") && settingLabels.Contains("System Tray"), "General settings includes appearance, language and behavior");
+    Check(settingLabels.Contains("Refresh Interval") && settingLabels.Contains("Launch at Login") && settingLabels.Contains("Notifications"), "General settings holds behavior and the More rows");
+    Call("Navigate", "appearance");
+    window.Measure(new Size(340, 720)); window.Arrange(new Rect(0, 0, 340, 720)); Dispatcher.UIThread.RunJobs();
+    var appearanceLabels = window.GetVisualDescendants().OfType<TextBlock>().Select(t => t.Text).ToArray();
+    Check(appearanceLabels.Contains("Theme") && appearanceLabels.Contains("Language") && appearanceLabels.Contains("Density") && appearanceLabels.Contains("System Tray"), "Display & Appearance groups usage display, interface and tray");
     Set("selectedSpendDate", null!); Call("Navigate", "providers");
-    window.Measure(new Size(560,720)); window.Arrange(new Rect(0,0,560,720)); Dispatcher.UIThread.RunJobs();
+    window.Measure(new Size(340, 720)); window.Arrange(new Rect(0, 0, 340, 720)); Dispatcher.UIThread.RunJobs();
     var summary = window.GetVisualDescendants().OfType<StackPanel>().Single(p => p.Name == "tokenplan-usage-overview");
     var management = window.GetVisualDescendants().OfType<TextBlock>().First(t => t.Text == "Manage Providers");
     Check(summary.TranslatePoint(default, window)!.Value.Y < management.TranslatePoint(default, window)!.Value.Y, "Usage overview precedes service management in one page");
     Call("Navigate", "about");
-    window.Measure(new Size(560,720)); window.Arrange(new Rect(0,0,560,720)); Dispatcher.UIThread.RunJobs();
+    window.Measure(new Size(340, 720)); window.Arrange(new Rect(0, 0, 340, 720)); Dispatcher.UIThread.RunJobs();
     var aboutLabels = window.GetVisualDescendants().OfType<TextBlock>().Select(t => t.Text).ToArray();
     Check(!aboutLabels.Contains("Platform") && !aboutLabels.Contains("Privacy") && !aboutLabels.Contains("MIT"), "About presents compact application metadata without removed copy");
     Check(window.GetVisualDescendants().OfType<Button>().Any(b => (string?)b.Content == "Report an Issue"), "About offers actionable support");
     var area = new PixelRect(-1920, 0, 1920, 1080);
-    var position = DesktopPanelPosition.Place(area, new PixelSize(560, 720), new PixelPoint(-1900, 0));
+    var position = DesktopPanelPosition.Place(area, new PixelSize(340, 720), new PixelPoint(-1900, 0));
     Check(position.X >= area.X && position.X + 560 <= area.Right && position.Y >= area.Y && position.Y + 720 <= area.Bottom, "Tray panel stays on negative-origin monitor");
     window.ConfigureTrayPanel(true);
     Check(window.IsTrayPanel && !window.ShowInTaskbar && !window.CanResize, "Tray mode uses compact non-taskbar panel");
@@ -246,11 +263,11 @@ try
     Check(!window.IsTrayPanel && window.ShowInTaskbar && window.CanResize, "Missing tray restores accessible system window");
     Set("preferences", new Preferences()); Call("Navigate", "overview");
     Check(window.TraySummaries().Any(), "Fresh settings expose default quota summaries");
-    window.Measure(new Size(560,720)); window.Arrange(new Rect(0,0,560,720)); Dispatcher.UIThread.RunJobs();
-    foreach (var progress in window.GetVisualDescendants().OfType<ProgressBar>())
+    window.Measure(new Size(340, 720)); window.Arrange(new Rect(0, 0, 340, 720)); Dispatcher.UIThread.RunJobs();
+    foreach (var meter in window.GetVisualDescendants().OfType<QuotaMeter>())
     {
-        var stack = progress.Parent as StackPanel;
-        Check(stack != null && stack.Children.IndexOf(progress) > 0, "Quota progress has its own row below labels and values");
+        var row = meter.Parent as Grid;
+        Check(row != null && Grid.GetColumn(meter) == 1, "Quota track shares the reading row between label and value");
     }
     // Exercise the fallback menu without touching the host's actual system tray.
     var trayType = typeof(MainWindow).Assembly.GetType("TokenPlan.Desktop.DesktopTray")!;

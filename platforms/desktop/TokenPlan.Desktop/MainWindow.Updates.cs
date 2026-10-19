@@ -1,6 +1,8 @@
 using System.Reflection;
 using System.Runtime.InteropServices;
+using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Layout;
 using TokenPlan.Core;
 namespace TokenPlan.Desktop;
 
@@ -43,18 +45,49 @@ public sealed partial class MainWindow
         { DiagnosticLog.Write("updates", "Update download or installer launch failed."); updateStatus = "Could not install the update. Try again later."; }
         finally { updateBusy = false; Render(); }
     }
+    /// <summary>The Updates card: a manual check, the available version and its installer action.</summary>
     Control UpdateControls()
     {
-        var panel = Stack(8);
-        var check = Action("Check for Updates", () => _ = CheckAppUpdate(true)); check.IsEnabled = !updateBusy;
-        panel.Children.Add(check);
+        var rows = new StretchStack { Spacing = 0 };
+        var check = PlainRow("Check for Updates", () => _ = CheckAppUpdate(true));
+        check.IsEnabled = !updateBusy;
+        rows.Children.Add(check);
         if (availableUpdate != null)
         {
-            panel.Children.Add(Text(availableUpdate.Version, 13, true));
-            var install = Action("Download and Install Update", () => _ = InstallAppUpdate()); install.IsEnabled = !updateBusy;
-            panel.Children.Add(install);
+            rows.Children.Add(Hairline());
+            rows.Children.Add(PlainRow(availableUpdate.Version, null, secondary: true));
+            rows.Children.Add(Hairline());
+            var install = PlainRow("Download and Install Update", () => _ = InstallAppUpdate());
+            install.IsEnabled = !updateBusy;
+            rows.Children.Add(install);
         }
-        if (updateStatus != null) panel.Children.Add(Text(L.T(updateStatus), 12, true));
-        return panel;
+        if (updateStatus != null)
+        {
+            rows.Children.Add(Hairline());
+            var status = Label(L.T(updateStatus), D.CaptionSize, T.Secondary);
+            status.Margin = new Thickness(12, 9, 12, 9);
+            rows.Children.Add(status);
+        }
+        return Section("Updates", CardSurface(rows));
+    }
+
+    /// <summary>A full-width text row that behaves like a button, matching the settings link rows.</summary>
+    Button PlainRow(string label, Action? action, bool secondary = false)
+    {
+        var button = new Button
+        {
+            Content = Label(L.T(label), D.RowLabelSize, secondary ? T.Secondary : T.Ink),
+            Background = Avalonia.Media.Brushes.Transparent,
+            BorderThickness = default,
+            Foreground = secondary ? T.Secondary : T.Ink,
+            FontSize = D.RowLabelSize,
+            Padding = new Thickness(12, 10),
+            HorizontalAlignment = HorizontalAlignment.Stretch,
+            HorizontalContentAlignment = HorizontalAlignment.Left,
+            CornerRadius = new CornerRadius(0)
+        };
+        if (action != null) button.Click += (_, _) => action();
+        else button.IsEnabled = false;
+        return button;
     }
 }
