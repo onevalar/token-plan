@@ -101,6 +101,8 @@ enum Formatters {
     static func periodLabel(milliseconds: Int) -> String? {
         if milliseconds == MetricPeriod.sessionMs { return "5h" }
         if milliseconds == MetricPeriod.weekMs { return "1w" }
+        let dayMs = 24 * 60 * 60 * 1000
+        if milliseconds > 0, milliseconds % dayMs == 0 { return "\(milliseconds / dayMs)d" }
         return compactDuration(TimeInterval(milliseconds) / 1000)
     }
 

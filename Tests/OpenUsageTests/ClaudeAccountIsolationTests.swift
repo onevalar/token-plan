@@ -282,7 +282,7 @@ final class ClaudeAccountIsolationTests: XCTestCase {
         let second = await fixture.provider.refresh()
 
         XCTAssertEqual(status(first)?.hasPrefix("Rate limited"), true)
-        XCTAssertEqual(second.warning?.contains("Retrying in ~10m"), true)
+        XCTAssertEqual(second.warning?.contains("Retrying automatically in about 10 min"), true)
         XCTAssertEqual(fixture.http.requests.count, 1)
         XCTAssertTrue(usageRequests(fixture.http).isEmpty)
     }

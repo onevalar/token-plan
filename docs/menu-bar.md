@@ -68,3 +68,5 @@ Account number badges appear only when multiple accounts of the same service are
 Open the account’s subscription details → Settings → Remove Account. Confirming removes it from TokenPlan and prevents automatic rediscovery, including after restart. CLI login files and saved usage history remain untouched. Use the visibility switch instead when you only want to hide an account temporarily. macOS, Windows and Linux support removal of identified Claude and Codex accounts.
 
 Claude account headings prefer the email from the verified account profile, followed by the plan. Generic Desktop labels such as “Personal” no longer overwrite a saved email. The overview, details and menu-bar settings share the same email label.
+
+Quota row titles use compact periods consistently: OpenCode shows `5h`, `1w`, and `30d`; Antigravity’s independent Argon pool shows `Argon · 1w`, without repeating a translated “Weekly”. Whole-day quota periods omit zero hours. These labels do not change quota values or reset timestamps.

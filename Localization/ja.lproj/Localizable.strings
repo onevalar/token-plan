@@ -22,6 +22,7 @@
 "%@: %lld days, %@ to %@, peak %@." = "%1$@：%2$lld 日間、%3$@ ～ %4$@、ピーク %5$@。";
 "%lld expiry times unavailable" = "ほか %lld 件の有効期限は不明です";
 "%lld metrics" = "%lld 項目";
+"%lld min" = "%lld 分";
 "%lld minutes" = "%lld 分";
 "%lldd %lldh" = "%lld日%lld時間";
 "%lldd ago" = "%lld 日前";
@@ -73,6 +74,7 @@
 "Amp is not logged in. Run amp login in Terminal, then refresh." = "Ampにログインしていません。ターミナルでamp loginを実行してから更新してください。";
 "Amp usage failed. Run amp usage in Terminal to check your connection." = "Ampの使用量を取得できません。ターミナルでamp usageを実行し、接続を確認してください。";
 "Amp usage timed out. Check your connection and refresh." = "Ampの使用量取得がタイムアウトしました。接続を確認してから更新してください。";
+"Anthropic has temporarily limited usage queries. Data may be out of date." = "Anthropic が使用量の照会を一時的に制限しています。データが最新でない可能性があります。";
 "Antigravity credentials are invalid. Open Antigravity or run `agy` to sign in again." = "Antigravity の認証情報が無効です。Antigravity を開くか `agy` を実行して再度サインインしてください。";
 "Antigravity sign-in expired. Open Antigravity or run `agy` to refresh." = "Antigravity のサインインの有効期限が切れました。Antigravity を開くか `agy` を実行して更新してください。";
 "Antigravity usage is temporarily unavailable. Try again shortly." = "Antigravity の使用量は一時的に利用できません。しばらくしてからお試しください。";
@@ -442,6 +444,7 @@
 "Rate limit resets" = "レート制限リセット";
 "Rate limited, retry in ~%@" = "レート制限中です。約 %@ 後に再試行";
 "Rate limited, try again later" = "レート制限中です。後でもう一度お試しください";
+"Rate limited. Retrying automatically shortly." = "使用量の照会が制限されています。まもなく自動的に再試行します。";
 "Rate limited. Wait before refreshing again." = "リクエストが制限されています。しばらく待ってから更新してください。";
 "Re-login for live usage. Run `claude` and sign in again to restore session and weekly limits." = "リアルタイムの使用量を取得するには再ログインが必要です。`claude` を実行して再度サインインすると、セッションと週間の上限が復元されます。";
 "Read-only in TokenPlan. Use reset credits in the provider's own app." = "TokenPlan では表示のみです。リセットクレジットは提供元のアプリで使用してください。";
@@ -509,6 +512,8 @@
 "Restores service visibility, metric order and menu-bar selections to their defaults. Connection details and notes are unchanged." = "サービスの表示、項目の順序、メニューバーの選択をデフォルトに戻します。接続情報とメモは変更しません。";
 "Restores this subscription's metric visibility, order and menu-bar selection. Other subscriptions are unchanged." = "この契約の項目表示、順序、メニューバーの選択を復元します。他の契約は変更しません。";
 "Restores this subscription's metric visibility, order and tray selection. Other subscriptions are unchanged." = "この契約の表示項目、順序、トレイ選択を初期化します。他の契約は変更されません。";
+"Retrying automatically in about %@." = "約 %@ 後に自動的に再試行します。";
+"Retrying automatically shortly." = "まもなく自動的に再試行します。";
 "Retrying in ~%@." = "約 %@ 後に再試行します。";
 "Reveal in Finder" = "Finder で表示";
 "Ring" = "リング";
@@ -674,6 +679,8 @@
 "Usage not available for API key." = "API キーでは使用量を取得できません。";
 "Usage or login data could not be read. Check credential file permissions and format, then retry." = "使用量またはログイン情報を読み取れません。認証ファイルの権限と形式を確認して再試行してください。";
 "Usage or login data could not be read. Sign in again." = "使用状況またはログイン情報を読み取れません。再ログインしてください。";
+"Usage queries are temporarily rate limited. Data may be out of date. Retrying automatically later." = "使用量の照会が一時的に制限されています。データが最新でない可能性があります。後で自動的に再試行します。";
+"Usage queries are temporarily rate limited. Data may be out of date. Retrying automatically shortly." = "使用量の照会が一時的に制限されています。データが最新でない可能性があります。まもなく自動的に再試行します。";
 "Usage request failed (HTTP %lld). Try again later." = "使用量のリクエストに失敗しました（HTTP %lld）。後でもう一度お試しください。";
 "Usage request failed after refresh. Try again." = "更新後も使用量のリクエストに失敗しました。もう一度お試しください。";
 "Usage request failed. Check your connection." = "使用量のリクエストに失敗しました。接続を確認してください。";

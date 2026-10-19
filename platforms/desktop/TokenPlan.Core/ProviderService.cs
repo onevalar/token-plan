@@ -120,7 +120,7 @@ public sealed partial class ProviderService : IDisposable
     static string Fingerprint(string token) => Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(token)));
     void CheckCooldown(string key)
     {
-        if (cooldowns.GetValueOrDefault(key) > DateTimeOffset.UtcNow) throw new ProviderFailure("Rate limited. Wait before refreshing again.");
+        if (cooldowns.GetValueOrDefault(key) > DateTimeOffset.UtcNow) throw new ProviderFailure("Usage queries are temporarily rate limited. Data may be out of date. Retrying automatically later.");
     }
     async Task<string> Fetch(HttpRequestMessage request, string cooldownKey, CancellationToken operationToken, bool allowMissing = false)
     {
@@ -133,7 +133,7 @@ public sealed partial class ProviderService : IDisposable
         {
             var next = response.RetryAfter ?? DateTimeOffset.UtcNow.AddMinutes(5);
             cooldowns[cooldownKey] = next > DateTimeOffset.UtcNow.AddMinutes(1) ? next : DateTimeOffset.UtcNow.AddMinutes(1);
-            throw new ProviderFailure("Rate limited. Wait before refreshing again.", response.Status);
+            throw new ProviderFailure("Usage queries are temporarily rate limited. Data may be out of date. Retrying automatically later.", response.Status);
         }
         if ((int)response.Status is < 200 or >= 300) throw new ProviderFailure("The provider could not return usage. Try again later.", response.Status);
         return response.Body;

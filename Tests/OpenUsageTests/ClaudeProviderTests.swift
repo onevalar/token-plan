@@ -270,6 +270,22 @@ final class ClaudeUsageMapperTests: XCTestCase {
         }
     }
 
+    func testRetryNoticeHandlesZeroMissingAndRoundedMinutes() {
+        for seconds: Int? in [nil, 0, -1] {
+            let mapped = ClaudeUsageMapper.rateLimitedUsage(credentials: ClaudeOAuth(), retryAfterSeconds: seconds)
+            XCTAssertTrue(mapped.warning?.contains("Retrying automatically shortly.") == true)
+            XCTAssertFalse(mapped.warning?.contains("now") == true)
+            XCTAssertFalse(badge(mapped.lines, "Status")?.contains("~") == true)
+            XCTAssertFalse(text(mapped.lines, "Note")?.contains("~") == true)
+        }
+        for (seconds, minutes) in [(1, 1), (59, 1), (60, 1), (61, 2), (600, 10)] {
+            XCTAssertTrue(ClaudeUsageMapper.rateLimitedWarning(retryAfterSeconds: seconds).contains("about \(minutes) min."))
+        }
+        let now = Date(timeIntervalSince1970: 1_800_000_000)
+        XCTAssertEqual(ClaudeUsageMapper.parseRetryAfterSeconds(HTTPResponse(statusCode: 429,
+            headers: ["retry-after": "Wed, 21 Oct 2015 07:28:00 GMT"], body: Data()), now: now), 0)
+    }
+
     func testRateLimitRetryAfterBadge() {
         let mapped = ClaudeUsageMapper.rateLimitedUsage(
             credentials: ClaudeOAuth(subscriptionType: "pro"),
@@ -277,8 +293,8 @@ final class ClaudeUsageMapperTests: XCTestCase {
         )
 
         XCTAssertEqual(mapped.plan, "Pro")
-        XCTAssertEqual(badge(mapped.lines, "Status"), "Rate limited, retry in ~10m")
-        XCTAssertEqual(text(mapped.lines, "Note"), "Live usage rate limited - retry in ~10m")
+        XCTAssertEqual(badge(mapped.lines, "Status"), "Rate limited, retry in ~10 min")
+        XCTAssertEqual(text(mapped.lines, "Note"), "Live usage rate limited - retry in ~10 min")
     }
 
     private func progress(_ lines: [MetricLine], _ label: String) -> (used: Double, limit: Double, resetsAt: Date?, periodDurationMs: Int?)? {
@@ -711,8 +727,23 @@ final class ClaudeProviderTests: XCTestCase {
         // provider header warning (amber triangle) — without it the default dashboard is silently blank.
         XCTAssertEqual(
             snapshot.warning,
-            "Updates blocked by Anthropic. Be patient — manual refreshes will make it worse. Retrying in ~10m."
+            "Anthropic has temporarily limited usage queries. Data may be out of date. Retrying automatically in about 10 min."
         )
+    }
+
+    func testMissingRetryHeaderShowsActualFallbackAndSkipsManualRetry() async {
+        let now = Date(timeIntervalSince1970: 1_800_000_000)
+        let http = FakeHTTPClient(response: HTTPResponse(statusCode: 429, headers: [:], body: Data()))
+        let provider = ClaudeProvider(
+            authStore: configuredAuthStore(files: FakeFiles([
+                "/tmp/claude/.credentials.json": #"{"claudeAiOauth":{"accessToken":"token","subscriptionType":"pro","scopes":["user:profile"]}}"#
+            ]), now: { now }), usageClient: ClaudeUsageClient(httpClient: http),
+            logUsageScanner: ClaudeLogFixture.scanner(home: nil), now: { now }, pricing: { TestPricing.bundled })
+        let first = await provider.refresh()
+        let second = await provider.refresh()
+        XCTAssertTrue(first.warning?.contains("about 5 min.") == true)
+        XCTAssertEqual(first.warning, second.warning)
+        XCTAssertEqual(http.requests.count, 1)
     }
 
     func testRateLimitServesLastGoodUsageThenBacksOff() async {
@@ -756,14 +787,14 @@ final class ClaudeProviderTests: XCTestCase {
         XCTAssertEqual(Self.progress(second.lines, "Session")?.used, 25)
         XCTAssertEqual(text(second.lines, "Note")?.contains("rate limited"), true)
         XCTAssertNil(badge(second.lines, "Status"))
-        XCTAssertEqual(second.warning?.hasPrefix("Updates blocked by Anthropic"), true)
+        XCTAssertEqual(second.warning?.hasPrefix("Anthropic has temporarily limited usage queries"), true)
 
         // 3) Within the cooldown the live call is skipped entirely; the cached bar is still shown and the
         // warning persists.
         clock.set(t0.addingTimeInterval(60))
         let third = await provider.refresh()
         XCTAssertEqual(Self.progress(third.lines, "Session")?.used, 25)
-        XCTAssertEqual(third.warning?.hasPrefix("Updates blocked by Anthropic"), true)
+        XCTAssertEqual(third.warning?.hasPrefix("Anthropic has temporarily limited usage queries"), true)
         XCTAssertEqual(httpClient.requests.filter { $0.url.path.hasSuffix("/api/oauth/usage") }.count, 2)
     }
 

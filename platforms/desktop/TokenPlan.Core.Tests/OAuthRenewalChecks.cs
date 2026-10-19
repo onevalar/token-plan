@@ -124,7 +124,7 @@ static class OAuthRenewalChecks
                 {
                     var first=await service.Refresh(family,CancellationToken.None);
                     var second=await service.Refresh(family,CancellationToken.None);
-                    check(limitedCalls==1 && first.ErrorKey==second.ErrorKey && second.ErrorKey!.Contains("Rate limited"),family+" renewal respects cooldown");
+                    check(limitedCalls==1 && first.ErrorKey==second.ErrorKey && second.ErrorKey!.Contains("temporarily rate limited"),family+" renewal respects cooldown");
                 }
                 if(!OperatingSystem.IsWindows())
                 {

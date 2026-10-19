@@ -25,6 +25,19 @@ var temp = Path.Combine(Path.GetTempPath(), "tokenplan-ui-" + Guid.NewGuid().ToS
 Set("preferencesFile", Path.Combine(temp, "preferences.json"));
 try
 {
+    foreach (var language in new[] { "zh-Hans", "zh-Hant", "ja", "ko" }) {
+        L.Use(language);
+        var retryCopy = L.T("Usage queries are temporarily rate limited. Data may be out of date. Retrying automatically later.");
+        Check(!retryCopy.Contains("Retrying") && !retryCopy.Contains("now"), "Rate limit notice is localized in " + language);
+    }
+    L.Use("en");
+    foreach (var language in new[] { "en", "zh-Hans", "zh-Hant", "ja", "ko" }) {
+        L.Use(language);
+        var titleMethod = typeof(MainWindow).GetMethod("MetricTitle", BindingFlags.Static | BindingFlags.NonPublic)!;
+        foreach (var (provider, label, expected) in new[] { ("antigravity", "Argon Weekly", "Argon · 1w"), ("opencode", "Session", "5h"), ("opencode", "Weekly", "1w"), ("opencode", "Monthly", "30d") })
+            Check((string)titleMethod.Invoke(null, new object[] { provider, label })! == expected, "Compact quota period in " + language + ": " + provider + " " + label);
+    }
+    L.Use("en");
     Set("preferences", new Preferences());
     window.Show(); Dispatcher.UIThread.RunJobs();
     var results = (Dictionary<string, ProviderResult>)Get("results")!;
@@ -73,7 +86,7 @@ try
     }
     results["opencode"] = new("opencode", "OpenCode", new("opencode", "OpenCode", "Go", new[] { new UsageWindow("Session", 100, DateTimeOffset.UtcNow.AddHours(2)) }, DateTimeOffset.UtcNow), null);
     var metricTitle = typeof(MainWindow).GetMethod("MetricTitle", BindingFlags.Static | BindingFlags.NonPublic)!;
-    Check((string)metricTitle.Invoke(null, new object[] { "opencode", "Session" })! == L.T("5 Hours"), "OpenCode display label explicitly identifies five hours");
+    Check((string)metricTitle.Invoke(null, new object[] { "opencode", "Session" })! == "5h", "OpenCode display label uses compact five-hour period");
     Set("preferences", new Preferences().PlaceMetric("opencode", "Session", MetricPlacement.Hidden, results["opencode"].Snapshot!.Windows));
     Check(((Preferences)Get("preferences")!).Placement("opencode", "Session") == MetricPlacement.Hidden, "OpenCode keeps existing metric preference identity");
     Call("OpenDetail", "opencode"); Call("Render");

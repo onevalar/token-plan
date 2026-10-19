@@ -164,7 +164,7 @@ final class ClaudeLivePlanTests: XCTestCase {
 
         XCTAssertEqual(first.plan, "Max 20x")
         XCTAssertEqual(second.plan, "Max 20x")
-        XCTAssertEqual(first.warning?.hasPrefix("Updates blocked by Anthropic"), true)
+        XCTAssertEqual(first.warning?.hasPrefix("Anthropic has temporarily limited usage queries"), true)
         XCTAssertEqual(http.requests.map(\.url.path), ["/api/oauth/profile", "/api/oauth/usage"])
     }
 

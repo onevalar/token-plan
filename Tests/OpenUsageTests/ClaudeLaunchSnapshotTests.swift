@@ -38,7 +38,7 @@ final class ClaudeLaunchSnapshotTests: XCTestCase {
         XCTAssertNil(snapshot?.lines.first { $0.label == "Status" })
         XCTAssertNil(snapshot?.lines.first { $0.label == "Today" }, "cached spend tiles are recomputed, never replayed")
         XCTAssertEqual(snapshot?.lines.filter { $0.label == "Note" }.count, 1)
-        XCTAssertEqual(snapshot?.warning?.hasPrefix("Updates blocked by Anthropic"), true)
+        XCTAssertEqual(snapshot?.warning?.hasPrefix("Anthropic has temporarily limited usage queries"), true)
         XCTAssertEqual(snapshot?.plan, "Max 20x")
     }
 
@@ -51,7 +51,7 @@ final class ClaudeLaunchSnapshotTests: XCTestCase {
 
         XCTAssertEqual(badge(snapshot.lines, "Status")?.hasPrefix("Rate limited"), true)
         XCTAssertNil(progressUsed(snapshot.lines, "Session"))
-        XCTAssertEqual(snapshot.warning?.hasPrefix("Updates blocked by Anthropic"), true)
+        XCTAssertEqual(snapshot.warning?.hasPrefix("Anthropic has temporarily limited usage queries"), true)
     }
 
     func testLaunchSnapshotStampedByAnotherAccountIsNotAdopted() {
@@ -90,7 +90,7 @@ final class ClaudeLaunchSnapshotTests: XCTestCase {
         profileAccount.value = Self.account
         let verified = await fixture.provider.refresh()
         XCTAssertEqual(progressUsed(verified.lines, "Session"), 40)
-        XCTAssertEqual(verified.warning?.hasPrefix("Updates blocked by Anthropic"), true)
+        XCTAssertEqual(verified.warning?.hasPrefix("Anthropic has temporarily limited usage queries"), true)
     }
 
     func testCardWithoutVerifiableIdentityKeepsBadge() async {
@@ -134,7 +134,7 @@ final class ClaudeLaunchSnapshotTests: XCTestCase {
 
         XCTAssertNil(progressUsed(snapshot.lines, "Session"))
         XCTAssertEqual(progressUsed(snapshot.lines, "Weekly"), 60)
-        XCTAssertEqual(snapshot.warning?.hasPrefix("Updates blocked by Anthropic"), true)
+        XCTAssertEqual(snapshot.warning?.hasPrefix("Anthropic has temporarily limited usage queries"), true)
     }
 
     func testLaunchResetGrantsPastTheirDeadlineAreDropped() async {

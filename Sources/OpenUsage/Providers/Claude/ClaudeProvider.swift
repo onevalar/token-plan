@@ -277,7 +277,7 @@ final class ClaudeProvider: ProviderRuntime {
                 state: &state,
                 credentialGeneration: &credentialGeneration
             )
-            // A rate-limited fetch rides its "Updates blocked by Anthropic" notice on the mapped usage so
+            // A rate-limited fetch carries its temporary-query-limit notice on the mapped usage so
             // it reaches the header triangle even when the badge/note lines aren't in the user's layout.
             warning = mapped.warning
         case .missingProfileScope:
@@ -423,8 +423,8 @@ final class ClaudeProvider: ProviderRuntime {
         // 429 can come back from either attempt; the helper hands both through unchanged. Start a cooldown
         // (respecting Retry-After) and serve the last-good usage rather than a bare badge.
         if response.statusCode == 429 {
-            let retryAfterSeconds = ClaudeUsageMapper.parseRetryAfterSeconds(response, now: now())
-            rateLimitedUntil = now().addingTimeInterval(TimeInterval(retryAfterSeconds ?? Int(Self.rateLimitCooldown)))
+            let retryAfterSeconds = ClaudeUsageMapper.parseRetryAfterSeconds(response, now: now()) ?? Int(Self.rateLimitCooldown)
+            rateLimitedUntil = now().addingTimeInterval(TimeInterval(retryAfterSeconds))
             adoptPendingLaunchUsageIfVerified(credentials: working.oauth)
             AppLog.info(LogTag.plugin("claude"), "rate-limited (serving \(lastGoodUsage == nil ? "badge" : "last-good usage"))")
             return rateLimitedSnapshot(credentials: working.oauth, retryAfterSeconds: retryAfterSeconds)

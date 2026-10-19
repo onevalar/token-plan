@@ -22,7 +22,7 @@ public sealed partial class ProviderService
                 var rows = CopilotBilling.Parse(await Get("/orgs/" + slug + "/settings/billing/usage/summary"));
                 if (rows.Count > 0) return personal with { Plan = personal.Plan + " · " + slug, Windows = personal.Windows.Concat(rows).ToArray() };
             }
-            catch (ProviderFailure e) when (e.Message != "Rate limited. Wait before refreshing again.") { log("copilot", "Organization billing is not accessible for this login."); }
+            catch (ProviderFailure e) when (e.Message != "Usage queries are temporarily rate limited. Data may be out of date. Retrying automatically later.") { log("copilot", "Organization billing is not accessible for this login."); }
         }
         return personal;
     }

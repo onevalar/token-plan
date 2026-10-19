@@ -122,7 +122,7 @@ final class ProviderHeaderLayoutTests: XCTestCase {
 
     func testAntigravityScopedTitlesFitOneLineInBothDensities() {
         for density in DensitySetting.allCases {
-            let rows = [("Claude", MetricPeriod.sessionMs), (tr("Claude Weekly"), MetricPeriod.weekMs)].map { title, period in
+            let rows = [("Claude", MetricPeriod.sessionMs), (tr("Claude Weekly"), MetricPeriod.weekMs), (tr("Argon Weekly"), MetricPeriod.weekMs)].map { title, period in
                 var data = WidgetData(title: title, icon: .providerMark("antigravity"), kind: .percent, used: 0, limit: 100)
                 data.periodDurationMs = period
                 data.resetsAt = Date().addingTimeInterval(6 * 86_400 + 23 * 3600)

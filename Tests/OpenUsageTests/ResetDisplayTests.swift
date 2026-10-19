@@ -289,8 +289,18 @@ final class ResetDisplayTests: XCTestCase {
         XCTAssertEqual(data.boundedTrailingText(), "$20 limit") // falls back to limit context, unflipped
     }
 
+    func testWholeDayQuotaPeriodsOmitZeroHours() {
+        XCTAssertEqual(Formatters.periodLabel(milliseconds: 30 * 86_400_000), "30d")
+        XCTAssertEqual(Formatters.periodLabel(milliseconds: 86_400_000), "1d")
+        XCTAssertEqual(Formatters.periodLabel(milliseconds: MetricPeriod.weekMs), "1w")
+        XCTAssertEqual(Formatters.periodLabel(milliseconds: 30 * 86_400_000 + 3_600_000), "30d 1h")
+        var data = WidgetData(title: tr("Monthly"), icon: .providerMark("opencode"), kind: .percent, used: 20, limit: 100)
+        data.periodDurationMs = 30 * 86_400_000
+        XCTAssertEqual(data.overviewTitle, "30d")
+    }
+
     func testModelScopedWeeklyTitlesDoNotRepeatTheCycle() {
-        for (title, scope) in [(tr("Claude Weekly"), "Claude"), (tr("Spark Weekly"), "Spark")] {
+        for (title, scope) in [(tr("Claude Weekly"), "Claude"), (tr("Spark Weekly"), "Spark"), (tr("Argon Weekly"), "Argon")] {
             var data = WidgetData(title: title, icon: .providerMark("antigravity"), kind: .percent, used: 0, limit: 100)
             data.periodDurationMs = MetricPeriod.weekMs
             XCTAssertEqual(data.overviewTitle, "\(scope) · 1w")

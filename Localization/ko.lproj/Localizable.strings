@@ -22,6 +22,7 @@
 "%@: %lld days, %@ to %@, peak %@." = "%1$@: %2$lld일, %3$@ ~ %4$@, 최대 %5$@.";
 "%lld expiry times unavailable" = "추가 %lld개의 만료 시간을 알 수 없음";
 "%lld metrics" = "지표 %lld개";
+"%lld min" = "%lld분";
 "%lld minutes" = "%lld분";
 "%lldd %lldh" = "%lld일 %lld시간";
 "%lldd ago" = "%lld일 전";
@@ -73,6 +74,7 @@
 "Amp is not logged in. Run amp login in Terminal, then refresh." = "Amp에 로그인하지 않았습니다. 터미널에서 amp login을 실행한 뒤 새로고침하세요.";
 "Amp usage failed. Run amp usage in Terminal to check your connection." = "Amp 사용량을 가져오지 못했습니다. 터미널에서 amp usage를 실행하여 연결을 확인하세요.";
 "Amp usage timed out. Check your connection and refresh." = "Amp 사용량 요청 시간이 초과되었습니다. 연결을 확인한 뒤 새로고침하세요.";
+"Anthropic has temporarily limited usage queries. Data may be out of date." = "Anthropic이 사용량 조회를 일시적으로 제한했습니다. 데이터가 최신이 아닐 수 있습니다.";
 "Antigravity credentials are invalid. Open Antigravity or run `agy` to sign in again." = "Antigravity 자격 증명이 올바르지 않습니다. Antigravity를 열거나 `agy`를 실행해 다시 로그인하세요.";
 "Antigravity sign-in expired. Open Antigravity or run `agy` to refresh." = "Antigravity 로그인이 만료되었습니다. Antigravity를 열거나 `agy`를 실행해 갱신하세요.";
 "Antigravity usage is temporarily unavailable. Try again shortly." = "Antigravity 사용량을 일시적으로 사용할 수 없습니다. 잠시 후 다시 시도하세요.";
@@ -442,6 +444,7 @@
 "Rate limit resets" = "한도 초기화";
 "Rate limited, retry in ~%@" = "요청 제한됨, 약 %@ 후 재시도";
 "Rate limited, try again later" = "요청 제한됨, 나중에 다시 시도하세요";
+"Rate limited. Retrying automatically shortly." = "사용량 조회가 제한되었습니다. 잠시 후 자동으로 다시 시도합니다.";
 "Rate limited. Wait before refreshing again." = "요청이 제한되었습니다. 잠시 기다린 후 새로고침하세요.";
 "Re-login for live usage. Run `claude` and sign in again to restore session and weekly limits." = "실시간 사용량을 보려면 다시 로그인하세요. `claude`를 실행해 다시 로그인하면 세션 및 주간 한도가 복원됩니다.";
 "Read-only in TokenPlan. Use reset credits in the provider's own app." = "TokenPlan에서는 조회만 가능합니다. 초기화 크레딧은 제공업체의 앱에서 사용하세요.";
@@ -509,6 +512,8 @@
 "Restores service visibility, metric order and menu-bar selections to their defaults. Connection details and notes are unchanged." = "서비스 표시, 지표 순서 및 메뉴 막대 선택을 기본값으로 복원합니다. 연결 정보와 메모는 변경하지 않습니다.";
 "Restores this subscription's metric visibility, order and menu-bar selection. Other subscriptions are unchanged." = "이 구독의 지표 표시, 순서 및 메뉴 막대 선택을 복원합니다. 다른 구독은 변경하지 않습니다.";
 "Restores this subscription's metric visibility, order and tray selection. Other subscriptions are unchanged." = "이 구독의 표시 항목, 순서, 트레이 선택을 초기화합니다. 다른 구독은 변경되지 않습니다.";
+"Retrying automatically in about %@." = "약 %@ 후 자동으로 다시 시도합니다.";
+"Retrying automatically shortly." = "잠시 후 자동으로 다시 시도합니다.";
 "Retrying in ~%@." = "약 %@ 후 재시도합니다.";
 "Reveal in Finder" = "Finder에서 보기";
 "Ring" = "링";
@@ -674,6 +679,8 @@
 "Usage not available for API key." = "API 키로는 사용량을 확인할 수 없습니다.";
 "Usage or login data could not be read. Check credential file permissions and format, then retry." = "사용량 또는 로그인 정보를 읽을 수 없습니다. 인증 파일의 권한과 형식을 확인한 후 다시 시도하세요.";
 "Usage or login data could not be read. Sign in again." = "사용량 또는 로그인 정보를 읽을 수 없습니다. 다시 로그인하세요.";
+"Usage queries are temporarily rate limited. Data may be out of date. Retrying automatically later." = "사용량 조회가 일시적으로 제한되었습니다. 데이터가 최신이 아닐 수 있습니다. 나중에 자동으로 다시 시도합니다.";
+"Usage queries are temporarily rate limited. Data may be out of date. Retrying automatically shortly." = "사용량 조회가 일시적으로 제한되었습니다. 데이터가 최신이 아닐 수 있습니다. 잠시 후 자동으로 다시 시도합니다.";
 "Usage request failed (HTTP %lld). Try again later." = "사용량 요청 실패 (HTTP %lld). 나중에 다시 시도하세요.";
 "Usage request failed after refresh. Try again." = "새로고침 후에도 사용량 요청에 실패했습니다. 다시 시도하세요.";
 "Usage request failed. Check your connection." = "사용량 요청에 실패했습니다. 연결을 확인하세요.";

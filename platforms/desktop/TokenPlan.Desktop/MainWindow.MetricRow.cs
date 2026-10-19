@@ -5,7 +5,15 @@ using TokenPlan.Core;
 namespace TokenPlan.Desktop;
 public sealed partial class MainWindow
 {
-    static string MetricTitle(string? id, string label) => L.T(id == "opencode" && label == "Session" ? "5 Hours" : label);
+    static string MetricTitle(string? id, string label) => (id, label) switch {
+        ("opencode", "Session" or "5 Hours") => "5h",
+        ("opencode" or "antigravity", "Weekly") => "1w",
+        ("opencode", "Monthly") => "30d",
+        ("antigravity", "Session") => "5h",
+        ("antigravity", "Argon Weekly") => "Argon · 1w",
+        ("antigravity", "Claude Weekly") => "Claude · 1w",
+        _ => L.T(label)
+    };
     Control MetricRow(UsageWindow metric, string? providerId = null)
     {
         var body = Stack(6);

@@ -146,7 +146,7 @@ public sealed partial class ProviderService
         if (!(await ReadOAuth(id, path, CancellationToken.None)).Bytes.AsSpan().SequenceEqual(old.Bytes)) throw new CredentialChanged();
         if ((int)response.Status is < 200 or >= 300)
         {
-            if (response.Status == HttpStatusCode.TooManyRequests) { cooldowns[id + Fingerprint(old.Access + "\0" + old.Account)] = (response.RetryAfter is { } retry && retry > DateTimeOffset.UtcNow.AddMinutes(1) ? retry : DateTimeOffset.UtcNow.AddMinutes(5)); throw new ProviderFailure("Rate limited. Wait before refreshing again."); }
+            if (response.Status == HttpStatusCode.TooManyRequests) { cooldowns[id + Fingerprint(old.Access + "\0" + old.Account)] = (response.RetryAfter is { } retry && retry > DateTimeOffset.UtcNow.AddMinutes(1) ? retry : DateTimeOffset.UtcNow.AddMinutes(5)); throw new ProviderFailure("Usage queries are temporarily rate limited. Data may be out of date. Retrying automatically later."); }
             var code = result == null ? null : TextValue(result, "error") ?? (result["error"] is JsonObject error ? TextValue(error, "code") : null);
             if (code == "refresh_token_reused") throw new ProviderFailure(AuthChanged);
             if ((response.Status is HttpStatusCode.BadRequest or HttpStatusCode.Unauthorized) && (code is "invalid_grant" or "refresh_token_expired" or "refresh_token_invalidated")) throw new ProviderFailure(AuthRevoked);

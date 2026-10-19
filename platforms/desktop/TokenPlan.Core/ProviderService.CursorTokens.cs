@@ -35,7 +35,7 @@ public sealed partial class ProviderService
             {
                 var next = response.Headers.RetryAfter?.Date ?? DateTimeOffset.UtcNow.Add(response.Headers.RetryAfter?.Delta ?? TimeSpan.FromMinutes(5));
                 cooldowns[cooldownKey] = next > DateTimeOffset.UtcNow.AddMinutes(1) ? next : DateTimeOffset.UtcNow.AddMinutes(1);
-                return Fail("Rate limited. Wait before refreshing again.");
+                return Fail("Usage queries are temporarily rate limited. Data may be out of date. Retrying automatically later.");
             }
             if (!response.IsSuccessStatusCode) return Fail("Cursor token history could not be loaded. Try refreshing again.");
             if (response.Content.Headers.ContentLength > 2 * 1024 * 1024) return Fail("Cursor token export is too large to load. View the full history in Cursor.");

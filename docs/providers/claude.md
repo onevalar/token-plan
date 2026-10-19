@@ -152,3 +152,7 @@ On macOS, Windows, and Linux, TokenPlan also discovers direct `.claude-*` direct
 Separate accounts read only their own directory's credentials (and scoped Keychain entry on macOS), never the default account's token or a shared environment token. Their local session history is scanned from that directory with account ownership checks. Accounts stored elsewhere or only inside a switching tool's private vault are not automatically discovered by this directory scan.
 
 Windows/Linux refresh their discovered account directories during refresh. Their quota snapshots are account-specific; token/cost history remains device-level and is not yet attributed to each additional account.
+
+### Temporary query limits
+
+HTTP 429 means usage queries are temporarily limited; it does not mean the subscription quota is exhausted. TokenPlan keeps the last successful readings, marks them as potentially stale and retries through its normal refresh loop. During a cooldown, manual refresh does not send another usage request. Positive retry delays are rounded up to localized minutes; zero or past retry times show “Retrying automatically shortly.” Missing or invalid retry headers use the existing five-minute fallback, which is also shown in the notice. Windows/Linux use a localized automatic-retry notice without inventing a countdown.

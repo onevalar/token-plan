@@ -22,6 +22,7 @@
 "%@: %lld days, %@ to %@, peak %@." = "%1$@：%2$lld 天，%3$@ 至 %4$@，峰值 %5$@。";
 "%lld expiry times unavailable" = "另有 %lld 份到期時間未知";
 "%lld metrics" = "%lld 項指標";
+"%lld min" = "%lld 分鐘";
 "%lld minutes" = "%lld 分鐘";
 "%lldd %lldh" = "%lld天%lld小時";
 "%lldd ago" = "%lld 天前";
@@ -73,6 +74,7 @@
 "Amp is not logged in. Run amp login in Terminal, then refresh." = "Amp 尚未登入。請在終端機執行 amp login，然後重新整理。";
 "Amp usage failed. Run amp usage in Terminal to check your connection." = "Amp 用量讀取失敗。請在終端機執行 amp usage 檢查連線。";
 "Amp usage timed out. Check your connection and refresh." = "Amp 用量讀取逾時。請檢查連線後重新整理。";
+"Anthropic has temporarily limited usage queries. Data may be out of date." = "Anthropic 暫時限制了用量查詢，目前資料可能不是最新。";
 "Antigravity credentials are invalid. Open Antigravity or run `agy` to sign in again." = "Antigravity 憑證無效。請開啟 Antigravity 或執行 `agy` 重新登入。";
 "Antigravity sign-in expired. Open Antigravity or run `agy` to refresh." = "Antigravity 登入已過期。請開啟 Antigravity 或執行 `agy` 重新整理。";
 "Antigravity usage is temporarily unavailable. Try again shortly." = "Antigravity 用量暫時無法使用，請稍後再試。";
@@ -442,6 +444,7 @@
 "Rate limit resets" = "額度重置次數";
 "Rate limited, retry in ~%@" = "被限流，約 %@ 後重試";
 "Rate limited, try again later" = "被限流，請稍後再試";
+"Rate limited. Retrying automatically shortly." = "用量查詢暫時受限，稍後自動重試。";
 "Rate limited. Wait before refreshing again." = "請求受到限流，請稍後再重新整理。";
 "Re-login for live usage. Run `claude` and sign in again to restore session and weekly limits." = "請重新登入以取得即時用量。執行 `claude` 並重新登入即可恢復工作階段與每週額度。";
 "Read-only in TokenPlan. Use reset credits in the provider's own app." = "TokenPlan 僅顯示這些額度，請在服務商自己的應用程式中使用。";
@@ -509,6 +512,8 @@
 "Restores service visibility, metric order and menu-bar selections to their defaults. Connection details and notes are unchanged." = "恢復服務顯示、指標順序與選單列選擇，連線資訊與備註不變。";
 "Restores this subscription's metric visibility, order and menu-bar selection. Other subscriptions are unchanged." = "恢復本訂閱的指標顯示、順序與選單列選擇，其他訂閱不變。";
 "Restores this subscription's metric visibility, order and tray selection. Other subscriptions are unchanged." = "還原此訂閱的顯示內容、順序及系統匣選擇，其他訂閱不受影響。";
+"Retrying automatically in about %@." = "約 %@ 後自動重試。";
+"Retrying automatically shortly." = "稍後自動重試。";
 "Retrying in ~%@." = "約 %@ 後重試。";
 "Reveal in Finder" = "在 Finder 中顯示";
 "Ring" = "環形";
@@ -674,6 +679,8 @@
 "Usage not available for API key." = "使用 API 金鑰登入時無法查看用量。";
 "Usage or login data could not be read. Check credential file permissions and format, then retry." = "無法讀取用量或登入資訊，請檢查憑證檔案的權限與格式後重試。";
 "Usage or login data could not be read. Sign in again." = "無法讀取用量或登入資訊，請重新登入。";
+"Usage queries are temporarily rate limited. Data may be out of date. Retrying automatically later." = "用量查詢暫時受限，目前資料可能不是最新。稍後自動重試。";
+"Usage queries are temporarily rate limited. Data may be out of date. Retrying automatically shortly." = "用量查詢暫時受限，目前資料可能不是最新。稍後自動重試。";
 "Usage request failed (HTTP %lld). Try again later." = "用量請求失敗（HTTP %lld），請稍後再試。";
 "Usage request failed after refresh. Try again." = "重新整理後用量請求仍然失敗，請重試。";
 "Usage request failed. Check your connection." = "用量請求失敗，請檢查網路。";

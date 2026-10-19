@@ -81,6 +81,7 @@ static class CursorChecks
             if (status == HttpStatusCode.Unauthorized) check(failed.ErrorKey == "Your Cursor session has expired. Sign in with Cursor again.", "Cursor expiration gives the correct desktop sign-in instruction");
             if (status == HttpStatusCode.TooManyRequests)
             {
+                check(failed.ErrorKey == "Usage queries are temporarily rate limited. Data may be out of date. Retrying automatically later.", "Rate limit explains stale data and automatic retry without blaming manual refresh");
                 await service.Refresh("cursor", CancellationToken.None);
                 check(attempts == 1, "Cursor manual retries obey rate-limit cooldown");
             }
