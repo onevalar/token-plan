@@ -17,15 +17,15 @@ TokenPlan 将多个 AI 服务的用量集中到一个轻量面板：查看还剩
 ## 下载
 
 <!-- download-links:start -->
-当前正式版：**1.0.11** · [发布说明](https://github.com/onevalar/token-plan/releases/tag/v1.0.11)
+当前正式版：**1.0.12** · [发布说明](https://github.com/onevalar/token-plan/releases/tag/v1.0.12)
 
 | 系统 | 安装包 | 平台要求 |
 | --- | --- | --- |
-| **macOS** | [下载 DMG](https://github.com/onevalar/token-plan/releases/download/v1.0.11/TokenPlan-1.0.11.dmg) | macOS 15 及以上；Apple Silicon / Intel 通用版 |
-| **Windows** | [下载 EXE](https://github.com/onevalar/token-plan/releases/download/v1.0.11/TokenPlan-Setup-1.0.11.exe) | x64；当前用户安装 |
-| **Linux** | [下载 DEB](https://github.com/onevalar/token-plan/releases/download/v1.0.11/tokenplan_1.0.11_amd64.deb) | Debian / Ubuntu x64（amd64），需要图形桌面 |
+| **macOS** | [下载 DMG](https://github.com/onevalar/token-plan/releases/download/v1.0.12/TokenPlan-1.0.12.dmg) | macOS 15 及以上；Apple Silicon / Intel 通用版 |
+| **Windows** | [下载 EXE](https://github.com/onevalar/token-plan/releases/download/v1.0.12/TokenPlan-Setup-1.0.12.exe) | x64；当前用户安装 |
+| **Linux** | [下载 DEB](https://github.com/onevalar/token-plan/releases/download/v1.0.12/tokenplan_1.0.12_amd64.deb) | Debian / Ubuntu x64（amd64），需要图形桌面 |
 
-[SHA-256 校验文件](https://github.com/onevalar/token-plan/releases/download/v1.0.11/SHA256SUMS.txt) · [全部版本](https://github.com/onevalar/token-plan/releases)
+[SHA-256 校验文件](https://github.com/onevalar/token-plan/releases/download/v1.0.12/SHA256SUMS.txt) · [全部版本](https://github.com/onevalar/token-plan/releases)
 <!-- download-links:end -->
 
 macOS 正式安装包已完成 Developer ID 签名和 Apple 公证。Windows 安装包目前未进行代码签名。Windows/Linux 安装包自带 .NET 运行时，不需要另行安装 SDK。Linux 当前提供 DEB，尚未提供 RPM、AppImage 或 ARM64 正式安装包。

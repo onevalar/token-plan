@@ -1,20 +1,20 @@
 {
-  "version": "1.0.11",
+  "version": "1.0.12",
   "platforms": {
     "macos-universal": {
-      "url": "https://github.com/onevalar/token-plan/releases/download/v1.0.11/TokenPlan-1.0.11.dmg",
-      "sha256": "2686e92e695ba0ac45d30dc69118ef2a0c7341199bb3c40c66beb5e5cf47f8be",
-      "size": 19411605
+      "url": "https://github.com/onevalar/token-plan/releases/download/v1.0.12/TokenPlan-1.0.12.dmg",
+      "sha256": "63476f25708834bbca53a5a50f1b921b900053ac9d425df7885a213bafe288c6",
+      "size": 19414334
     },
     "windows-x64": {
-      "url": "https://github.com/onevalar/token-plan/releases/download/v1.0.11/TokenPlan-Setup-1.0.11.exe",
-      "sha256": "187982bb2557205d141845c46bd2cc725b521039b292e821b94fcf39e44eeff6",
-      "size": 54299082
+      "url": "https://github.com/onevalar/token-plan/releases/download/v1.0.12/TokenPlan-Setup-1.0.12.exe",
+      "sha256": "066cbb11a135cda2cd833cf417064882f98d5d240386f72a23b2862bcef78d93",
+      "size": 54296692
     },
     "linux-x64": {
-      "url": "https://github.com/onevalar/token-plan/releases/download/v1.0.11/tokenplan_1.0.11_amd64.deb",
-      "sha256": "67d42b16f220ca6560184684fff86204749705f7955d8c36e70e6b72c2cf00b5",
-      "size": 36523346
+      "url": "https://github.com/onevalar/token-plan/releases/download/v1.0.12/tokenplan_1.0.12_amd64.deb",
+      "sha256": "ae6aa55d5d839e0c966edfab7c10111e63bacef0c06b99d44ba4ae17ba3e1143",
+      "size": 36520978
     }
   }
 }
