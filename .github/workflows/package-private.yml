@@ -46,7 +46,7 @@ jobs:
         with:
           persist-credentials: false
           ref: ${{ needs.validate.outputs.commit }}
-      - uses: actions/setup-dotnet@v5
+      - uses: actions/setup-dotnet@v6
         with:
           global-json-file: platforms/desktop/global.json
       - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends nsis
@@ -73,7 +73,7 @@ jobs:
       - uses: actions/checkout@v7
         with:
           ref: ${{ needs.validate.outputs.commit }}
-      - uses: actions/setup-dotnet@v5
+      - uses: actions/setup-dotnet@v6
         with:
           global-json-file: platforms/desktop/global.json
       - name: Install Linux interface fonts

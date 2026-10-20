@@ -134,7 +134,7 @@ jobs:
         with:
           ref: ${{ needs.validate.outputs.tag }}
           persist-credentials: false
-      - uses: actions/setup-dotnet@v5
+      - uses: actions/setup-dotnet@v6
         with:
           global-json-file: platforms/desktop/global.json
       - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends nsis libicu-dev fonts-noto-cjk
@@ -165,7 +165,7 @@ jobs:
         with:
           ref: ${{ needs.validate.outputs.tag }}
           persist-credentials: false
-      - uses: actions/setup-dotnet@v5
+      - uses: actions/setup-dotnet@v6
         with:
           global-json-file: platforms/desktop/global.json
       - uses: actions/download-artifact@v4
