@@ -22,7 +22,11 @@ if container not in info.get('NSUbiquitousContainers', {}):
     raise ValueError('Production iCloud container metadata missing')
 if not (app/'Contents/embedded.provisionprofile').is_file():
     raise ValueError('Production iCloud provisioning profile missing')
-for target in [app, app/'Contents/MacOS/tokenplan-bridge']:
+helper = app/'Contents/Helpers/TokenPlan Bridge.app'
+helper_info = plistlib.loads((helper/'Contents/Info.plist').read_bytes())
+if helper_info.get('CFBundleIdentifier') != info['CFBundleIdentifier'] or not (helper/'Contents/embedded.provisionprofile').is_file():
+    raise ValueError('Helper bundle identity/profile mismatch')
+for target in [app, helper]:
     entitlements = subprocess.run(['codesign','-d','--entitlements',':-',str(target)], check=True, capture_output=True).stdout
     signed = plistlib.loads(entitlements)
     if container not in signed.get('com.apple.developer.icloud-container-identifiers', []) or 'CloudDocuments' not in signed.get('com.apple.developer.icloud-services', []):

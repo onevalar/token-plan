@@ -12,5 +12,5 @@ try {
  for(const account of s.accounts)if(!Array.isArray(account.metrics)||!Array.isArray(account.history)||typeof account.enabled!=='boolean')throw Error('Incomplete account contract');
  if(/"(?:accessToken|refreshToken|CredentialFingerprint)"\s*:/.test(raw))throw Error('Authentication field leaked');
  console.log(`Packaged helper responded with ${s.accounts.length} account descriptors; no credentials exported.`);
-} catch(error){console.error('Packaged helper verification failed:',error instanceof SyntaxError?'invalid JSON':error.message?.split('\n')[0]);process.exitCode=1;}
+} catch(error){console.error('Packaged helper verification failed:',error instanceof SyntaxError?'invalid JSON':error.message?.split('\n')[0]);if(error.signal||Number.isInteger(error.status))console.error(`Process exit: status=${error.status}, signal=${error.signal??'none'}`);process.exitCode=1;}
 finally {if(process.platform==='darwin')try{execFileSync('/usr/bin/defaults',['delete',suite],{stdio:'ignore'});}catch{}}

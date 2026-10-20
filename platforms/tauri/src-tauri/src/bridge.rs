@@ -13,6 +13,11 @@ impl Bridge {
         let executable = std::env::current_exe().map_err(|_| "bridge_unavailable")?;
         let filename = if cfg!(windows) { "tokenplan-bridge.exe" } else { "tokenplan-bridge" };
         let path = executable.parent().ok_or("bridge_unavailable")?.join(filename);
+        #[cfg(target_os = "macos")]
+        let path = {
+            let bundled = executable.parent().unwrap().join("../Helpers/TokenPlan Bridge.app/Contents/MacOS/tokenplan-bridge");
+            if bundled.exists() { bundled } else { path }
+        };
         let mut command = Command::new(path);
         command.arg("--desktop-bridge").stdin(Stdio::piped()).stdout(Stdio::piped()).stderr(Stdio::null()).kill_on_drop(true);
         #[cfg(target_os = "macos")]

@@ -36,7 +36,7 @@ fn sample(m:&Metric,remaining:bool,now:i64)->Option<(f64,i8,Option<i64>)> {
     if !m.has_data{return None}let percent=m.percent?;if !percent.is_finite(){return None}
     let used=if remaining{100.0-percent}else{percent};let reset=m.resets_at.as_deref().and_then(|s|chrono::DateTime::parse_from_rfc3339(s).ok()).map(|d|d.timestamp_millis());
     let mut bucket=-1;
-    if used>=99.5 {bucket=2;} else if !m.not_started {
+    if used>99.5 {bucket=2;} else if !m.not_started {
         if let (Some(end),Some(period))=(reset,m.period_seconds) {
             let elapsed=period-(end-now) as f64/1000.0;
             if used>0.0&&period>0.0&&end>now&&elapsed>=60.0_f64.max(period*0.01) {
@@ -59,7 +59,8 @@ pub async fn evaluate(app:&tauri::AppHandle,state:&DesktopState) {
             let (mut next,fire)=transition(&previous,used,bucket,reset,state.settings.notifications);
             for i in fire {
                 let title=translated(TITLES[i],language).to_owned();
-                let body=format!("{} · {}\n{}",account.name,translated(&m.label,language),translated(BODIES[i],language));
+                let account_label=if account.email.is_empty(){account.name.clone()}else{format!("{} · {}",account.name,account.email)};
+                let body=format!("{} · {}\n{}",account_label,translated(&m.label,language),translated(BODIES[i],language));
                 let result=deliver(app,title,body).await;
                 if result.is_ok(){next.fired[i]=true;}else{
                     let new_window=reset.is_some_and(|r|previous.reset.is_none_or(|old|r>old+1000));

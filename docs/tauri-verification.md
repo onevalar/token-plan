@@ -66,3 +66,7 @@ A follow-up regression explicitly resumes shortcut registration after saving (We
 the blur event when disabling a focused recorder). Headless iCloud checks poll asynchronously,
 with a 30-second throttle, in addition to metadata events; the dedicated nine-test suite passes.
 Real iCloud exchange between two signed-in Macs has not been exercised in this environment.
+
+### Production helper launch gate
+
+The production check now launches the signed Mac data helper, not just the unsigned build. This caught macOS rejecting iCloud entitlements on a bare sidecar even after notarization. The helper is now staged as an internal application bundle with its own matching provisioning profile; the shell launches that bundle’s executable. Release verification checks both bundle identities and entitlements, then requires an actual bridge response.

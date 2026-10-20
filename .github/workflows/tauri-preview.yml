@@ -158,7 +158,7 @@ jobs:
         run: python3 ../../script/sign_tauri_transition.py
       - name: Verify signed production helper can launch
         if: runner.os == 'macOS' && inputs.production
-        run: node scripts/smoke-bridge.mjs src-tauri/target/universal-apple-darwin/release/bundle/macos/TokenPlan.app/Contents/MacOS/tokenplan-bridge
+        run: node scripts/smoke-bridge.mjs 'src-tauri/target/universal-apple-darwin/release/bundle/macos/TokenPlan.app/Contents/Helpers/TokenPlan Bridge.app/Contents/MacOS/tokenplan-bridge'
       - uses: actions/upload-artifact@v4
         if: always()
         with:
