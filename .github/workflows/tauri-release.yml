@@ -67,6 +67,8 @@ jobs:
         with:
           pattern: tauri-*
           path: artifacts
+      - name: Check release download metadata
+        run: python3 script/test_tauri_release_readme.py
       - name: Build and publish the signed update manifest
         env:
           GH_TOKEN: ${{ github.token }}
