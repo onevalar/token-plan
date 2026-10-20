@@ -22,7 +22,7 @@ subprocess.run(['install_name_tool','-add_rpath','@executable_path/../../../../F
                 str(contents/'MacOS/tokenplan-bridge')],check=True)
 info = plistlib.loads((root/'platforms/tauri/src-tauri/production-info.plist').read_bytes())
 info.update(CFBundleIdentifier='com.onevalar.tokenplan', CFBundleExecutable='tokenplan-bridge',
-            CFBundleName='TokenPlan Bridge', CFBundlePackageType='APPL',
+            CFBundleName='TokenPlan', CFBundlePackageType='APPL',
             CFBundleVersion='1', CFBundleShortVersionString=os.environ['TOKENPLAN_VERSION'], LSUIElement=True)
 (contents/'Info.plist').write_bytes(plistlib.dumps(info))
 subprocess.run(['codesign','--force','--options','runtime','--timestamp',

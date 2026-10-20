@@ -70,3 +70,18 @@ Real iCloud exchange between two signed-in Macs has not been exercised in this e
 ### Production helper launch gate
 
 The production check now launches the signed Mac data helper, not just the unsigned build. This caught macOS rejecting iCloud entitlements on a bare sidecar even after notarization. The helper is now staged as an internal application bundle with its own matching provisioning profile; the shell launches that bundle’s executable. Release verification checks both bundle identities and entitlements, then requires an actual bridge response.
+
+## Final production verification
+
+[Run 39401415744](https://github.com/onevalar/token-plan/actions/runs/39401415744)
+passed on macOS, Windows and Ubuntu 24.04 at `055e5ff`. It includes the restored features,
+all platform tests, signed updater artifact verification, Apple notarization, Sparkle
+migration feed signing, and actual startup of the signed Mac helper with its own profile.
+This resolves the production-only helper termination found in run 39397477568.
+The following release-only name cleanup uses TokenPlan instead of a preview/helper label;
+the eight Rust regressions pass. The stable release rebuild repeats all checks from the tag.
+
+The owner requested restoring the missing features before publishing 2.0.0. The restored
+scope is documented in release/2.0.0.md. Physical global hotkey dispatch, real two-Mac iCloud
+exchange and an installed native-to-Tauri upgrade are not claimed by these CI results.
+The user's installed application remains unchanged.

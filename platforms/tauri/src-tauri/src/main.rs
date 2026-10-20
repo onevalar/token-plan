@@ -73,7 +73,7 @@ fn main() {
                 .icon(tauri::image::Image::from_bytes(include_bytes!(
                     "../icons/icon.png"
                 ))?)
-                .tooltip("TokenPlan Preview")
+                .tooltip(app.config().product_name.as_deref().unwrap_or("TokenPlan"))
                 .menu(&menu)
                 .show_menu_on_left_click(false)
                 .on_menu_event(|app, event| match event.id.as_ref() {

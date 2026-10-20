@@ -1,0 +1,2 @@
+2.0.0: restored legacy features; production verification 39401415744 passed on all three platforms.
+See docs/tauri-verification.md for tested scope and platform limitations.
