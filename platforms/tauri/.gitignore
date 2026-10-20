@@ -6,3 +6,4 @@ src-tauri/gen/
 test-results/
 playwright-report/
 src-tauri/tauri.package.json
+transition/

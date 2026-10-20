@@ -49,6 +49,7 @@
 "API Key" = "API 키";
 "API Key Configured" = "API 키 구성됨";
 "API Keys" = "API 키";
+"API key" = "API 키";
 "About" = "정보";
 "About TokenPlan" = "TokenPlan 정보";
 "Account" = "계정";
@@ -66,6 +67,7 @@
 "Alert when a limit is projected to finish before it resets." = "한도가 초기화되기 전에 소진될 것으로 예상되면 알립니다.";
 "Alert when a limit is projected to finish with little left." = "한도가 거의 남지 않을 것으로 예상되면 알립니다.";
 "All Providers" = "모든 제공업체";
+"All services" = "모든 서비스";
 "Allow Notifications" = "알림 허용";
 "Almost Out" = "거의 소진";
 "Always Visible" = "항상 표시";
@@ -105,7 +107,10 @@
 "Check Automatically" = "자동으로 확인";
 "Check for Updates" = "업데이트 확인";
 "Check for Updates…" = "업데이트 확인…";
+"Check updates automatically" = "업데이트 자동 확인";
+"Checking for updates…" = "업데이트 확인 중…";
 "Checks hourly and shows a banner when an update is available." = "1시간마다 확인하고 업데이트가 있으면 배너를 표시합니다.";
+"Choose at most two tray metrics per account." = "계정당 트레이 지표를 최대 2개 선택하세요.";
 "Choose services and accounts to show. Hiding them keeps stars, overview and refresh unchanged." = "표시할 서비스와 계정을 선택하세요. 숨겨도 별표, 개요 및 새로고침은 바뀌지 않습니다.";
 "Choose the service's local folder, such as .claude or .codex, to read its login and usage history." = "로그인 및 사용 기록을 읽으려면 .claude 또는 .codex 같은 서비스 폴더를 선택하세요。";
 "Choose up to two items." = "최대 두 항목을 선택하세요.";
@@ -147,8 +152,11 @@
 "Cost" = "비용";
 "Cost Estimates" = "비용 추정";
 "Cost/MTok" = "백만 토큰당 비용";
+"Could not apply this change. Refresh and try again." = "변경하지 못했습니다. 새로 고침 후 다시 시도하세요.";
 "Could not check for updates. Try again later." = "업데이트를 확인할 수 없습니다. 나중에 다시 시도하세요.";
+"Could not check or install the update. Try again later." = "업데이트를 확인하거나 설치하지 못했습니다. 나중에 다시 시도하세요.";
 "Could not install the update. Try again later." = "업데이트를 설치할 수 없습니다. 나중에 다시 시도하세요.";
+"Could not save. Try again." = "저장하지 못했습니다. 다시 시도하세요.";
 "Couldn't %@ the terminal helper: %@" = "터미널 도우미를 %1$@하지 못했습니다: %2$@";
 "Couldn't copy the log path to the clipboard." = "로그 경로를 클립보드에 복사하지 못했습니다.";
 "Couldn't reach %@. Check your connection." = "%@에 연결할 수 없습니다. 연결을 확인하세요.";
@@ -186,12 +194,14 @@
 "Daily quota" = "일일 한도";
 "Dark" = "다크";
 "Dashboard" = "대시보드";
+"Date" = "날짜";
 "Date Range" = "기간";
 "Debug" = "디버그";
 "Default" = "기본";
 "Density" = "밀도";
 "Details" = "상세";
 "Details Only" = "상세만";
+"Details only" = "상세만";
 "Detects provider logins again without resetting your display preferences." = "표시 설정을 초기화하지 않고 서비스 로그인을 다시 감지합니다.";
 "Devin quota data unavailable. Try again later." = "Devin 한도 데이터를 사용할 수 없습니다. 나중에 다시 시도하세요.";
 "Disabled" = "사용 안 함";
@@ -224,6 +234,7 @@
 "Error" = "오류";
 "Estimate costs for models that don't have known pricing." = "가격을 알 수 없는 모델의 비용을 추정합니다.";
 "Estimated API Cost" = "예상 API 비용";
+"Estimated cost" = "예상 비용";
 "Estimated from model token rates, not your subscription bill." = "모델 토큰 요금으로 계산한 추정치이며 구독 청구 금액이 아닙니다.";
 "Estimated locally, so it may be off" = "로컬에서 추정한 값이라 오차가 있을 수 있습니다";
 "Example Data" = "예시 데이터";
@@ -241,6 +252,7 @@
 "Extra usage spent" = "추가 사용량 지출";
 "Fable" = "Fable";
 "Fallback Model" = "대체 모델";
+"Find accounts" = "계정 찾기";
 "Folder authorization failed. Select the folder again." = "폴더 권한을 허용하지 못했습니다. 다시 선택하세요.";
 "Folder authorized. Enable the service and refresh its usage." = "폴더가 허용되었습니다. 서비스를 활성화하고 사용량을 새로고침하세요.";
 "Follow System" = "시스템 설정 따르기";
@@ -280,12 +292,16 @@
 "Hide From Screen Share" = "화면 공유 시 숨기기";
 "Hide Usage Values" = "사용량 숨기기";
 "History" = "기록";
+"History comes from logs on this device. It may not cover every account or device." = "이 기기의 로그 기록입니다. 모든 계정이나 기기를 포함하지 않을 수 있습니다.";
+"Home" = "홈";
 "Horizontal Bar" = "가로 막대";
 "Increase Transparency" = "투명도 높이기";
 "Individual Credits" = "개인 크레딧";
 "Info" = "정보";
 "Input" = "입력";
 "Install Update" = "업데이트 설치";
+"Install and restart" = "설치 후 다시 시작";
+"Installing update…" = "업데이트 설치 중…";
 "Install…" = "설치…";
 "Interface" = "앱 화면";
 "Interface review uses example data. No accounts are connected." = "화면 검토용 예시 데이터입니다. 실제 계정에 연결되지 않았습니다.";
@@ -335,6 +351,7 @@
 "Menu Bar: %@" = "메뉴 막대: %@";
 "Menu Bar: %lld/%lld" = "메뉴 막대: %lld/%lld";
 "Menu Bar: Percentage shows up to 2 starred metrics; Ring shows one primary quota per selected account." = "메뉴 막대: 백분율은 별표 지표를 최대 2개, 링은 선택한 계정마다 주요 할당량 하나를 표시합니다.";
+"Menu bar / system tray" = "메뉴 막대 / 트레이";
 "Metric" = "지표";
 "Monitor Your AI Subscriptions with TokenPlan" = "TokenPlan으로 AI 구독을 모니터링하세요";
 "Monthly" = "월간";
@@ -343,6 +360,8 @@
 "More Usage Details" = "사용량 상세 정보";
 "Move Down" = "아래로 이동";
 "Move Up" = "위로 이동";
+"Move down" = "아래로";
+"Move up" = "위로";
 "Needs Attention" = "확인 필요";
 "Next refresh in %lldm" = "%lld분 후 새로고침";
 "Next refresh in %llds" = "%lld초 후 새로고침";
@@ -367,6 +386,7 @@
 "No reported token usage was found in the Cursor export." = "Cursor 내보내기에 보고된 토큰 사용량이 없습니다.";
 "No token data for this period" = "이 기간의 토큰 데이터가 없습니다";
 "No usage data" = "사용량 데이터 없음";
+"No usage history available." = "사용 기록이 없습니다.";
 "No usage in this period" = "이 기간에 사용량이 없습니다";
 "No usage yet. Refresh after signing in." = "사용량이 없습니다. 로그인 후 새로 고침하세요.";
 "No valid login for this Codex account. Sign in with Codex, xswap, or pi, then refresh." = "이 Codex 계정에 유효한 로그인이 없습니다. Codex, xswap 또는 pi로 로그인한 뒤 새로고침하세요.";
@@ -422,6 +442,7 @@
 "Pay as you go" = "종량제";
 "Percentage" = "백분율";
 "Personal" = "개인";
+"Pin to tray" = "트레이에 고정";
 "Platform" = "플랫폼";
 "Preferences could not be read. Changes can be saved again in Settings." = "환경설정을 읽을 수 없습니다. 설정에서 다시 저장할 수 있습니다.";
 "Preferences could not be saved. Check the app data folder permissions." = "환경설정을 저장할 수 없습니다. 앱 데이터 폴더 권한을 확인하세요.";
@@ -441,6 +462,7 @@
 "Quota History" = "할당량 기록";
 "Quota Readings" = "할당량 기록";
 "Quota Style" = "사용량 그래프";
+"Quota observations" = "할당량 기록";
 "Rate Limit Resets" = "한도 초기화";
 "Rate limit resets" = "한도 초기화";
 "Rate limited, retry in ~%@" = "요청 제한됨, 약 %@ 후 재시도";
@@ -460,8 +482,10 @@
 "Refresh Every Five Minutes" = "5분마다 자동 새로고침";
 "Refresh Interval" = "새로고침 간격";
 "Refresh Usage" = "사용량 새로고침";
+"Refresh automatically" = "자동 새로 고침";
 "Refresh failed" = "새로고침 실패";
 "Refresh failed: %@" = "새로고침 실패: %@";
+"Refresh interval" = "새로 고침 간격";
 "Refresh now" = "지금 새로고침";
 "Refresh now (⌘R)" = "지금 새로고침 (⌘R)";
 "Refresh timed out after %llds" = "%lld초 후 새로고침 시간 초과";
@@ -472,6 +496,9 @@
 "Remove Account" = "계정 제거";
 "Remove Account?" = "계정을 제거할까요?";
 "Remove Account…" = "계정 제거…";
+"Remove account" = "계정 제거";
+"Remove from TokenPlan? Your CLI login and history are kept." = "TokenPlan에서 제거할까요? CLI 로그인과 기록은 유지됩니다.";
+"Remove saved key" = "저장된 키 삭제";
 "Remove this account from TokenPlan and stop adding it automatically. Your CLI login and saved usage history will not be deleted." = "TokenPlan에서 이 계정을 제거하고 자동 추가를 중지합니다. CLI 로그인과 저장된 사용 기록은 삭제되지 않습니다.";
 "Removed from menu bar" = "메뉴 막대에서 제거됨";
 "Report an Issue" = "문제 신고";
@@ -537,9 +564,11 @@
 "Show Note in Overview" = "개요에 메모 표시";
 "Show TokenPlan" = "TokenPlan 열기";
 "Show Usage As" = "사용량 표시 방식";
+"Show account" = "계정 표시";
 "Show less" = "접기";
 "Show more" = "펼치기";
 "Show on Home" = "홈에 표시";
+"Show remaining quota" = "남은 할당량 표시";
 "Shown Services" = "표시할 서비스";
 "Sign in to GitHub Copilot in your editor, or run gh auth login, and try again." = "편집기에서 GitHub Copilot에 로그인하거나 gh auth login을 실행한 뒤 다시 시도하세요.";
 "Sign in to the provider's app or CLI, then restart TokenPlan to detect it. API keys can be entered in the service's settings." = "서비스 앱이나 CLI에서 로그인한 후 TokenPlan을 다시 시작해 감지하세요. API 키는 해당 서비스 설정에 입력할 수 있습니다.";
@@ -548,6 +577,7 @@
 "Sign in with the Codex CLI, then refresh." = "Codex CLI에 로그인한 후 새로고침하세요.";
 "Sign in with the Cursor desktop app, then refresh." = "Cursor 데스크톱 앱에 로그인한 후 새로고침하세요.";
 "Some Cursor export rows were invalid. Totals may be incomplete." = "일부 Cursor 내보내기 행이 잘못되어 집계가 불완전할 수 있습니다.";
+"Some history could not be read. Totals may be incomplete." = "일부 기록을 읽을 수 없어 합계가 불완전할 수 있습니다.";
 "Some local token logs were skipped or could not be read. Totals may be incomplete." = "일부 로컬 로그를 건너뛰었거나 읽을 수 없습니다. 집계가 불완전할 수 있습니다.";
 "Some models could not be priced. This estimate is incomplete." = "일부 모델의 가격을 확인할 수 없어 추정치가 불완전합니다.";
 "Some synced usage data couldn’t be read. Check the log for details." = "동기화된 사용량 데이터 일부를 읽을 수 없습니다. 자세한 내용은 로그를 확인하세요.";
@@ -608,6 +638,7 @@
 "The synced history contains the same model more than once." = "동기화된 기록에 같은 모델이 여러 번 있습니다.";
 "The synced provider identifier is invalid." = "동기화된 제공업체 식별자가 올바르지 않습니다.";
 "The system credential reader is missing. Install libsecret-tools, or open Antigravity and refresh." = "자격 증명 도구가 없습니다. libsecret-tools를 설치하거나 Antigravity를 열고 새로 고침하세요.";
+"The update could not be installed. Your current version is unchanged." = "업데이트를 설치하지 못했습니다. 현재 버전은 변경되지 않았습니다.";
 "Theme" = "테마";
 "These three readings share one allowance. More expensive models use it up faster. They are not each model's own remaining amount." = "이 세 항목은 같은 한도입니다. 비싼 모델일수록 더 빨리 소진되며, 모델별 잔여량이 아닙니다.";
 "This Mac" = "이 Mac";
@@ -646,6 +677,7 @@
 "Total tokens %@ across %lld providers" = "제공업체 %2$lld곳의 총 토큰 %1$@";
 "Total usage" = "총 사용량";
 "Total usage limit missing from API response." = "API 응답에 총 사용량 한도가 없습니다.";
+"Tray Style" = "트레이 스타일";
 "Turns providers back on for the tools you have installed and resets every provider's metrics and order. Are you sure?" = "설치된 도구의 제공업체를 다시 켜고 모든 제공업체의 지표와 순서를 초기화합니다. 계속할까요?";
 "Two items selected. Deselect one to choose another." = "두 항목을 선택했습니다. 다른 항목을 선택하려면 하나를 해제하세요.";
 "Type Shortcut…" = "단축키 입력…";
@@ -663,6 +695,7 @@
 "Up to %lld stars per provider" = "제공업체당 별표는 최대 %lld개";
 "Up to 2 stars per provider" = "제공업체당 별표는 최대 2개";
 "Update Available" = "업데이트 있음";
+"Update available" = "업데이트 있음";
 "Updated" = "업데이트";
 "Updated %@" = "%@ 업데이트됨";
 "Updated %@ ago" = "%@ 전에 업데이트";

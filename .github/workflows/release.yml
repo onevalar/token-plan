@@ -27,6 +27,7 @@ jobs:
     outputs:
       tag: ${{ steps.meta.outputs.tag }}
       version: ${{ steps.meta.outputs.version }}
+      tauri: ${{ steps.meta.outputs.tauri }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -52,10 +53,16 @@ jobs:
           fi
           git show "$source_ref:release/$version.md" > /tmp/notes
           test -s /tmp/notes
+          if git cat-file -e "$source_ref:release/tauri-accepted" 2>/dev/null; then
+            echo "tauri=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "tauri=false" >> "$GITHUB_OUTPUT"
+          fi
           echo "tag=$source_ref" >> "$GITHUB_OUTPUT"
           echo "version=$version" >> "$GITHUB_OUTPUT"
   mac:
     needs: validate
+    if: needs.validate.outputs.tauri != 'true'
     runs-on: macos-26
     env:
       TOKENPLAN_VERSION: ${{ needs.validate.outputs.version }}
@@ -120,6 +127,7 @@ jobs:
           retention-days: 7
   desktop:
     needs: validate
+    if: needs.validate.outputs.tauri != 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -220,3 +228,22 @@ jobs:
           if [[ "$VERIFY_ONLY" == 'true' ]]; then options+=(--prepare-only); fi
           python3 script/publish_update.py "$VERSION" --folder dist/public --build "$(cat dist/public/build.txt)" "${options[@]}"
           gh api repos/onevalar/token-plan --jq '{private, permissions}'
+
+  tauri:
+    permissions:
+      contents: write
+    needs: validate
+    if: needs.validate.outputs.tauri == 'true' && inputs.verify_only != true
+    uses: ./.github/workflows/tauri-release.yml
+    with:
+      tag: v${{ needs.validate.outputs.version }}
+    secrets: inherit
+  tauri-verification:
+    needs: validate
+    if: needs.validate.outputs.tauri == 'true' && inputs.verify_only == true
+    uses: ./.github/workflows/tauri-preview.yml
+    with:
+      source_ref: ${{ needs.validate.outputs.tag }}
+      version: ${{ needs.validate.outputs.version }}
+      production: true
+    secrets: inherit

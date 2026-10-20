@@ -49,6 +49,7 @@
 "API Key" = "API 金鑰";
 "API Key Configured" = "已設定 API 金鑰";
 "API Keys" = "API 金鑰";
+"API key" = "API 金鑰";
 "About" = "關於";
 "About TokenPlan" = "關於 TokenPlan";
 "Account" = "帳號";
@@ -66,6 +67,7 @@
 "Alert when a limit is projected to finish before it resets." = "預計額度會在重置前用完時提醒。";
 "Alert when a limit is projected to finish with little left." = "預計額度所剩無幾時提醒。";
 "All Providers" = "全部提供方";
+"All services" = "全部服務";
 "Allow Notifications" = "允許通知";
 "Almost Out" = "即將用完";
 "Always Visible" = "永遠顯示";
@@ -105,7 +107,10 @@
 "Check Automatically" = "自動檢查";
 "Check for Updates" = "檢查更新";
 "Check for Updates…" = "檢查更新…";
+"Check updates automatically" = "自動檢查更新";
+"Checking for updates…" = "正在檢查更新…";
 "Checks hourly and shows a banner when an update is available." = "每小時檢查一次，有更新時顯示橫幅。";
+"Choose at most two tray metrics per account." = "每個帳號最多選擇兩項系統匣指標。";
 "Choose services and accounts to show. Hiding them keeps stars, overview and refresh unchanged." = "選擇顯示的服務和帳號。隱藏不會改變星號、總覽或重新整理。";
 "Choose the service's local folder, such as .claude or .codex, to read its login and usage history." = "選擇服務的本機資料夾（如 .claude 或 .codex），以讀取登入和用量記錄。";
 "Choose up to two items." = "最多選擇兩項。";
@@ -147,8 +152,11 @@
 "Cost" = "費用";
 "Cost Estimates" = "費用估算";
 "Cost/MTok" = "每百萬 token 費用";
+"Could not apply this change. Refresh and try again." = "無法套用變更，請重新整理後重試。";
 "Could not check for updates. Try again later." = "無法檢查更新，請稍後重試。";
+"Could not check or install the update. Try again later." = "無法檢查或安裝更新，請稍後重試。";
 "Could not install the update. Try again later." = "無法安裝更新，請稍後重試。";
+"Could not save. Try again." = "儲存失敗，請重試。";
 "Couldn't %@ the terminal helper: %@" = "無法%1$@終端機輔助工具：%2$@";
 "Couldn't copy the log path to the clipboard." = "無法將記錄檔路徑拷貝到剪貼簿。";
 "Couldn't reach %@. Check your connection." = "無法連線到 %@，請檢查網路。";
@@ -186,12 +194,14 @@
 "Daily quota" = "每日額度";
 "Dark" = "深色";
 "Dashboard" = "儀表板";
+"Date" = "日期";
 "Date Range" = "日期範圍";
 "Debug" = "除錯";
 "Default" = "預設";
 "Density" = "密度";
 "Details" = "詳情";
 "Details Only" = "僅詳情";
+"Details only" = "僅詳細資料";
 "Detects provider logins again without resetting your display preferences." = "重新偵測服務登入，不會重置顯示設定。";
 "Devin quota data unavailable. Try again later." = "Devin 額度資料暫時無法使用，請稍後再試。";
 "Disabled" = "已停用";
@@ -224,6 +234,7 @@
 "Error" = "錯誤";
 "Estimate costs for models that don't have known pricing." = "為沒有已知定價的模型估算費用。";
 "Estimated API Cost" = "API 費用估算";
+"Estimated cost" = "估計費用";
 "Estimated from model token rates, not your subscription bill." = "按模型 token 價格估算，不代表訂閱帳單。";
 "Estimated locally, so it may be off" = "在本機估算，可能有偏差";
 "Example Data" = "範例資料";
@@ -241,6 +252,7 @@
 "Extra usage spent" = "額外用量已花費";
 "Fable" = "Fable";
 "Fallback Model" = "備用模型";
+"Find accounts" = "尋找帳號";
 "Folder authorization failed. Select the folder again." = "資料夾授權失敗，請重新選擇。";
 "Folder authorized. Enable the service and refresh its usage." = "資料夾已授權，請啟用服務並重新整理用量。";
 "Follow System" = "跟隨系統";
@@ -280,12 +292,16 @@
 "Hide From Screen Share" = "螢幕分享時隱藏";
 "Hide Usage Values" = "隱藏用量數值";
 "History" = "歷史記錄";
+"History comes from logs on this device. It may not cover every account or device." = "歷史來自本機記錄，不一定涵蓋所有帳號與裝置。";
+"Home" = "首頁顯示";
 "Horizontal Bar" = "橫條";
 "Increase Transparency" = "增加透明度";
 "Individual Credits" = "個人餘額";
 "Info" = "資訊";
 "Input" = "輸入";
 "Install Update" = "安裝更新";
+"Install and restart" = "安裝並重新啟動";
+"Installing update…" = "正在安裝更新…";
 "Install…" = "安裝…";
 "Interface" = "應用程式介面";
 "Interface review uses example data. No accounts are connected." = "介面評審使用範例資料，尚未連接真實帳號。";
@@ -335,6 +351,7 @@
 "Menu Bar: %@" = "選單列：%@";
 "Menu Bar: %lld/%lld" = "選單列：%lld/%lld";
 "Menu Bar: Percentage shows up to 2 starred metrics; Ring shows one primary quota per selected account." = "選單列：百分比顯示最多 2 項星號指標；環形為每個所選帳號顯示一項主要額度。";
+"Menu bar / system tray" = "選單列 / 系統匣";
 "Metric" = "指標";
 "Monitor Your AI Subscriptions with TokenPlan" = "用 TokenPlan 監控你的 AI 訂閱";
 "Monthly" = "每月";
@@ -343,6 +360,8 @@
 "More Usage Details" = "更多用量詳情";
 "Move Down" = "下移";
 "Move Up" = "上移";
+"Move down" = "下移";
+"Move up" = "上移";
 "Needs Attention" = "需要處理";
 "Next refresh in %lldm" = "%lld 分鐘後重新整理";
 "Next refresh in %llds" = "%lld 秒後重新整理";
@@ -367,6 +386,7 @@
 "No reported token usage was found in the Cursor export." = "Cursor 匯出中暫無已回報的 Token 用量。";
 "No token data for this period" = "這段期間沒有 token 資料";
 "No usage data" = "沒有用量資料";
+"No usage history available." = "暫無用量記錄。";
 "No usage in this period" = "這段期間沒有用量";
 "No usage yet. Refresh after signing in." = "尚無用量，請登入後重新整理。";
 "No valid login for this Codex account. Sign in with Codex, xswap, or pi, then refresh." = "這個 Codex 帳號沒有有效登入。請用 Codex、xswap 或 pi 登入後再重新整理。";
@@ -422,6 +442,7 @@
 "Pay as you go" = "按量付費";
 "Percentage" = "百分比";
 "Personal" = "個人";
+"Pin to tray" = "固定至系統匣";
 "Platform" = "執行平台";
 "Preferences could not be read. Changes can be saved again in Settings." = "無法讀取偏好設定，可在設定中重新儲存。";
 "Preferences could not be saved. Check the app data folder permissions." = "無法儲存偏好設定，請檢查應用程式資料目錄的權限。";
@@ -441,6 +462,7 @@
 "Quota History" = "額度記錄";
 "Quota Readings" = "配額記錄";
 "Quota Style" = "圖形樣式";
+"Quota observations" = "額度歷史記錄";
 "Rate Limit Resets" = "額度重置次數";
 "Rate limit resets" = "額度重置次數";
 "Rate limited, retry in ~%@" = "被限流，約 %@ 後重試";
@@ -460,8 +482,10 @@
 "Refresh Every Five Minutes" = "每五分鐘自動重新整理";
 "Refresh Interval" = "重新整理間隔";
 "Refresh Usage" = "重新整理用量";
+"Refresh automatically" = "自動重新整理";
 "Refresh failed" = "重新整理失敗";
 "Refresh failed: %@" = "重新整理失敗：%@";
+"Refresh interval" = "重新整理間隔";
 "Refresh now" = "立即重新整理";
 "Refresh now (⌘R)" = "立即重新整理（⌘R）";
 "Refresh timed out after %llds" = "重新整理在 %lld 秒後逾時";
@@ -472,6 +496,9 @@
 "Remove Account" = "移除帳號";
 "Remove Account?" = "移除帳號？";
 "Remove Account…" = "移除帳號…";
+"Remove account" = "移除帳號";
+"Remove from TokenPlan? Your CLI login and history are kept." = "從 TokenPlan 移除？終端機登入與歷史記錄會保留。";
+"Remove saved key" = "刪除已儲存金鑰";
 "Remove this account from TokenPlan and stop adding it automatically. Your CLI login and saved usage history will not be deleted." = "從 TokenPlan 中移除此帳號，並停止自動新增。不會登出命令列工具，也不會刪除已儲存的用量歷史。";
 "Removed from menu bar" = "已從選單列移除";
 "Report an Issue" = "回報問題";
@@ -537,9 +564,11 @@
 "Show Note in Overview" = "在總覽顯示備註";
 "Show TokenPlan" = "開啟 TokenPlan";
 "Show Usage As" = "用量顯示方式";
+"Show account" = "顯示帳號";
 "Show less" = "收合";
 "Show more" = "展開";
 "Show on Home" = "首頁顯示";
+"Show remaining quota" = "顯示剩餘額度";
 "Shown Services" = "顯示的服務";
 "Sign in to GitHub Copilot in your editor, or run gh auth login, and try again." = "請在編輯器中登入 GitHub Copilot，或執行 gh auth login 後再試。";
 "Sign in to the provider's app or CLI, then restart TokenPlan to detect it. API keys can be entered in the service's settings." = "先在服務應用或命令列工具登入，再重新啟動 TokenPlan 偵測。API 金鑰可在對應服務的設定中填寫。";
@@ -548,6 +577,7 @@
 "Sign in with the Codex CLI, then refresh." = "請先在 Codex CLI 中登入，再重新整理。";
 "Sign in with the Cursor desktop app, then refresh." = "請先在 Cursor 桌面應用程式中登入，再重新整理。";
 "Some Cursor export rows were invalid. Totals may be incomplete." = "部分 Cursor 匯出記錄無效，統計可能不完整。";
+"Some history could not be read. Totals may be incomplete." = "部分歷史記錄無法讀取，統計可能不完整。";
 "Some local token logs were skipped or could not be read. Totals may be incomplete." = "部分本機日誌已略過或無法讀取，統計可能不完整。";
 "Some models could not be priced. This estimate is incomplete." = "部分模型無法計價，此估算不完整。";
 "Some synced usage data couldn’t be read. Check the log for details." = "部分已同步的用量資料無法讀取。詳情請查看記錄檔。";
@@ -608,6 +638,7 @@
 "The synced history contains the same model more than once." = "同步的記錄中同一模型出現多次。";
 "The synced provider identifier is invalid." = "同步的服務商識別無效。";
 "The system credential reader is missing. Install libsecret-tools, or open Antigravity and refresh." = "缺少系統憑證讀取工具。請安裝 libsecret-tools，或開啟 Antigravity 後重新整理。";
+"The update could not be installed. Your current version is unchanged." = "更新安裝失敗，目前版本未變更。";
 "Theme" = "主題";
 "These three readings share one allowance. More expensive models use it up faster. They are not each model's own remaining amount." = "這三條是同一份額度。貴的模型會更快用完，不是每個模型各自的剩餘量。";
 "This Mac" = "這台 Mac";
@@ -646,6 +677,7 @@
 "Total tokens %@ across %lld providers" = "%2$lld 個服務商的總 token 數 %1$@";
 "Total usage" = "總用量";
 "Total usage limit missing from API response." = "API 回應中缺少總用量上限。";
+"Tray Style" = "系統匣樣式";
 "Turns providers back on for the tools you have installed and resets every provider's metrics and order. Are you sure?" = "將為你已安裝的工具重新啟用對應服務商，並重置每個服務商的指標與順序。確定嗎？";
 "Two items selected. Deselect one to choose another." = "已選兩項，請先取消一項再選擇其他內容。";
 "Type Shortcut…" = "輸入快速鍵…";
@@ -663,6 +695,7 @@
 "Up to %lld stars per provider" = "每個服務商最多 %lld 個星號";
 "Up to 2 stars per provider" = "每個服務商最多 2 個星號";
 "Update Available" = "有新版本";
+"Update available" = "有可用更新";
 "Updated" = "更新於";
 "Updated %@" = "更新於 %@";
 "Updated %@ ago" = "%@前更新";

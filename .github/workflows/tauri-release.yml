@@ -1,0 +1,76 @@
+name: Publish shared Tauri desktop
+on:
+  workflow_call:
+    inputs:
+      tag:
+        required: true
+        type: string
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Approved vX.Y.Z tag on main, with release/X.Y.Z.md'
+        required: true
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: tokenplan-tauri-public-release
+  cancel-in-progress: false
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    outputs:
+      source_ref: ${{ steps.meta.outputs.source_ref }}
+      version: ${{ steps.meta.outputs.version }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - id: meta
+        env:
+          TAG: ${{ inputs.tag }}
+        shell: bash
+        run: |
+          [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] || exit 1
+          source_ref=$(git rev-parse --verify "refs/tags/$TAG^{commit}")
+          git merge-base --is-ancestor "$source_ref" origin/main
+          version="${TAG#v}"
+          git show "$source_ref:release/$version.md" > /tmp/release-notes
+          test -s /tmp/release-notes
+          # Explicit acceptance marker prevents an unverified preview from becoming stable.
+          git show "$source_ref:release/tauri-accepted" > /tmp/accepted
+          echo "source_ref=$source_ref" >> "$GITHUB_OUTPUT"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+  build:
+    needs: validate
+    uses: ./.github/workflows/tauri-preview.yml
+    with:
+      source_ref: ${{ needs.validate.outputs.source_ref }}
+      version: ${{ needs.validate.outputs.version }}
+      production: true
+    secrets: inherit
+  publish:
+    needs: [validate, build]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: tauri-*
+          path: artifacts
+      - name: Build and publish the signed update manifest
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ needs.validate.outputs.version }}
+          SOURCE_REF: ${{ needs.validate.outputs.source_ref }}
+          GH_REPO: ${{ github.repository }}
+        run: python3 script/publish_tauri_update.py

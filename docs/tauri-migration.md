@@ -71,6 +71,18 @@ The first production migration must also validate the transition from the native
 a signed Tauri update alone is not evidence that an existing native installation upgrades.
 Linux automatic replacement uses AppImage; `.deb` installations remain package-managed.
 
+The reusable `tauri-release.yml` workflow builds all three platforms from the approved tag.
+Stable routing remains native until `release/tauri-accepted` is committed after acceptance.
+The production Mac job signs a transition DMG with the existing Sparkle key and checks its
+notarization; its monotonic bundle version lets the native Mac updater offer the migration.
+The publisher uploads all signed assets before advancing either manifest. Windows/Linux
+native installations require one manual migration install; subsequent Tauri installations
+use the new signed feed. The native desktop feed is deliberately not given installers with
+incompatible unattended-install arguments. No production transition has been published yet.
+
+CI also verifies the actual updater archive against the public key embedded in the app,
+in addition to the regression that rejects a modified archive.
+
 ## Boundaries and acceptance
 
 The frontend never receives credentials. It cannot select helper paths or execute shell

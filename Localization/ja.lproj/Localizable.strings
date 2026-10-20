@@ -49,6 +49,7 @@
 "API Key" = "APIキー";
 "API Key Configured" = "API キー設定済み";
 "API Keys" = "APIキー";
+"API key" = "API キー";
 "About" = "情報";
 "About TokenPlan" = "TokenPlan について";
 "Account" = "アカウント";
@@ -66,6 +67,7 @@
 "Alert when a limit is projected to finish before it resets." = "リセット前に上限を使い切る見込みのときに通知します。";
 "Alert when a limit is projected to finish with little left." = "上限の残りがわずかになる見込みのときに通知します。";
 "All Providers" = "すべてのプロバイダー";
+"All services" = "すべてのサービス";
 "Allow Notifications" = "通知を許可";
 "Almost Out" = "もうすぐ上限";
 "Always Visible" = "常に表示";
@@ -105,7 +107,10 @@
 "Check Automatically" = "自動的に確認";
 "Check for Updates" = "アップデートを確認";
 "Check for Updates…" = "アップデートを確認…";
+"Check updates automatically" = "更新を自動確認";
+"Checking for updates…" = "更新を確認中…";
 "Checks hourly and shows a banner when an update is available." = "1 時間ごとに確認し、更新があるとバナーを表示します。";
+"Choose at most two tray metrics per account." = "アカウントごとに最大2項目です。";
 "Choose services and accounts to show. Hiding them keeps stars, overview and refresh unchanged." = "表示するサービスとアカウントを選択します。非表示にしてもスター、概要、更新は変わりません。";
 "Choose the service's local folder, such as .claude or .codex, to read its login and usage history." = "ログインと使用履歴を読むため、.claude や .codex などのサービスフォルダを選択してください。";
 "Choose up to two items." = "最大2項目を選択できます。";
@@ -147,8 +152,11 @@
 "Cost" = "コスト";
 "Cost Estimates" = "コスト見積もり";
 "Cost/MTok" = "百万トークンあたりコスト";
+"Could not apply this change. Refresh and try again." = "変更できません。更新して再試行してください。";
 "Could not check for updates. Try again later." = "更新を確認できません。後で再試行してください。";
+"Could not check or install the update. Try again later." = "更新を確認またはインストールできません。後で再試行してください。";
 "Could not install the update. Try again later." = "更新をインストールできません。後で再試行してください。";
+"Could not save. Try again." = "保存できません。再試行してください。";
 "Couldn't %@ the terminal helper: %@" = "ターミナルヘルパーを%1$@できませんでした：%2$@";
 "Couldn't copy the log path to the clipboard." = "ログのパスをクリップボードにコピーできませんでした。";
 "Couldn't reach %@. Check your connection." = "%@ に接続できません。接続を確認してください。";
@@ -186,12 +194,14 @@
 "Daily quota" = "日次の上限";
 "Dark" = "ダーク";
 "Dashboard" = "ダッシュボード";
+"Date" = "日付";
 "Date Range" = "期間";
 "Debug" = "デバッグ";
 "Default" = "標準";
 "Density" = "密度";
 "Details" = "詳細";
 "Details Only" = "詳細のみ";
+"Details only" = "詳細のみ";
 "Detects provider logins again without resetting your display preferences." = "表示設定をリセットせずにログインを再検出します。";
 "Devin quota data unavailable. Try again later." = "Devin の上限データを取得できません。後でもう一度お試しください。";
 "Disabled" = "無効";
@@ -224,6 +234,7 @@
 "Error" = "エラー";
 "Estimate costs for models that don't have known pricing." = "価格が不明なモデルのコストを見積もります。";
 "Estimated API Cost" = "API 費用の推定";
+"Estimated cost" = "推定費用";
 "Estimated from model token rates, not your subscription bill." = "モデルのトークン料金による推定で、契約の請求額ではありません。";
 "Estimated locally, so it may be off" = "ローカルで推定しているため、誤差がある場合があります";
 "Example Data" = "サンプルデータ";
@@ -241,6 +252,7 @@
 "Extra usage spent" = "追加使用量の支出";
 "Fable" = "Fable";
 "Fallback Model" = "フォールバックモデル";
+"Find accounts" = "アカウントを検索";
 "Folder authorization failed. Select the folder again." = "フォルダを許可できませんでした。再度選択してください。";
 "Folder authorized. Enable the service and refresh its usage." = "フォルダを許可しました。サービスを有効にして使用量を更新してください。";
 "Follow System" = "システムに従う";
@@ -280,12 +292,16 @@
 "Hide From Screen Share" = "画面共有時に隠す";
 "Hide Usage Values" = "使用量を非表示";
 "History" = "履歴";
+"History comes from logs on this device. It may not cover every account or device." = "この端末のログによる履歴です。すべてのアカウントや端末を含むとは限りません。";
+"Home" = "ホーム";
 "Horizontal Bar" = "横棒";
 "Increase Transparency" = "透明度を上げる";
 "Individual Credits" = "個人クレジット";
 "Info" = "情報";
 "Input" = "入力";
 "Install Update" = "アップデートをインストール";
+"Install and restart" = "インストールして再起動";
+"Installing update…" = "更新をインストール中…";
 "Install…" = "インストール…";
 "Interface" = "アプリの表示";
 "Interface review uses example data. No accounts are connected." = "画面確認用のサンプルデータです。アカウントには接続していません。";
@@ -335,6 +351,7 @@
 "Menu Bar: %@" = "メニューバー：%@";
 "Menu Bar: %lld/%lld" = "メニューバー：%lld/%lld";
 "Menu Bar: Percentage shows up to 2 starred metrics; Ring shows one primary quota per selected account." = "メニューバー：パーセントはスター付き項目を最大2つ、リングは選択した各アカウントの主要な利用枠を1つ表示します。";
+"Menu bar / system tray" = "メニューバー / トレイ";
 "Metric" = "項目";
 "Monitor Your AI Subscriptions with TokenPlan" = "TokenPlan で AI サブスクリプションを監視";
 "Monthly" = "月間";
@@ -343,6 +360,8 @@
 "More Usage Details" = "使用量の詳細";
 "Move Down" = "下へ";
 "Move Up" = "上へ";
+"Move down" = "下へ";
+"Move up" = "上へ";
 "Needs Attention" = "確認が必要";
 "Next refresh in %lldm" = "%lld 分後に更新";
 "Next refresh in %llds" = "%lld 秒後に更新";
@@ -367,6 +386,7 @@
 "No reported token usage was found in the Cursor export." = "Cursor のエクスポートにトークン使用量の記録がありません。";
 "No token data for this period" = "この期間のトークンデータはありません";
 "No usage data" = "使用量データなし";
+"No usage history available." = "使用履歴はありません。";
 "No usage in this period" = "この期間の使用はありません";
 "No usage yet. Refresh after signing in." = "利用状況がありません。ログインして更新してください。";
 "No valid login for this Codex account. Sign in with Codex, xswap, or pi, then refresh." = "この Codex アカウントには有効なログインがありません。Codex、xswap、または pi でサインインしてから更新してください。";
@@ -422,6 +442,7 @@
 "Pay as you go" = "従量課金";
 "Percentage" = "パーセント";
 "Personal" = "個人";
+"Pin to tray" = "トレイに固定";
 "Platform" = "プラットフォーム";
 "Preferences could not be read. Changes can be saved again in Settings." = "設定を読み込めませんでした。設定画面から保存し直せます。";
 "Preferences could not be saved. Check the app data folder permissions." = "設定を保存できませんでした。アプリデータフォルダーの権限を確認してください。";
@@ -441,6 +462,7 @@
 "Quota History" = "使用枠の履歴";
 "Quota Readings" = "クォータ記録";
 "Quota Style" = "使用量グラフ";
+"Quota observations" = "クォータの記録";
 "Rate Limit Resets" = "レート制限リセット";
 "Rate limit resets" = "レート制限リセット";
 "Rate limited, retry in ~%@" = "レート制限中です。約 %@ 後に再試行";
@@ -460,8 +482,10 @@
 "Refresh Every Five Minutes" = "5 分ごとに自動更新";
 "Refresh Interval" = "更新間隔";
 "Refresh Usage" = "使用量を更新";
+"Refresh automatically" = "自動更新";
 "Refresh failed" = "更新に失敗しました";
 "Refresh failed: %@" = "更新に失敗しました：%@";
+"Refresh interval" = "更新間隔";
 "Refresh now" = "今すぐ更新";
 "Refresh now (⌘R)" = "今すぐ更新（⌘R）";
 "Refresh timed out after %llds" = "%lld 秒後に更新がタイムアウトしました";
@@ -472,6 +496,9 @@
 "Remove Account" = "アカウントを削除";
 "Remove Account?" = "アカウントを削除しますか？";
 "Remove Account…" = "アカウントを削除…";
+"Remove account" = "アカウントを削除";
+"Remove from TokenPlan? Your CLI login and history are kept." = "TokenPlan から削除しますか？CLI のログインと履歴は残ります。";
+"Remove saved key" = "保存キーを削除";
 "Remove this account from TokenPlan and stop adding it automatically. Your CLI login and saved usage history will not be deleted." = "TokenPlan からこのアカウントを削除し、自動追加を停止します。CLI のログインと保存済みの使用履歴は削除されません。";
 "Removed from menu bar" = "メニューバーから削除しました";
 "Report an Issue" = "問題を報告";
@@ -537,9 +564,11 @@
 "Show Note in Overview" = "概要にメモを表示";
 "Show TokenPlan" = "TokenPlan を表示";
 "Show Usage As" = "使用量の表示方法";
+"Show account" = "アカウントを表示";
 "Show less" = "表示を減らす";
 "Show more" = "もっと見る";
 "Show on Home" = "ホームに表示";
+"Show remaining quota" = "残りの使用枠を表示";
 "Shown Services" = "表示するサービス";
 "Sign in to GitHub Copilot in your editor, or run gh auth login, and try again." = "エディタで GitHub Copilot にサインインするか、gh auth login を実行してからもう一度お試しください。";
 "Sign in to the provider's app or CLI, then restart TokenPlan to detect it. API keys can be entered in the service's settings." = "サービスのアプリやCLIでログインし、TokenPlanを再起動して検出します。APIキーは該当サービスの設定で入力できます。";
@@ -548,6 +577,7 @@
 "Sign in with the Codex CLI, then refresh." = "Codex CLI でログインしてから更新してください。";
 "Sign in with the Cursor desktop app, then refresh." = "Cursor デスクトップアプリでログインしてから更新してください。";
 "Some Cursor export rows were invalid. Totals may be incomplete." = "Cursor のエクスポートに無効な行があり、集計が不完全な可能性があります。";
+"Some history could not be read. Totals may be incomplete." = "一部の履歴を取得できません。合計が不完全な場合があります。";
 "Some local token logs were skipped or could not be read. Totals may be incomplete." = "一部のローカルログを読み取れないかスキップしました。集計が不完全な可能性があります。";
 "Some models could not be priced. This estimate is incomplete." = "一部モデルの料金が不明なため、推定は不完全です。";
 "Some synced usage data couldn’t be read. Check the log for details." = "同期された使用量データの一部を読み取れませんでした。詳細はログを確認してください。";
@@ -608,6 +638,7 @@
 "The synced history contains the same model more than once." = "同期された履歴に同じモデルが複数含まれています。";
 "The synced provider identifier is invalid." = "同期されたプロバイダー識別子が無効です。";
 "The system credential reader is missing. Install libsecret-tools, or open Antigravity and refresh." = "資格情報ツールがありません。libsecret-tools をインストールするか、Antigravity を開いて更新してください。";
+"The update could not be installed. Your current version is unchanged." = "更新をインストールできませんでした。現在のバージョンは変更されていません。";
 "Theme" = "テーマ";
 "These three readings share one allowance. More expensive models use it up faster. They are not each model's own remaining amount." = "この3つは同じ利用枠です。高いモデルほど早く消費され、モデルごとの残りではありません。";
 "This Mac" = "この Mac";
@@ -646,6 +677,7 @@
 "Total tokens %@ across %lld providers" = "%2$lld 社のプロバイダー合計トークン %1$@";
 "Total usage" = "合計使用量";
 "Total usage limit missing from API response." = "API の応答に合計使用量の上限がありません。";
+"Tray Style" = "トレイの表示";
 "Turns providers back on for the tools you have installed and resets every provider's metrics and order. Are you sure?" = "インストール済みのツールのプロバイダーを再度有効にし、各プロバイダーの指標と順序をリセットします。よろしいですか？";
 "Two items selected. Deselect one to choose another." = "2項目を選択済みです。変更するには1項目を解除してください。";
 "Type Shortcut…" = "ショートカットを入力…";
@@ -663,6 +695,7 @@
 "Up to %lld stars per provider" = "プロバイダーごとにスターは最大 %lld つ";
 "Up to 2 stars per provider" = "プロバイダーごとにスターは最大 2 つ";
 "Update Available" = "アップデートがあります";
+"Update available" = "更新があります";
 "Updated" = "更新日時";
 "Updated %@" = "%@ に更新";
 "Updated %@ ago" = "%@前に更新";

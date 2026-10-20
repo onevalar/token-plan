@@ -59,7 +59,7 @@ test('update installation errors stay visible and do not restart',async({page})=
  await expect(page.getByRole('status')).toContainText('9.9.9');
  await page.getByRole('button',{name:'安装并重启',exact:true}).click();await expect(page.getByRole('status')).toContainText('更新安装失败');
 });
-for(const [locale,settings] of [['en','General settings'],['zh-Hant','一般設定'],['ja','一般設定'],['ko','일반 설정']])test(`localized navigation ${locale}`,async({page})=>{
+for(const [locale,settings] of [['en','General Settings'],['zh-Hant','一般設定'],['ja','一般設定'],['ko','일반 설정']])test(`localized navigation ${locale}`,async({page})=>{
  await mockDesktop(page,locale);await page.goto('/');await page.locator('header button').last().click();
  await expect(page.getByRole('menuitem',{name:settings,exact:true})).toBeVisible();
 });

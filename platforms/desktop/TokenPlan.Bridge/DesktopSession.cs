@@ -24,7 +24,10 @@ public sealed partial class DesktopSession : IDisposable
         var claude = Environment.GetEnvironmentVariable("CLAUDE_CONFIG_DIR") ?? Path.Combine(home, ".claude");
         service = new(codex, claude);
         service.IsAccountRemoved = a => preferences.IsAccountRemoved(a);
-        scanners = new() { ["codex"] = new(codex), ["claude"] = new("", claudeHomes: claude.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)) };
+        var claudeHomes = Environment.GetEnvironmentVariable("CLAUDE_CONFIG_DIR") is { Length: > 0 } configured
+            ? configured.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            : new[] { claude, Path.Combine(Environment.GetEnvironmentVariable("XDG_CONFIG_HOME") ?? Path.Combine(home, ".config"), "claude") };
+        scanners = new() { ["codex"] = new(codex), ["claude"] = new("", claudeHomes: claudeHomes) };
         stateFile = Path.Combine(Path.GetDirectoryName(file)!, "tauri-session.json");
         if (File.Exists(stateFile))
         {

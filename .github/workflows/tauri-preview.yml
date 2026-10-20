@@ -2,6 +2,17 @@ name: Tauri migration checks
 
 on:
   workflow_dispatch:
+  workflow_call:
+    inputs:
+      source_ref:
+        type: string
+        required: true
+      version:
+        type: string
+        default: '0.0.0'
+      production:
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -19,6 +30,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
+          ref: ${{ inputs.source_ref || github.sha }}
           persist-credentials: false
       - uses: actions/setup-node@v6
         with:
@@ -84,6 +96,8 @@ jobs:
       - name: Package signed updater artifacts
         shell: bash
         env:
+          TOKENPLAN_VERSION: ${{ inputs.version || '0.0.0' }}
+          TOKENPLAN_PRODUCTION: ${{ inputs.production && 'true' || 'false' }}
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
@@ -95,6 +109,14 @@ jobs:
           else
             npm run tauri -- build --config src-tauri/tauri.package.json
           fi
+      - name: Verify packaged updater signature
+        run: node scripts/verify-artifacts.mjs
+      - name: Sign the native Mac migration feed
+        if: runner.os == 'macOS' && inputs.production
+        env:
+          TOKENPLAN_VERSION: ${{ inputs.version }}
+          SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
+        run: python3 ../../script/sign_tauri_transition.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -105,6 +127,7 @@ jobs:
             platforms/tauri/src-tauri/target/**/release/bundle/**/*.exe*
             platforms/tauri/src-tauri/target/**/release/bundle/**/*.AppImage*
             platforms/tauri/src-tauri/target/**/release/bundle/**/*.deb
+            platforms/tauri/transition/appcast.xml
             platforms/tauri/test-results/
           if-no-files-found: warn
       # Verification artifacts only. Published feeds require an approved stable version.

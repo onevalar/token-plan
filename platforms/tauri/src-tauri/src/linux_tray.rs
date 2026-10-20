@@ -22,12 +22,18 @@ impl Tray for Item {
 pub async fn update(app:&tauri::AppHandle,state:&DesktopState)->Result<(),()> {
  let manager=app.state::<LinuxTrays>();let mut handles=manager.0.lock().await;
  let shown=tray::visible(state);
- let ids:Vec<_>=shown.iter().map(|(a,_)|a.id.clone()).collect();
+ let ids:Vec<_>=if shown.is_empty() { vec!["root".to_string()] } else { shown.iter().map(|(a,_)|a.id.clone()).collect() };
  if handles.iter().map(|(id,_)|id).ne(ids.iter()) || handles.iter().any(|(_,h)|h.is_closed()) {
   for (_,h) in handles.drain(..) { h.shutdown().await; }
  }
  let language=if state.settings.language=="system" {&state.settings.locale} else {&state.settings.language};
  let dark=match state.settings.appearance.as_str(){"dark"=>true,"light"=>false,_=>app.get_webview_window("main").and_then(|w|w.theme().ok())==Some(tauri::Theme::Dark)};
+ if shown.is_empty() {
+  let image=tauri::image::Image::from_bytes(include_bytes!("../icons/icon.png")).map_err(|_|())?;
+  let item=Item{app:app.clone(),id:"TokenPlan_root".into(),title:"TokenPlan".into(),quit:tray::quit_label(language).into(),width:image.width() as i32,height:image.height() as i32,pixels:image.rgba().chunks_exact(4).flat_map(|p|[p[3],p[0],p[1],p[2]]).collect()};
+  if let Some((_,handle))=handles.first(){handle.update(|old|*old=item).await.ok_or(())?;}
+  else {handles.push(("root".into(),item.spawn().await.map_err(|_|())?));}
+ }
  for (account,badge) in shown {
   let image=tray::render(account,badge,&state.settings.tray_style,dark);
   let pixels=image.rgba().chunks_exact(4).flat_map(|p|[p[3],p[0],p[1],p[2]]).collect();
@@ -38,6 +44,6 @@ pub async fn update(app:&tauri::AppHandle,state:&DesktopState)->Result<(),()> {
    let handle=item.spawn().await.map_err(|_|())?;handles.push((account.id.clone(),handle));
   }
  }
- if let Some(root)=app.tray_by_id("root") {root.set_menu(Some(tray::menu(app,language).map_err(|_|())?)).map_err(|_|())?;root.set_visible(ids.is_empty()).map_err(|_|())?;}
+ if let Some(root)=app.tray_by_id("root") {root.set_menu(Some(tray::menu(app,language).map_err(|_|())?)).map_err(|_|())?;root.set_visible(false).map_err(|_|())?;}
  Ok(())
 }
