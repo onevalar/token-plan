@@ -9,6 +9,7 @@ export async function mockDesktop(page:Page,language='zh-Hans',cloud=false) {
    transformCallback:(fn:unknown)=>{callbacks.set(++sequence,fn);return sequence;},
    unregisterCallback:(id:number)=>callbacks.delete(id),
    invoke:async(command:string,args:any)=>{
+    if(command==='shortcut_capture'){(window as any).__shortcutPaused=args.paused;return;}
     if(command==='plugin:app|version')return '0.0.0';
     if(command.startsWith('plugin:event|'))return ++sequence;
     if(command==='plugin:updater|check')return {rid:8,version:'9.9.9',currentVersion:'0.0.0',body:'Fixture update',rawJson:{}};

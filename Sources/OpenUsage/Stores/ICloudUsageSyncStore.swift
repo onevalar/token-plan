@@ -163,6 +163,7 @@ final class ICloudUsageSyncStore {
     private var metadataQuery: NSMetadataQuery?
     private var notificationTokens: [NSObjectProtocol] = []
     private var syncActivityCount = 0
+    private var lastRemoteReload = Date.distantPast
 
     let deviceID: String
     let deviceName: String
@@ -265,8 +266,15 @@ final class ICloudUsageSyncStore {
         }
     }
 
+    // The headless desktop helper also polls: metadata-query callbacks depend on a UI run loop.
+    func refreshIfNeeded(now: Date = Date()) async {
+        guard enabled, !isSyncing, now.timeIntervalSince(lastRemoteReload) >= 30 else { return }
+        await reload()
+    }
+
     private func reload() async {
         guard enabled else { return }
+        lastRemoteReload = Date()
         await withSyncActivity {
             do {
                 let result = try await fileStore.loadDocuments()

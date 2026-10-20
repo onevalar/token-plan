@@ -55,3 +55,14 @@ notification/shortcut settings. Rust tests cover baseline suppression, reset jit
 disabled-trigger reactivation required shortcut modifiers, and used/remaining parity. A final package check launches the
 signed production helper to catch entitlement/provisioning launch failures. Production iCloud signing and
 OS-level behavior still need verification; these results alone do not approve stable routing.
+
+The independent Mac preview was launched with an isolated defaults suite and automatic refresh
+and updates disabled. Settings opened, shortcut recording/replacement/persistence/clearing
+worked, and Quit closed the preview. App-targeted injected key events do not establish physical
+OS-global hotkey dispatch. The preview was closed, its defaults removed and the generated app
+moved into a `.noindex` build directory; the installed native app was not replaced.
+
+A follow-up regression explicitly resumes shortcut registration after saving (WebKit can drop
+the blur event when disabling a focused recorder). Headless iCloud checks poll asynchronously,
+with a 30-second throttle, in addition to metadata events; the dedicated nine-test suite passes.
+Real iCloud exchange between two signed-in Macs has not been exercised in this environment.

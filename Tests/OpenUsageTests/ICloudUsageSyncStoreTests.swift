@@ -3,6 +3,26 @@ import XCTest
 
 @MainActor
 final class ICloudUsageSyncStoreTests: XCTestCase {
+    func testHeadlessPollingIsThrottledAndStopsWhenDisabled() async throws {
+        let defaults = makeDefaults("polling")
+        let fileStore = RecordingHistoryFileStore()
+        let sync = makeSync(defaults: defaults, fileStore: fileStore)
+        sync.enabled = true
+        try await waitUntil { await fileStore.writeCount == 1 && !sync.isSyncing }
+        let before = await fileStore.loadCount
+        await sync.refreshIfNeeded()
+        let unchanged = await fileStore.loadCount
+        XCTAssertEqual(unchanged, before)
+        await sync.refreshIfNeeded(now: Date().addingTimeInterval(60))
+        let polled = await fileStore.loadCount
+        XCTAssertEqual(polled, before + 1)
+        sync.enabled = false
+        try await waitUntil { await fileStore.deletedDeviceIDs.contains(sync.deviceID) }
+        await sync.refreshIfNeeded(now: Date().addingTimeInterval(120))
+        let disabled = await fileStore.loadCount
+        XCTAssertEqual(disabled, polled)
+    }
+
     func testEnableWritesLoadsAndDisableDeletesThisMac() async throws {
         let defaults = makeDefaults("enable-disable")
         let fileStore = RecordingHistoryFileStore()
@@ -230,7 +250,9 @@ private actor RecordingHistoryFileStore: UsageHistoryFileStoring {
         self.invalidFileMessages = invalidFileMessages
     }
 
+    private(set) var loadCount = 0
     func loadDocuments() async throws -> UsageHistoryLoadResult {
+        loadCount += 1
         if unavailable { throw ICloudUsageSyncError.unavailable }
         loadInFlight = true
         defer { loadInFlight = false }

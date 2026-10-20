@@ -61,7 +61,7 @@ public final class DesktopBridge {
                 guard registry.provider(id: id) != nil, !accounts.isRemoved(id) else { throw Failure.invalid }
             }
             switch method {
-            case "state": break
+            case "state": Task { await cloud.refreshIfNeeded() }
             case "notificationPermission":
                 AppNotifications.shared.registerAsDelegate()
                 let status = await AppNotifications.shared.authorizationStatus()
