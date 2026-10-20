@@ -17,8 +17,9 @@ contents = app/'Contents'
 shutil.copy2(bins/'tokenplan-bridge-universal-apple-darwin', contents/'MacOS/tokenplan-bridge')
 shutil.copy2(os.environ['TOKENPLAN_ICLOUD_PROFILE'], contents/'embedded.provisionprofile')
 shutil.copytree(bins/'OpenUsage_OpenUsage.bundle', contents/'Resources/OpenUsage_OpenUsage.bundle')
-# Resolve the shell's framework without duplicating it in the installer.
-(contents/'Frameworks').symlink_to('../../../Frameworks')
+# An escaping framework symlink fails strict bundle validation. Use a loader path instead.
+subprocess.run(['install_name_tool','-add_rpath','@executable_path/../../../../Frameworks',
+                str(contents/'MacOS/tokenplan-bridge')],check=True)
 info = plistlib.loads((root/'platforms/tauri/src-tauri/production-info.plist').read_bytes())
 info.update(CFBundleIdentifier='com.onevalar.tokenplan', CFBundleExecutable='tokenplan-bridge',
             CFBundleName='TokenPlan Bridge', CFBundlePackageType='APPL',
@@ -27,3 +28,5 @@ info.update(CFBundleIdentifier='com.onevalar.tokenplan', CFBundleExecutable='tok
 subprocess.run(['codesign','--force','--options','runtime','--timestamp',
                 '--entitlements',os.environ['TOKENPLAN_ICLOUD_ENTITLEMENTS'],
                 '--sign',os.environ['APPLE_SIGNING_IDENTITY'],str(app)],check=True)
+
+subprocess.run(['codesign','--verify','--strict',str(app)],check=True)
