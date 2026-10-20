@@ -5,6 +5,7 @@ mod shortcuts;
 mod notifications;
 mod model;
 mod tray;
+mod panel;
 #[cfg(target_os="linux")]
 mod linux_tray;
 use tauri::{
@@ -14,29 +15,16 @@ use tauri::{
 };
 
 fn show(app: &tauri::AppHandle) {
-    if let Some(window) = app.get_webview_window("main") {
-        let _ = window.show();
-        let _ = window.unminimize();
-        let _ = window.set_focus();
-    }
+    panel::show(app);
 }
 
 fn show_near(app:&tauri::AppHandle,x:i32,y:i32) {
-    if let Some(window)=app.get_webview_window("main") {
-        if let Ok(Some(monitor))=window.current_monitor() {
-            let screen=monitor.position();let size=monitor.size();
-            let panel=window.outer_size().unwrap_or(tauri::PhysicalSize::new(480,680));
-            let x=(x-panel.width as i32+20).clamp(screen.x,(screen.x+size.width as i32-panel.width as i32).max(screen.x));
-            let y=(y+12).clamp(screen.y,(screen.y+size.height as i32-panel.height as i32).max(screen.y));
-            let _=window.set_position(tauri::PhysicalPosition::new(x,y));
-        }
-    }
-    show(app);
+    panel::toggle_near(app,x,y);
 }
 
 #[tauri::command]
 fn hide(app: tauri::AppHandle) {
-    if let Some(window)=app.get_webview_window("main") { let _=window.hide(); }
+    panel::hide(&app);
 }
 
 #[tauri::command]
@@ -53,12 +41,13 @@ fn main() {
         .manage(notifications::Alerts::default())
         .manage(bridge::Bridge::default())
         .manage(tray::Trays::default())
+        .manage(panel::Panel::default())
         .invoke_handler(tauri::generate_handler![bridge::desktop_request, shortcuts::shortcut_capture, quit, hide])
         .setup(|app| {
             // A missing global-hotkey backend (e.g. a Wayland-only session) must not prevent startup.
             if app.handle().plugin(tauri_plugin_global_shortcut::Builder::new().with_handler(|app,_,event| {
                 if event.state()==tauri_plugin_global_shortcut::ShortcutState::Pressed {
-                    if let Some(window)=app.get_webview_window("main") {if window.is_visible().unwrap_or(false){let _=window.hide();}else{show(app);}}
+                    if let Some(window)=app.get_webview_window("main") {if window.is_visible().unwrap_or(false){panel::hide(app);}else{show(app);}}
                 }
             }).build()).is_err(){eprintln!("Global shortcuts unavailable in this desktop session");}
 
@@ -82,15 +71,13 @@ fn main() {
                     _ => {}
                 })
                 .on_tray_icon_event(|tray, event| {
-                    if matches!(
-                        event,
-                        TrayIconEvent::Click {
+                    if let TrayIconEvent::Click {
                             button: MouseButton::Left,
                             button_state: MouseButtonState::Up,
+                            position,
                             ..
-                        }
-                    ) {
-                        show(tray.app_handle());
+                        } = event {
+                        show_near(tray.app_handle(),position.x as i32,position.y as i32);
                     }
                 })
                 .build(app)?;
@@ -108,17 +95,25 @@ fn main() {
             Ok(())
         })
         .on_window_event(|window, event| {
+            if let tauri::WindowEvent::Focused(focused)=event {
+                panel::focus_changed(window.app_handle(),*focused);
+            }
             if let tauri::WindowEvent::ThemeChanged(_) = event {
                 tauri::async_runtime::spawn(bridge::redraw_trays(window.app_handle().clone()));
             }
             if let tauri::WindowEvent::CloseRequested { api, .. } = event {
-                if window.hide().is_ok() {
-                    api.prevent_close();
-                }
+                panel::hide(window.app_handle());
+                api.prevent_close();
             }
         })
-        .run(tauri::generate_context!())
-        .expect("TokenPlan desktop runtime failed");
+        .build(tauri::generate_context!())
+        .expect("TokenPlan desktop runtime failed")
+        .run(|app,event| {
+            #[cfg(target_os="macos")]
+            if let tauri::RunEvent::Reopen {..}=event {show(app);}
+            #[cfg(not(target_os="macos"))]
+            let _=(app,event);
+        });
 }
 
 #[cfg(test)]

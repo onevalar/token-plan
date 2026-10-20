@@ -55,6 +55,7 @@
 "Account" = "账号";
 "Activity" = "活动";
 "Add" = "添加";
+"Add Service" = "添加服务";
 "Add Service Login" = "添加服务登录";
 "Add an API key in service settings, then refresh." = "在服务设置中添加 API 密钥，然后刷新。";
 "Additional Claude and Codex logins can come from Claude Swap, Codex Swap, supported Codex homes or pi. TokenPlan only reads these logins; it does not switch accounts." = "多个 Claude、Codex 登录可来自 Claude Swap、Codex Swap、受支持的 Codex 目录或 pi。TokenPlan 只读取登录，不负责切换账号。";
@@ -90,6 +91,7 @@
 "Authorize a Folder" = "授权文件夹";
 "Auto" = "自动";
 "Automatic Refresh" = "自动刷新";
+"Available Services" = "可添加的服务";
 "Available Usage" = "用量数据";
 "Back" = "返回";
 "Back to History" = "返回用量历史";
@@ -133,6 +135,7 @@
 "Clear shortcut" = "清除快捷键";
 "Clear this account's local quota history?" = "清除此账号的本地额度历史？";
 "Click here and press a key with Control, Alt or Command." = "点击此处，按下包含 Control、Alt 或 Command 的组合键。";
+"Close" = "关闭";
 "Codex CLI logs on this device. Includes logs from different sign-ins, not the current account's complete usage." = "统计本机 Codex CLI 日志，包含不同登录留下的记录，并非当前账户的全部用量。";
 "Codex auth data is invalid." = "Codex 认证数据无效。";
 "Codex logs" = "Codex 日志";
@@ -255,6 +258,7 @@
 "Extra usage spent" = "额外用量已花费";
 "Fable" = "Fable";
 "Fallback Model" = "备用模型";
+"Filter by Service" = "按服务筛选";
 "Find accounts" = "查找账号";
 "Folder authorization failed. Select the folder again." = "文件夹授权失败，请重新选择。";
 "Folder authorized. Enable the service and refresh its usage." = "文件夹已授权，请启用服务并刷新用量。";
@@ -368,11 +372,13 @@
 "Move down" = "下移";
 "Move up" = "上移";
 "Needs Attention" = "需要处理";
+"Next Page" = "下一页";
 "Next refresh in %lldm" = "%lld 分钟后刷新";
 "Next refresh in %llds" = "%lld 秒后刷新";
 "No %@ API key. Open this service’s Settings to add it." = "尚未添加 %1$@ API 密钥，请在此服务的“设置”中添加。";
 "No %@ API key. Set %@ or add it to %@." = "没有 %1$@ 的 API 密钥。请设置 %2$@，或将其添加到 %3$@。";
 "No Enabled Providers" = "没有已启用的服务商";
+"No Matching Services" = "没有匹配的服务";
 "No Ollama key found. Install Ollama and run `ollama signin` to track cloud usage." = "没有找到 Ollama 密钥。请安装 Ollama 并运行 `ollama signin` 以追踪云端用量。";
 "No OpenCode Go subscription on this key." = "该密钥下没有 OpenCode Go 订阅。";
 "No OpenRouter API key. Set OPENROUTER_API_KEY or add it to ~/.config/tokenplan/openrouter.json." = "没有 OpenRouter 的 API 密钥。请设置 OPENROUTER_API_KEY，或将其添加到 ~/.config/tokenplan/openrouter.json。";
@@ -452,6 +458,7 @@
 "Preferences could not be read. Changes can be saved again in Settings." = "无法读取偏好设置，可在设置中重新保存。";
 "Preferences could not be saved. Check the app data folder permissions." = "无法保存偏好设置，请检查应用数据目录的权限。";
 "Preview" = "预览";
+"Previous Page" = "上一页";
 "Pricing" = "价格估算";
 "Pricing could not be updated. Using previously known prices." = "价格表更新失败，正在使用已有价格。";
 "Privacy" = "隐私";
@@ -554,6 +561,7 @@
 "Save" = "保存";
 "Saved" = "已保存";
 "Saved in App" = "已保存在应用中";
+"Search Services" = "搜索服务";
 "Service Configuration" = "服务配置";
 "Services & Subscriptions" = "服务与订阅";
 "Session" = "会话";
@@ -736,6 +744,7 @@
 "Using reset credit…" = "正在使用重置额度…";
 "Version" = "版本";
 "Vertical Bar" = "竖柱";
+"View History" = "查看历史";
 "Visible" = "显示";
 "Visible appears in the overview; Details appears only here; Hidden removes the metric. Drag the handle to reorder." = "“显示”放在首页，“详情”仅在详情页显示，“隐藏”则不显示。拖动左侧手柄可排序。";
 "Vouchers" = "代金券";

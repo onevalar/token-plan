@@ -9,12 +9,19 @@ class ReleaseReadmeTests(unittest.TestCase):
 
     def test_real_asset_names_and_all_platforms(self):
         result = update_readme(self.text, '2.0.0', self.names)
-        self.assertNotIn('/v1.0.12/', result)
+        current = result.split('<!-- download-links:start -->')[1].split('<!-- download-links:end -->')[0]
+        self.assertNotIn('/v1.0.12/', current)
         self.assertIn('SHA256SUMS.txt', result)
         for name in self.names:
             self.assertIn('/v2.0.0/' + name, result)
         self.assertEqual(result, update_readme(result, '2.0.0', self.names))
 
+    def test_classic_mac_download_survives_subsequent_publications(self):
+        result = update_readme(self.text, '2.0.0', self.names)
+        classic = result.split('### macOS 经典版')[1].split('macOS 正式安装包已完成')[0]
+        self.assertIn('/v1.0.12/TokenPlan-1.0.12.dmg', classic)
+        self.assertIn('/v1.0.12/SHA256SUMS.txt', classic)
+        self.assertEqual(classic, self.text.split('### macOS 经典版')[1].split('macOS 正式安装包已完成')[0])
     def test_incomplete_or_ambiguous_artifacts_are_rejected(self):
         for names in [self.names[:-1], self.names + ['duplicate.dmg']]:
             with self.assertRaises(ValueError):

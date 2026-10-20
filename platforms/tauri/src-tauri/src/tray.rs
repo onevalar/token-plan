@@ -31,7 +31,9 @@ pub fn update(app: &tauri::AppHandle, state: &DesktopState) -> tauri::Result<()>
         let readings = account.metrics.iter().filter(|m| m.pinned && m.has_data).take(2)
             .map(|m| m.percent.map(|v| format!("{}: {:.0}%", m.label, v)).unwrap_or_else(|| format!("{}: {}", m.label, m.amount.map(|v| v.to_string()).unwrap_or_else(|| "—".into())))).collect::<Vec<_>>().join(" · ");
         let tooltip = format!("{} {} {}\n{}", account.name, account.email, account.plan, readings);
-        if let Some(tray) = app.tray_by_id(&id) { tray.set_icon(Some(image))?; tray.set_tooltip(Some(&tooltip))?; tray.set_menu(Some(menu(app, if state.settings.language == "system" { &state.settings.locale } else { &state.settings.language })?))?; }
+        // set_icon() clears NSImage's template flag on macOS. Preserve it atomically
+        // on every refresh, otherwise black pixels disappear on a dark menu bar.
+        if let Some(tray) = app.tray_by_id(&id) { tray.set_icon_with_as_template(Some(image),cfg!(target_os="macos"))?; tray.set_tooltip(Some(&tooltip))?; tray.set_menu(Some(menu(app, if state.settings.language == "system" { &state.settings.locale } else { &state.settings.language })?))?; }
         else {
             TrayIconBuilder::with_id(&id).icon(image).tooltip(&tooltip)
                 .icon_as_template(cfg!(target_os="macos"))
@@ -40,6 +42,16 @@ pub fn update(app: &tauri::AppHandle, state: &DesktopState) -> tauri::Result<()>
                 .on_tray_icon_event(|tray,event| if let TrayIconEvent::Click { button: MouseButton::Left, button_state: MouseButtonState::Up, position, .. } = event {
                     crate::show_near(tray.app_handle(), position.x as i32, position.y as i32);
                 }).build(app)?;
+        }
+        // Exercise the native NSImage state in development runs, including the
+        // second and subsequent refreshes that used to remove template rendering.
+        #[cfg(all(target_os="macos",debug_assertions))]
+        if let Some(tray)=app.tray_by_id(&id) {
+            #[allow(deprecated)]
+            let template=tray.with_inner_tray_icon(|inner|
+                inner.ns_status_item().and_then(|item|item.image())
+                    .is_some_and(|image|image.isTemplate()))?;
+            debug_assert!(template,"Menu-bar refresh lost the native template image flag");
         }
     }
     if let Some(root) = app.tray_by_id("root") { root.set_menu(Some(menu(app, if state.settings.language == "system" { &state.settings.locale } else { &state.settings.language })?))?; root.set_visible(ids.is_empty())?; }
@@ -69,7 +81,7 @@ fn logo(family: &str) -> &'static str {
 }
 
 pub fn render(account: &Account, badge: Option<usize>, style: &str, dark: bool) -> Image<'static> {
-    render_with_width(account, badge, style, dark, style=="percentage" && cfg!(target_os="macos"))
+    render_with_width(account, badge, style, dark, style=="percentage" && cfg!(target_os="macos") && account.metrics.iter().any(|m|m.pinned))
 }
 
 fn render_with_width(account: &Account, badge: Option<usize>, style: &str, dark: bool, wide: bool) -> Image<'static> {
@@ -77,8 +89,12 @@ fn render_with_width(account: &Account, badge: Option<usize>, style: &str, dark:
     let mut pixmap = tiny_skia::Pixmap::new(width,40).unwrap();
     if style!="percentage" || wide || account.metrics.iter().all(|m| !m.pinned) { if let Ok(tree) = usvg::Tree::from_str(logo(&account.family), &usvg::Options::default()) {
         let size = tree.size();
-        let scale = 20.0 / size.width().max(size.height());
-        let transform = tiny_skia::Transform::from_scale(scale,scale).post_translate(if wide {0.0} else {10.0},10.0);
+        let standalone = account.metrics.iter().all(|m| !m.pinned);
+        let extent = if standalone {32.0} else {20.0};
+        let scale = extent / size.width().max(size.height());
+        let transform = tiny_skia::Transform::from_scale(scale,scale).post_translate(
+            if wide && !standalone {0.0} else {(40.0-size.width()*scale)/2.0},
+            (40.0-size.height()*scale)/2.0);
         resvg::render(&tree, transform, &mut pixmap.as_mut());
     }}
     let ink = if dark && !cfg!(target_os="macos") {255} else {0};
@@ -147,6 +163,23 @@ mod tests {
             let icon=render_with_width(&state.accounts[0],None,"percentage",false,wide);
             assert!(icon.rgba().chunks_exact(4).any(|p| p[3]>0), "No pins must not create an invisible account icon");
         }
+    }
+    #[test]
+    fn an_unpinned_percentage_account_uses_the_same_compact_icon_as_ring_mode() {
+        let mut s=fixture();
+        for metric in &mut s.accounts[0].metrics {metric.pinned=false;}
+        let ring=render(&s.accounts[0],None,"ring",false);
+        let percentage=render(&s.accounts[0],None,"percentage",false);
+        assert_eq!(percentage.width(),40);
+        assert_eq!(percentage.rgba(),ring.rgba());
+        let coverage=ring.rgba().chunks_exact(4).filter(|p|p[3]>0).count();
+        let pinned=render(&fixture().accounts[0],None,"ring",false);
+        // Check the standalone logo's bounds rather than a blank fallback image.
+        let columns:Vec<_>=(0..40).filter(|x|(0..40).any(|y|ring.rgba()[((y*40+x)*4+3) as usize]>0)).collect();
+        // The SVG includes intrinsic whitespace; its visible strokes must still
+        // exceed the old 20px standalone-icon viewport.
+        assert!(columns.last().unwrap()-columns.first().unwrap()>20);
+        assert!(coverage>100 && pinned.height()==ring.height());
     }
     #[test]
     fn both_modes_render_transparent_rgba_at_the_same_height() {

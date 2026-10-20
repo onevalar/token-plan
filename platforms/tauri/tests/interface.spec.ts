@@ -25,8 +25,8 @@ test('account settings allow zero home metrics and preserve another account',asy
   await row.getByRole('combobox').click();await page.getByRole('option',{name:'仅详情',exact:true}).click();
  }
  await page.getByRole('button',{name:'返回',exact:true}).click();
- await expect(page.locator('.provider').first().locator('.metric')).toHaveCount(0);
- await expect(page.locator('.provider').nth(1).locator('.metric')).toHaveCount(2);
+ await expect(page.locator('.account-block').first().locator('.metric')).toHaveCount(0);
+ await expect(page.locator('.account-block').nth(1).locator('.metric')).toHaveCount(2);
  await page.getByRole('button',{name:'Claude first@example.com',exact:true}).click();await page.getByRole('button',{name:'显示配置',exact:true}).click();
  await page.getByRole('switch',{name:'显示账号',exact:true}).click();
  await page.getByRole('button',{name:'返回',exact:true}).click();
@@ -84,5 +84,16 @@ test('service order is reflected in the homepage',async({page})=>{
  await page.getByRole('button',{name:'更多',exact:true}).click();await page.getByRole('menuitem',{name:'服务配置'}).click();
  await page.locator('.service-row').nth(1).getByRole('button',{name:/上移/}).click();
  await page.getByRole('button',{name:'返回',exact:true}).click();
- await expect(page.locator('.provider').first()).toContainText('second.with.a.long.address@example.com');
+ await expect(page.locator('.account-block').first()).toContainText('second.with.a.long.address@example.com');
+});
+
+test('Escape dismisses the panel from details but first closes an open menu',async({page})=>{
+ await mockDesktop(page);await page.goto('/');
+ await page.getByRole('button',{name:'Claude first@example.com',exact:true}).click();
+ await page.getByRole('button',{name:'更多',exact:true}).click();
+ await page.keyboard.press('Escape');
+ await expect(page.getByRole('menu',{includeHidden:true})).toHaveCount(0);
+ expect(await page.evaluate(()=>(window as any).__panelHides??0)).toBe(0);
+ await page.keyboard.press('Escape');
+ expect(await page.evaluate(()=>(window as any).__panelHides)).toBe(1);
 });

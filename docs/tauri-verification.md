@@ -4,6 +4,52 @@ The migration keeps the native provider engines and uses a shared React/Arc inte
 Tests use synthetic accounts, isolated preferences and disposable signing fixtures; they do
 not change the installed application or refresh real credentials.
 
+## Desktop layout and tray repair after 2.0.2
+
+The 2.0.2 helper startup checks did not validate the complete interface. The reported
+regressions included unbounded history tables, repeated provider headings, oversized
+charts and invisible menu-bar icons after refresh on dark backgrounds.
+
+The repair was checked with seven enabled accounts, eight inactive services and thirty
+days of synthetic history. Chromium and WebKit each passed 26 interaction scenarios.
+The final narrow-window capture scenarios additionally cover one-day trends, active-account
+ordering across hidden entries, seven-day pagination and the searchable service picker.
+Frontend build, 12 shared unit tests, update-feed and production-window tests, three
+release README tests and eleven Rust tests passed.
+The packaged-update signature test remains a CI packaging check and was not run here.
+
+A disposable macOS app bundle ran the compiled shell against a synthetic helper.
+The actual WebView dashboard and service configuration were inspected. Manual refresh,
+automatic state polling and ring-to-percentage switching exercised the native template-image
+assertion. This checks NSImage state; the desktop capture tool did not provide a usable
+full-menu-bar screenshot, so pixel-level system menu-bar acceptance is not claimed.
+The panel is 390 logical pixels wide and has no title bar or traffic-light controls.
+The native app was hidden with Escape from its detail page and reopened with that page
+intact. Switching to another application with Cmd-Tab also hid the panel, exercising the
+native focus-loss path. Browser tests verify that Escape closes an open menu before dismissing the panel.
+Unit tests cover focus-loss dismissal and reject delayed events after a reopen. The
+desktop capture tool could not reliably activate an outside application window, so
+outside-click and physical tray-toggle acceptance remain manual checks.
+On Linux without a tray host, dismissal minimizes the ordinary fallback window instead
+of making it inaccessible.
+Windows and Linux installed desktop shells were not exercised locally in this repair.
+
+The preview was closed, unregistered and removed. The installed application, real account
+settings, release version and public feeds were not changed.
+
+The original macOS 1.0.12 DMG was downloaded and its SHA-256 matched the published
+digest (`63476f25708834bbca53a5a50f1b921b900053ac9d425df7885a213bafe288c6`).
+The README updater regression verifies that later releases preserve its fixed Classic
+download section. This does not freeze the old application's update feed.
+
+Synthetic-account screenshots:
+[light dashboard](screenshots/desktop-repair/dashboard-light.png),
+[dark dashboard](screenshots/desktop-repair/dashboard-dark.png),
+[light configuration](screenshots/desktop-repair/configuration-light.png),
+[dark configuration](screenshots/desktop-repair/configuration-dark.png),
+[expanded history](screenshots/desktop-repair/history-dark.png),
+[native macOS panel](screenshots/desktop-repair/panel-macos.png).
+
 ## Verified locally
 
 - Native Swift regression suite: 1,603 XCTest checks, five skips, no failures; CLI and

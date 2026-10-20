@@ -1,20 +1,60 @@
-import {Fragment,useState} from 'react';
+import {useState} from 'react';
+import {ChevronDown,ChevronRight,ChevronLeft} from 'lucide-react';
 import {Button} from './components/arc/button/button';
 import {Select} from './components/arc/select/select';
-import {historyRows,type Account} from './desktop';
+import type {Account} from './desktop';
 import type {Copy} from './copy';
 import {providerText} from './providerText';
-export function History({accounts,t,language,synced=false}:{accounts:Account[];t:Copy;language:string;synced?:boolean}) {
- const [showQuota,setShowQuota]=useState(false);const [expanded,setExpanded]=useState<string|null>(null);
- const [family,setFamily]=useState('all');const [days,setDays]=useState('30');
+import {historyRange,historyBounds,summarizeHistory,historyColor,dateKey} from './historyModel';
+import {accountTitle} from './usage';
+
+export function History({accounts,t,language,synced=false,compact=false,onOpen}:{accounts:Account[];t:Copy;language:string;synced?:boolean;compact?:boolean;onOpen?:()=>void}) {
+ const [family,setFamily]=useState('all'),[range,setRange]=useState('30');
+ const [page,setPage]=useState(0),[expanded,setExpanded]=useState<string|null>(null),[modelRow,setModelRow]=useState<string|null>(null);
+ const [showQuota,setShowQuota]=useState(false),[quotaPage,setQuotaPage]=useState(0);
+ const tr=(s:string)=>providerText(s,language);
+ const number=(v:number)=>new Intl.NumberFormat(language,{notation:'compact',maximumFractionDigits:1}).format(v);
+ const compactMoney=(v:number)=>`$${new Intl.NumberFormat('en',{notation:'compact',maximumFractionDigits:1}).format(v)}`;
+ const money=(v:number|null)=>v==null?'—':`$${v.toLocaleString(language,{maximumFractionDigits:2,minimumFractionDigits:2})}`;
+ const rows=historyRange(accounts,family,range),total=summarizeHistory(rows);
+ const providers=[...new Set(rows.map(r=>r.provider))].map(name=>({name,...summarizeHistory(rows.filter(r=>r.provider===name))}));
+ const costSum=providers.reduce((sum,p)=>sum+(p.cost??0),0);
+ let cursor=0;
+ const gradient=providers.filter(p=>(p.cost??0)>0).map(p=>{const from=cursor;cursor+=(p.cost??0)/costSum*100;return `${historyColor(p.name)} ${from}% ${cursor}%`;}).join(',');
+ const days=[...new Set(rows.map(r=>r.date))],pages=Math.max(1,Math.ceil(days.length/7)),current=Math.min(page,pages-1);
+ const dates=days.slice(current*7,current*7+7);
  const families=[...new Map(accounts.map(a=>[a.family,a.name])).entries()];
- const cutoff=new Date();cutoff.setDate(cutoff.getDate()-Number(days)+1);
- const key=`${cutoff.getFullYear()}-${String(cutoff.getMonth()+1).padStart(2,'0')}-${String(cutoff.getDate()).padStart(2,'0')}`;
- const rows=historyRows(accounts,family).filter(d=>d.date>=key);
- return <section className="history"><h2>{t.history}</h2><p className="muted">{synced?providerText('Shares usage history through iCloud, so you can see one combined summary for all your Macs.',language):t.deviceHistory}</p>
- <div className="history-controls"><Select label={t.configure} value={family} onValueChange={setFamily} options={[{value:'all',label:t.all},...families.map(([value,label])=>({value,label}))]}/><Select label={t.history} value={days} onValueChange={setDays} options={[1,7,30].map(n=>({value:String(n),label:`${n}d`}))}/></div>
- {accounts.some(a=>a.historyPartial)&&<p role="status">{t.historyWarning}</p>}
- {rows.length?<div className="table-scroll"><table><thead><tr><th>{t.date}</th><th>{t.configure}</th><th>{t.tokens}</th><th>{t.cost}</th></tr></thead><tbody>{rows.map(r=><Fragment key={`${r.owner}-${r.date}`}><tr><td>{r.models.length?<Button variant="ghost" aria-expanded={expanded===`${r.owner}-${r.date}`} onClick={()=>setExpanded(expanded===`${r.owner}-${r.date}`?null:`${r.owner}-${r.date}`)}>{r.date} {expanded===`${r.owner}-${r.date}`?"−":"+"}</Button>:r.date}</td><td>{r.provider}{r.account&&<small className="email">{r.account}</small>}</td><td>{r.tokens.toLocaleString()}</td><td>{r.cost==null?'—':`$${r.cost.toFixed(2)}`}</td></tr>{expanded===`${r.owner}-${r.date}`&&r.models.map(m=><tr className="model-history-row" key={m.model}><td></td><td>{providerText(m.model,language)}{m.variants.length>0&&<details><summary>{providerText("Model Breakdown",language)}</summary>{m.variants.map(v=><p key={v.model}>{v.model} · {v.tokens.toLocaleString()} token · {v.cost==null?"—":`$${v.cost.toFixed(2)}`}</p>)}</details>}</td><td>{m.tokens.toLocaleString()}</td><td>{m.cost==null?"—":`$${m.cost.toFixed(2)}`}</td></tr>)}</Fragment>)}</tbody></table></div>:<p>{t.noHistory}</p>}
- {accounts.some(a=>a.observations.length>0)&&<><Button variant="ghost" aria-expanded={showQuota} onClick={()=>setShowQuota(!showQuota)}>{t.quotaHistory}</Button>{showQuota&&<div className="table-scroll"><table><tbody>{accounts.filter(a=>family==='all'||a.family===family).flatMap(a=>a.observations.filter(o=>o.date.slice(0,10)>=key).slice(0,168).map(o=><tr key={`${a.id}-${o.date}-${o.label}`}><td>{new Date(o.date).toLocaleString(language)}</td><td>{a.name} {a.email}</td><td>{providerText(o.label,language)}</td><td>{o.value==null?'—':`${o.value.toLocaleString(undefined,{maximumFractionDigits:2})}${o.unit==='percent'?'%':o.unit==='USD'?' USD':o.unit==='CNY'?' CNY':''}`}</td></tr>))}</tbody></table></div>}</>}
+ const changeRange=(value:string)=>{setRange(value);setPage(0);setExpanded(null);setQuotaPage(0);};
+ const bounds=historyBounds(range);
+ const observations=accounts.filter(a=>family==='all'||a.family===family).flatMap(a=>a.observations.map(o=>({...o,account:a}))).filter(o=>{const date=o.date.length===10?o.date:dateKey(new Date(o.date));return date>=bounds.start&&date<=bounds.end;}).sort((a,b)=>b.date.localeCompare(a.date));
+ const currentQuota=Math.min(quotaPage,Math.max(0,Math.ceil(observations.length/10)-1));
+ return <section className={`history ${compact?'history-compact':''}`}>
+  <div className="section-heading"><h2>{t.history}</h2>{compact&&<Button size="sm" variant="ghost" onClick={onOpen}>{tr('View History')}<ChevronRight size={16}/></Button>}</div>
+  <nav className="segments" aria-label={t.history}>{[['1','Today'],['yesterday','Yesterday'],['30','Last 30 Days']].map(([value,label])=><Button size="sm" key={value} variant={range===value?'secondary':'ghost'} aria-pressed={range===value} onClick={()=>changeRange(value)}>{tr(label)}</Button>)}</nav>
+  <div className="history-summary">
+   <div className="history-donut" style={{background:gradient?`conic-gradient(${gradient})`:'var(--surface-muted)'}} aria-label={`${t.cost}: ${money(total.cost)}`}><div><strong>{total.cost==null?'—':compactMoney(total.cost)}</strong><small>{t.cost}</small></div></div>
+   <div className="history-legend">{providers.map(p=><div key={p.name}><span><i style={{background:historyColor(p.name)}}/>{p.name}</span><strong>{money(p.cost)}</strong></div>)}{!providers.length&&<p className="muted">{t.noHistory}</p>}</div>
+  </div>
+  {!compact&&<>
+   <p className="notice">{synced?tr('Shares usage history through iCloud, so you can see one combined summary for all your Macs.'):t.deviceHistory}</p>
+   <div className="history-controls"><Select label={tr('Filter by Service')} value={family} onValueChange={v=>{setFamily(v);setPage(0);setQuotaPage(0);setExpanded(null);setModelRow(null);}} options={[{value:'all',label:t.all},...families.map(([value,label])=>({value,label}))]}/><span className="muted">{number(total.tokens)} {t.tokens}</span></div>
+   {accounts.some(a=>a.historyPartial)&&<p role="status" className="notice">{t.historyWarning}</p>}
+   <div className="history-days">{dates.map(date=>{
+    const entries=rows.filter(r=>r.date===date),sum=summarizeHistory(entries);
+    return <div className="history-day" key={date}>
+     <Button className="history-day-trigger" variant="ghost" aria-expanded={expanded===date} onClick={()=>setExpanded(expanded===date?null:date)}>
+      <span>{date}</span><span className="day-total"><small>{number(sum.tokens)} {t.tokens}</small><strong>{money(sum.cost)}</strong>{expanded===date?<ChevronDown size={16}/>:<ChevronRight size={16}/>}</span>
+     </Button>
+     {expanded===date&&<div className="history-entries">{entries.map(r=><div className="history-entry" key={r.owner}>
+      <Button className="history-entry-trigger" size="sm" variant="ghost" aria-expanded={modelRow===r.owner} onClick={()=>setModelRow(modelRow===r.owner?null:r.owner)}>
+       <span><strong>{r.provider}</strong>{r.account&&<small>{accountTitle(r.account)}</small>}</span><span><strong>{money(r.cost)}</strong><small>{number(r.tokens)} {t.tokens}</small></span>
+      </Button>
+      {modelRow===r.owner&&r.models.map(m=><div className="model-history-row" key={m.model}><span>{tr(m.model)}</span><span>{number(m.tokens)} {t.tokens} · {money(m.cost)}</span>{m.variants.length>0&&<details><summary>{tr('Model Breakdown')}</summary>{m.variants.map(v=><p key={v.model}>{v.model} · {number(v.tokens)} {t.tokens} · {money(v.cost)}</p>)}</details>}</div>)}
+     </div>)}</div>}
+    </div>;
+   })}</div>
+   {days.length>7&&<div className="pagination"><Button size="sm" variant="ghost" disabled={!current} aria-label={tr('Previous Page')} onClick={()=>{setPage(current-1);setExpanded(null);}}><ChevronLeft size={16}/></Button><span>{current+1} / {pages}</span><Button size="sm" variant="ghost" disabled={current===pages-1} aria-label={tr('Next Page')} onClick={()=>{setPage(current+1);setExpanded(null);}}><ChevronRight size={16}/></Button></div>}
+   {observations.length>0&&<><Button size="sm" variant="ghost" aria-expanded={showQuota} onClick={()=>setShowQuota(!showQuota)}>{t.quotaHistory}</Button>{showQuota&&<div className="quota-observations">{observations.slice(currentQuota*10,currentQuota*10+10).map((o,i)=><div key={`${o.account.id}-${o.date}-${i}`}><span>{o.account.name} · {tr(o.label)}<small>{new Date(o.date).toLocaleString(language)}</small></span><strong>{o.value==null?'—':`${number(o.value)} ${o.unit??''}`}</strong></div>)}<div className="pagination"><Button size="sm" variant="ghost" disabled={!currentQuota} onClick={()=>setQuotaPage(currentQuota-1)}>{tr('Previous Page')}</Button><Button size="sm" variant="ghost" disabled={(currentQuota+1)*10>=observations.length} onClick={()=>setQuotaPage(currentQuota+1)}>{tr('Next Page')}</Button></div></div>}</>}
+  </>}
  </section>;
 }

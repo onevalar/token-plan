@@ -1,6 +1,6 @@
 import type {Page} from '@playwright/test';
 import fixture from './fixtures/desktop.json' with {type:'json'};
-export async function mockDesktop(page:Page,language='zh-Hans',cloud=false) {
+export async function mockDesktop(page:Page,language='zh-Hans',cloud=false,data:unknown=fixture) {
  await page.addInitScript(({data,language,cloud})=>{
   const state:any=structuredClone(data);state.sync={available:cloud,enabled:false,syncing:false,error:"",devices:[]};state.settings.language=language;
   let sequence=0;const callbacks=new Map();
@@ -9,6 +9,7 @@ export async function mockDesktop(page:Page,language='zh-Hans',cloud=false) {
    transformCallback:(fn:unknown)=>{callbacks.set(++sequence,fn);return sequence;},
    unregisterCallback:(id:number)=>callbacks.delete(id),
    invoke:async(command:string,args:any)=>{
+    if(command==='hide'){(window as any).__panelHides=((window as any).__panelHides??0)+1;return;}
     if(command==='shortcut_capture'){(window as any).__shortcutPaused=args.paused;return;}
     if(command==='plugin:app|version')return '0.0.0';
     if(command.startsWith('plugin:event|'))return ++sequence;
@@ -28,5 +29,5 @@ export async function mockDesktop(page:Page,language='zh-Hans',cloud=false) {
     return structuredClone(state);
    }
   }});
- },{data:fixture,language,cloud});
+ },{data,language,cloud});
 }

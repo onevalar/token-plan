@@ -55,6 +55,7 @@
 "Account" = "アカウント";
 "Activity" = "アクティビティ";
 "Add" = "追加";
+"Add Service" = "サービスを追加";
 "Add Service Login" = "サービスのログインを追加";
 "Add an API key in service settings, then refresh." = "サービス設定で API キーを追加し、更新してください。";
 "Additional Claude and Codex logins can come from Claude Swap, Codex Swap, supported Codex homes or pi. TokenPlan only reads these logins; it does not switch accounts." = "追加のClaude/CodexログインはClaude Swap、Codex Swap、対応するCodexホーム、piから読み取れます。TokenPlanはアカウントを切り替えません。";
@@ -90,6 +91,7 @@
 "Authorize a Folder" = "フォルダを許可";
 "Auto" = "自動";
 "Automatic Refresh" = "自動更新";
+"Available Services" = "追加できるサービス";
 "Available Usage" = "取得済みの使用状況";
 "Back" = "戻る";
 "Back to History" = "履歴に戻る";
@@ -133,6 +135,7 @@
 "Clear shortcut" = "ショートカットを解除";
 "Clear this account's local quota history?" = "このアカウントのローカル割り当て履歴を消去しますか？";
 "Click here and press a key with Control, Alt or Command." = "ここをクリックし、Control、Alt、Commandを含むキーの組み合わせを押してください。";
+"Close" = "閉じる";
 "Codex CLI logs on this device. Includes logs from different sign-ins, not the current account's complete usage." = "この端末の Codex CLI ログを集計します。別のログイン時の記録も含み、現在のアカウント全体の使用量ではありません。";
 "Codex auth data is invalid." = "Codex の認証データが無効です。";
 "Codex logs" = "Codex ログ";
@@ -255,6 +258,7 @@
 "Extra usage spent" = "追加使用量の支出";
 "Fable" = "Fable";
 "Fallback Model" = "フォールバックモデル";
+"Filter by Service" = "サービスで絞り込み";
 "Find accounts" = "アカウントを検索";
 "Folder authorization failed. Select the folder again." = "フォルダを許可できませんでした。再度選択してください。";
 "Folder authorized. Enable the service and refresh its usage." = "フォルダを許可しました。サービスを有効にして使用量を更新してください。";
@@ -368,11 +372,13 @@
 "Move down" = "下へ";
 "Move up" = "上へ";
 "Needs Attention" = "確認が必要";
+"Next Page" = "次のページ";
 "Next refresh in %lldm" = "%lld 分後に更新";
 "Next refresh in %llds" = "%lld 秒後に更新";
 "No %@ API key. Open this service’s Settings to add it." = "%1$@ の API キーがありません。このサービスの「設定」で追加してください。";
 "No %@ API key. Set %@ or add it to %@." = "%1$@ の API キーがありません。%2$@ を設定するか、%3$@ に追加してください。";
 "No Enabled Providers" = "有効なプロバイダーがありません";
+"No Matching Services" = "該当するサービスはありません";
 "No Ollama key found. Install Ollama and run `ollama signin` to track cloud usage." = "Ollama のキーが見つかりません。Ollama をインストールして `ollama signin` を実行するとクラウド使用量を追跡できます。";
 "No OpenCode Go subscription on this key." = "このキーには OpenCode Go のサブスクリプションがありません。";
 "No OpenRouter API key. Set OPENROUTER_API_KEY or add it to ~/.config/tokenplan/openrouter.json." = "OpenRouter の API キーがありません。OPENROUTER_API_KEY を設定するか、~/.config/tokenplan/openrouter.json に追加してください。";
@@ -452,6 +458,7 @@
 "Preferences could not be read. Changes can be saved again in Settings." = "設定を読み込めませんでした。設定画面から保存し直せます。";
 "Preferences could not be saved. Check the app data folder permissions." = "設定を保存できませんでした。アプリデータフォルダーの権限を確認してください。";
 "Preview" = "プレビュー";
+"Previous Page" = "前のページ";
 "Pricing" = "料金の推定";
 "Pricing could not be updated. Using previously known prices." = "価格表を更新できません。既存の価格を使用しています。";
 "Privacy" = "プライバシー";
@@ -554,6 +561,7 @@
 "Save" = "保存";
 "Saved" = "保存しました";
 "Saved in App" = "アプリに保存済み";
+"Search Services" = "サービスを検索";
 "Service Configuration" = "サービス設定";
 "Services & Subscriptions" = "サービスと契約";
 "Session" = "セッション";
@@ -736,6 +744,7 @@
 "Using reset credit…" = "リセットクレジットを使用中…";
 "Version" = "バージョン";
 "Vertical Bar" = "縦棒";
+"View History" = "履歴を表示";
 "Visible" = "表示";
 "Visible appears in the overview; Details appears only here; Hidden removes the metric. Drag the handle to reorder." = "「表示」は概要、「詳細」はこのページのみ、「非表示」は表示しません。左のハンドルで並べ替えます。";
 "Vouchers" = "バウチャー";

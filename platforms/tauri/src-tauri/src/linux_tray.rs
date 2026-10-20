@@ -16,7 +16,7 @@ impl Tray for Item {
  }
  fn watcher_offline(&self,_:ksni::OfflineReason)->bool {
   // Keep a usable window when the desktop has no StatusNotifier host.
-  crate::show(&self.app);let _=self.app.emit("desktop-error","tray_failed");true
+  crate::panel::retain_window_without_tray(&self.app);let _=self.app.emit("desktop-error","tray_failed");true
  }
 }
 pub async fn update(app:&tauri::AppHandle,state:&DesktopState)->Result<(),()> {

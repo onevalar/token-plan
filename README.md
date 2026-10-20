@@ -28,6 +28,14 @@ TokenPlan 将多个 AI 服务的用量集中到一个轻量面板：查看还剩
 [SHA-256 校验文件](https://github.com/onevalar/token-plan/releases/download/v2.0.2/SHA256SUMS.txt) · [全部版本](https://github.com/onevalar/token-plan/releases)
 <!-- download-links:end -->
 
+### macOS 经典版
+
+**TokenPlan 1.0.12（经典版）**保留原生 macOS 界面，供希望继续使用旧版的用户选择。
+
+[下载经典版 DMG](https://github.com/onevalar/token-plan/releases/download/v1.0.12/TokenPlan-1.0.12.dmg) · [校验文件](https://github.com/onevalar/token-plan/releases/download/v1.0.12/SHA256SUMS.txt) · [1.0.12 发布说明](https://github.com/onevalar/token-plan/releases/tag/v1.0.12)
+
+经典版保留当时的原始安装包；后续主要更新 2.x，经典版是否继续维护另行决定。两个版本使用同一个应用名称和账号配置，请退出当前版本后替换安装，不要同时运行。若希望停留在经典版，可关闭自动检查更新；经典版的“检查更新”仍可能提供 2.x 升级，请按自己的意愿选择。
+
 macOS 正式安装包已完成 Developer ID 签名和 Apple 公证。Windows 安装包目前未进行代码签名。Windows/Linux 自带数据助手运行时，无需安装 .NET SDK。
 
 > **升级至 2.0：** Mac 1.x 可通过“检查更新”迁移；Windows/Linux 1.x 需先退出旧版，手动安装一次 2.0，并保留用户数据。之后三个系统使用签名校验的 Tauri 更新；Linux 应用内更新使用 AppImage，DEB 由包管理器升级。[2.0 安装与迁移说明](docs/tauri-installation.md)

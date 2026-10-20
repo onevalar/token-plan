@@ -1,5 +1,6 @@
 import {writeFileSync} from 'node:fs';
 import {execFileSync} from 'node:child_process';
+import {packageWindows} from './window-config.mjs';
 // Explicit release metadata only; never derive a shipping version from a preview build.
 const version=process.env.TOKENPLAN_VERSION??'0.0.0';
 const production=process.env.TOKENPLAN_PRODUCTION==='true';
@@ -17,6 +18,6 @@ if(production){
   config.bundle.macOS.files={'embedded.provisionprofile':process.env.TOKENPLAN_ICLOUD_PROFILE,'Helpers/TokenPlan Bridge.app':'binaries/TokenPlan Bridge.app'};
  }
  config.productName='TokenPlan';config.identifier='com.onevalar.tokenplan';
- config.app={windows:[{label:'main',title:'TokenPlan',width:480,height:680,minWidth:390,minHeight:400}]};
+ config.app={windows:packageWindows('TokenPlan')};
 }
 writeFileSync('src-tauri/tauri.package.json',JSON.stringify(config,null,2)+'\n');

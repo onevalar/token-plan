@@ -5,6 +5,32 @@ components provide one interface for macOS, Windows and Linux. A fixed bundled h
 continues to use the existing Swift providers on Mac and .NET providers on Windows/Linux.
 The installed native app and stable update feeds are not replaced by development builds.
 
+## Dashboard, service configuration and history
+
+The default desktop panel is 390 logical pixels wide, without a native title bar.
+It closes on focus loss, Escape, or another click on its tray icon. Focus-loss dismissal
+is deferred briefly so a tray activation does not hide and immediately reopen it.
+The panel is placed inside the clicked monitor's work area. On Linux without a compatible
+tray host, a decorated taskbar-accessible window remains available instead.
+Production packaging inherits the preview's window configuration.
+
+The dashboard groups adjacent accounts of the same service without changing the saved
+account order. Only metrics explicitly assigned to Home appear there. Service configuration
+shows a usage summary and enabled accounts; Add Service opens a searchable list of saved
+inactive services. Moving an enabled account skips inactive entries in the saved order.
+
+View History opens a separate history page. Today, Yesterday and Last 30 Days use local
+calendar dates. Daily totals are shown seven days per page; expanding a day shows accounts,
+then model totals and variants. Quota observations are separately expanded and paginated.
+Device-scoped histories are still counted once per provider, and missing prices stay unknown.
+These views use the same existing data sources and do not change saved metric placements.
+
+On macOS, every tray refresh must set the image and its template flag together. Calling
+`set_icon` alone resets that flag in the current tray library and makes black icons disappear
+on dark menu bars. Debug builds check the native NSImage flag after creation and refresh.
+An account without pinned metrics keeps a legible, centered icon in both styles, without
+the empty percentage-width space or an automatic change to its saved pins.
+
 ## Implemented
 
 - Account discovery, individual visibility, removal with confirmation, saved notes and API

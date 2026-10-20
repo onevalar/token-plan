@@ -12,7 +12,9 @@ test('daily history expands real model amounts',async({page})=>{
  await page.clock.setFixedTime(new Date('2026-10-20T12:00:00Z'));
  await mockDesktop(page);await page.goto('/');
  await page.getByRole('button',{name:'更多',exact:true}).click();await page.getByRole('menuitem',{name:'服务配置'}).click();
- await page.locator('.history').getByRole('button',{name:'2026-10-20 +',exact:true}).click();
+ await page.getByRole('button',{name:'查看历史',exact:true}).click();
+ await page.locator('.history-day-trigger').first().click();
+ await page.locator('.history-entry-trigger').first().click();
  await expect(page.locator('.model-history-row')).toContainText('claude-test');await expect(page.locator('.model-history-row')).toContainText('$1.20');
 });
 

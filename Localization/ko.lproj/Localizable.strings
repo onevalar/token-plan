@@ -55,6 +55,7 @@
 "Account" = "계정";
 "Activity" = "활동";
 "Add" = "추가";
+"Add Service" = "서비스 추가";
 "Add Service Login" = "서비스 로그인 추가";
 "Add an API key in service settings, then refresh." = "서비스 설정에서 API 키를 추가한 후 새로 고침하세요.";
 "Additional Claude and Codex logins can come from Claude Swap, Codex Swap, supported Codex homes or pi. TokenPlan only reads these logins; it does not switch accounts." = "추가 Claude 및 Codex 로그인은 Claude Swap, Codex Swap, 지원되는 Codex 홈 또는 pi에서 읽습니다. TokenPlan은 계정을 전환하지 않습니다.";
@@ -90,6 +91,7 @@
 "Authorize a Folder" = "폴더 권한 허용";
 "Auto" = "자동";
 "Automatic Refresh" = "자동 새로 고침";
+"Available Services" = "추가 가능한 서비스";
 "Available Usage" = "사용 가능한 사용량";
 "Back" = "뒤로";
 "Back to History" = "기록으로 돌아가기";
@@ -133,6 +135,7 @@
 "Clear shortcut" = "단축키 지우기";
 "Clear this account's local quota history?" = "이 계정의 로컬 사용량 기록을 지울까요?";
 "Click here and press a key with Control, Alt or Command." = "여기를 클릭하고 Control, Alt 또는 Command를 포함한 키 조합을 누르세요.";
+"Close" = "닫기";
 "Codex CLI logs on this device. Includes logs from different sign-ins, not the current account's complete usage." = "이 기기의 Codex CLI 로그를 집계합니다. 다른 로그인 때의 기록도 포함되며 현재 계정의 전체 사용량은 아닙니다.";
 "Codex auth data is invalid." = "Codex 인증 데이터가 올바르지 않습니다.";
 "Codex logs" = "Codex 로그";
@@ -255,6 +258,7 @@
 "Extra usage spent" = "추가 사용량 지출";
 "Fable" = "Fable";
 "Fallback Model" = "대체 모델";
+"Filter by Service" = "서비스별 필터";
 "Find accounts" = "계정 찾기";
 "Folder authorization failed. Select the folder again." = "폴더 권한을 허용하지 못했습니다. 다시 선택하세요.";
 "Folder authorized. Enable the service and refresh its usage." = "폴더가 허용되었습니다. 서비스를 활성화하고 사용량을 새로고침하세요.";
@@ -368,11 +372,13 @@
 "Move down" = "아래로";
 "Move up" = "위로";
 "Needs Attention" = "확인 필요";
+"Next Page" = "다음 페이지";
 "Next refresh in %lldm" = "%lld분 후 새로고침";
 "Next refresh in %llds" = "%lld초 후 새로고침";
 "No %@ API key. Open this service’s Settings to add it." = "%1$@ API 키가 없습니다. 이 서비스의 설정에서 추가하세요.";
 "No %@ API key. Set %@ or add it to %@." = "%1$@ API 키가 없습니다. %2$@을(를) 설정하거나 %3$@에 추가하세요.";
 "No Enabled Providers" = "활성화된 제공업체 없음";
+"No Matching Services" = "일치하는 서비스 없음";
 "No Ollama key found. Install Ollama and run `ollama signin` to track cloud usage." = "Ollama 키를 찾을 수 없습니다. Ollama를 설치하고 `ollama signin`을 실행하면 클라우드 사용량을 추적할 수 있습니다.";
 "No OpenCode Go subscription on this key." = "이 키에는 OpenCode Go 구독이 없습니다.";
 "No OpenRouter API key. Set OPENROUTER_API_KEY or add it to ~/.config/tokenplan/openrouter.json." = "OpenRouter API 키가 없습니다. OPENROUTER_API_KEY를 설정하거나 ~/.config/tokenplan/openrouter.json에 추가하세요.";
@@ -452,6 +458,7 @@
 "Preferences could not be read. Changes can be saved again in Settings." = "환경설정을 읽을 수 없습니다. 설정에서 다시 저장할 수 있습니다.";
 "Preferences could not be saved. Check the app data folder permissions." = "환경설정을 저장할 수 없습니다. 앱 데이터 폴더 권한을 확인하세요.";
 "Preview" = "미리보기";
+"Previous Page" = "이전 페이지";
 "Pricing" = "요금 추정";
 "Pricing could not be updated. Using previously known prices." = "가격표를 업데이트하지 못했습니다. 기존 가격을 사용합니다.";
 "Privacy" = "개인정보";
@@ -554,6 +561,7 @@
 "Save" = "저장";
 "Saved" = "저장됨";
 "Saved in App" = "앱에 저장됨";
+"Search Services" = "서비스 검색";
 "Service Configuration" = "서비스 설정";
 "Services & Subscriptions" = "서비스 및 구독";
 "Session" = "세션";
@@ -736,6 +744,7 @@
 "Using reset credit…" = "초기화 크레딧 사용 중…";
 "Version" = "버전";
 "Vertical Bar" = "세로 막대";
+"View History" = "기록 보기";
 "Visible" = "표시";
 "Visible appears in the overview; Details appears only here; Hidden removes the metric. Drag the handle to reorder." = "표시는 개요에, 상세는 이 페이지에만 표시하며 숨김은 표시하지 않습니다. 왼쪽 핸들로 순서를 바꾸세요.";
 "Vouchers" = "바우처";
