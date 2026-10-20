@@ -85,3 +85,13 @@ The owner requested restoring the missing features before publishing 2.0.0. The 
 scope is documented in release/2.0.0.md. Physical global hotkey dispatch, real two-Mac iCloud
 exchange and an installed native-to-Tauri upgrade are not claimed by these CI results.
 The user's installed application remains unchanged.
+
+## Published 2.0.0
+
+[Release workflow 39404031790](https://github.com/onevalar/token-plan/actions/runs/39404031790)
+passed from tag `v2.0.0` (`5be4b6e`) and published the stable release, download links and update
+feeds. Public HTTP checks returned 200 for DMG, EXE, AppImage and DEB. Both the Tauri feed
+(all four architecture keys) and native Sparkle transition feed announce 2.0.0 and reference
+uploaded assets. Public SHA-256 entries match GitHub's recorded digests for every asset.
+No installed local app was replaced; real two-Mac sync and installed migration remain the
+explicit untested scopes above.
