@@ -2,6 +2,15 @@ name: Tauri migration checks
 
 on:
   workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to verify; does not publish a release'
+        type: string
+        default: '0.0.0'
+      production:
+        description: 'Verify production identity and native Mac transition signature'
+        type: boolean
+        default: false
   workflow_call:
     inputs:
       source_ref:
