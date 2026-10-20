@@ -69,13 +69,16 @@ fn logo(family: &str) -> &'static str {
 }
 
 pub fn render(account: &Account, badge: Option<usize>, style: &str, dark: bool) -> Image<'static> {
-    let wide = style=="percentage" && cfg!(target_os="macos");
+    render_with_width(account, badge, style, dark, style=="percentage" && cfg!(target_os="macos"))
+}
+
+fn render_with_width(account: &Account, badge: Option<usize>, style: &str, dark: bool, wide: bool) -> Image<'static> {
     let width = if wide { 84 } else { 40 };
     let mut pixmap = tiny_skia::Pixmap::new(width,40).unwrap();
-    if style!="percentage" || wide { if let Ok(tree) = usvg::Tree::from_str(logo(&account.family), &usvg::Options::default()) {
+    if style!="percentage" || wide || account.metrics.iter().all(|m| !m.pinned) { if let Ok(tree) = usvg::Tree::from_str(logo(&account.family), &usvg::Options::default()) {
         let size = tree.size();
         let scale = 20.0 / size.width().max(size.height());
-        let transform = tiny_skia::Transform::from_scale(scale,scale).post_translate(if style=="percentage" {0.0} else {10.0},10.0);
+        let transform = tiny_skia::Transform::from_scale(scale,scale).post_translate(if wide {0.0} else {10.0},10.0);
         resvg::render(&tree, transform, &mut pixmap.as_mut());
     }}
     let ink = if dark && !cfg!(target_os="macos") {255} else {0};
@@ -134,6 +137,15 @@ mod tests {
         for style in ["ring","percentage"] {
             s.settings.tray_style=style.into();
             assert_eq!(visible(&s).iter().map(|(_,n)|*n).collect::<Vec<_>>(),vec![Some(1),Some(2),None]);
+        }
+    }
+    #[test]
+    fn unpinned_accounts_keep_an_icon_in_square_and_wide_percentage_trays() {
+        let mut state=fixture();
+        for metric in &mut state.accounts[0].metrics { metric.pinned=false; }
+        for wide in [false,true] {
+            let icon=render_with_width(&state.accounts[0],None,"percentage",false,wide);
+            assert!(icon.rgba().chunks_exact(4).any(|p| p[3]>0), "No pins must not create an invisible account icon");
         }
     }
     #[test]

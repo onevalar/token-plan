@@ -71,7 +71,7 @@ function App(){
   {page==='updates'&&<Updates t={t} updater={updater} automatic={state?.settings.autoUpdates??true} onAutomatic={autoUpdates=>act({method:'settings',value:{autoUpdates}})}/>}
   {state&&page==='settings'&&<GeneralSettings state={state} send={send} t={t} busy={busy}/>}
   {state&&page==='configure'&&<>
-   <History accounts={state.accounts} t={t}/>
+   <History accounts={state.accounts} t={t} language={language}/>
    <section className="settings-list"><div className="provider-heading"><h2>{t.configure}</h2><Button disabled={busy} onClick={()=>act({method:'discover'})}>{t.discover}</Button></div>
     {state.accounts.map((a,i)=><div className="service-row" key={a.id}>
       <Button variant="ghost" onClick={()=>open(a.id)}>{a.name}{a.email?` · ${accountTitle(a.email)}`:''}</Button>
@@ -91,7 +91,7 @@ function App(){
    {tab==='settings'?<AccountSettings account={account} send={send} t={t} busy={busy} language={language}/>:<>
     {account.error&&<p role="status">{providerText(account.error,language)}</p>}
     {account.metrics.filter(m=>m.placement!=='hidden').map(m=><MetricRow key={m.id} metric={m} now={now} missing={basic.missing} language={language}/>)}
-    {account.note&&<p>{account.note}</p>}<History accounts={[account]} t={t}/>
+    {account.note&&<p>{account.note}</p>}<History accounts={[account]} t={t} language={language}/>
    </>}
   </section>}
  </main></MotionConfig>;

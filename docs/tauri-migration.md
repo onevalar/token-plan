@@ -51,7 +51,8 @@ npm run test:ui
 builds the Mac helper for both architectures. The CI workflow `Tauri migration checks`
 builds universal Mac, Windows x64 and Linux x64 packages, signs updater artifacts and
 notarizes Mac builds. It uploads verification artifacts without publishing a stable release.
-Native backend tests and synthetic-account UI tests are included.
+Native backend tests and synthetic-account UI tests are included. See the
+[verification record](tauri-verification.md) for results and installed acceptance boundaries.
 
 Do not test edits against the installed app's preferences. The bridge tests use temporary
 files; the helper smoke test uses an isolated Mac defaults domain and makes no refresh call.
