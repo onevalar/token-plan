@@ -1,5 +1,23 @@
 {
-  "version": "0.0.0",
-  "notes": "The Tauri migration has no published release yet.",
-  "platforms": {}
+  "version": "2.0.0",
+  "notes": "# TokenPlan 2.0.0\n\n## 新版桌面界面\n\n- 使用 Tauri、React 和 Arc 重构 macOS、Windows、Linux 界面，统一首页、服务配置、历史记录、通用设置和更新流程。\n- 支持账号显示与隐藏、移除、排序、备注、API Key 管理和指标显示配置；复用原有账号配置与可读取的历史数据。\n- 菜单栏与系统托盘支持环形、百分比模式，两种模式保持相同的账号顺序与连续编号；取消全部指标时仍保留服务图标。\n- 新增签名校验的 Tauri 自动更新流程，并保留 Mac 旧版 Sparkle 的迁移更新入口。\n- 优化五种语言、浅色与深色外观、窄窗口布局及错误反馈。\n\n## 安装与升级\n\n- macOS：提供 Apple Silicon / Intel 通用 DMG，最低 macOS 15；完成 Developer ID 签名和 Apple 公证。\n- Windows：提供 x64 安装程序，使用系统 WebView2；安装程序目前没有 Windows 代码签名。\n- Linux：提供 x64 AppImage 和 DEB；本轮验证环境为 Ubuntu 24.04。AppImage 支持应用内更新，DEB 通过包管理器升级。\n- Windows/Linux 从 1.x 升级需退出旧版后手动安装一次 2.0.0；如安装方式改变，应卸载旧应用程序，保留用户配置和历史数据。\n- macOS 1.x 保留“检查更新”迁移入口。首次跨架构升级的实机验证情况以正式发布前的验收记录为准。\n\n## 本版范围\n\n- 三平台共用界面与操作流程；数据仍取决于各服务商返回内容和本机可读取的凭据、日志。\n- 保留 macOS 的 iCloud 历史同步、设备标识与账号隔离；iCloud 同步仍仅支持 Mac 间使用。\n- 三平台增加额度提醒及全局快捷键设置，Mac 读取旧版的通知偏好和已保存快捷键。\n- 历史记录支持展开每日模型明细，保留 token、已知费用和模型变体；未知定价不显示为零费用。\n- Linux 全局快捷键目前支持 X11，Wayland 下会明确显示不可用；注册失败会明确提示，不覆盖原来的快捷键。\n- Linux 托盘是否可用、图标排列与窗口定位仍受桌面环境限制；无兼容托盘时保留窗口入口。\n",
+  "pub_date": "2026-10-20T10:20:36.577Z",
+  "platforms": {
+    "darwin-aarch64": {
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUZDAvZHhCYm02S0I5ckRCU3Q5NXZYM3VFSlhmWkZnQk5pN24xWmZ2aFUvU2ljM2dvOUI3T0RFRFJnVStTOU0wbnZsdWN3bmEzNS9lYVhJVk94cjIxQ1h0d1dDY3lucVEwPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkyNDkxNjAyCWZpbGU6VG9rZW5QbGFuLmFwcC50YXIuZ3oJdmVyc2lvbjoyLjAuMAptbnhVOUt2dE1UYW1HUXp1V3FUS0FWK3V3RUM3TEpBalJ5SXc4c0pLZ0xqWlNORmdzTFlnZU1waVR6bXRpL2RWdXBkN2ZXYWNmNDNUL29tdWFwenpCQT09Cg==",
+      "url": "https://github.com/onevalar/token-plan/releases/download/v2.0.0/TokenPlan.app.tar.gz"
+    },
+    "windows-x86_64": {
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUZDAvZHhCYm02S0orWTFrelV6T2hzbmlSYSt5QzhJZkprMWhXekY2RGg2YW5mV1o5WmNmdk5lWS9pQXlLcDYwQThZNkc5UzVZNE9xemNFSmRyWkNvVERJQXBGQ0JHVkFFPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkyNDkxMDQ5CWZpbGU6VG9rZW5QbGFuXzIuMC4wX3g2NC1zZXR1cC5leGUJdmVyc2lvbjoyLjAuMApxTTFyWXJ3eWpSdkJjWFBzRGdMZXZ1OHBXUVNUMHZTQXNYUzdSRE9LQ1d2dmpHK1JGR0VnSmtBNXV6WHEreUtqSG0yblhTR2ZMaGFFM3BkcmpoV3VBdz09Cg==",
+      "url": "https://github.com/onevalar/token-plan/releases/download/v2.0.0/TokenPlan_2.0.0_x64-setup.exe"
+    },
+    "linux-x86_64": {
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUZDAvZHhCYm02S0l5Ky95c2FFQjFxcGRGUXZxek1kZnJ2Z2xhRnVRYjV5bHpzSGdJRFozcjNGYVh3WjVlUExPQld2SEw2cktFc1FXQi9jM3ZoVzE3SVRKYXlZWURWdlFZPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkyNDkwNTY4CWZpbGU6VG9rZW5QbGFuXzIuMC4wX2FtZDY0LkFwcEltYWdlCXZlcnNpb246Mi4wLjAKd1dpZUVYSjZJNmVwRVI1aklPemd5QThJY1U0TUMvNHRKT01PcjJmenJvRWxlalVyU1NkWmQxMGU2SlFldzlpT3ZjUlFKUWR6OTZpZ29mU0JpYzB2RGc9PQo=",
+      "url": "https://github.com/onevalar/token-plan/releases/download/v2.0.0/TokenPlan_2.0.0_amd64.AppImage"
+    },
+    "darwin-x86_64": {
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUZDAvZHhCYm02S0I5ckRCU3Q5NXZYM3VFSlhmWkZnQk5pN24xWmZ2aFUvU2ljM2dvOUI3T0RFRFJnVStTOU0wbnZsdWN3bmEzNS9lYVhJVk94cjIxQ1h0d1dDY3lucVEwPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkyNDkxNjAyCWZpbGU6VG9rZW5QbGFuLmFwcC50YXIuZ3oJdmVyc2lvbjoyLjAuMAptbnhVOUt2dE1UYW1HUXp1V3FUS0FWK3V3RUM3TEpBalJ5SXc4c0pLZ0xqWlNORmdzTFlnZU1waVR6bXRpL2RWdXBkN2ZXYWNmNDNUL29tdWFwenpCQT09Cg==",
+      "url": "https://github.com/onevalar/token-plan/releases/download/v2.0.0/TokenPlan.app.tar.gz"
+    }
+  }
 }

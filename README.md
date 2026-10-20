@@ -17,30 +17,30 @@ TokenPlan 将多个 AI 服务的用量集中到一个轻量面板：查看还剩
 ## 下载
 
 <!-- download-links:start -->
-当前正式版：**1.0.12** · [发布说明](https://github.com/onevalar/token-plan/releases/tag/v1.0.12)
+当前正式版：**2.0.0** · [发布说明](https://github.com/onevalar/token-plan/releases/tag/v2.0.0)
 
 | 系统 | 安装包 | 平台要求 |
 | --- | --- | --- |
-| **macOS** | [下载 DMG](https://github.com/onevalar/token-plan/releases/download/v1.0.12/TokenPlan-1.0.12.dmg) | macOS 15 及以上；Apple Silicon / Intel 通用版 |
-| **Windows** | [下载 EXE](https://github.com/onevalar/token-plan/releases/download/v1.0.12/TokenPlan-Setup-1.0.12.exe) | x64；当前用户安装 |
-| **Linux** | [下载 DEB](https://github.com/onevalar/token-plan/releases/download/v1.0.12/tokenplan_1.0.12_amd64.deb) | Debian / Ubuntu x64（amd64），需要图形桌面 |
+| **macOS** | [下载 DMG](https://github.com/onevalar/token-plan/releases/download/v2.0.0/TokenPlan_2.0.0_universal.dmg) | macOS 15 及以上；Apple Silicon / Intel 通用版 |
+| **Windows** | [下载 EXE](https://github.com/onevalar/token-plan/releases/download/v2.0.0/TokenPlan_2.0.0_x64-setup.exe) | Windows x64；需要 WebView2 |
+| **Linux** | [下载 AppImage](https://github.com/onevalar/token-plan/releases/download/v2.0.0/TokenPlan_2.0.0_amd64.AppImage) · [下载 DEB](https://github.com/onevalar/token-plan/releases/download/v2.0.0/TokenPlan_2.0.0_amd64.deb) | Ubuntu 24.04 x64 验证；需要图形桌面 |
 
-[SHA-256 校验文件](https://github.com/onevalar/token-plan/releases/download/v1.0.12/SHA256SUMS.txt) · [全部版本](https://github.com/onevalar/token-plan/releases)
+[SHA-256 校验文件](https://github.com/onevalar/token-plan/releases/download/v2.0.0/SHA256SUMS.txt) · [全部版本](https://github.com/onevalar/token-plan/releases)
 <!-- download-links:end -->
 
-macOS 正式安装包已完成 Developer ID 签名和 Apple 公证。Windows 安装包目前未进行代码签名。Windows/Linux 安装包自带 .NET 运行时，不需要另行安装 SDK。Linux 当前提供 DEB，尚未提供 RPM、AppImage 或 ARM64 正式安装包。
+macOS 正式安装包已完成 Developer ID 签名和 Apple 公证。Windows 安装包目前未进行代码签名。Windows/Linux 自带数据助手运行时，无需安装 .NET SDK。
 
-> **旧版本升级：** 从 1.0.6 起，源码、安装包和更新列表统一放在本仓库。Mac 旧版可通过“检查更新”升级；Windows/Linux 1.0.5 及更早版本需手动下载安装一次 1.0.6 或更新版本，之后使用新的应用内更新入口。原 `onevalar/apps` 仓库仅保留历史版本与迁移兼容信息。
+> **升级至 2.0：** Mac 1.x 可通过“检查更新”迁移；Windows/Linux 1.x 需先退出旧版，手动安装一次 2.0，并保留用户数据。之后三个系统使用签名校验的 Tauri 更新；Linux 应用内更新使用 AppImage，DEB 由包管理器升级。[2.0 安装与迁移说明](docs/tauri-installation.md)
 
 ## 主要功能
 
 - **订阅额度一眼可见**：查看服务返回的会话、每周或模型额度、重置倒计时、额外用量及余额。
-- **菜单栏与系统托盘入口**：Mac 可按账号显示环形或百分比；Windows/Linux 从托盘打开用量面板和菜单。
+- **菜单栏与系统托盘入口**：三个系统均支持按账号显示环形或百分比，并从菜单栏或托盘打开面板和退出菜单。
 - **Claude / Codex 多账号**：识别受支持的本机登录来源，分别查看账号额度，独立设置显示内容。各平台支持的来源有所不同。
 - **用量历史与费用估算**：查看可读取日志中的 token 和按模型价格估算的费用，提供今日、昨日、近 30 天等汇总。
 - **按习惯配置**：调整服务顺序、显示指标、已用/剩余、刷新间隔、语言、浅色/深色主题及用量提醒。
 - **认证续期与错误诊断**：支持可续期的 Claude/Codex CLI 登录，区分凭据问题、权限拒绝、限流和网络错误。
-- **版本更新**：Mac 通过 Sparkle 更新；Windows/Linux 检查新版本、下载并校验安装包，再交由系统安装程序完成升级。
+- **版本更新**：三个系统使用签名校验的更新包；Linux AppImage 可在应用内更新，DEB 由包管理器升级。
 
 ## 支持的服务
 
@@ -65,7 +65,7 @@ macOS 正式安装包已完成 Developer ID 签名和 Apple 公证。Windows 安
 
 ### Windows
 
-1. 下载并运行 `TokenPlan-Setup-<版本号>.exe`，按安装向导完成安装。
+1. 下载并运行 Windows `.exe` 安装包，按安装向导完成安装。
 2. 从开始菜单启动 TokenPlan。
 3. 点击系统托盘图标打开面板；看不到图标时，检查任务栏的隐藏图标区域。
 
@@ -76,14 +76,10 @@ macOS 正式安装包已完成 Developer ID 签名和 Apple 公证。Windows 安
 下载 `.deb` 后，在该文件所在目录打开终端，将命令中的文件名替换成你实际下载的文件名：
 
 ```sh
-sudo apt install './tokenplan_<版本号>_amd64.deb'
+sudo apt install './TokenPlan_<版本号>_amd64.deb'
 ```
 
-安装后从应用菜单启动 **TokenPlan**，或在终端运行：
-
-```sh
-tokenplan
-```
+安装后从应用菜单启动 **TokenPlan**。AppImage 的运行方式见 [2.0 安装说明](docs/tauri-installation.md)。
 
 支持系统托盘的桌面可从托盘打开面板，并通过右键菜单退出。部分 Linux 桌面不提供兼容的托盘宿主，此时 TokenPlan 会保留普通窗口入口；这与 Mac 菜单栏的呈现方式有所不同。不要用 `sudo` 启动应用，以免读取到另一个用户的配置。
 
