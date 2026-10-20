@@ -95,3 +95,13 @@ feeds. Public HTTP checks returned 200 for DMG, EXE, AppImage and DEB. Both the 
 uploaded assets. Public SHA-256 entries match GitHub's recorded digests for every asset.
 No installed local app was replaced; real two-Mac sync and installed migration remain the
 explicit untested scopes above.
+
+## Native migration regression found after publication
+
+The installed 1.0.12 Sparkle log rejected 2.0.0 because the destination bundle omitted
+`SUPublicEDKey`. Archive EdDSA validation and Apple notarization had passed, but they do
+not cover Sparkle's prohibition on removing the existing application's signing key.
+The 2.0.0 native feed entry has been withdrawn; published binaries remain immutable.
+Production metadata now retains the original public key and the migration signer checks
+the actual bundled Info.plist against release/update-config.json before advertising it.
+Regression tests reject both a missing key and an unintended key change.

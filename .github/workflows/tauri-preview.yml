@@ -59,6 +59,7 @@ jobs:
         run: rustup toolchain install 1.90.0 --profile minimal
       - run: npm ci
       - run: npm run build
+      - run: python3 ../../script/test_tauri_migration_update.py
       - run: npm test
       - name: Native backend regression checks
         if: runner.os != 'macOS'

@@ -30,7 +30,7 @@ TokenPlan 将多个 AI 服务的用量集中到一个轻量面板：查看还剩
 
 macOS 正式安装包已完成 Developer ID 签名和 Apple 公证。Windows 安装包目前未进行代码签名。Windows/Linux 自带数据助手运行时，无需安装 .NET SDK。
 
-> **升级至 2.0：** Mac 1.x 可通过“检查更新”迁移；Windows/Linux 1.x 需先退出旧版，手动安装一次 2.0，并保留用户数据。之后三个系统使用签名校验的 Tauri 更新；Linux 应用内更新使用 AppImage，DEB 由包管理器升级。[2.0 安装与迁移说明](docs/tauri-installation.md)
+> **升级至 2.0：** 2.0.0 的 Mac 1.x 应用内升级存在公钥元数据遗漏，已暂停推送，等待修正版；手动安装不受此校验问题影响。Windows/Linux 1.x 需先退出旧版，手动安装一次 2.0，并保留用户数据。之后三个系统使用签名校验的 Tauri 更新；Linux 应用内更新使用 AppImage，DEB 由包管理器升级。[2.0 安装与迁移说明](docs/tauri-installation.md)
 
 ## 主要功能
 

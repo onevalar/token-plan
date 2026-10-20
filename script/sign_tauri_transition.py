@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Let an installed native Mac app upgrade once to the approved Tauri release."""
 import html
+import json
+from tauri_migration_metadata import validate_migration_key
 import os
 from pathlib import Path
 import plistlib
@@ -17,6 +19,7 @@ app = base/'macos/TokenPlan.app'
 info = plistlib.loads((app/'Contents/Info.plist').read_bytes())
 if (info['CFBundleIdentifier'], info['CFBundleShortVersionString']) != ('com.onevalar.tokenplan', version):
     raise ValueError('Production app identity/version mismatch')
+validate_migration_key(info, json.loads((ROOT/'release/update-config.json').read_text()))
 container = 'iCloud.com.onevalar.tokenplan'
 if container not in info.get('NSUbiquitousContainers', {}):
     raise ValueError('Production iCloud container metadata missing')

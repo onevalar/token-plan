@@ -6,7 +6,14 @@ from publish_update import assemble, update_readme_downloads
 
 class PublicReleaseTests(unittest.TestCase):
     def test_download_links_follow_release_without_rewriting_migration_notes(self):
-        source = (Path(__file__).resolve().parent.parent / 'README.md').read_text()
+        source = '''Installation instructions
+<!-- download-links:start -->
+https://github.com/onevalar/token-plan/releases/download/v1.0.6/TokenPlan-1.0.6.dmg
+https://github.com/onevalar/token-plan/releases/download/v1.0.6/TokenPlan-Setup-1.0.6.exe
+https://github.com/onevalar/token-plan/releases/download/v1.0.6/tokenplan_1.0.6_amd64.deb
+<!-- download-links:end -->
+Migration notes for 1.0.5 must remain unchanged.
+'''
         updated = update_readme_downloads(source, '1.2.3')
         before, block = updated.split('<!-- download-links:start -->')
         block, after = block.split('<!-- download-links:end -->')
