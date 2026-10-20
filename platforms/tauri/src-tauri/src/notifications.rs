@@ -62,7 +62,8 @@ pub async fn evaluate(app:&tauri::AppHandle,state:&DesktopState) {
                 let body=format!("{} · {}\n{}",account.name,translated(&m.label,language),translated(BODIES[i],language));
                 let result=deliver(app,title,body).await;
                 if result.is_ok(){next.fired[i]=true;}else{
-                    if i==0{next.under=previous.under;}else{next.bucket=previous.bucket;}
+                    let new_window=reset.is_some_and(|r|previous.reset.is_none_or(|old|r>old+1000));
+                    if i==0{next.under=if new_window{false}else{previous.under};}else{next.bucket=if new_window{-1}else{previous.bucket};}
                     let _=app.emit("desktop-error","notification_failed");
                 }
             }
