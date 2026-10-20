@@ -10,6 +10,11 @@ AGENTS.md is the source of truth for agent instructions in this repository. CLAU
 
 > **Repository note:** TokenPlan is a fork of the MIT-licensed OpenUsage (original © Robin Ebers); the forked-from baseline is OpenUsage v0.7.14. It has its own name, bundle ids, icon, update feed and feature set. Do not reintroduce upstream names, logos, endpoints, analytics keys or contact details. Active development happens on `main`. Keep `main` as the only long-lived or packaging branch; use workflow dispatch and pinned main commits for test builds, and approved version tags for releases.
 
+## Dependency Updates
+
+- The owner requires `main` as the only repository branch. Do not enable Dependabot version-update or security-update PRs, or create dependency-update branches.
+- Review dependency updates and run the relevant checks before committing them directly to `main`. Keep vulnerability alerts separate from automatic update PRs; do not disable alerts as part of this policy.
+
 ## Releases
 
 Pushing an approved stable `vX.Y.Z` tag on `main` runs `.github/workflows/release.yml`: macOS signing/notarization and Windows/Linux installer builds, followed by publication to this public `onevalar/token-plan` repository under `vX.Y.Z`. Update feeds live in `updates/` on main. Source is open under the existing MIT license. The desktop-only workflow is a manual packaging check and does not publish. Version numbers are the owner's decision; confirm before tagging. Require nonempty approved `release/X.Y.Z.md` notes. Never leave a release in Draft or replace published binaries. See `docs/updates.md` for required cloud credentials.
