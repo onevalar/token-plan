@@ -1,7 +1,15 @@
 <?xml version='1.0' encoding='utf-8'?>
 <rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
     <channel>
-        <item><title>TokenPlan 2.0.1</title><sparkle:version>1792493591</sparkle:version><sparkle:shortVersionString>2.0.1</sparkle:shortVersionString><sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion><description>&lt;pre&gt;# TokenPlan 2.0.1
+        <item><title>TokenPlan 2.0.2</title><sparkle:version>1792507597</sparkle:version><sparkle:shortVersionString>2.0.2</sparkle:shortVersionString><sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion><description>&lt;pre&gt;# TokenPlan 2.0.2
+
+- 修复 macOS 正式安装后后台程序无法打开配置、首页显示“无法读取用量”的问题，继续使用已有账号、设置和历史记录。
+- 将内部读取组件明确命名为 TokenPlan Bridge，并标记为仅后台运行，避免被识别为另一个同名 TokenPlan 应用。
+- 发布前同时验证独立测试配置和正式配置的后台启动，并检查后台组件标识；保留更新签名、公证及旧版 macOS 升级公钥校验。
+- 重新构建 macOS、Windows 和 Linux 安装包。2.x 可检查更新；macOS 1.x 可直接升级，Windows/Linux 1.x 需手动安装一次，Linux 自动更新使用 AppImage。
+
+安装后可推出挂载中的 TokenPlan 安装磁盘。磁盘中的应用是安装副本，并非另一份已安装的软件。
+&lt;/pre&gt;</description><enclosure url="https://github.com/onevalar/token-plan/releases/download/v2.0.2/TokenPlan_2.0.2_universal.dmg" length="29527132" type="application/octet-stream" sparkle:edSignature="v0KlucNf1EYi68QQw+ML+0xSe0RmuQUsrnDQG/xCvX/oIqZkBmMw4JLQiQxbYtGVvC8Kh5CGupNB54w2jEo4CQ==" /></item><item><title>TokenPlan 2.0.1</title><sparkle:version>1792493591</sparkle:version><sparkle:shortVersionString>2.0.1</sparkle:shortVersionString><sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion><description>&lt;pre&gt;# TokenPlan 2.0.1
 
 - 修复 macOS 1.x 通过“检查更新”升级到 Tauri 版本时，因新版应用缺少原有更新公钥而被拒绝安装的问题。
 - 保留旧版 Sparkle 的公钥元数据；新版继续使用 Tauri 的签名自动更新。

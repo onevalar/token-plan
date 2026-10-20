@@ -17,15 +17,15 @@ TokenPlan 将多个 AI 服务的用量集中到一个轻量面板：查看还剩
 ## 下载
 
 <!-- download-links:start -->
-当前正式版：**2.0.1** · [发布说明](https://github.com/onevalar/token-plan/releases/tag/v2.0.1)
+当前正式版：**2.0.2** · [发布说明](https://github.com/onevalar/token-plan/releases/tag/v2.0.2)
 
 | 系统 | 安装包 | 平台要求 |
 | --- | --- | --- |
-| **macOS** | [下载 DMG](https://github.com/onevalar/token-plan/releases/download/v2.0.1/TokenPlan_2.0.1_universal.dmg) | macOS 15 及以上；Apple Silicon / Intel 通用版 |
-| **Windows** | [下载 EXE](https://github.com/onevalar/token-plan/releases/download/v2.0.1/TokenPlan_2.0.1_x64-setup.exe) | Windows x64；需要 WebView2 |
-| **Linux** | [下载 AppImage](https://github.com/onevalar/token-plan/releases/download/v2.0.1/TokenPlan_2.0.1_amd64.AppImage) · [下载 DEB](https://github.com/onevalar/token-plan/releases/download/v2.0.1/TokenPlan_2.0.1_amd64.deb) | Ubuntu 24.04 x64 验证；需要图形桌面 |
+| **macOS** | [下载 DMG](https://github.com/onevalar/token-plan/releases/download/v2.0.2/TokenPlan_2.0.2_universal.dmg) | macOS 15 及以上；Apple Silicon / Intel 通用版 |
+| **Windows** | [下载 EXE](https://github.com/onevalar/token-plan/releases/download/v2.0.2/TokenPlan_2.0.2_x64-setup.exe) | Windows x64；需要 WebView2 |
+| **Linux** | [下载 AppImage](https://github.com/onevalar/token-plan/releases/download/v2.0.2/TokenPlan_2.0.2_amd64.AppImage) · [下载 DEB](https://github.com/onevalar/token-plan/releases/download/v2.0.2/TokenPlan_2.0.2_amd64.deb) | Ubuntu 24.04 x64 验证；需要图形桌面 |
 
-[SHA-256 校验文件](https://github.com/onevalar/token-plan/releases/download/v2.0.1/SHA256SUMS.txt) · [全部版本](https://github.com/onevalar/token-plan/releases)
+[SHA-256 校验文件](https://github.com/onevalar/token-plan/releases/download/v2.0.2/SHA256SUMS.txt) · [全部版本](https://github.com/onevalar/token-plan/releases)
 <!-- download-links:end -->
 
 macOS 正式安装包已完成 Developer ID 签名和 Apple 公证。Windows 安装包目前未进行代码签名。Windows/Linux 自带数据助手运行时，无需安装 .NET SDK。
