@@ -5,7 +5,12 @@ use tauri_plugin_global_shortcut::{GlobalShortcutExt, Shortcut, Modifiers};
 pub struct Binding(pub Mutex<BindingState>);
 #[derive(Default)]
 pub struct BindingState { value:String, paused:bool }
-pub fn available(app:&tauri::AppHandle)->bool {app.try_state::<tauri_plugin_global_shortcut::GlobalShortcut<tauri::Wry>>().is_some()}
+pub fn available(app:&tauri::AppHandle)->bool {
+    // The upstream hotkey backend is X11-only. An XWayland connection is not a system-wide grab.
+    #[cfg(target_os="linux")]
+    if std::env::var("XDG_SESSION_TYPE").as_deref()==Ok("wayland") || std::env::var_os("WAYLAND_DISPLAY").is_some(){return false}
+    app.try_state::<tauri_plugin_global_shortcut::GlobalShortcut<tauri::Wry>>().is_some()
+}
 fn parse(value: &str) -> Result<Shortcut,String> {
     if value.len()>100 { return Err("shortcut_failed".into()); }
     let shortcut:Shortcut=value.parse().map_err(|_|"shortcut_failed")?;

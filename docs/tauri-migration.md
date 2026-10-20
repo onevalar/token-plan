@@ -108,7 +108,8 @@ native notification backend directly because the Tauri plugin discards delivery 
 Notifications may still be suppressed by OS focus/quiet modes after successful scheduling.
 
 The official global-shortcut plugin provides background registration. An unavailable binding
-leaves the prior one registered. Linux support depends on the desktop host (notably Wayland).
+leaves the prior one registered. Linux global shortcuts use X11; Wayland sessions explicitly disable this control rather than
+misreporting an XWayland-only registration as system-wide support.
 The new dependencies are needed for native shortcuts, quota reset timestamp parsing, and
 observable notification delivery, not frontend styling.
 
