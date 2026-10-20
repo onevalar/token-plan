@@ -12,7 +12,7 @@ struct OpenUsageCLI {
                 let suite = ProcessInfo.processInfo.environment["TOKENPLAN_DEFAULTS_SUITE"] ?? "com.onevalar.tokenplan"
                 guard let defaults = UserDefaults(suiteName: suite) else { throw CLIError.appDefaultsUnavailable }
                 var bridge = await DesktopBridge(defaults: defaults)
-                while let line = readLine() {
+                while let line = await Task.detached(priority: .utility, operation: { readLine() }).value {
                     // Discovery rebuilds the registry only on explicit user request.
                     if let data = line.data(using: .utf8),
                        let object = try? JSONSerialization.jsonObject(with: data) as? [String: Any],

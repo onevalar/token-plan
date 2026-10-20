@@ -1,4 +1,6 @@
+import {SystemSettings} from './SystemSettings';
 import {Switch} from './components/arc/switch/switch';
+import {providerText} from './providerText';
 import {Select} from './components/arc/select/select';
 
 import {trayAccounts,type DesktopState,type Send} from './desktop';
@@ -18,5 +20,11 @@ export function GeneralSettings({state,send,t,busy}:{state:DesktopState;send:Sen
    {a.badge&&<sup>{a.badge}</sup>}{state.settings.trayStyle==='percentage'&&<span className="tray-numbers">{a.metrics.filter(m=>m.pinned).slice(0,2).map(m=><span key={m.id}>{m.hasData&&m.percent!=null?`${Math.round(m.percent)}%`:'—'}</span>)}</span>}
   </span>)}</div>
   {state.accounts.filter(a=>a.enabled).map(a=><div className="account-option" key={a.id}><span>{a.name}{a.email?` · ${a.email}`:''}</span><Switch aria-label={`${a.name} ${a.email}`} checked={a.tray} disabled={busy} onCheckedChange={value=>{void send({method:'tray',accountId:a.id,value}).catch(()=>{});}}/></div>)}
+  <SystemSettings state={state} send={send} busy={busy}/>
+  {state.sync.available&&<section className="settings-list"><h3>iCloud</h3>
+   <Switch label={providerText('Sync Across Macs',state.settings.language==='system'?navigator.language:state.settings.language)} checked={state.sync.enabled} disabled={busy} onCheckedChange={iCloudEnabled=>change({iCloudEnabled})}/>
+   <p className="muted">{providerText('Shares usage history through iCloud, so you can see one combined summary for all your Macs.',state.settings.language==='system'?navigator.language:state.settings.language)}</p>
+   {state.sync.enabled&&<>{state.sync.syncing&&<p role="status">{providerText('Syncing usage history',state.settings.language==='system'?navigator.language:state.settings.language)}</p>}{state.sync.error&&<p role="alert">{providerText(state.sync.error,state.settings.language==='system'?navigator.language:state.settings.language)}</p>}{state.sync.devices.map(d=><div key={d.id}><strong>{d.name}</strong>{d.current&&<span> · {providerText('This Mac',state.settings.language==='system'?navigator.language:state.settings.language)}</span>}<p className="muted">{new Date(d.updatedAt).toLocaleString()}</p></div>)}</>}
+  </section>}
  </section>;
 }

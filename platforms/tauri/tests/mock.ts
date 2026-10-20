@@ -16,6 +16,7 @@ export async function mockDesktop(page:Page,language='zh-Hans') {
     if(command==='plugin:resources|close')return;
     if(command!=='desktop_request')return;
     const r=args.request,a=state.accounts.find(a=>a.id===r.accountId);
+    if(r.method==='notificationPermission')return structuredClone(state);
     if(r.method==='enabled'&&a)a.enabled=r.value;
     if(r.method==='tray'&&a)a.tray=r.value;
     if(r.method==='note'&&a)a.note=r.value;

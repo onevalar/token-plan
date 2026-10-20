@@ -11,9 +11,9 @@ export const accountSchema = z.object({
  note:z.string(), error:z.string(), fetchedAt:z.string(), metrics:z.array(metricSchema),
  observations:z.array(z.object({date:z.string(),label:z.string(),value:n,unit:z.string().nullable()})).default([]),
  historyScope:z.enum(["device","account"]).default("account"),historyPartial:z.boolean().default(false),
- history:z.array(z.object({date:z.string(),tokens:z.number(),cost:n})),
+ history:z.array(z.object({date:z.string(),tokens:z.number(),cost:n,models:z.array(z.object({model:z.string(),tokens:z.number(),cost:n,variants:z.array(z.object({model:z.string(),tokens:z.number(),cost:n})).default([])})).default([])})),
 });
-export const desktopSchema = z.object({schema:z.literal('tokenplan.desktop.v1'),accounts:z.array(accountSchema),settings:z.object({showRemaining:z.boolean().default(false),appearance:z.enum(['system','light','dark']),language:z.string(),trayStyle:z.enum(['ring','percentage']),refreshMinutes:z.number(),autoRefresh:z.boolean(),autoUpdates:z.boolean().default(true)})});
+export const desktopSchema = z.object({schema:z.literal('tokenplan.desktop.v1'),accounts:z.array(accountSchema),sync:z.object({available:z.boolean(),enabled:z.boolean(),syncing:z.boolean(),error:z.string(),devices:z.array(z.object({id:z.string(),name:z.string(),current:z.boolean(),updatedAt:z.string()}))}).default({available:false,enabled:false,syncing:false,error:'',devices:[]}),settings:z.object({notifications:z.tuple([z.boolean(),z.boolean(),z.boolean()]).default([false,false,false]),shortcut:z.string().default(""),showRemaining:z.boolean().default(false),appearance:z.enum(['system','light','dark']),language:z.string(),trayStyle:z.enum(['ring','percentage']),refreshMinutes:z.number(),autoRefresh:z.boolean(),autoUpdates:z.boolean().default(true)})});
 export type DesktopState=z.infer<typeof desktopSchema>;
 export type Account=z.infer<typeof accountSchema>;
 export type Metric=z.infer<typeof metricSchema>;

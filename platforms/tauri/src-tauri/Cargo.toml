@@ -15,7 +15,9 @@ serde = { version = "1", features = ["derive"] }
 resvg = { version = "0.45", default-features = false }
 tauri-plugin-updater = "2"
 tauri-plugin-process = "2"
-tokio = { version = "1", features = ["process", "time", "io-util", "sync"] }
+tokio = { version = "1", features = ["process", "time", "io-util", "sync", "signal"] }
+tauri-plugin-global-shortcut = "2"
+chrono = "0.4"
 
 
 [dev-dependencies]
@@ -34,3 +36,7 @@ strip = "none"
 # Tauri's AppIndicator adapter does not forward Linux left-click activation.
 # SNI supplies Activate plus the standard right-click D-Bus menu.
 ksni = "0.3.6"
+
+[target.'cfg(not(target_os = "macos"))'.dependencies]
+# Direct result handling: the Tauri notification plugin discards desktop delivery failures.
+notify-rust = "4"

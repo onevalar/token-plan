@@ -56,3 +56,14 @@ T = {'API key': ('API 密钥', 'API 金鑰', 'API キー', 'API 키'),
                                                                            '않았습니다.'),
  'Tray Style': ('托盘样式', '系統匣樣式', 'トレイの表示', '트레이 스타일'),
  'Update available': ('有可用更新', '有可用更新', '更新があります', '업데이트 있음')}
+
+T.update({
+ 'Global Shortcut': ('全局快捷键','全域快捷鍵','グローバルショートカット','전역 단축키'),
+ 'Show or hide TokenPlan': ('显示或隐藏 TokenPlan','顯示或隱藏 TokenPlan','TokenPlanを表示・非表示','TokenPlan 표시 또는 숨기기'),
+ 'Click here and press a key with Control, Alt or Command.': ('点击此处，按下包含 Control、Alt 或 Command 的组合键。','按一下此處，按下包含 Control、Alt 或 Command 的組合鍵。','ここをクリックし、Control、Alt、Commandを含むキーの組み合わせを押してください。','여기를 클릭하고 Control, Alt 또는 Command를 포함한 키 조합을 누르세요.'),
+ 'Use Control, Alt or Command with another key.': ('请使用 Control、Alt 或 Command 加其他按键。','請使用 Control、Alt 或 Command 加其他按鍵。','Control、Alt、Commandと別のキーを組み合わせてください。','Control, Alt 또는 Command와 다른 키를 함께 누르세요.'),
+ 'Clear shortcut': ('清除快捷键','清除快捷鍵','ショートカットを解除','단축키 지우기'),
+ 'This shortcut is unavailable. Choose another combination.': ('此快捷键不可用，请选择其他组合。','此快捷鍵無法使用，請選擇其他組合。','このショートカットは使用できません。別の組み合わせを選んでください。','이 단축키를 사용할 수 없습니다. 다른 조합을 선택하세요.'),
+ 'Allow TokenPlan notifications in system settings, then try again.': ('请在系统设置中允许 TokenPlan 通知，然后重试。','請在系統設定中允許 TokenPlan 通知，然後重試。','システム設定でTokenPlanの通知を許可して再試行してください。','시스템 설정에서 TokenPlan 알림을 허용한 후 다시 시도하세요.'),
+ 'Model Breakdown': ('模型明细','模型明細','モデル別内訳','모델별 내역'),
+})

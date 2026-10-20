@@ -12,7 +12,7 @@ public sealed partial class DesktopSession
     }
     object Snapshot() => new {
         schema = "tokenplan.desktop.v1",
-        settings = new { showRemaining = preferences.ShowRemaining, locale = System.Globalization.CultureInfo.CurrentUICulture.Name, appearance = preferences.Appearance, language = preferences.Language, trayStyle, autoUpdates, refreshMinutes = preferences.RefreshMinutes, autoRefresh = preferences.AutoRefresh },
+        settings = new { notifications, shortcut, showRemaining = preferences.ShowRemaining, locale = System.Globalization.CultureInfo.CurrentUICulture.Name, appearance = preferences.Appearance, language = preferences.Language, trayStyle, autoUpdates, refreshMinutes = preferences.RefreshMinutes, autoRefresh = preferences.AutoRefresh },
         accounts = Accounts().Select(a => new {
             id = a.SettingsKey, family = a.Id, name = ProviderCatalog.Get(a.Id).Name,
             email = a.AccountEmail ?? "", plan = a.Snapshot?.Plan ?? "",
@@ -30,7 +30,7 @@ public sealed partial class DesktopSession
                 resetsAt = w.ResetsAt?.ToString("O"), periodSeconds = w.PeriodSeconds, values = Array.Empty<object>()
             }),
             history = a.AccountKey == null && trends.TryGetValue(a.Id, out var trend)
-                ? trend.Days.Select(d => new { date = d.Date.ToString("yyyy-MM-dd"), tokens = d.Tokens.Total, cost = d.Cost?.Dollars }).ToArray() : [],
+                ? trend.Days.Select(d => new { date = d.Date.ToString("yyyy-MM-dd"), tokens = d.Tokens.Total, cost = d.Cost?.Dollars, models = (d.Models ?? []).Select(m => new { model = m.Model, tokens = m.Tokens.Total, cost = m.Cost.Unpriced > 0 ? (double?)null : m.Cost.Dollars, variants = Array.Empty<object>() }).ToArray() }).ToArray() : [],
             observations = Observations(a),
             historyScope = a.Id == "cursor" ? "account" : "device", historyPartial = failedHistories.Contains(HistoryFile(a)) || (trends.GetValueOrDefault(a.Id)?.Partial ?? false)
         }).ToArray()

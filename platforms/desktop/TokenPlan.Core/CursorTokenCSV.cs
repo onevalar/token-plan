@@ -15,6 +15,7 @@ public static class CursorTokenCSV
         var since = today.AddDays(-29);
         var days = new Dictionary<DateOnly, TokenCounts>();
         var costs = new Dictionary<DateOnly, CostTotal>();
+        var models = new ModelTotals();
         string[]? header = null;
         int[] columns = Array.Empty<int>();
         var partial = false;
@@ -44,6 +45,7 @@ public static class CursorTokenCSV
                 var nextTotal = checked(total + tokens.Total);
                 days[date] = (days.GetValueOrDefault(date) ?? TokenCounts.Zero).Plus(tokens);
                 costs[date] = (costs.GetValueOrDefault(date) ?? new()).Add(ModelPricing.Estimate(row[columns[1]], tokens, applyLongContext: false));
+                models.Add(date, new(at, tokens, ModelPricing.Estimate(row[columns[1]], tokens, applyLongContext: false), row[columns[1]]));
                 total = nextTotal;
             }
             catch (Exception e) when (e is InvalidDataException or OverflowException or ArgumentException) { partial = true; }
@@ -78,7 +80,7 @@ public static class CursorTokenCSV
         if (field.Length > 0 || row.Count > 0 || state == State.Closed) { Field(); Row(); }
         if (header == null) throw new InvalidDataException();
         cancellation.ThrowIfCancellationRequested();
-        return new(days.OrderBy(d => d.Key).Select(d => new TokenDay(d.Key, d.Value, costs.GetValueOrDefault(d.Key))).ToArray(), partial, now);
+        return new(days.OrderBy(d => d.Key).Select(d => new TokenDay(d.Key, d.Value, costs.GetValueOrDefault(d.Key), models.Read(d.Key))).ToArray(), partial, now);
     }
     static long Number(string raw)
     {

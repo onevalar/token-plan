@@ -69,6 +69,7 @@
 "All Providers" = "全部提供方";
 "All services" = "全部服務";
 "Allow Notifications" = "允許通知";
+"Allow TokenPlan notifications in system settings, then try again." = "請在系統設定中允許 TokenPlan 通知，然後重試。";
 "Almost Out" = "即將用完";
 "Always Visible" = "永遠顯示";
 "Amp CLI did not report subscription quotas. Only the credit balance is available." = "Amp 命令列工具未提供訂閱額度，目前只能讀取餘額。";
@@ -129,7 +130,9 @@
 "Clear" = "清除";
 "Clear Account History" = "清除帳號歷史";
 "Clear Shortcut" = "清除快速鍵";
+"Clear shortcut" = "清除快捷鍵";
 "Clear this account's local quota history?" = "清除此帳號的本機額度歷史？";
+"Click here and press a key with Control, Alt or Command." = "按一下此處，按下包含 Control、Alt 或 Command 的組合鍵。";
 "Codex CLI logs on this device. Includes logs from different sign-ins, not the current account's complete usage." = "統計本機 Codex CLI 日誌，包含不同登入留下的記錄，並非目前帳號的全部用量。";
 "Codex auth data is invalid." = "Codex 驗證資料無效。";
 "Codex logs" = "Codex 記錄檔";
@@ -276,7 +279,7 @@
 "Get API Key" = "取得 API 金鑰";
 "Gift" = "贈送";
 "GitHub token invalid or expired. Re-authenticate (gh auth login) and try again." = "GitHub 權杖無效或已過期。請重新驗證（gh auth login）後再試。";
-"Global Shortcut" = "全域快速鍵";
+"Global Shortcut" = "全域快捷鍵";
 "Granted" = "贈金";
 "Grok Bot" = "Grok Bot";
 "Grok Bot usage" = "Grok Bot 用量";
@@ -353,6 +356,7 @@
 "Menu Bar: Percentage shows up to 2 starred metrics; Ring shows one primary quota per selected account." = "選單列：百分比顯示最多 2 項星號指標；環形為每個所選帳號顯示一項主要額度。";
 "Menu bar / system tray" = "選單列 / 系統匣";
 "Metric" = "指標";
+"Model Breakdown" = "模型明細";
 "Monitor Your AI Subscriptions with TokenPlan" = "用 TokenPlan 監控你的 AI 訂閱";
 "Monthly" = "每月";
 "More" = "更多";
@@ -568,6 +572,7 @@
 "Show less" = "收合";
 "Show more" = "展開";
 "Show on Home" = "首頁顯示";
+"Show or hide TokenPlan" = "顯示或隱藏 TokenPlan";
 "Show remaining quota" = "顯示剩餘額度";
 "Shown Services" = "顯示的服務";
 "Sign in to GitHub Copilot in your editor, or run gh auth login, and try again." = "請在編輯器中登入 GitHub Copilot，或執行 gh auth login 後再試。";
@@ -653,6 +658,7 @@
 "This period used a model with unknown pricing" = "這段期間使用了價格未知的模型";
 "This saved account shares its login with a CLI. Open it in your account switcher to renew safely, then retry." = "此儲存帳號與 CLI 共用登入憑證。請在帳號切換工具中開啟該帳號以安全續期，然後重試。";
 "This service integration is not available in this build." = "此版本尚未支援這項服務。";
+"This shortcut is unavailable. Choose another combination." = "此快捷鍵無法使用，請選擇其他組合。";
 "Time Format" = "時間格式";
 "Today" = "今天";
 "Token Usage" = "Token 用量";
@@ -720,6 +726,7 @@
 "Usage request failed. Check your connection." = "用量請求失敗，請檢查網路。";
 "Usage response invalid. Try again later." = "用量回應無效，請稍後再試。";
 "Use" = "使用";
+"Use Control, Alt or Command with another key." = "請使用 Control、Alt 或 Command 加其他按鍵。";
 "Use Credit" = "使用額度";
 "Use This Reset Credit?" = "使用這份重置額度？";
 "Use the tray menu to reopen TokenPlan, refresh usage or quit. Enable background mode only if your desktop displays the tray icon." = "透過系統匣選單重新開啟 TokenPlan、重新整理或結束。請確認桌面能顯示系統匣圖示後，再啟用背景執行。";

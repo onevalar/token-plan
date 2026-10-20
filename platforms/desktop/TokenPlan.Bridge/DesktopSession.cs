@@ -14,6 +14,8 @@ public sealed partial class DesktopSession : IDisposable
     readonly string stateFile;
     string trayStyle = "ring";
     bool autoUpdates = true;
+    bool[] notifications = [false, false, false];
+    string shortcut = "";
     List<string> accountOrder = [];
     public DesktopSession(string? preferencesPath = null)
     {
@@ -39,6 +41,8 @@ public sealed partial class DesktopSession : IDisposable
                     // Restored headings are not authenticated quota snapshots.
                     results[account.SettingsKey] = new(account.Id, account.Name, null, null, AccountKey: account.AccountKey, AccountEmail: account.AccountEmail, AccountIdentity: account.AccountIdentity);
                 }
+            if (doc.RootElement.TryGetProperty("notifications", out var alerts)) { var flags = alerts.Deserialize<bool[]>(); if (flags?.Length == 3) notifications = flags; }
+            if (doc.RootElement.TryGetProperty("shortcut", out var binding)) shortcut = binding.GetString() ?? "";
             if (doc.RootElement.TryGetProperty("autoUpdates", out var automatic)) autoUpdates = automatic.GetBoolean();
             trayStyle = doc.RootElement.GetProperty("trayStyle").GetString() is "percentage" ? "percentage" : "ring";
             if (doc.RootElement.TryGetProperty("cooldowns", out var cooldowns)) service.RestoreCooldowns(cooldowns.Deserialize<Dictionary<string, DateTimeOffset>>() ?? []);
@@ -121,6 +125,8 @@ public sealed partial class DesktopSession : IDisposable
     }
     void ApplySettings(JsonElement value)
     {
+        if (value.TryGetProperty("notifications", out var alerts)) { var flags = alerts.Deserialize<bool[]>(); if (flags?.Length != 3) throw new InvalidDataException(); notifications = flags; }
+        if (value.TryGetProperty("shortcut", out var binding)) { var text = binding.GetString() ?? ""; if (text.Length > 100) throw new InvalidDataException(); shortcut = text; }
         if (value.TryGetProperty("showRemaining", out var remaining)) preferences = preferences with { ShowRemaining = remaining.GetBoolean() };
         if (value.TryGetProperty("appearance", out var appearance))
         {
@@ -147,7 +153,7 @@ public sealed partial class DesktopSession : IDisposable
         lock (persistenceLock) {
         Directory.CreateDirectory(Path.GetDirectoryName(stateFile)!);
         var temp = stateFile + ".tmp";
-        File.WriteAllText(temp, JsonSerializer.Serialize(new { trayStyle, autoUpdates, nextRefresh, accountOrder, cooldowns = service.ExportCooldowns(), accounts = results.Values.Select(a => new ProviderResult(a.Id, a.Name, null, null, AccountKey: a.AccountKey, AccountEmail: a.AccountEmail, AccountIdentity: a.AccountIdentity)).ToArray() }));
+        File.WriteAllText(temp, JsonSerializer.Serialize(new { trayStyle, autoUpdates, notifications, shortcut, nextRefresh, accountOrder, cooldowns = service.ExportCooldowns(), accounts = results.Values.Select(a => new ProviderResult(a.Id, a.Name, null, null, AccountKey: a.AccountKey, AccountEmail: a.AccountEmail, AccountIdentity: a.AccountIdentity)).ToArray() }));
         File.Move(temp, stateFile, true);
         }
     }

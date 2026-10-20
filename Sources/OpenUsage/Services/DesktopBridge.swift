@@ -1,4 +1,5 @@
 import Foundation
+import Darwin
 
 /// Private JSON-lines protocol for the bundled Tauri helper. Never exports auth stores or keys.
 @MainActor
@@ -11,9 +12,13 @@ public final class DesktopBridge {
     private let layout: LayoutStore
     private let store: WidgetDataStore
     private let notes: SubscriptionNotesStore
+    private let cloud: ICloudUsageSyncStore
 
     public init(defaults: UserDefaults) async {
         self.defaults = defaults
+        // Only the private bundled helper sets this callback; notify its owning shell.
+        let shellPID = getppid()
+        AppNotifications.shared.onActivate = { if shellPID > 1 { kill(shellPID, SIGUSR1) } }
         let domain = ProcessInfo.processInfo.environment["TOKENPLAN_DEFAULTS_SUITE"] ?? "com.onevalar.tokenplan"
         let fresh = SettingsMigrator.isFreshInstall(defaults: defaults, domainName: domain)
         SettingsMigrator.migrate(defaults: defaults, domainName: domain)
@@ -39,6 +44,8 @@ public final class DesktopBridge {
             cache: ProviderSnapshotCache(userDefaults: defaults, allowsPersistedFreshness: true),
             defaults: defaults, isProviderEnabled: { enablement.isEnabled($0) && !accounts.isRemoved($0) },
             providerIdentityKeys: assembly.identityKeysByCard)
+        self.cloud = ICloudUsageSyncStore(dataStore: store, defaults: defaults,
+            deviceIDStore: KeychainICloudDeviceIDStore(bundleIdentifier: "com.onevalar.tokenplan"))
     }
 
     public func execute(_ input: Data) async -> Data {
@@ -48,11 +55,20 @@ public final class DesktopBridge {
                   let method = request["method"] as? String else { throw Failure.invalid }
             let id = request["accountId"] as? String ?? ""
             let value = request["value"]
-            if !["state", "refresh", "settings"].contains(method) {
+            if !["state", "refresh", "settings", "notificationPermission", "notify"].contains(method) {
                 guard registry.provider(id: id) != nil, !accounts.isRemoved(id) else { throw Failure.invalid }
             }
             switch method {
             case "state": break
+            case "notificationPermission":
+                AppNotifications.shared.registerAsDelegate()
+                guard await AppNotifications.shared.requestAuthorization().value else { throw Failure.notification }
+            case "notify":
+                guard let fields = value as? [String: String],
+                      let title = fields["title"], let body = fields["body"],
+                      title.count < 500, body.count < 2000 else { throw Failure.invalid }
+                AppNotifications.shared.registerAsDelegate()
+                guard await AppNotifications.shared.post(idPrefix: "desktop", title: title, subtitle: "", body: body) else { throw Failure.notification }
             case "refresh":
                 if id.isEmpty { await store.refreshAll(force: false) }
                 else {
@@ -98,6 +114,11 @@ public final class DesktopBridge {
                 if key.isEmpty { try provider.deleteAPIKey() } else { try provider.saveAPIKey(key) }
             case "settings":
                 guard let settings = value as? [String: Any] else { throw Failure.invalid }
+                if let flags = settings["notifications"] as? [Bool], flags.count == 3 {
+                    for (key, flag) in zip(["underTenPercent", "healthyToClose", "closeToRunningOut"], flags) { defaults.set(flag, forKey: "tokenplan.notifications.\(key)") }
+                }
+                if let shortcut = settings["shortcut"] as? String, shortcut.count <= 100 { defaults.set(shortcut, forKey: "tokenplan.desktop.shortcut") }
+                if let enabled = settings["iCloudEnabled"] as? Bool { cloud.enabled = enabled }
                 if let remaining = settings["showRemaining"] as? Bool { store.meterStyle = remaining ? .remaining : .used }
                 if let style = settings["trayStyle"] as? String {
                     guard let parsed = MenuBarStyle(rawValue: style) else { throw Failure.invalid }
@@ -122,19 +143,23 @@ public final class DesktopBridge {
             return try JSONSerialization.data(withJSONObject: ["ok": true, "state": snapshot()])
         } catch {
             AppLog.warn(.config, "Desktop bridge request failed: \(type(of: error))")
-            let code = (error as? Failure) == .pinLimit ? "pin_limit" : "request_failed"
+            let code = (error as? Failure) == .pinLimit ? "pin_limit" : (error as? Failure) == .notification ? "notification_failed" : "request_failed"
             return (try? JSONSerialization.data(withJSONObject: ["ok": false, "error": code])) ?? Data()
         }
     }
 
-    private enum Failure: Error { case invalid, pinLimit }
+    private enum Failure: Error { case invalid, pinLimit, notification }
 
     private func snapshot() -> [String: Any] {
         let entries: [[String: Any]] = registry.orderedProviderIDs(savedOrder: layout.providerOrder).compactMap { id in
             guard let provider = registry.provider(id: id), !accounts.isRemoved(id) else { return nil }
             let snapshot = store.snapshots[id]
-            let history = snapshot?.usageHistory?.series.daily.map {
-                ["date": $0.date, "tokens": $0.totalTokens, "cost": $0.costUSD as Any? ?? NSNull()] as [String: Any]
+            let history = snapshot?.usageHistory?.series.daily.map { entry in
+                ["date": entry.date, "tokens": entry.totalTokens, "cost": entry.costUSD as Any? ?? NSNull(),
+                 "models": (snapshot?.usageHistory?.modelUsage?.daily.first { day in day.date == entry.date }?.models ?? []).map { model in
+                     ["model": model.model, "tokens": model.totalTokens, "cost": model.costUSD as Any? ?? NSNull(),
+                      "variants": (model.variants ?? []).map { ["model": $0.model, "tokens": $0.totalTokens, "cost": $0.costUSD as Any? ?? NSNull()] as [String: Any] }] as [String: Any]
+                 }] as [String: Any]
             } ?? []
             let metrics = layout.orderedSupportedMetrics(for: id).map { descriptor -> [String: Any] in
                 let data = store.data(for: descriptor)
@@ -170,8 +195,15 @@ public final class DesktopBridge {
                 "fetchedAt": snapshot.map { OpenUsageISO8601.string(from: $0.refreshedAt) } ?? ""
             ]
         }
-        return ["schema": "tokenplan.desktop.v1", "accounts": entries, "settings": [
+        return ["schema": "tokenplan.desktop.v1", "accounts": entries, "sync": [
+            "available": true, "enabled": cloud.enabled, "syncing": cloud.isSyncing,
+            "error": cloud.serviceError ?? "", "devices": cloud.displayedDocuments.map {
+                ["id": $0.deviceID, "name": $0.deviceName, "current": $0.deviceID == cloud.deviceID, "updatedAt": OpenUsageISO8601.string(from: $0.updatedAt)] as [String: Any]
+            }
+        ], "settings": [
             "showRemaining": store.meterStyle == .remaining,
+            "notifications": ["underTenPercent", "healthyToClose", "closeToRunningOut"].map { defaults.bool(forKey: "tokenplan.notifications.\($0)") },
+            "shortcut": DesktopShortcutMigration.read(defaults: defaults),
             "locale": Locale.current.identifier,
             "appearance": defaults.string(forKey: AppearanceSetting.key) ?? "system",
             "language": defaults.string(forKey: LanguageSetting.key) ?? "system",

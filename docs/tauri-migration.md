@@ -93,6 +93,26 @@ Arc's upstream MIT license is bundled; no Arc Pro source is redistributed.
 
 A passing browser test does not prove platform tray behavior, notarization or installed
 updates. Keep native views until packaged acceptance and the first production upgrade have
-been validated. Existing iCloud-specific synchronization, native notification/shortcut
-preferences and advanced history breakdowns are outside this shared-interface slice; do not
-claim full replacement of those native features before their own acceptance.
+been validated. The shared settings now expose the original Mac iCloud history store, all three quota
+notification triggers and a recorded global shortcut. Mac imports the original notification
+preferences and Carbon shortcut; clearing a shortcut explicitly prevents re-import. iCloud
+remains Mac-only, preserves the existing device identity and shares only normalized history.
+Production packaging embeds the original provisioning profile and derived entitlements in
+both the shell and bundled helper; preview identities do not have production cloud access.
+
+Notification evaluation lives in Rust and runs while the window is hidden. It uses remaining
+quota regardless of display mode, primes without alerts at launch, tracks worsening edges,
+re-arms after recovery/reset and commits milestones only after successful scheduling. Mac
+uses the existing UserNotifications implementation in the helper; Windows/Linux call the
+native notification backend directly because the Tauri plugin discards delivery errors.
+Notifications may still be suppressed by OS focus/quiet modes after successful scheduling.
+
+The official global-shortcut plugin provides background registration. An unavailable binding
+leaves the prior one registered. Linux support depends on the desktop host (notably Wayland).
+The new dependencies are needed for native shortcuts, quota reset timestamp parsing, and
+observable notification delivery, not frontend styling.
+
+Daily history expands model totals and raw variants where available. Windows/Linux scanners
+retain bounded per-model aggregates without storing prompt content, with the same stream
+replay deduplication as the daily totals. Unknown model prices remain unavailable.
+These additions still require fresh packaged acceptance before the stable migration marker.

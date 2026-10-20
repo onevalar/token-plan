@@ -13,6 +13,7 @@ import UserNotifications
 @MainActor
 final class AppNotifications: NSObject, UNUserNotificationCenterDelegate {
     static let shared = AppNotifications()
+    var onActivate: (@MainActor () -> Void)?
 
     /// Injectable so tests can supply a fake center and assert what got scheduled. Production returns
     /// the system `current()` center.
@@ -168,7 +169,7 @@ final class AppNotifications: NSObject, UNUserNotificationCenterDelegate {
         }
         Task { @MainActor in
             AppLog.info(.notifications, "notification tapped; opening popover")
-            MenuBarPopover.show()
+            if let onActivate = self.onActivate { onActivate() } else { MenuBarPopover.show() }
         }
         completionHandler()
     }

@@ -6,7 +6,7 @@ use tokio::{io::{AsyncBufReadExt, AsyncWriteExt, BufReader}, process::{Child, Ch
 
 struct Process { child: Child, input: ChildStdin, output: BufReader<ChildStdout> }
 #[derive(Default)]
-pub struct Bridge { process: Mutex<Option<Process>>, latest: Mutex<Option<DesktopState>> }
+pub struct Bridge { operations: Mutex<()>, process: Mutex<Option<Process>>, latest: Mutex<Option<DesktopState>> }
 
 impl Bridge {
     async fn spawn() -> Result<Process, String> {
@@ -22,7 +22,7 @@ impl Bridge {
         let mut child = command.spawn().map_err(|_| "bridge_unavailable")?;
         Ok(Process { input: child.stdin.take().ok_or("bridge_unavailable")?, output: BufReader::new(child.stdout.take().ok_or("bridge_unavailable")?), child })
     }
-    async fn call(&self, request: Value) -> Result<DesktopState, String> {
+    pub(crate) async fn call(&self, request: Value) -> Result<DesktopState, String> {
         let mut holder = self.process.lock().await;
         if holder.is_none() { *holder = Some(Self::spawn().await?); }
         let process = holder.as_mut().unwrap();
@@ -49,7 +49,7 @@ impl Bridge {
             _ => { let _ = process.child.kill().await; *holder = None; return Err("read_failed".into()); }
         };
         let reply: Value = serde_json::from_slice(&output).map_err(|_| "invalid_response")?;
-        if reply["ok"] != true { return Err(if reply["error"] == "pin_limit" { "pin_limit" } else { "request_failed" }.into()); }
+        if reply["ok"] != true { return Err(if reply["error"] == "pin_limit" { "pin_limit" } else if reply["error"] == "notification_failed" { "notification_failed" } else { "request_failed" }.into()); }
         let state: DesktopState = serde_json::from_value(reply["state"].clone()).map_err(|_| "invalid_response")?;
         if !state.validate() { return Err("invalid_response".into()); }
         *self.latest.lock().await = Some(state.clone());
@@ -59,9 +59,21 @@ impl Bridge {
 
 #[tauri::command]
 pub async fn desktop_request(app: tauri::AppHandle, request: Value) -> Result<DesktopState, String> {
+    let bridge=app.state::<Bridge>();
+    let _operation=bridge.operations.lock().await;
     let method = request["method"].as_str().ok_or("request_failed")?;
-    if !["state","refresh","discover","enabled","remove","tray","metric","move","settings","key","note"].contains(&method) { return Err("request_failed".into()); }
-    let state = app.state::<Bridge>().call(request).await?;
+    if !["state","refresh","discover","enabled","remove","tray","metric","move","settings","key","note","notificationPermission"].contains(&method) { return Err("request_failed".into()); }
+    #[cfg(not(target_os="macos"))]
+    if method=="notificationPermission" {return app.state::<Bridge>().call(json!({"method":"state"})).await;}
+    let requested_shortcut=request["value"]["shortcut"].as_str().map(str::to_owned).filter(|_|method=="settings");
+    let old_shortcut=app.state::<Bridge>().latest.lock().await.as_ref().map(|s|s.settings.shortcut.clone()).unwrap_or_default();
+    if let Some(value)=&requested_shortcut {crate::shortcuts::apply(&app,value)?;}
+    let state = match app.state::<Bridge>().call(request).await {
+        Ok(state)=>state,
+        Err(error)=>{if requested_shortcut.is_some(){crate::shortcuts::restore(&app,&old_shortcut);}return Err(error)}
+    };
+    crate::shortcuts::restore(&app,&state.settings.shortcut);
+    crate::notifications::evaluate(&app,&state).await;
     let _ = app.emit("desktop-state", &state);
     #[cfg(not(target_os="linux"))]
     let tray_result = crate::tray::update(&app, &state).map_err(|_| ());
@@ -85,6 +97,8 @@ pub fn start_background(app: tauri::AppHandle) {
                     if desktop_request(app.clone(), json!({"method":"refresh"})).await.is_err() {
                         let _ = app.emit("desktop-error", "read_failed");
                     }
+                } else if desktop_request(app.clone(), json!({"method":"state"})).await.is_err() {
+                    let _ = app.emit("desktop-error", "read_failed");
                 }
             }
         }

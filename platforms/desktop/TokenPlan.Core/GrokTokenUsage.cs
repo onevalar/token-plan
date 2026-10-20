@@ -26,14 +26,14 @@ public static class GrokTokenUsage
             var counts = new TokenCounts(input - read - write, Count(model.Value, "outputTokens"), read, CacheWrite: write);
             var ticks = KeyUsageParser.Number(model.Value, "costUsdTicks") ?? (models.EnumerateObject().Count() == 1 ? KeyUsageParser.Number(usage, "costUsdTicks") : null);
             var cost = ticks is >= 0 ? ticks / 10_000_000_000d : ModelPricing.Estimate(model.Name, counts);
-            result.Add(new(id, model.Name, new(timestamp, counts, cost)));
+            result.Add(new(id, model.Name, new(timestamp, counts, cost, model.Name)));
         }
         return result;
     }
     public static Task<TokenTrend> Scan(string home, DateTimeOffset now, TimeZoneInfo zone, CancellationToken cancellation) => Task.Run(() =>
     {
         var directory = Path.Combine(home, "sessions"); if (!Directory.Exists(directory)) return new TokenTrend(Array.Empty<TokenDay>(), false, now);
-        var days = new Dictionary<DateOnly, TokenDay>(); var seen = new HashSet<string>(); var watch = Stopwatch.StartNew(); var partial = false; long bytes = 0;
+        var models = new ModelTotals(); var days = new Dictionary<DateOnly, TokenDay>(); var seen = new HashSet<string>(); var watch = Stopwatch.StartNew(); var partial = false; long bytes = 0;
         try
         {
             var files = Directory.EnumerateFiles(directory, "updates.jsonl", new EnumerationOptions { RecurseSubdirectories = true, AttributesToSkip = FileAttributes.ReparsePoint, IgnoreInaccessible = false }).Take(2001).ToArray();
@@ -59,8 +59,9 @@ public static class GrokTokenUsage
                             if (entry.Event.Timestamp < now.AddDays(-30) || entry.Event.Timestamp > now.AddMinutes(5)) continue;
                             if (entry.EventID is { Length: > 0 } id && !seen.Add(id + "\0" + entry.Model)) continue;
                             var date = DateOnly.FromDateTime(TimeZoneInfo.ConvertTime(entry.Event.Timestamp, zone).DateTime);
+                            models.Add(date, entry.Event);
                             var prior = days.GetValueOrDefault(date) ?? new(date, TokenCounts.Zero, new());
-                            days[date] = new(date, prior.Tokens.Plus(entry.Event.Tokens), prior.Cost!.Add(entry.Event.EstimatedCost));
+                            days[date] = new(date, prior.Tokens.Plus(entry.Event.Tokens), prior.Cost!.Add(entry.Event.EstimatedCost), models.Read(date));
                         }
                     }
                     catch (Exception e) when (e is JsonException or InvalidDataException or OverflowException) { partial = true; }

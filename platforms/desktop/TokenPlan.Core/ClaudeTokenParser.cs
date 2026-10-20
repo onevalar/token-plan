@@ -59,7 +59,7 @@ public sealed class ClaudeTokenParser
         if (hasSpeed && (speed.ValueKind != JsonValueKind.String || speed.GetString() is not ("fast" or "standard"))) throw new InvalidDataException();
         var tokens = new TokenCounts(input, output, read, CacheWrite: write);
         _ = tokens.Total;
-        return new(new(at, tokens, ModelPricing.Estimate(model, tokens, hasSpeed && speed.GetString() == "fast", oneHourWrites)), message, request, sidechain, hasSpeed);
+        return new(new(at, tokens, ModelPricing.Estimate(model, tokens, hasSpeed && speed.GetString() == "fast", oneHourWrites), model), message, request, sidechain, hasSpeed);
     }
     static long Number(JsonElement value, string key, bool required = false)
     {

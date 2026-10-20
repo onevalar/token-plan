@@ -7,6 +7,11 @@ const config={version,bundle:{active:true,createUpdaterArtifacts:true}};
 if(production){
  if(version==='0.0.0')throw Error('Production version missing');
  config.bundle.macOS={bundleVersion:String(Math.floor(Date.now()/1000))};
+ if(process.platform==='darwin'){
+  if(!process.env.TOKENPLAN_ICLOUD_ENTITLEMENTS||!process.env.TOKENPLAN_ICLOUD_PROFILE)throw Error('Production iCloud signing configuration missing');
+  config.bundle.macOS.entitlements=process.env.TOKENPLAN_ICLOUD_ENTITLEMENTS;
+  config.bundle.macOS.files={'embedded.provisionprofile':process.env.TOKENPLAN_ICLOUD_PROFILE};
+ }
  config.productName='TokenPlan';config.identifier='com.onevalar.tokenplan';
  config.app={windows:[{label:'main',title:'TokenPlan',width:480,height:680,minWidth:390,minHeight:400}]};
 }

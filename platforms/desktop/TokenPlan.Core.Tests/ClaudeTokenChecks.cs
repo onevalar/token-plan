@@ -38,6 +38,7 @@ static class ClaudeTokenChecks
         var credential = Path.Combine(home, ".credentials.json"); await File.WriteAllTextAsync(credential, "credential sentinel");
         var scan = new LocalTokenUsage("", claudeHomes: new[] { home, Path.Combine(home, "projects") });
         var trend = await scan.Scan(now, TimeZoneInfo.Utc, CancellationToken.None);
+        check(trend.Days.Single().Models is [var model] && model.Model == "claude-test-model" && model.Tokens.Total == 195 && model.Cost.Unpriced > 0, "Claude model history preserves deduplication and unknown pricing");
         check(!trend.Partial && trend.Days.Single().Tokens.Total == 195, "Claude discovers project logs and deduplicates overlapping configured homes");
         check((await scan.Scan(now, TimeZoneInfo.Utc, CancellationToken.None)).Days.Single().Tokens.Total == 195, "Repeated Claude scans are idempotent");
         check((await File.ReadAllBytesAsync(file)).SequenceEqual(original) && await File.ReadAllTextAsync(credential) == "credential sentinel", "Claude scanning leaves both conversations and credentials byte-for-byte unchanged");

@@ -44,5 +44,13 @@ that requires an approved production version. The current native feeds remain ac
 The Linux CI target is Ubuntu 24.04 x64. Compatibility with older distributions is not
 established by that build. AppImage supports in-app replacement; DEB remains managed by
 the package manager. Windows/Linux native users need one manual migration installation,
-after quitting the old client. Existing native-only iCloud and advanced history features
-remain documented in the migration boundaries.
+after quitting the old client. The restored iCloud, notification, shortcut and model-history capabilities are now documented
+in the migration boundaries; their production bundle verification is pending.
+
+## Restored native features (2026-10-20)
+
+Local verification: 1,605 Swift tests (five existing skips), 523 .NET core checks and isolated
+bridge integration passed. WebKit passed all 19 scenarios, including model expansion and
+notification/shortcut settings. Rust tests cover baseline suppression, reset jitter, recovery,
+disabled-trigger reactivation and required shortcut modifiers. Production iCloud signing and
+OS-level behavior still need verification; these results alone do not approve stable routing.

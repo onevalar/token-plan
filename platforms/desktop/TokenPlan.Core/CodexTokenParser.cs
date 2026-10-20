@@ -8,7 +8,7 @@ public record TokenCounts(long Input, long Output, long CacheRead, long Other = 
     public TokenCounts Plus(TokenCounts other) => new(checked(Input + other.Input), checked(Output + other.Output), checked(CacheRead + other.CacheRead), checked(Other + other.Other), checked(CacheWrite + other.CacheWrite));
     public static TokenCounts Zero => new(0, 0, 0);
 }
-public record TokenEvent(DateTimeOffset Timestamp, TokenCounts Tokens, double? EstimatedCost = null);
+public record TokenEvent(DateTimeOffset Timestamp, TokenCounts Tokens, double? EstimatedCost = null, string? Model = null);
 
 /// Mirrors the macOS rollout parser's cumulative counters and child replay gate.
 /// Only session metadata and token counters are retained; prompts and responses are discarded.
@@ -68,7 +68,7 @@ public sealed class CodexTokenParser
             if (usage == null) return null;
             var cached = Math.Min(usage.Cached, usage.Input);
             var entry = new TokenEvent(timestamp, new(usage.Input - cached, usage.Output, cached, Math.Max(0, usage.Total - usage.Input - usage.Output)));
-            entry = entry with { EstimatedCost = ModelPricing.Estimate(model, entry.Tokens, fastMode, provider: "codex") };
+            entry = entry with { EstimatedCost = ModelPricing.Estimate(model, entry.Tokens, fastMode, provider: "codex"), Model = model };
             if (entry == lastEvent) return null;
             lastEvent = entry;
             return entry;

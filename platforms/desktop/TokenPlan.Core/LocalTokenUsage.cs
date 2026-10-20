@@ -3,7 +3,8 @@ using System.Security.Cryptography;
 
 namespace TokenPlan.Core;
 
-public record TokenDay(DateOnly Date, TokenCounts Tokens, CostTotal? Cost = null);
+public record TokenDay(DateOnly Date, TokenCounts Tokens, CostTotal? Cost = null, IReadOnlyList<TokenModel>? Models = null);
+public record TokenModel(string Model, TokenCounts Tokens, CostTotal Cost);
 public record TokenTrend(IReadOnlyList<TokenDay> Days, bool Partial, DateTimeOffset ScannedAt, string? ErrorKey = null, bool ScanningPending = false, string? CredentialFingerprint = null)
 {
     public IReadOnlyList<TokenDay> Range(int days, DateOnly today)
@@ -40,6 +41,7 @@ public sealed class LocalTokenUsage(string codexHome, long byteBudget = 128 * 10
         public List<ClaudeTokenEntry> ClaudeEntries = new();
         public Dictionary<DateOnly, TokenCounts> Days = new();
         public Dictionary<DateOnly, CostTotal> Costs = new();
+        public ModelTotals Models = new();
     }
     public async Task<TokenTrend> Scan(DateTimeOffset now, TimeZoneInfo zone, CancellationToken cancellation)
     {
@@ -97,7 +99,7 @@ public sealed class LocalTokenUsage(string codexHome, long byteBudget = 128 * 10
                     }
                     if (!cache.Completed) partial = scanningPending = true;
                     if (cache.Parser.SessionID is { } id && !sessionIDs.Add(id)) continue;
-                    foreach (var old in cache.Days.Keys.Where(day => day < since).ToArray()) { cache.Days.Remove(old); cache.Costs.Remove(old); }
+                    foreach (var old in cache.Days.Keys.Where(day => day < since).ToArray()) { cache.Days.Remove(old); cache.Costs.Remove(old); cache.Models.Remove(old); }
                     partial |= cache.HadSkippedLines || cache.Parser.HadInvalidRecords || cache.ClaudeParser.HadInvalidRecords;
                     used.Add(cache);
                 }
@@ -105,6 +107,8 @@ public sealed class LocalTokenUsage(string codexHome, long byteBudget = 128 * 10
             }
             var totals = new Dictionary<DateOnly, TokenCounts>();
             var costs = new Dictionary<DateOnly, CostTotal>();
+            var models = new ModelTotals();
+            foreach (var cache in used) models.Merge(cache.Models, since);
             foreach (var cache in used)
                 foreach (var (date, tokens) in cache.Days)
                     { totals[date] = (totals.GetValueOrDefault(date) ?? TokenCounts.Zero).Plus(tokens); costs[date] = (costs.GetValueOrDefault(date) ?? new()).Plus(cache.Costs.GetValueOrDefault(date) ?? new()); }
@@ -114,10 +118,11 @@ public sealed class LocalTokenUsage(string codexHome, long byteBudget = 128 * 10
                     var date = DateOnly.FromDateTime(TimeZoneInfo.ConvertTime(entry.Event.Timestamp, zone).DateTime);
                     totals[date] = (totals.GetValueOrDefault(date) ?? TokenCounts.Zero).Plus(entry.Event.Tokens);
                     costs[date] = (costs.GetValueOrDefault(date) ?? new()).Add(entry.Event.EstimatedCost);
+                    models.Add(date, entry.Event);
                 }
             _ = totals.Values.Aggregate(TokenCounts.Zero, (sum, tokens) => sum.Plus(tokens)).Total;
             if (partial) DiagnosticLog.Write("token-logs", "Some local token logs were skipped or could not be read. Totals may be incomplete.");
-            return new(totals.OrderBy(d => d.Key).Select(d => new TokenDay(d.Key, d.Value, costs.GetValueOrDefault(d.Key))).ToArray(), partial, now, ScanningPending: scanningPending || Expired());
+            return new(totals.OrderBy(d => d.Key).Select(d => new TokenDay(d.Key, d.Value, costs.GetValueOrDefault(d.Key), models.Read(d.Key))).ToArray(), partial, now, ScanningPending: scanningPending || Expired());
         }
         catch (Exception e) when (e is IOException or UnauthorizedAccessException or OverflowException)
         {
@@ -209,7 +214,7 @@ public sealed class LocalTokenUsage(string codexHome, long byteBudget = 128 * 10
                         var date = DateOnly.FromDateTime(TimeZoneInfo.ConvertTime(entry.Timestamp, zone).DateTime);
                         // Writers can append after the scan's start time; do not permanently lose those events.
                         if (date >= since && entry.Timestamp <= now.AddMinutes(5))
-                            { cache.Days[date] = (cache.Days.GetValueOrDefault(date) ?? TokenCounts.Zero).Plus(entry.Tokens); cache.Costs[date] = (cache.Costs.GetValueOrDefault(date) ?? new()).Add(entry.EstimatedCost); }
+                            { cache.Days[date] = (cache.Days.GetValueOrDefault(date) ?? TokenCounts.Zero).Plus(entry.Tokens); cache.Costs[date] = (cache.Costs.GetValueOrDefault(date) ?? new()).Add(entry.EstimatedCost); cache.Models.Add(date, entry); }
                         else if (entry.Timestamp > now.AddMinutes(5)) cache.HadSkippedLines = true;
                     }
                     cache.DiscardingLongLine = false; cache.Offset = position; length = 0;

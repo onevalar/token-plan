@@ -1,6 +1,8 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 mod bridge;
+mod shortcuts;
+mod notifications;
 mod model;
 mod tray;
 #[cfg(target_os="linux")]
@@ -47,6 +49,13 @@ fn main() {
         .plugin(tauri_plugin_single_instance::init(|app, _, _| show(app)))
         .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_process::init())
+        .plugin(tauri_plugin_global_shortcut::Builder::new().with_handler(|app,_,event| {
+            if event.state()==tauri_plugin_global_shortcut::ShortcutState::Pressed {
+                if let Some(window)=app.get_webview_window("main") {if window.is_visible().unwrap_or(false){let _=window.hide();}else{show(app);}}
+            }
+        }).build())
+        .manage(shortcuts::Binding::default())
+        .manage(notifications::Alerts::default())
         .manage(bridge::Bridge::default())
         .manage(tray::Trays::default())
         .invoke_handler(tauri::generate_handler![bridge::desktop_request, quit, hide])
@@ -83,6 +92,16 @@ fn main() {
                     }
                 })
                 .build(app)?;
+            #[cfg(target_os="macos")]
+            {
+                let handle=app.handle().clone();
+                tauri::async_runtime::spawn(async move {
+                    match tokio::signal::unix::signal(tokio::signal::unix::SignalKind::user_defined1()){
+                        Ok(mut clicks)=>while clicks.recv().await.is_some(){show(&handle);},
+                        Err(_)=>{let _=tauri::Emitter::emit(&handle,"desktop-error","notification_failed");}
+                    }
+                });
+            }
             bridge::start_background(app.handle().clone());
             Ok(())
         })

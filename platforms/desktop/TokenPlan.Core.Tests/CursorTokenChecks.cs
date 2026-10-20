@@ -11,6 +11,7 @@ static class CursorTokenChecks
     {
         var csv = Header + "\n" + Row;
         var parsed = CursorTokenCSV.Parse(csv, now, TimeZoneInfo.Utc);
+        check(parsed.Days.Single().Models is [var model] && model.Model == "model" && model.Tokens.Total == 195 && model.Cost.Unpriced == 1, "Cursor model totals retain unknown pricing instead of zero cost");
         check(!parsed.Partial && parsed.Days.Single().Tokens == new TokenCounts(100, 20, 60, CacheWrite: 15), "Cursor export keeps four disjoint token buckets without inferring counts from quota");
         var quoted = CursorTokenCSV.Parse("\uFEFF" + Header + "\r\n2026-10-06T12:00:00.123Z,\"model, with \"\"quotes\"\"\nextra\",15,\"1,000\",,20\r\n", now, TimeZoneInfo.Utc);
         check(!quoted.Partial && quoted.Days.Single().Tokens == new TokenCounts(1000, 20, 0, CacheWrite: 15), "CSV handles BOM, CRLF, quoted commas/newlines/quotes, grouped counts and empty numeric cells");

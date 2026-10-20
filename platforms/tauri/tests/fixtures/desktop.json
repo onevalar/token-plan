@@ -56,7 +56,15 @@
         {
           "date": "2026-10-20",
           "tokens": 1200,
-          "cost": 1.2
+          "cost": 1.2,
+          "models": [
+            {
+              "model": "claude-test",
+              "tokens": 1200,
+              "cost": 1.2,
+              "variants": []
+            }
+          ]
         }
       ],
       "historyScope": "account",

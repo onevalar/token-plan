@@ -69,6 +69,7 @@
 "All Providers" = "全部提供方";
 "All services" = "全部服务";
 "Allow Notifications" = "允许通知";
+"Allow TokenPlan notifications in system settings, then try again." = "请在系统设置中允许 TokenPlan 通知，然后重试。";
 "Almost Out" = "即将用完";
 "Always Visible" = "始终显示";
 "Amp CLI did not report subscription quotas. Only the credit balance is available." = "Amp 命令行工具未提供订阅额度，目前只能读取余额。";
@@ -129,7 +130,9 @@
 "Clear" = "清除";
 "Clear Account History" = "清除账号历史";
 "Clear Shortcut" = "清除快捷键";
+"Clear shortcut" = "清除快捷键";
 "Clear this account's local quota history?" = "清除此账号的本地额度历史？";
+"Click here and press a key with Control, Alt or Command." = "点击此处，按下包含 Control、Alt 或 Command 的组合键。";
 "Codex CLI logs on this device. Includes logs from different sign-ins, not the current account's complete usage." = "统计本机 Codex CLI 日志，包含不同登录留下的记录，并非当前账户的全部用量。";
 "Codex auth data is invalid." = "Codex 认证数据无效。";
 "Codex logs" = "Codex 日志";
@@ -353,6 +356,7 @@
 "Menu Bar: Percentage shows up to 2 starred metrics; Ring shows one primary quota per selected account." = "菜单栏：百分比显示最多 2 项星标指标；环形为每个所选账号显示一项主要额度。";
 "Menu bar / system tray" = "菜单栏 / 系统托盘";
 "Metric" = "指标";
+"Model Breakdown" = "模型明细";
 "Monitor Your AI Subscriptions with TokenPlan" = "用 TokenPlan 监控你的 AI 订阅";
 "Monthly" = "每月";
 "More" = "更多";
@@ -568,6 +572,7 @@
 "Show less" = "收起";
 "Show more" = "展开";
 "Show on Home" = "首页显示";
+"Show or hide TokenPlan" = "显示或隐藏 TokenPlan";
 "Show remaining quota" = "显示剩余额度";
 "Shown Services" = "显示的服务";
 "Sign in to GitHub Copilot in your editor, or run gh auth login, and try again." = "请在编辑器中登录 GitHub Copilot，或运行 gh auth login 后重试。";
@@ -653,6 +658,7 @@
 "This period used a model with unknown pricing" = "这段时间使用了价格未知的模型";
 "This saved account shares its login with a CLI. Open it in your account switcher to renew safely, then retry." = "此保存账号与 CLI 共用登录凭据。请在账号切换工具中打开该账号以安全续期，然后重试。";
 "This service integration is not available in this build." = "此版本暂未接入这项服务。";
+"This shortcut is unavailable. Choose another combination." = "此快捷键不可用，请选择其他组合。";
 "Time Format" = "时间格式";
 "Today" = "今天";
 "Token Usage" = "Token 用量";
@@ -720,6 +726,7 @@
 "Usage request failed. Check your connection." = "用量请求失败，请检查网络。";
 "Usage response invalid. Try again later." = "用量响应无效，请稍后重试。";
 "Use" = "使用";
+"Use Control, Alt or Command with another key." = "请使用 Control、Alt 或 Command 加其他按键。";
 "Use Credit" = "使用额度";
 "Use This Reset Credit?" = "使用这份重置额度？";
 "Use the tray menu to reopen TokenPlan, refresh usage or quit. Enable background mode only if your desktop displays the tray icon." = "通过托盘菜单重新打开 TokenPlan、刷新或退出。请确认桌面能显示托盘图标后，再启用后台运行。";
