@@ -1,0 +1,110 @@
+name: Tauri migration checks
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-26, windows-latest, ubuntu-24.04]
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        working-directory: platforms/tauri
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: platforms/tauri/package-lock.json
+      - uses: actions/setup-dotnet@v5
+        if: runner.os != 'macOS'
+        with:
+          dotnet-version: 10.0.x
+      - name: Install Linux webview prerequisites
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev patchelf
+      - name: Select Rust toolchain
+        run: rustup toolchain install 1.90.0 --profile minimal
+      - run: npm ci
+      - run: npm run build
+      - run: npm test
+      - name: Native backend regression checks
+        if: runner.os != 'macOS'
+        run: |
+          dotnet run --project ../desktop/TokenPlan.Core.Tests -c Release
+          dotnet run --project ../desktop/TokenPlan.Bridge.Tests -c Release
+      - name: Swift backend regression checks
+        if: runner.os == 'macOS'
+        run: swift test --package-path ../..
+      - name: Add Intel Mac target
+        if: runner.os == 'macOS'
+        run: rustup target add x86_64-apple-darwin --toolchain 1.90.0
+      - name: Build native helper
+        env:
+          TOKENPLAN_UNIVERSAL: ${{ runner.os == 'macOS' && 'true' || 'false' }}
+        run: npm run prepare:bridge
+      - name: Build and test Tauri shell
+        run: |
+          cargo build --locked --manifest-path src-tauri/Cargo.toml
+          cargo test --locked --manifest-path src-tauri/Cargo.toml
+      - name: Native helper protocol smoke test
+        shell: bash
+        run: |
+          if [[ "$RUNNER_OS" == "Windows" ]]; then
+            node scripts/smoke-bridge.mjs src-tauri/target/debug/tokenplan-bridge.exe
+          else
+            node scripts/smoke-bridge.mjs src-tauri/target/debug/tokenplan-bridge
+          fi
+      - name: Install test browser
+        run: npx playwright install --with-deps chromium
+      - run: npm run test:ui
+      - uses: apple-actions/import-codesign-certs@v7
+        if: runner.os == 'macOS'
+        with:
+          p12-file-base64: ${{ secrets.APPLE_CERTIFICATE }}
+          p12-password: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+      - name: Select Mac signing identity
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          identity=$(security find-identity -v -p codesigning | awk -F'"' '/Developer ID Application/ {print $2; exit}')
+          test -n "$identity"
+          echo "APPLE_SIGNING_IDENTITY=$identity" >> "$GITHUB_ENV"
+      - name: Package signed updater artifacts
+        shell: bash
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          APPLE_TEAM_ID: H4982D35ZR
+        run: |
+          node scripts/package-config.mjs
+          if [[ "$RUNNER_OS" == "macOS" ]]; then
+            npm run tauri -- build --target universal-apple-darwin --config src-tauri/tauri.package.json
+          else
+            npm run tauri -- build --config src-tauri/tauri.package.json
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: tauri-${{ runner.os }}
+          path: |
+            platforms/tauri/src-tauri/target/**/release/bundle/**/*.dmg
+            platforms/tauri/src-tauri/target/**/release/bundle/**/*.app.tar.gz*
+            platforms/tauri/src-tauri/target/**/release/bundle/**/*.exe*
+            platforms/tauri/src-tauri/target/**/release/bundle/**/*.AppImage*
+            platforms/tauri/src-tauri/target/**/release/bundle/**/*.deb
+            platforms/tauri/test-results/
+          if-no-files-found: warn
+      # Verification artifacts only. Published feeds require an approved stable version.

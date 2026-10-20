@@ -6,6 +6,26 @@ import OpenUsage
 struct OpenUsageCLI {
     static func main() async {
         do {
+            if CommandLine.arguments.dropFirst().elementsEqual(["--desktop-bridge"]) {
+                // UI translations belong to the shared frontend; this override is process-only.
+                UserDefaults.standard.setVolatileDomain(["AppleLanguages": ["en"]], forName: UserDefaults.argumentDomain)
+                let suite = ProcessInfo.processInfo.environment["TOKENPLAN_DEFAULTS_SUITE"] ?? "com.onevalar.tokenplan"
+                guard let defaults = UserDefaults(suiteName: suite) else { throw CLIError.appDefaultsUnavailable }
+                var bridge = await DesktopBridge(defaults: defaults)
+                while let line = readLine() {
+                    // Discovery rebuilds the registry only on explicit user request.
+                    if let data = line.data(using: .utf8),
+                       let object = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                       object["method"] as? String == "discover" {
+                        bridge = await DesktopBridge(defaults: defaults)
+                        FileHandle.standardOutput.write(await bridge.execute(Data(#"{"method":"state"}"#.utf8)))
+                    } else {
+                        FileHandle.standardOutput.write(await bridge.execute(Data(line.utf8)))
+                    }
+                    FileHandle.standardOutput.write(Data("\n".utf8))
+                }
+                return
+            }
             let arguments = try CLIArguments.parse(Array(CommandLine.arguments.dropFirst()))
             if arguments.showHelp {
                 print(help)

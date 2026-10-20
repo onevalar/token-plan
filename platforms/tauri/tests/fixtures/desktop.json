@@ -1,0 +1,175 @@
+{
+  "schema": "tokenplan.desktop.v1",
+  "settings": {
+    "appearance": "system",
+    "language": "zh-Hans",
+    "trayStyle": "ring",
+    "refreshMinutes": 5,
+    "autoRefresh": false,
+    "autoUpdates": false
+  },
+  "accounts": [
+    {
+      "id": "claude",
+      "family": "claude",
+      "name": "Claude",
+      "email": "first@example.com",
+      "plan": "Pro",
+      "enabled": true,
+      "tray": true,
+      "removable": true,
+      "apiKey": false,
+      "note": "",
+      "error": "",
+      "fetchedAt": "2026-10-20T12:00:00Z",
+      "metrics": [
+        {
+          "id": "weekly",
+          "label": "Weekly",
+          "placement": "home",
+          "pinned": true,
+          "pinnable": true,
+          "hasData": true,
+          "unit": "percent",
+          "percent": 65,
+          "amount": null,
+          "resetsAt": "2026-10-25T12:00:00Z",
+          "periodSeconds": 604800,
+          "values": []
+        },
+        {
+          "id": "argon",
+          "label": "Argon Weekly",
+          "placement": "home",
+          "pinned": false,
+          "pinnable": true,
+          "hasData": false,
+          "unit": "percent",
+          "percent": null,
+          "amount": null,
+          "resetsAt": "2026-10-25T12:00:00Z",
+          "periodSeconds": 604800,
+          "values": []
+        }
+      ],
+      "history": [
+        {
+          "date": "2026-10-20",
+          "tokens": 1200,
+          "cost": 1.2
+        }
+      ],
+      "historyScope": "account",
+      "historyPartial": false,
+      "observations": []
+    },
+    {
+      "id": "claude:third",
+      "family": "claude",
+      "name": "Claude",
+      "email": "second.with.a.long.address@example.com",
+      "plan": "Pro",
+      "enabled": true,
+      "tray": true,
+      "removable": true,
+      "apiKey": false,
+      "note": "",
+      "error": "",
+      "fetchedAt": "2026-10-20T12:00:00Z",
+      "metrics": [
+        {
+          "id": "weekly",
+          "label": "Weekly",
+          "placement": "home",
+          "pinned": true,
+          "pinnable": true,
+          "hasData": true,
+          "unit": "percent",
+          "percent": 65,
+          "amount": null,
+          "resetsAt": "2026-10-25T12:00:00Z",
+          "periodSeconds": 604800,
+          "values": []
+        },
+        {
+          "id": "argon",
+          "label": "Argon Weekly",
+          "placement": "home",
+          "pinned": false,
+          "pinnable": true,
+          "hasData": false,
+          "unit": "percent",
+          "percent": null,
+          "amount": null,
+          "resetsAt": "2026-10-25T12:00:00Z",
+          "periodSeconds": 604800,
+          "values": []
+        }
+      ],
+      "history": [
+        {
+          "date": "2026-10-20",
+          "tokens": 1200,
+          "cost": 1.2
+        }
+      ],
+      "historyScope": "account",
+      "historyPartial": false,
+      "observations": []
+    },
+    {
+      "id": "codex",
+      "family": "codex",
+      "name": "Codex",
+      "email": "codex@example.com",
+      "plan": "Pro",
+      "enabled": true,
+      "tray": true,
+      "removable": true,
+      "apiKey": false,
+      "note": "",
+      "error": "",
+      "fetchedAt": "2026-10-20T12:00:00Z",
+      "metrics": [
+        {
+          "id": "weekly",
+          "label": "Weekly",
+          "placement": "home",
+          "pinned": true,
+          "pinnable": true,
+          "hasData": true,
+          "unit": "percent",
+          "percent": 65,
+          "amount": null,
+          "resetsAt": "2026-10-25T12:00:00Z",
+          "periodSeconds": 604800,
+          "values": []
+        },
+        {
+          "id": "argon",
+          "label": "Argon Weekly",
+          "placement": "home",
+          "pinned": false,
+          "pinnable": true,
+          "hasData": false,
+          "unit": "percent",
+          "percent": null,
+          "amount": null,
+          "resetsAt": "2026-10-25T12:00:00Z",
+          "periodSeconds": 604800,
+          "values": []
+        }
+      ],
+      "history": [
+        {
+          "date": "2026-10-20",
+          "tokens": 1200,
+          "cost": 1.2
+        }
+      ],
+      "historyScope": "account",
+      "historyPartial": false,
+      "observations": []
+    }
+  ]
+}

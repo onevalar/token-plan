@@ -16,6 +16,7 @@ Pushing an approved stable `vX.Y.Z` tag on `main` runs `.github/workflows/releas
 
 ## Architecture
 
+- The owner selected a shared Tauri + React interface on 2026-10-20. `platforms/tauri` is the migration preview; see `docs/tauri-migration.md` for parity requirements. Use Arc for its web UI. Do not switch stable packaging/update feeds to this preview until platform integration and feature parity are verified.
 - SwiftPM executable target; SwiftUI content hosted in an AppKit-owned `NSStatusItem` + custom key-capable `NSPanel`.
 - Swift 6 with strict concurrency.
 - Providers implement the small `ProviderRuntime` protocol: an auth store reads credentials already on the user's machine, a usage client calls the provider's API, and a mapper normalizes the response into `MetricLine` values. The UI renders those normalized values.

@@ -1,0 +1,36 @@
+[package]
+name = "tokenplan-shell"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = ["tray-icon", "image-png"] }
+tauri-plugin-single-instance = "2"
+serde_json = "1"
+serde = { version = "1", features = ["derive"] }
+resvg = { version = "0.45", default-features = false }
+tauri-plugin-updater = "2"
+tauri-plugin-process = "2"
+tokio = { version = "1", features = ["process", "time", "io-util", "sync"] }
+
+
+[dev-dependencies]
+minisign-verify = "0.3"
+base64 = "0.22"
+
+# Rust's debug-info stripping can misalign Mach-O LINKEDIT with Xcode 27
+# (rust-lang/rust#157750). Keep compile-time dylibs loadable without changing
+# deployment targets or release optimization.
+[profile.release]
+strip = "none"
+[profile.release.build-override]
+strip = "none"
+
+[target.'cfg(target_os = "linux")'.dependencies]
+# Tauri's AppIndicator adapter does not forward Linux left-click activation.
+# SNI supplies Activate plus the standard right-click D-Bus menu.
+ksni = "0.3.6"

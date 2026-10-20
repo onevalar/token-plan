@@ -1,0 +1,58 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "TokenPlan Preview",
+  "version": "0.0.0",
+  "identifier": "com.onevalar.tokenplan.preview",
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "beforeBuildCommand": "npm run build",
+    "devUrl": "http://127.0.0.1:1420",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "label": "main",
+        "title": "TokenPlan Preview",
+        "width": 480,
+        "height": 680,
+        "minWidth": 390,
+        "minHeight": 400
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src ipc: http://ipc.localhost; object-src 'none'; frame-src 'none'; base-uri 'none'"
+    }
+  },
+  "bundle": {
+    "active": false,
+    "macOS": {
+      "minimumSystemVersion": "15.0"
+    },
+    "externalBin": [
+      "binaries/tokenplan-bridge"
+    ],
+    "icon": [
+      "icons/icon.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "shortDescription": "AI subscription usage in your system tray",
+    "category": "Utility",
+    "resources": {
+      "../src/components/arc/LICENSE": "licenses/Arc-LICENSE",
+      "../../../LICENSE": "licenses/TokenPlan-LICENSE"
+    }
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDI4QkFCOTA1NzFGN0QzREQKUldUZDAvZHhCYm02S0xqcWRnSTFySEJKWm1YWWpsam92aHlJYWw2Ykk5MitNSFVzd2ROVHNBT3kK",
+      "endpoints": [
+        "https://raw.githubusercontent.com/onevalar/token-plan/main/updates/tauri.json"
+      ],
+      "windows": {
+        "installMode": "passive"
+      }
+    }
+  }
+}

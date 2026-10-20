@@ -3,7 +3,7 @@ public sealed partial class ProviderService
 {
     string? accountIdentityHint;
     public Func<ProviderResult, bool> IsAccountRemoved { get; set; } = _ => false;
-    readonly Dictionary<string, ProviderService> accountServices = new();
+    readonly System.Collections.Concurrent.ConcurrentDictionary<string, ProviderService> accountServices = new();
     public async Task<IReadOnlyList<ProviderResult>> RefreshAdditionalAccounts(string family, CancellationToken cancellation)
     {
         if (family is not ("claude" or "codex")) return Array.Empty<ProviderResult>();
@@ -21,6 +21,7 @@ public sealed partial class ProviderService
             {
                 service = new(family == "codex" ? source.Home : codexHome, family == "claude" ? source.Home : claudeHome, handler: accountHandler, log: log, keys: Keys, userHome: userHome, alternateAuthFile: source.AuthFile, encodedAuth: source.Encoded, requestTimeout: http.Timeout, allowAuthRefresh: allowAuthRefresh && source.CanRefresh);
                 accountServices[key] = service;
+                service.RestoreCooldowns(ExportCooldowns());
             }
             service.accountIdentityHint = source.Identity;
             service.IsAccountRemoved = IsAccountRemoved;

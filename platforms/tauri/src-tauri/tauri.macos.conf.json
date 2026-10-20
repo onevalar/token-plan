@@ -1,0 +1,16 @@
+{
+  "bundle": {
+    "targets": [
+      "app",
+      "dmg"
+    ],
+    "macOS": {
+      "frameworks": [
+        "binaries/Sparkle.framework"
+      ]
+    },
+    "resources": {
+      "binaries/OpenUsage_OpenUsage.bundle": "OpenUsage_OpenUsage.bundle"
+    }
+  }
+}
