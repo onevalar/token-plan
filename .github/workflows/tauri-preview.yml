@@ -101,6 +101,14 @@ jobs:
           identity=$(security find-identity -v -p codesigning | awk -F'"' '/Developer ID Application/ {print $2; exit}')
           test -n "$identity"
           echo "APPLE_SIGNING_IDENTITY=$identity" >> "$GITHUB_ENV"
+      - name: Sign nested Swift framework helpers
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          # Tauri signs the framework itself; Sparkle's nested apps also need our
+          # Developer ID, hardened runtime and secure timestamp before notarization.
+          codesign --force --deep --options runtime --timestamp --sign "$APPLE_SIGNING_IDENTITY" src-tauri/binaries/Sparkle.framework
+          codesign --verify --deep --strict src-tauri/binaries/Sparkle.framework
       - name: Package signed updater artifacts
         shell: bash
         env:
