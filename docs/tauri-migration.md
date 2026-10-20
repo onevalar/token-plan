@@ -99,6 +99,12 @@ preferences and Carbon shortcut; clearing a shortcut explicitly prevents re-impo
 remains Mac-only, preserves the existing device identity and shares only normalized history.
 Production packaging embeds the original provisioning profile and derived entitlements in
 both the shell and bundled helper; preview identities do not have production cloud access.
+The helper shares the production bundle identifier. It must open that settings domain with
+`UserDefaults.standard`; using its own identifier as a named suite is rejected by Foundation.
+Explicit test-suite overrides still use named suites. Packaged acceptance runs both the
+isolated test suite and the real production-domain startup path before publishing.
+The nested helper is named `TokenPlan Bridge` and marked background-only so it is not
+presented as a second user-facing TokenPlan application.
 
 Notification evaluation lives in Rust and runs while the window is hidden. It uses remaining
 quota regardless of display mode, primes without alerts at launch, tracks worsening edges,

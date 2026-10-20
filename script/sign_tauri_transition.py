@@ -29,6 +29,8 @@ helper = app/'Contents/Helpers/TokenPlan Bridge.app'
 helper_info = plistlib.loads((helper/'Contents/Info.plist').read_bytes())
 if helper_info.get('CFBundleIdentifier') != info['CFBundleIdentifier'] or not (helper/'Contents/embedded.provisionprofile').is_file():
     raise ValueError('Helper bundle identity/profile mismatch')
+if helper_info.get('LSBackgroundOnly') is not True or helper_info.get('CFBundleName') != 'TokenPlan Bridge':
+    raise ValueError('Helper must be a distinctly named background-only component')
 for target in [app, helper]:
     entitlements = subprocess.run(['codesign','-d','--entitlements',':-',str(target)], check=True, capture_output=True).stdout
     signed = plistlib.loads(entitlements)

@@ -10,7 +10,7 @@ struct OpenUsageCLI {
                 // UI translations belong to the shared frontend; this override is process-only.
                 UserDefaults.standard.setVolatileDomain(["AppleLanguages": ["en"]], forName: UserDefaults.argumentDomain)
                 let suite = ProcessInfo.processInfo.environment["TOKENPLAN_DEFAULTS_SUITE"] ?? "com.onevalar.tokenplan"
-                guard let defaults = UserDefaults(suiteName: suite) else { throw CLIError.appDefaultsUnavailable }
+                guard let defaults = AppDefaults.open(domain: suite) else { throw CLIError.appDefaultsUnavailable }
                 var bridge = await DesktopBridge(defaults: defaults)
                 while let line = await Task.detached(priority: .utility, operation: { readLine() }).value {
                     // Discovery rebuilds the registry only on explicit user request.
@@ -38,7 +38,7 @@ struct OpenUsageCLI {
                 return
             }
 
-            guard let defaults = UserDefaults(suiteName: app.bundleIdentifier) else {
+            guard let defaults = AppDefaults.open(domain: app.bundleIdentifier) else {
                 throw CLIError.appDefaultsUnavailable
             }
             let result = try await UsageReader(userDefaults: defaults).read(
