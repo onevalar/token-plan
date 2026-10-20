@@ -77,7 +77,15 @@ public sealed partial class DesktopSession : IDisposable
             case "remove":
                 if (account == null || Preferences.AccountRemovalKey(account) == null) throw new InvalidDataException();
                 preferences = preferences.RemoveAccount(account); break;
-            case "tray": preferences = preferences with { TrayAccounts = new(preferences.TrayAccounts) { [id] = value.GetBoolean() } }; break;
+            case "tray":
+                if (!preferences.TrayServices.GetValueOrDefault(family, true))
+                {
+                    var choices = new Dictionary<string, bool>(preferences.TrayAccounts);
+                    foreach (var known in Accounts().Where(a => a.Id == family)) choices[known.SettingsKey] = false;
+                    preferences = preferences with { TrayAccounts = choices, TrayServices = new(preferences.TrayServices) { [family] = true } };
+                }
+                preferences = preferences with { TrayAccounts = new(preferences.TrayAccounts) { [id] = value.GetBoolean() } };
+                break;
             case "note":
                 var note = value.GetString() ?? ""; if (note.Length > 2000) throw new InvalidDataException();
                 preferences = preferences with { ProviderNotes = new(preferences.ProviderNotes) { [id] = note } }; break;

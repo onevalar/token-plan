@@ -68,7 +68,7 @@ public final class DesktopBridge {
                 accounts.remove(id); enablement.setEnabled(false, for: id)
             case "tray":
                 guard let enabled = value as? Bool else { throw Failure.invalid }
-                layout.setMenuBarAccountVisible(enabled, for: id)
+                layout.setMenuBarEntrySelected(enabled, for: id)
             case "note":
                 guard let note = value as? String, note.count <= 2000 else { throw Failure.invalid }
                 notes.setNote(note, for: id)

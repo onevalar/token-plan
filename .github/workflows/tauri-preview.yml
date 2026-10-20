@@ -81,6 +81,14 @@ jobs:
       - name: Install test browser
         run: npx playwright install --with-deps chromium
       - run: npm run test:ui
+      - name: Install WebKit test engine
+        if: runner.os != 'Windows'
+        run: npx playwright install --with-deps webkit
+      - name: Verify WebKit interactions
+        if: runner.os != 'Windows'
+        env:
+          TOKENPLAN_TEST_ENGINE: webkit
+        run: npm run test:ui
       - uses: apple-actions/import-codesign-certs@v7
         if: runner.os == 'macOS'
         with:

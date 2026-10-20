@@ -3,6 +3,7 @@ export default defineConfig({
   testDir: "./tests",
   workers: 1,
   use: {
+    browserName: process.env.TOKENPLAN_TEST_ENGINE === "webkit" ? "webkit" : "chromium",
     baseURL: "http://127.0.0.1:1420",
     locale: "zh-CN",
     launchOptions: process.env.TOKENPLAN_TEST_BROWSER ? { executablePath: process.env.TOKENPLAN_TEST_BROWSER } : {},

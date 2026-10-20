@@ -63,3 +63,26 @@ for(const [locale,settings] of [['en','General Settings'],['zh-Hant','一般設�
  await mockDesktop(page,locale);await page.goto('/');await page.locator('header button').last().click();
  await expect(page.getByRole('menuitem',{name:settings,exact:true})).toBeVisible();
 });
+
+test('confirmed account removal leaves contiguous tray numbering',async({page})=>{
+ await mockDesktop(page);await page.goto('/');
+ await page.getByRole('button',{name:'Claude first@example.com',exact:true}).click();
+ await page.getByRole('button',{name:'显示配置',exact:true}).click();
+ await page.getByRole('button',{name:'移除账号',exact:true}).click();
+ // Arc intentionally ignores a confirming press within its 280 ms accidental-double-click guard.
+ await page.waitForTimeout(300);
+ await page.getByRole('group').getByRole('button',{name:'移除账号',exact:true}).click();
+ await expect(page.locator('.service-row').filter({hasText:'first@example.com'})).toHaveCount(0);
+ await expect(page.locator('.service-row').filter({hasText:'second.with.a.long.address@example.com'})).toHaveCount(1);
+ await page.getByRole('button',{name:'更多',exact:true}).click();await page.getByRole('menuitem',{name:'通用设置'}).click();
+ await expect(page.locator('.tray-account-preview')).toHaveCount(2);
+ await expect(page.locator('.tray-account-preview sup')).toHaveCount(0);
+});
+
+test('service order is reflected in the homepage',async({page})=>{
+ await mockDesktop(page);await page.goto('/');
+ await page.getByRole('button',{name:'更多',exact:true}).click();await page.getByRole('menuitem',{name:'服务配置'}).click();
+ await page.locator('.service-row').nth(1).getByRole('button',{name:/上移/}).click();
+ await page.getByRole('button',{name:'返回',exact:true}).click();
+ await expect(page.locator('.provider').first()).toContainText('second.with.a.long.address@example.com');
+});
