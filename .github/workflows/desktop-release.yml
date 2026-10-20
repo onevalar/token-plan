@@ -69,7 +69,7 @@ jobs:
         run: script/build_desktop_installers.sh "${{ steps.meta.outputs.version }}"
 
       - name: Keep installers as a run artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: TokenPlan-desktop-installers-${{ steps.meta.outputs.version }}
           path: dist/installers/*
