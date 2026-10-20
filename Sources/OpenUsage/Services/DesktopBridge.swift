@@ -19,7 +19,7 @@ public final class DesktopBridge {
         // Only the private bundled helper sets this callback; notify its owning shell.
         let shellPID = getppid()
         if ProcessInfo.processInfo.environment["TOKENPLAN_DESKTOP_SHELL_PID"] == String(shellPID) {
-            AppNotifications.shared.onActivate = { if shellPID > 1 { kill(shellPID, SIGUSR1) } }
+            AppNotifications.shared.onActivate = { if shellPID > 1 && getppid() == shellPID { kill(shellPID, SIGUSR1) } }
         }
         let domain = ProcessInfo.processInfo.environment["TOKENPLAN_DEFAULTS_SUITE"] ?? "com.onevalar.tokenplan"
         let fresh = SettingsMigrator.isFreshInstall(defaults: defaults, domainName: domain)
@@ -64,7 +64,11 @@ public final class DesktopBridge {
             case "state": break
             case "notificationPermission":
                 AppNotifications.shared.registerAsDelegate()
-                guard await AppNotifications.shared.requestAuthorization().value else { throw Failure.notification }
+                let status = await AppNotifications.shared.authorizationStatus()
+                if status == .denied { throw Failure.notification }
+                if ![.authorized, .provisional].contains(status) {
+                    guard await AppNotifications.shared.requestAuthorization().value else { throw Failure.notification }
+                }
             case "notify":
                 guard let fields = value as? [String: String],
                       let title = fields["title"], let body = fields["body"],
