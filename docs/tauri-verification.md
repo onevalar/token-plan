@@ -34,13 +34,22 @@ On Linux without a tray host, dismissal minimizes the ordinary fallback window i
 of making it inaccessible.
 Windows and Linux installed desktop shells were not exercised locally in this repair.
 
-The preview was closed, unregistered and removed. The installed application, real account
-settings, release version and public feeds were not changed.
+The preview was closed, unregistered and removed. During this isolated test, the installed
+application, real account settings and public feeds were not changed.
 
 The original macOS 1.0.12 DMG was downloaded and its SHA-256 matched the published
 digest (`63476f25708834bbca53a5a50f1b921b900053ac9d425df7885a213bafe288c6`).
 The README updater regression verifies that later releases preserve its fixed Classic
 download section. This does not freeze the old application's update feed.
+
+Release 2.0.3 subsequently passed all three platform jobs in
+[run 39457286122](https://github.com/onevalar/token-plan/actions/runs/39457286122).
+The public DMG, EXE, AppImage and DEB URLs returned anonymous HTTP 200; both update
+feeds point to 2.0.3 and the README retains Classic. The downloaded universal Mac update
+archive matched its published SHA-256 and the embedded updater public key. Its app
+reported version 2.0.3 and the production bundle ID, contained arm64 and x86_64 code,
+and passed strict code-signature and stapled notarization-ticket validation. The extracted
+verification app was removed; the installed app was not replaced.
 
 Synthetic-account screenshots:
 [light dashboard](screenshots/desktop-repair/dashboard-light.png),
