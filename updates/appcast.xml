@@ -1,7 +1,14 @@
 <?xml version='1.0' encoding='utf-8'?>
 <rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
     <channel>
-        <item><title>TokenPlan 2.0.2</title><sparkle:version>1792507597</sparkle:version><sparkle:shortVersionString>2.0.2</sparkle:shortVersionString><sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion><description>&lt;pre&gt;# TokenPlan 2.0.2
+        <item><title>TokenPlan 2.0.3</title><sparkle:version>1792514291</sparkle:version><sparkle:shortVersionString>2.0.3</sparkle:shortVersionString><sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion><description>&lt;pre&gt;# TokenPlan 2.0.3
+
+- 将默认面板从 480 收窄到 390，恢复菜单栏／托盘临时面板：不显示普通窗口标题栏和红黄绿按钮，点击面板外自动收起，再次点击托盘图标可开关面板。Linux 没有兼容托盘时保留可操作的普通窗口。
+- 修复 macOS 菜单栏图标刷新后丢失明暗适配、在深色背景下看不见的问题，并改善未固定指标账号的图标大小和空白。
+- 整理三平台共用的首页、服务配置和历史记录：合并相邻的同服务账号标题，统一指标对齐和额度颜色，缩小趋势图，按日期展开并分页查看历史，折叠未启用的服务列表。
+- 重新构建 macOS、Windows 和 Linux 安装包，2.x 用户可通过“检查更新”升级。Linux 应用内自动更新使用 AppImage；DEB 由包管理器升级。
+- 项目首页新增 macOS 1.0.12“经典版”固定下载入口，保留原始安装包；后续主要维护 2.x。两个版本请择一运行，停留经典版的用户可关闭自动检查更新。
+&lt;/pre&gt;</description><enclosure url="https://github.com/onevalar/token-plan/releases/download/v2.0.3/TokenPlan_2.0.3_universal.dmg" length="29553013" type="application/octet-stream" sparkle:edSignature="2mA40FeJP39fvhWBB0rLcoTlCJHbEPOEznedTP+fZ9AzhJKkGJCRJC9SCYqILvXUMn8dbDMPF7IIwa154izcBg==" /></item><item><title>TokenPlan 2.0.2</title><sparkle:version>1792507597</sparkle:version><sparkle:shortVersionString>2.0.2</sparkle:shortVersionString><sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion><description>&lt;pre&gt;# TokenPlan 2.0.2
 
 - 修复 macOS 正式安装后后台程序无法打开配置、首页显示“无法读取用量”的问题，继续使用已有账号、设置和历史记录。
 - 将内部读取组件明确命名为 TokenPlan Bridge，并标记为仅后台运行，避免被识别为另一个同名 TokenPlan 应用。
