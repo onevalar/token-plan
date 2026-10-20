@@ -123,3 +123,17 @@ Daily history expands model totals and raw variants where available. Windows/Lin
 retain bounded per-model aggregates without storing prompt content, with the same stream
 replay deduplication as the daily totals. Unknown model prices remain unavailable.
 These additions still require fresh packaged acceptance before the stable migration marker.
+
+## 2.0.2 production startup verification
+
+Release run `39440203614` passed the three platform builds, interface tests and updater
+signature checks. The Mac job also passed both isolated-suite and production-domain
+startup checks against the final signed helper.
+
+The published Mac DMG was downloaded separately and matched its published SHA-256.
+Its signature verified against the saved native 1.0.12 update key; application signing,
+notarization and background-helper metadata passed. Running that downloaded helper
+against the existing local production configuration returned usage for all seven enabled
+accounts with no account errors. The verification image was ejected afterward; the
+installed 2.0.1 application was not replaced. This verifies the downloaded helper and
+upgrade signatures, not an unattended installation on the user's Mac.
