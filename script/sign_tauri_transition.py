@@ -17,6 +17,16 @@ app = base/'macos/TokenPlan.app'
 info = plistlib.loads((app/'Contents/Info.plist').read_bytes())
 if (info['CFBundleIdentifier'], info['CFBundleShortVersionString']) != ('com.onevalar.tokenplan', version):
     raise ValueError('Production app identity/version mismatch')
+container = 'iCloud.com.onevalar.tokenplan'
+if container not in info.get('NSUbiquitousContainers', {}):
+    raise ValueError('Production iCloud container metadata missing')
+if not (app/'Contents/embedded.provisionprofile').is_file():
+    raise ValueError('Production iCloud provisioning profile missing')
+for target in [app, app/'Contents/MacOS/tokenplan-bridge']:
+    entitlements = subprocess.run(['codesign','-d','--entitlements',':-',str(target)], check=True, capture_output=True).stdout
+    signed = plistlib.loads(entitlements)
+    if container not in signed.get('com.apple.developer.icloud-container-identifiers', []) or 'CloudDocuments' not in signed.get('com.apple.developer.icloud-services', []):
+        raise ValueError('Signed shell or helper is missing iCloud access')
 subprocess.run(['codesign','--verify','--deep','--strict','-R=notarized',str(app)], check=True)
 subprocess.run(['xcrun','stapler','validate',str(app)], check=True)
 archives = list((base/'dmg').glob('*.dmg'))

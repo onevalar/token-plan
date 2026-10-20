@@ -50,7 +50,8 @@ in the migration boundaries; their production bundle verification is pending.
 ## Restored native features (2026-10-20)
 
 Local verification: 1,605 Swift tests (five existing skips), 523 .NET core checks and isolated
-bridge integration passed. WebKit passed all 19 scenarios, including model expansion and
+bridge integration passed. Chromium and WebKit passed all 20 scenarios, including model expansion and
 notification/shortcut settings. Rust tests cover baseline suppression, reset jitter, recovery,
-disabled-trigger reactivation and required shortcut modifiers. Production iCloud signing and
+disabled-trigger reactivation required shortcut modifiers, and used/remaining parity. A final package check launches the
+signed production helper to catch entitlement/provisioning launch failures. Production iCloud signing and
 OS-level behavior still need verification; these results alone do not approve stable routing.

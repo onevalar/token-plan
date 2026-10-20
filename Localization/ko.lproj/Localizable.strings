@@ -280,6 +280,7 @@
 "Gift" = "선물";
 "GitHub token invalid or expired. Re-authenticate (gh auth login) and try again." = "GitHub 토큰이 올바르지 않거나 만료되었습니다. 다시 인증(gh auth login)한 뒤 시도하세요.";
 "Global Shortcut" = "전역 단축키";
+"Global shortcuts are unavailable in this desktop session." = "현재 데스크톱 환경에서 전역 단축키를 사용할 수 없습니다.";
 "Granted" = "지급됨";
 "Grok Bot" = "Grok Bot";
 "Grok Bot usage" = "Grok Bot 사용량";

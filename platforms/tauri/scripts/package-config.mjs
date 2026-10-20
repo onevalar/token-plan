@@ -9,6 +9,7 @@ if(production){
  config.bundle.macOS={bundleVersion:String(Math.floor(Date.now()/1000))};
  if(process.platform==='darwin'){
   if(!process.env.TOKENPLAN_ICLOUD_ENTITLEMENTS||!process.env.TOKENPLAN_ICLOUD_PROFILE)throw Error('Production iCloud signing configuration missing');
+  config.bundle.macOS.infoPlist='production-info.plist';
   config.bundle.macOS.entitlements=process.env.TOKENPLAN_ICLOUD_ENTITLEMENTS;
   config.bundle.macOS.files={'embedded.provisionprofile':process.env.TOKENPLAN_ICLOUD_PROFILE};
  }

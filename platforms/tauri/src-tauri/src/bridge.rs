@@ -16,7 +16,7 @@ impl Bridge {
         let mut command = Command::new(path);
         command.arg("--desktop-bridge").stdin(Stdio::piped()).stdout(Stdio::piped()).stderr(Stdio::null()).kill_on_drop(true);
         #[cfg(target_os = "macos")]
-        command.env("TOKENPLAN_DEFAULTS_SUITE", std::env::var("TOKENPLAN_DEFAULTS_SUITE").unwrap_or_else(|_| "com.onevalar.tokenplan".into()));
+        command.env("TOKENPLAN_DESKTOP_SHELL_PID",std::process::id().to_string()).env("TOKENPLAN_DEFAULTS_SUITE", std::env::var("TOKENPLAN_DEFAULTS_SUITE").unwrap_or_else(|_| "com.onevalar.tokenplan".into()));
         #[cfg(target_os = "windows")]
         command.creation_flags(0x08000000);
         let mut child = command.spawn().map_err(|_| "bridge_unavailable")?;
@@ -68,10 +68,11 @@ pub async fn desktop_request(app: tauri::AppHandle, request: Value) -> Result<De
     let requested_shortcut=request["value"]["shortcut"].as_str().map(str::to_owned).filter(|_|method=="settings");
     let old_shortcut=app.state::<Bridge>().latest.lock().await.as_ref().map(|s|s.settings.shortcut.clone()).unwrap_or_default();
     if let Some(value)=&requested_shortcut {crate::shortcuts::apply(&app,value)?;}
-    let state = match app.state::<Bridge>().call(request).await {
+    let mut state = match app.state::<Bridge>().call(request).await {
         Ok(state)=>state,
         Err(error)=>{if requested_shortcut.is_some(){crate::shortcuts::restore(&app,&old_shortcut);}return Err(error)}
     };
+    state.settings.shortcut_available=crate::shortcuts::available(&app);
     crate::shortcuts::restore(&app,&state.settings.shortcut);
     crate::notifications::evaluate(&app,&state).await;
     let _ = app.emit("desktop-state", &state);

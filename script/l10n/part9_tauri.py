@@ -67,3 +67,5 @@ T.update({
  'Allow TokenPlan notifications in system settings, then try again.': ('请在系统设置中允许 TokenPlan 通知，然后重试。','請在系統設定中允許 TokenPlan 通知，然後重試。','システム設定でTokenPlanの通知を許可して再試行してください。','시스템 설정에서 TokenPlan 알림을 허용한 후 다시 시도하세요.'),
  'Model Breakdown': ('模型明细','模型明細','モデル別内訳','모델별 내역'),
 })
+
+T.update({"Global shortcuts are unavailable in this desktop session.": ("当前桌面环境不支持全局快捷键。", "目前桌面環境不支援全域快捷鍵。", "このデスクトップ環境ではグローバルショートカットを利用できません。", "현재 데스크톱 환경에서 전역 단축키를 사용할 수 없습니다.")})

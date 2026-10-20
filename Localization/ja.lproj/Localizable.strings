@@ -280,6 +280,7 @@
 "Gift" = "ギフト";
 "GitHub token invalid or expired. Re-authenticate (gh auth login) and try again." = "GitHub トークンが無効か期限切れです。再認証（gh auth login）してからもう一度お試しください。";
 "Global Shortcut" = "グローバルショートカット";
+"Global shortcuts are unavailable in this desktop session." = "このデスクトップ環境ではグローバルショートカットを利用できません。";
 "Granted" = "付与済み";
 "Grok Bot" = "Grok Bot";
 "Grok Bot usage" = "Grok Bot の使用量";

@@ -76,6 +76,11 @@ pub async fn evaluate(app:&tauri::AppHandle,state:&DesktopState) {
 #[cfg(test)] mod tests {
     use super::*;
     #[test] fn baseline_edges_and_recovery(){let(a,f)=transition(&Observation::default(),95.,2,Some(10000),[true;3]);assert!(f.is_empty());let(b,_)=transition(&a,20.,0,Some(10000),[true;3]);let(mut c,f)=transition(&b,95.,2,Some(10000),[true;3]);assert_eq!(f,vec![2,0]);c.fired=[true,false,true];assert!(transition(&c,96.,2,Some(10001),[true;3]).1.is_empty());assert!(!transition(&c,96.,2,Some(20000),[true;3]).1.is_empty());}
+    #[test] fn display_mode_and_empty_data_do_not_change_alerts(){
+        let state:DesktopState=serde_json::from_str(include_str!("../../tests/fixtures/desktop.json")).unwrap();
+        let mut metric=state.accounts[0].metrics[0].clone();metric.has_data=true;metric.not_started=false;metric.percent=Some(95.0);metric.resets_at=None;
+        let used=sample(&metric,false,0).unwrap();metric.percent=Some(5.0);assert_eq!(used,sample(&metric,true,0).unwrap());metric.has_data=false;assert!(sample(&metric,true,0).is_none());
+    }
     #[test] fn disabled_edge_is_not_consumed(){let(a,_)=transition(&Observation::default(),20.,0,None,[false;3]);let(b,f)=transition(&a,95.,2,None,[false;3]);assert!(f.is_empty());assert_eq!(transition(&b,95.,2,None,[true;3]).1,vec![2,0]);}
 }
 

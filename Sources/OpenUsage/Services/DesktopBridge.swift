@@ -18,7 +18,9 @@ public final class DesktopBridge {
         self.defaults = defaults
         // Only the private bundled helper sets this callback; notify its owning shell.
         let shellPID = getppid()
-        AppNotifications.shared.onActivate = { if shellPID > 1 { kill(shellPID, SIGUSR1) } }
+        if ProcessInfo.processInfo.environment["TOKENPLAN_DESKTOP_SHELL_PID"] == String(shellPID) {
+            AppNotifications.shared.onActivate = { if shellPID > 1 { kill(shellPID, SIGUSR1) } }
+        }
         let domain = ProcessInfo.processInfo.environment["TOKENPLAN_DEFAULTS_SUITE"] ?? "com.onevalar.tokenplan"
         let fresh = SettingsMigrator.isFreshInstall(defaults: defaults, domainName: domain)
         SettingsMigrator.migrate(defaults: defaults, domainName: domain)

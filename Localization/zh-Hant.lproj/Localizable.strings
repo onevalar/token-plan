@@ -280,6 +280,7 @@
 "Gift" = "贈送";
 "GitHub token invalid or expired. Re-authenticate (gh auth login) and try again." = "GitHub 權杖無效或已過期。請重新驗證（gh auth login）後再試。";
 "Global Shortcut" = "全域快捷鍵";
+"Global shortcuts are unavailable in this desktop session." = "目前桌面環境不支援全域快捷鍵。";
 "Granted" = "贈金";
 "Grok Bot" = "Grok Bot";
 "Grok Bot usage" = "Grok Bot 用量";
