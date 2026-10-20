@@ -105,3 +105,18 @@ The 2.0.0 native feed entry has been withdrawn; published binaries remain immuta
 Production metadata now retains the original public key and the migration signer checks
 the actual bundled Info.plist against release/update-config.json before advertising it.
 Regression tests reject both a missing key and an unintended key change.
+
+## 2.0.1 native trust regression fixed
+
+Release workflow 39409802758 published v2.0.1 from `fc41d71`. Windows initially timed out
+while navigating to the local test page before assertions; rerunning the failed job with
+the same source and unchanged tests passed. Mac and Linux passed on the original attempt.
+The actual bundled Info.plist passed the new native-key guard before publication.
+
+The public 2.0.1 DMG was downloaded and its SHA-256 matched GitHub's asset digest. A
+read-only mount then verified its Sparkle Ed25519 signature with the key captured from
+the user's installed 1.0.12, checked the destination key is identical, validated its code
+signature against that installed app's designated requirement, validated the stapled
+notarization ticket, and successfully launched the bundled data helper. Both public
+update feeds announce 2.0.1 and their assets/checksums were checked. The mounted image
+was ejected; the installed app was not replaced, and the full installer flow was not run.
