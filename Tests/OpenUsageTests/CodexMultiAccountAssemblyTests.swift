@@ -40,6 +40,22 @@ final class CodexMultiAccountAssemblyTests: XCTestCase {
         )
     }
 
+    func testSwitchingTheOnlyLoginKeepsThePreviousAccountAndBindsTheNewRuntime() async {
+        let defaults = makeScratchDefaults()
+        let first = await assemble(files: FakeFiles([
+            "/Users/dev/.codex/auth.json": Fixtures.codexAuth(accountID: "ACCT-A", email: "alice@test")
+        ]), defaults: defaults)
+        XCTAssertEqual(first.identityKeysByCard["codex"], "acct-a")
+        let next = await assemble(files: FakeFiles([
+            "/Users/dev/.codex/auth.json": Fixtures.codexAuth(accountID: "ACCT-B", email: "bob@test")
+        ]), defaults: defaults)
+        let records = ProviderAccountsStore(defaults: defaults).records
+        XCTAssertEqual(records.filter { !$0.removedTombstone }.count, 2)
+        XCTAssertEqual(next.codexCards.count, 1)
+        XCTAssertNotEqual(next.codexCards.first?.id, "codex")
+        XCTAssertEqual(next.codexCards.first?.identity.email, "bob@test")
+    }
+
     func testSingleAccountAcrossHomeAndPiStaysOnThePlainCodexProvider() async {
         let files = FakeFiles([
             "/Users/dev/.codex/auth.json": Fixtures.codexAuth(accountID: "ACCT-A", email: "alice@test"),

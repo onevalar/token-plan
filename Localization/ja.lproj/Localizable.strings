@@ -54,6 +54,7 @@
 "About TokenPlan" = "TokenPlan について";
 "Account" = "アカウント";
 "Account Management" = "アカウント管理";
+"Account saved. Reconnect its login, then detect accounts again." = "アカウントは保存されています。再ログインしてから再検出してください。";
 "Accounts follow the order in Service Configuration." = "アカウントはサービス設定と同じ順序で表示されます。";
 "Activity" = "アクティビティ";
 "Add" = "追加";
@@ -148,10 +149,15 @@
 "Comfortable" = "ゆったり";
 "Command Line" = "コマンドライン";
 "Compact" = "コンパクト";
+"Complete the official login in the terminal, then detect accounts again." = "ターミナルで公式のログインを完了し、再検出してください。";
 "Complete the update in the installer." = "インストーラーで更新を完了してください。";
 "Completions" = "補完";
+"Configuration Directory" = "設定フォルダ";
 "Confirm" = "確認";
+"Connect Account" = "アカウントを接続";
 "Connect Amp with amp login, then refresh." = "amp login でログインしてから更新してください。";
+"Connect Existing Configuration Directory" = "既存の設定フォルダを接続";
+"Connect and Detect" = "接続して検出";
 "Connected" = "接続済み";
 "Connected Providers" = "接続済みサービス";
 "Connection" = "接続";
@@ -159,17 +165,21 @@
 "Consumes one reset credit. Only the usage windows eligible on the server will be reset. This can't be undone." = "リセットクレジットを1つ消費します。サーバーが対象とする利用枠のみリセットされます。この操作は取り消せません。";
 "Content" = "項目";
 "Content Item" = "表示項目";
+"Copied" = "コピーしました";
 "Copilot usage data is unavailable for this account." = "このアカウントでは Copilot の使用量データを取得できません。";
 "Copilot usage request failed (HTTP %lld). Try again later." = "Copilot の使用量リクエストに失敗しました（HTTP %lld）。後でもう一度お試しください。";
 "Copilot usage response invalid. Try again later." = "Copilot の使用量の応答が無効です。後でもう一度お試しください。";
 "Copy Log Path" = "ログのパスをコピー";
+"Copy Login Command" = "ログインコマンドをコピー";
 "Cost" = "コスト";
 "Cost Estimates" = "コスト見積もり";
 "Cost/MTok" = "百万トークンあたりコスト";
 "Could not apply this change. Refresh and try again." = "変更できません。更新して再試行してください。";
 "Could not check for updates. Try again later." = "更新を確認できません。後で再試行してください。";
 "Could not check or install the update. Try again later." = "更新を確認またはインストールできません。後で再試行してください。";
+"Could not complete this step. Check the directory or login and try again." = "操作を完了できませんでした。フォルダやログイン状態を確認し、再試行してください。";
 "Could not install the update. Try again later." = "更新をインストールできません。後で再試行してください。";
+"Could not open a terminal. Copy this command and run it in your terminal." = "ターミナルを開けませんでした。このコマンドをコピーして実行してください。";
 "Could not save. Try again." = "保存できません。再試行してください。";
 "Couldn't %@ the terminal helper: %@" = "ターミナルヘルパーを%1$@できませんでした：%2$@";
 "Couldn't copy the log path to the clipboard." = "ログのパスをクリップボードにコピーできませんでした。";
@@ -221,6 +231,8 @@
 "Details" = "詳細";
 "Details Only" = "詳細のみ";
 "Details only" = "詳細のみ";
+"Detect Accounts" = "アカウントを再検出";
+"Detection complete. Choose an account below or return to its details." = "検出が完了しました。下から選択するか、アカウント詳細に戻ってください。";
 "Detects provider logins again without resetting your display preferences." = "表示設定をリセットせずにログインを再検出します。";
 "Devin quota data unavailable. Try again later." = "Devin の上限データを取得できません。後でもう一度お試しください。";
 "Disabled" = "無効";
@@ -250,6 +262,7 @@
 "Enabled Accounts" = "有効なアカウント";
 "Enabled Services" = "有効なサービス";
 "Enter API Key" = "APIキーを入力";
+"Enter the full directory path, not a credential or token file." = "認証情報ファイルではなく、フォルダの絶対パスを入力してください。";
 "Enterprise usage data unavailable. Try again later." = "Enterprise の使用量データを取得できません。後でもう一度お試しください。";
 "Error" = "エラー";
 "Estimate costs for models that don't have known pricing." = "価格が不明なモデルのコストを見積もります。";
@@ -369,6 +382,8 @@
 "Local token totals are incomplete. Refresh again to continue scanning." = "トークン集計はまだ完了していません。再度更新するとスキャンを続行します。";
 "Location" = "表示場所";
 "Log Level" = "ログレベル";
+"Login Complete — Detect Again" = "ログイン完了・再検出";
+"Login Service" = "ログインするサービス";
 "Login Source" = "ログイン元";
 "MTok" = "百万トークン";
 "Manage" = "管理";
@@ -592,6 +607,7 @@
 "Run devin auth login or sign in to Devin and try again." = "devin auth login を実行するか Devin にサインインしてから、もう一度お試しください。";
 "Save" = "保存";
 "Saved" = "保存しました";
+"Saved accounts stay here when a login expires. Reconnect and detect again; no restart is needed." = "ログインが失効してもアカウントは保持されます。再ログイン後に再検出してください。再起動は不要です。";
 "Saved in App" = "アプリに保存済み";
 "Saving…" = "保存中…";
 "Search Services" = "サービスを検索";
@@ -618,6 +634,7 @@
 "Show or hide TokenPlan" = "TokenPlanを表示・非表示";
 "Show remaining quota" = "残りの使用枠を表示";
 "Shown Services" = "表示するサービス";
+"Sign In to Another Account" = "別のアカウントにログイン";
 "Sign in to GitHub Copilot in your editor, or run gh auth login, and try again." = "エディタで GitHub Copilot にサインインするか、gh auth login を実行してからもう一度お試しください。";
 "Sign in to the provider's app or CLI, then restart TokenPlan to detect it. API keys can be entered in the service's settings." = "サービスのアプリやCLIでログインし、TokenPlanを再起動して検出します。APIキーは該当サービスの設定で入力できます。";
 "Sign in with Antigravity, then refresh." = "Antigravity にログインして更新してください。";
@@ -764,6 +781,7 @@
 "Use This Reset Credit?" = "このリセットクレジットを使用しますか？";
 "Use the tray menu to reopen TokenPlan, refresh usage or quit. Enable background mode only if your desktop displays the tray icon." = "トレイメニューから TokenPlan を再表示、更新、終了できます。デスクトップにトレイアイコンが表示される場合のみ、バックグラウンド実行を有効にしてください。";
 "Used" = "使用済み";
+"Uses a separate configuration directory and keeps your current login. Install the official CLI first if the command is unavailable." = "専用の設定フォルダを使用し、現在のログインを保持します。コマンドが見つからない場合は公式 CLI をインストールしてください。";
 "Uses your provider login. No TokenPlan sign-in is needed." = "サービスの既存ログインを利用します。TokenPlanへのログインは不要です。";
 "Using reset credit…" = "リセットクレジットを使用中…";
 "Version" = "バージョン";
@@ -785,6 +803,7 @@
 "Will reach limit" = "上限に達する見込み";
 "Window" = "ウィンドウ";
 "Windows and Linux show these indicators in the tray panel. The system tray keeps the TokenPlan icon." = "Windows と Linux ではトレイパネルにこれらの項目を表示し、システムトレイには TokenPlan アイコンを表示します。";
+"Working…" = "処理中…";
 "Yesterday" = "昨日";
 "You are up to date." = "最新バージョンです。";
 "You have no rate limit resets" = "利用できるレート制限リセットはありません";

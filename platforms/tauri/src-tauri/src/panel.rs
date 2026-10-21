@@ -1,10 +1,12 @@
-use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicU64, AtomicU32, Ordering};
 use tauri::{Emitter, Manager};
 
 #[derive(Default)]
 pub struct Panel {
     revision: AtomicU64,
     persistent: AtomicBool,
+    content_height: AtomicU32,
+    anchor: std::sync::Mutex<Option<(i32,i32,i32)>>,
 }
 impl Panel {
     fn changed(&self) -> u64 { self.revision.fetch_add(1,Ordering::SeqCst)+1 }
@@ -119,6 +121,7 @@ fn placement(anchor:(i32,i32,i32),origin:(i32,i32),area:(u32,u32),size:(u32,u32)
 pub fn toggle_near(app:&tauri::AppHandle,center:i32,top:i32,bottom:i32) {
     if let Some(window)=app.get_webview_window("main") {
         if window.is_visible().unwrap_or(false) {hide(app);return;}
+        *app.state::<Panel>().anchor.lock().unwrap()=Some((center,top,bottom));
         // The clicked monitor may differ from the panel's previous monitor.
         // Tray positions are physical pixels, but macOS looks up `monitor_from_point`
         // in logical points, so match the physical monitor bounds directly.
@@ -130,13 +133,39 @@ pub fn toggle_near(app:&tauri::AppHandle,center:i32,top:i32,bottom:i32) {
             let area=monitor.work_area();
             let scale=monitor.scale_factor();
             let width=(390.0*scale).round() as u32;
-            let height=((680.0*scale).round() as u32).min(area.size.height);
+            let desired=app.state::<Panel>().content_height.load(Ordering::SeqCst);
+            let height=bounded_height(if desired==0 {280.} else {desired as f64},scale,area.size.height);
             checked(app,window.set_size(tauri::PhysicalSize::new(width,height)));
             let (x,y)=placement((center,top,bottom),(area.position.x,area.position.y),(area.size.width,area.size.height),(width,height),(6.0*scale) as i32);
             checked(app,window.set_position(tauri::PhysicalPosition::new(x,y)));
         }
     }
     show(app);
+}
+
+fn bounded_height(content:f64,scale:f64,available:u32)->u32 {
+    ((content.clamp(120.,680.)*scale).ceil() as u32).min(available.saturating_sub((12.*scale).ceil() as u32).max(1))
+}
+
+#[tauri::command]
+pub fn panel_content_height(app:tauri::AppHandle,height:f64)->Result<(),String> {
+    if !height.is_finite() || !(0. ..=100000.).contains(&height) {return Err("invalid_height".into());}
+    let panel=app.state::<Panel>();
+    let value=height.ceil() as u32;
+    let previous=panel.content_height.swap(value,Ordering::SeqCst);
+    if previous==value || panel.persistent.load(Ordering::SeqCst) {return Ok(());}
+    let window=app.get_webview_window("main").ok_or("window_unavailable")?;
+    let monitor=window.current_monitor().map_err(|e|e.to_string())?;
+    if let Some(monitor)=monitor {
+        let area=monitor.work_area();let scale=monitor.scale_factor();
+        let size=tauri::PhysicalSize::new((390.*scale).round() as u32,bounded_height(height,scale,area.size.height));
+        window.set_size(size).map_err(|e|e.to_string())?;
+        if let Some(anchor)=*panel.anchor.lock().unwrap() {
+            let (x,y)=placement(anchor,(area.position.x,area.position.y),(area.size.width,area.size.height),(size.width,size.height),(6.*scale) as i32);
+            window.set_position(tauri::PhysicalPosition::new(x,y)).map_err(|e|e.to_string())?;
+        }
+    }
+    Ok(())
 }
 
 /// How the web interface should draw the panel's outer frame.
@@ -174,6 +203,12 @@ pub fn retain_window_without_tray(app:&tauri::AppHandle) {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test] fn content_height_shrinks_grows_and_respects_screen_scale() {
+        assert_eq!(bounded_height(210.,2.,1800),420);
+        assert_eq!(bounded_height(2000.,2.,1800),1360);
+        assert_eq!(bounded_height(600.,2.,700),676);
+        assert_eq!(bounded_height(20.,1.,900),120);
+    }
     #[test] fn pending_blur_cannot_hide_reopened_or_refocused_panel() {
         let state=Panel::default();
         let blur=state.changed();

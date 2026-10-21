@@ -1,4 +1,5 @@
 import {useState} from 'react';
+import {AccountOnboarding} from './AccountOnboarding';
 import {ChevronRight} from 'lucide-react';
 import {Button} from '../components/arc/button/button';
 import {MetricRow} from '../Metrics';
@@ -15,6 +16,7 @@ export function AccountDetail({account,tab,onTab,history,send,t,busy,language,no
  const row=(m:Metric)=><div key={m.id}><MetricRow metric={{...m,expiries:[],percent:m.unit==='percent'&&!m.hasData?0:m.percent}} now={now} missing={missing} language={language} remaining={remaining}/>{m.expiries.length>0&&<details className="expiry-details"><summary>{t.expires} · {m.expiries.length}</summary><ul>{m.expiries.map((date,i)=><li key={i}>{new Date(date).toLocaleString(language,{dateStyle:'medium',timeStyle:'short'})}</li>)}</ul></details>}</div>;
  return <div className="account-detail">
   {(account.email||account.plan)&&<div className="detail-identity">{account.email&&<span>{account.email}</span>}{account.plan&&<span className="plan-tag">{account.plan}</span>}</div>}
+  {account.error&&/account saved|sign.?in|log.?in|credential|authenticat|session.*expired/i.test(account.error)&&['claude','codex'].includes(account.family)&&<AccountOnboarding send={send} busy={busy} language={language} family={account.family}/>}
   <nav className="segments preview-segments detail-tabs" aria-label={account.name}>
    <Button size="sm" variant={tab==='usage'?'secondary':'ghost'} aria-pressed={tab==='usage'} onClick={()=>onTab('usage')}>{t.usage}</Button>
    <Button size="sm" variant={tab==='settings'?'secondary':'ghost'} aria-pressed={tab==='settings'} onClick={()=>onTab('settings')}>{tr('Settings')}</Button>

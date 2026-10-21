@@ -339,3 +339,52 @@ test('quota readings retain accessible used and remaining names without explanat
  await expect(visible(page).getByRole('progressbar').first()).toHaveAccessibleName(/剩余/);
  await expect(visible(page).getByText(/剩余|距重置/)).toHaveCount(0);
 });
+
+test('content height follows the active page and shrinks after returning to one service',async({page})=>{
+ const data=largeDesktop();data.accounts.forEach((a,i)=>{a.enabled=i===0;});
+ await setup(page,data);
+ await expect.poll(()=>page.evaluate(()=>(window as any).__panelHeights?.at(-1))).toBeGreaterThan(100);
+ const home=await page.evaluate(()=>(window as any).__panelHeights.at(-1));
+ expect(home).toBeLessThan(500);
+ await menu(page,'通用设置');
+ await expect.poll(()=>page.evaluate(()=>(window as any).__panelHeights.at(-1))).toBeGreaterThan(home);
+ await back(page);
+ await expect.poll(()=>page.evaluate(()=>(window as any).__panelHeights.at(-1))).toBe(home);
+});
+
+test('account setup guides isolated login and detection without restarting',async({page},info)=>{
+ await setup(page);await menu(page,'服务配置');await page.getByRole('button',{name:'添加服务',exact:true}).click();
+ const scan=page.getByRole('button',{name:'重新检测账号',exact:true});
+ await expect(scan).toBeEnabled();
+ await page.evaluate(()=>(window as any).__failNextRequest=true);
+ await scan.click();
+ await expect(visible(page).getByRole('alert').filter({hasText:'操作未完成'})).toBeVisible();
+ await scan.click();
+ await expect(visible(page).getByRole('status')).toContainText('检测完成');
+ await page.getByRole('button',{name:'登录新账号',exact:true}).click();
+ await expect(page.locator('.login-command')).toContainText('CLAUDE_CONFIG_DIR=/isolated');
+ expect(await page.evaluate(()=>(window as any).__loginProviders)).toEqual(['claude']);
+ await page.screenshot({path:info.outputPath('account-login-guide.png')});
+ await page.getByRole('button',{name:'已完成登录，重新检测',exact:true}).click();
+ expect(await page.evaluate(()=>(window as any).__requests.at(-1).method)).toBe('discover');
+ await page.getByRole('button',{name:'连接已有配置目录',exact:true}).click();
+ await page.getByRole('textbox',{name:'配置目录',exact:true}).fill('invalid');
+ await page.getByRole('button',{name:'连接并检测',exact:true}).click();
+ await expect(visible(page).getByRole('alert').filter({hasText:'操作未完成'})).toBeVisible();
+ await page.getByRole('textbox',{name:'配置目录',exact:true}).fill('/custom/account');
+ await page.getByRole('button',{name:'连接并检测',exact:true}).click();
+ await expect(visible(page).getByRole('status')).toContainText('检测完成');
+ expect(await page.evaluate(()=>(window as any).__directories.at(-1))).toEqual({provider:'claude',directory:'/custom/account'});
+ await noOverflow(page);
+});
+
+test('unavailable saved account remains configurable and offers reconnect guidance',async({page})=>{
+ const data=largeDesktop();const account=data.accounts[0];account.error='Account saved. Reconnect its login, then detect accounts again.';account.metrics=[];
+ await setup(page,data);
+ await visible(page).locator('.dashboard').getByRole('button',{name:`${account.name} ${account.email}`,exact:true}).click();
+ await expect(page.getByRole('button',{name:'登录新账号',exact:true})).toBeVisible();
+ await expect(visible(page).getByText('账号已保留。请重新连接登录后，再检测账号。',{exact:true})).toBeVisible();
+ await page.getByRole('button',{name:'设置',exact:true}).click();
+ await expect(page.getByRole('textbox',{name:'备注',exact:true})).toBeVisible();
+ await noOverflow(page);
+});

@@ -46,5 +46,33 @@ try {
   Assert(!state.GetProperty("accounts").EnumerateArray().Any(a=>a.GetProperty("id").GetString()=="claude:second"),"Tombstone survives relaunch");
   Assert(!state.ToString().Contains("CredentialFingerprint"),"No authentication fields exported");
  }
+ // Login switches must not replace the previous account's durable identity or customization.
+ var switchDir=Path.Combine(root,"switching");Directory.CreateDirectory(switchDir);
+ var switchFile=Path.Combine(switchDir,"preferences.json");
+ using(var session=new DesktopSession(switchFile)) {
+  var remember=typeof(DesktopSession).GetMethod("RememberAccount",System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic)!;
+  remember.Invoke(session,[new ProviderResult("claude","Claude",null,null,AccountEmail:"first@example.com",AccountIdentity:"first|org")]);
+  await Call(session,new{method="note",accountId="claude",value="first note"});
+  await Call(session,new{method="enabled",accountId="claude",value=false});
+  var switched=(ProviderResult)remember.Invoke(session,[new ProviderResult("claude","Claude",null,null,AccountEmail:"next@example.com",AccountIdentity:"next|org")])!;
+  Assert(switched.SettingsKey!="claude","Quota observations use the new account key after a login switch");
+  var state=await Call(session,new{method="state"});
+  var accounts=state.GetProperty("accounts").EnumerateArray().Where(a=>a.GetProperty("family").GetString()=="claude").ToArray();
+  Assert(accounts.Length==2,"Switching preserves both account headings");
+  Assert(accounts.Single(a=>a.GetProperty("id").GetString()=="claude").GetProperty("note").GetString()=="first note","Old identity retains notes");
+  remember.Invoke(session,[new ProviderResult("claude","Claude",null,"login unavailable")]);
+  remember.Invoke(session,[new ProviderResult("claude","Claude",null,null,AccountKey:"claude:other-source",AccountEmail:"first@example.com",AccountIdentity:"first|org")]);
+  state=await Call(session,new{method="settings",value=new{autoRefresh=false}});
+  accounts=state.GetProperty("accounts").EnumerateArray().Where(a=>a.GetProperty("family").GetString()=="claude").ToArray();
+  Assert(accounts.Length==2,"Reconnection merges by identity, not login directory");
+  Assert(!accounts.Single(a=>a.GetProperty("id").GetString()=="claude").GetProperty("enabled").GetBoolean(),"Reconnection keeps visibility");
+ }
+ using(var session=new DesktopSession(switchFile)) {
+  var state=await Call(session,new{method="state"});
+  Assert(state.GetProperty("accounts").EnumerateArray().Count(a=>a.GetProperty("family").GetString()=="claude")==2,"Both accounts survive a process restart");
+ }
+ var registeredHome=Path.Combine(root,"registered");Directory.CreateDirectory(registeredHome);
+ File.WriteAllText(Path.Combine(root,".tokenplan-account-directories.json"),JsonSerializer.Serialize(new Dictionary<string,string[]>{{"claude",[registeredHome]}}));
+ Assert(AccountHomes.Discover("claude",root,Path.Combine(root,".claude"),_=>null).Any(a=>a.Home==registeredHome),"Registered independent directory is discoverable");
  Console.WriteLine("Bridge integration checks passed (isolated preferences; no network or real credentials).");
 }finally{Directory.Delete(root,true);}

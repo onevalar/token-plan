@@ -33,7 +33,7 @@ enum ClaudeHomeDiscovery {
         observer: DefaultAccountObserver,
         listDirectories: @Sendable (URL) -> [String]
     ) -> [Home] {
-        listDirectories(observer.homeDirectory()).sorted().compactMap { directory in
+        Set(listDirectories(observer.homeDirectory()) + AccountDirectoryRegistry.paths(family: "claude", files: observer.files, home: observer.homeDirectory())).sorted().compactMap { directory in
             let scoped = DefaultAccountObserver(
                 environment: ClaudeHomeEnvironment(directory: directory, base: observer.environment),
                 files: observer.files, keychain: observer.keychain, homeDirectory: observer.homeDirectory

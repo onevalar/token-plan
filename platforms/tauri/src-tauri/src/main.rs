@@ -1,6 +1,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 mod bridge;
+mod account_setup;
 mod shortcuts;
 mod notifications;
 mod model;
@@ -53,7 +54,8 @@ fn main() {
         .manage(bridge::Bridge::default())
         .manage(tray::Trays::default())
         .manage(panel::Panel::default())
-        .invoke_handler(tauri::generate_handler![bridge::desktop_request, shortcuts::shortcut_capture, panel::panel_frame, quit, hide])
+        .manage(account_setup::AccountSetup::default())
+        .invoke_handler(tauri::generate_handler![bridge::desktop_request, shortcuts::shortcut_capture, panel::panel_frame, panel::panel_content_height, account_setup::account_login, account_setup::account_directory, quit, hide])
         .setup(|app| {
             #[cfg(target_os="windows")]
             {

@@ -5,7 +5,7 @@ public sealed partial class DesktopSession
     async Task RefreshAccounts(bool discover, string? family)
     {
         using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(110));
-        var ids = preferences.OrderedProviders.Where(preferences.IsEnabled).Where(p => family == null || p == family).ToArray();
+        var ids = preferences.OrderedProviders.Where(p => preferences.IsEnabled(p) || (discover && p is ("claude" or "codex"))).Where(p => family == null || p == family).ToArray();
         try
         {
             await Parallel.ForEachAsync(ids, new ParallelOptions { MaxDegreeOfParallelism = 2, CancellationToken = timeout.Token }, async (provider, cancellation) =>
@@ -15,12 +15,18 @@ public sealed partial class DesktopSession
                 try
                 {
                     var fresh = await service.Refresh(provider, cancellation);
-                    results[provider] = fresh.PreserveLastSuccess(results.GetValueOrDefault(provider));
+                    fresh = RememberAccount(fresh);
                     lock (persistenceLock) ObserveQuota(fresh);
-                    foreach (var extra in await service.RefreshAdditionalAccounts(provider, cancellation))
+                    var extras = await service.RefreshAdditionalAccounts(provider, cancellation);
+                    foreach (var extra in extras)
                     {
-                        results[extra.SettingsKey] = extra.PreserveLastSuccess(results.GetValueOrDefault(extra.SettingsKey));
-                        lock (persistenceLock) ObserveQuota(extra);
+                        var remembered = RememberAccount(extra);
+                        lock (persistenceLock) ObserveQuota(remembered);
+                    }
+                    if (provider is "claude" or "codex") {
+                        var identities = extras.Append(fresh).Select(a => a.AccountIdentity).Where(i => i != null).ToHashSet();
+                        foreach (var saved in results.Values.Where(a => a.Id == provider && a.AccountIdentity != null && !identities.Contains(a.AccountIdentity)))
+                            results[saved.SettingsKey] = saved with { Snapshot = null, ErrorKey = "Account saved. Reconnect its login, then detect accounts again." };
                     }
                     await RefreshHistory(provider, cancellation);
                 }

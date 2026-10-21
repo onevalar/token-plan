@@ -50,3 +50,24 @@ T['Metrics without a percentage are shown as values.'] = ('包含非百分比指
 T['Windows and Linux show these indicators in the tray panel. The system tray keeps the TokenPlan icon.'] = ('Windows 和 Linux 在托盘面板中显示这些指标，系统托盘保留 TokenPlan 图标。','Windows 和 Linux 在系統匣面板中顯示這些指標，系統匣保留 TokenPlan 圖示。','Windows と Linux ではトレイパネルにこれらの項目を表示し、システムトレイには TokenPlan アイコンを表示します。','Windows와 Linux에서는 트레이 패널에 지표를 표시하고 시스템 트레이에는 TokenPlan 아이콘을 유지합니다.')
 T['Selected accounts appear as live system tray indicators. Each value uses its own icon in percentage mode. Your desktop controls icon spacing, order and overflow.'] = ('选中的账号会在系统托盘中实时显示用量。百分比模式下，每项数值单独显示。图标间距、排列和折叠由桌面系统控制。','選取的帳號會在系統匣中即時顯示用量。百分比模式下，每項數值分開顯示。圖示間距、排列和收合由桌面系統控制。','選択したアカウントの使用量をシステムトレイに表示します。割合モードでは各値を別のアイコンに表示します。間隔・並び順・折りたたみはデスクトップが制御します。','선택한 계정의 사용량이 시스템 트레이에 실시간으로 표시됩니다. 백분율 모드에서는 각 값이 별도 아이콘으로 표시됩니다. 간격, 순서 및 숨김은 데스크톱에서 제어합니다.')
 T['If an indicator is hidden, move it from the taskbar overflow area into the system tray.'] = ('如果图标被隐藏，可从任务栏的折叠区域拖到系统托盘中。','如果圖示被隱藏，可從工作列的收合區域拖到系統匣中。','アイコンが隠れている場合は、タスクバーのオーバーフロー領域からシステムトレイに移動してください。','아이콘이 숨겨져 있다면 작업 표시줄의 숨겨진 아이콘 영역에서 시스템 트레이로 옮기세요.')
+T.update({
+ 'Connect Account': ('连接账号','連接帳號','アカウントを接続','계정 연결'),
+ 'Account saved. Reconnect its login, then detect accounts again.': ('账号已保留。请重新连接登录后，再检测账号。','帳號已保留。請重新連接登入後，再偵測帳號。','アカウントは保存されています。再ログインしてから再検出してください。','계정이 저장되어 있습니다. 다시 로그인한 후 계정을 검색하세요.'),
+ 'Saved accounts stay here when a login expires. Reconnect and detect again; no restart is needed.': ('登录失效后账号仍会保留。重新登录后再次检测即可，无需重启。','登入失效後帳號仍會保留。重新登入後再次偵測即可，無需重新啟動。','ログインが失効してもアカウントは保持されます。再ログイン後に再検出してください。再起動は不要です。','로그인이 만료되어도 계정은 유지됩니다. 다시 로그인한 후 검색하세요. 재시작은 필요 없습니다.'),
+ 'Login Service': ('登录服务','登入服務','ログインするサービス','로그인 서비스'),
+ 'Working…': ('正在处理…','正在處理…','処理中…','처리 중…'),
+ 'Detect Accounts': ('重新检测账号','重新偵測帳號','アカウントを再検出','계정 다시 검색'),
+ 'Sign In to Another Account': ('登录新账号','登入新帳號','別のアカウントにログイン','새 계정 로그인'),
+ 'Detection complete. Choose an account below or return to its details.': ('检测完成。可在下方选择账号，或返回账号详情。','偵測完成。可在下方選取帳號，或返回帳號詳情。','検出が完了しました。下から選択するか、アカウント詳細に戻ってください。','검색이 완료되었습니다. 아래에서 계정을 선택하거나 계정 상세로 돌아가세요.'),
+ 'Could not complete this step. Check the directory or login and try again.': ('操作未完成，请检查目录或登录状态后重试。','操作未完成，請檢查目錄或登入狀態後重試。','操作を完了できませんでした。フォルダやログイン状態を確認し、再試行してください。','완료하지 못했습니다. 폴더 또는 로그인 상태를 확인하고 다시 시도하세요.'),
+ 'Complete the official login in the terminal, then detect accounts again.': ('请在终端中完成官方登录，然后重新检测账号。','請在終端機中完成官方登入，然後重新偵測帳號。','ターミナルで公式のログインを完了し、再検出してください。','터미널에서 공식 로그인을 완료한 후 계정을 다시 검색하세요.'),
+ 'Could not open a terminal. Copy this command and run it in your terminal.': ('无法打开终端，请复制此命令到终端运行。','無法開啟終端機，請複製此命令到終端機執行。','ターミナルを開けませんでした。このコマンドをコピーして実行してください。','터미널을 열 수 없습니다. 이 명령을 복사해 터미널에서 실행하세요.'),
+ 'Uses a separate configuration directory and keeps your current login. Install the official CLI first if the command is unavailable.': ('使用独立配置目录，不覆盖当前登录。若提示找不到命令，请先安装对应的官方 CLI。','使用獨立設定目錄，不覆蓋目前登入。若找不到命令，請先安裝對應的官方 CLI。','専用の設定フォルダを使用し、現在のログインを保持します。コマンドが見つからない場合は公式 CLI をインストールしてください。','별도 설정 폴더를 사용하여 현재 로그인을 유지합니다. 명령을 찾을 수 없다면 공식 CLI를 먼저 설치하세요.'),
+ 'Copy Login Command': ('复制登录命令','複製登入命令','ログインコマンドをコピー','로그인 명령 복사'),
+ 'Login Complete — Detect Again': ('已完成登录，重新检测','已完成登入，重新偵測','ログイン完了・再検出','로그인 완료 — 다시 검색'),
+ 'Connect Existing Configuration Directory': ('连接已有配置目录','連接現有設定目錄','既存の設定フォルダを接続','기존 설정 폴더 연결'),
+ 'Configuration Directory': ('配置目录','設定目錄','設定フォルダ','설정 폴더'),
+ 'Enter the full directory path, not a credential or token file.': ('输入目录的完整路径，不是凭据或令牌文件的路径。','輸入目錄的完整路徑，而非憑證或權杖檔案路徑。','認証情報ファイルではなく、フォルダの絶対パスを入力してください。','인증 정보나 토큰 파일이 아닌 폴더의 전체 경로를 입력하세요.'),
+ 'Connect and Detect': ('连接并检测','連接並偵測','接続して検出','연결 및 검색'),
+ 'Copied': ('已复制','已複製','コピーしました','복사됨'),
+})

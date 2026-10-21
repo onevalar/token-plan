@@ -8,6 +8,13 @@ public static class AccountHomes
     {
         environment ??= Environment.GetEnvironmentVariable;
         var candidates = new List<AccountHome>();
+        var registrations = Path.Combine(home, ".tokenplan-account-directories.json");
+        if (File.Exists(registrations)) {
+            if (new FileInfo(registrations).Length > 1024 * 1024) throw new InvalidDataException();
+            var saved = JsonSerializer.Deserialize<Dictionary<string, string[]>>(File.ReadAllText(registrations)) ?? [];
+            foreach (var path in saved.GetValueOrDefault(family, []).Take(64))
+                if (Path.IsPathFullyQualified(path)) candidates.Add(new(path, Path.GetFileName(path)));
+        }
         if (family == "claude")
         {
             foreach (var path in (environment("CLAUDE_CONFIG_DIR") ?? "").Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
@@ -41,6 +48,10 @@ public static class AccountHomes
         }
         if (family == "codex")
         {
+            if (Directory.Exists(home))
+                foreach (var directory in Directory.EnumerateDirectories(home, ".codex-*").Order(StringComparer.Ordinal))
+                    if ((File.GetAttributes(directory) & FileAttributes.ReparsePoint) == 0) candidates.Add(new(directory, Path.GetFileName(directory)));
+
             foreach (var path in (environment("TOKENPLAN_CODEX_HOMES") ?? "").Split(Path.PathSeparator, StringSplitOptions.RemoveEmptyEntries))
                 if (Path.IsPathFullyQualified(path)) candidates.Add(new(path, Path.GetFileName(path)));
             var registry = Path.Combine(environment("XSWAP_HOME") ?? Path.Combine(environment("XDG_DATA_HOME") ?? Path.Combine(home, ".local", "share"), "codex-swap"), "accounts.json");

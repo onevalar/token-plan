@@ -1,0 +1,30 @@
+using System.Security.Cryptography;
+using System.Text;
+using TokenPlan.Core;
+namespace TokenPlan.Bridge;
+public sealed partial class DesktopSession
+{
+    // A default login directory can change owners. Never let that replace a saved identity.
+    ProviderResult RememberAccount(ProviderResult fresh)
+    {
+        lock (persistenceLock)
+        {
+            if (fresh.Id is not ("claude" or "codex")) {
+                return results[fresh.SettingsKey] = fresh.PreserveLastSuccess(results.GetValueOrDefault(fresh.SettingsKey));
+            }
+            if (string.IsNullOrEmpty(fresh.AccountIdentity)) {
+                if (results.TryGetValue(fresh.SettingsKey, out var saved) && saved.AccountIdentity != null) {
+                    results[saved.SettingsKey] = saved with { Snapshot = null, ErrorKey = fresh.ErrorKey ?? "Account saved. Reconnect its login, then detect accounts again." };
+                } else results[fresh.SettingsKey] = fresh;
+                return results[fresh.SettingsKey];
+            }
+            var existing = results.Values.FirstOrDefault(a => a.Id == fresh.Id && a.AccountIdentity == fresh.AccountIdentity);
+            if (existing != null) fresh = fresh with { AccountKey = existing.AccountKey };
+            else if (results.TryGetValue(fresh.SettingsKey, out var previous) && previous.AccountIdentity != null && previous.AccountIdentity != fresh.AccountIdentity) {
+                results[previous.SettingsKey] = previous with { Snapshot = null, ErrorKey = "Account saved. Reconnect its login, then detect accounts again." };
+                fresh = fresh with { AccountKey = fresh.Id + ":" + Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(fresh.AccountIdentity))).ToLowerInvariant()[..16] };
+            }
+            return results[fresh.SettingsKey] = fresh.PreserveLastSuccess(existing);
+        }
+    }
+}

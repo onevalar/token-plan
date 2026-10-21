@@ -54,6 +54,7 @@
 "About TokenPlan" = "关于 TokenPlan";
 "Account" = "账号";
 "Account Management" = "账号管理";
+"Account saved. Reconnect its login, then detect accounts again." = "账号已保留。请重新连接登录后，再检测账号。";
 "Accounts follow the order in Service Configuration." = "账号顺序与服务配置保持一致。";
 "Activity" = "活动";
 "Add" = "添加";
@@ -148,10 +149,15 @@
 "Comfortable" = "宽松";
 "Command Line" = "命令行";
 "Compact" = "紧凑";
+"Complete the official login in the terminal, then detect accounts again." = "请在终端中完成官方登录，然后重新检测账号。";
 "Complete the update in the installer." = "请在安装程序中完成更新。";
 "Completions" = "补全";
+"Configuration Directory" = "配置目录";
 "Confirm" = "确认";
+"Connect Account" = "连接账号";
 "Connect Amp with amp login, then refresh." = "运行 amp login 登录账号后刷新。";
+"Connect Existing Configuration Directory" = "连接已有配置目录";
+"Connect and Detect" = "连接并检测";
 "Connected" = "已连接";
 "Connected Providers" = "已连接的服务";
 "Connection" = "连接";
@@ -159,17 +165,21 @@
 "Consumes one reset credit. Only the usage windows eligible on the server will be reset. This can't be undone." = "将消耗一份重置额度，仅重置服务端允许的用量周期。此操作无法撤销。";
 "Content" = "内容";
 "Content Item" = "内容项";
+"Copied" = "已复制";
 "Copilot usage data is unavailable for this account." = "该账户无法获取 Copilot 用量数据。";
 "Copilot usage request failed (HTTP %lld). Try again later." = "Copilot 用量请求失败（HTTP %lld），请稍后重试。";
 "Copilot usage response invalid. Try again later." = "Copilot 用量响应无效，请稍后重试。";
 "Copy Log Path" = "复制日志路径";
+"Copy Login Command" = "复制登录命令";
 "Cost" = "费用";
 "Cost Estimates" = "费用估算";
 "Cost/MTok" = "每百万 token 费用";
 "Could not apply this change. Refresh and try again." = "无法应用此更改，请刷新后重试。";
 "Could not check for updates. Try again later." = "无法检查更新，请稍后重试。";
 "Could not check or install the update. Try again later." = "无法检查或安装更新，请稍后重试。";
+"Could not complete this step. Check the directory or login and try again." = "操作未完成，请检查目录或登录状态后重试。";
 "Could not install the update. Try again later." = "无法安装更新，请稍后重试。";
+"Could not open a terminal. Copy this command and run it in your terminal." = "无法打开终端，请复制此命令到终端运行。";
 "Could not save. Try again." = "保存失败，请重试。";
 "Couldn't %@ the terminal helper: %@" = "无法%1$@终端助手：%2$@";
 "Couldn't copy the log path to the clipboard." = "无法将日志路径复制到剪贴板。";
@@ -221,6 +231,8 @@
 "Details" = "详情";
 "Details Only" = "仅详情";
 "Details only" = "仅详情";
+"Detect Accounts" = "重新检测账号";
+"Detection complete. Choose an account below or return to its details." = "检测完成。可在下方选择账号，或返回账号详情。";
 "Detects provider logins again without resetting your display preferences." = "重新检测服务登录，不会重置显示设置。";
 "Devin quota data unavailable. Try again later." = "Devin 额度数据暂不可用，请稍后重试。";
 "Disabled" = "已停用";
@@ -250,6 +262,7 @@
 "Enabled Accounts" = "已启用账号";
 "Enabled Services" = "已启用服务";
 "Enter API Key" = "输入 API Key";
+"Enter the full directory path, not a credential or token file." = "输入目录的完整路径，不是凭据或令牌文件的路径。";
 "Enterprise usage data unavailable. Try again later." = "企业版用量数据暂不可用，请稍后重试。";
 "Error" = "错误";
 "Estimate costs for models that don't have known pricing." = "为没有已知定价的模型估算费用。";
@@ -369,6 +382,8 @@
 "Local token totals are incomplete. Refresh again to continue scanning." = "Token 统计尚不完整，再次刷新可继续扫描。";
 "Location" = "显示位置";
 "Log Level" = "日志级别";
+"Login Complete — Detect Again" = "已完成登录，重新检测";
+"Login Service" = "登录服务";
 "Login Source" = "登录来源";
 "MTok" = "百万 token";
 "Manage" = "管理";
@@ -592,6 +607,7 @@
 "Run devin auth login or sign in to Devin and try again." = "请运行 devin auth login 或登录 Devin 后重试。";
 "Save" = "保存";
 "Saved" = "已保存";
+"Saved accounts stay here when a login expires. Reconnect and detect again; no restart is needed." = "登录失效后账号仍会保留。重新登录后再次检测即可，无需重启。";
 "Saved in App" = "已保存在应用中";
 "Saving…" = "正在保存…";
 "Search Services" = "搜索服务";
@@ -618,6 +634,7 @@
 "Show or hide TokenPlan" = "显示或隐藏 TokenPlan";
 "Show remaining quota" = "显示剩余额度";
 "Shown Services" = "显示的服务";
+"Sign In to Another Account" = "登录新账号";
 "Sign in to GitHub Copilot in your editor, or run gh auth login, and try again." = "请在编辑器中登录 GitHub Copilot，或运行 gh auth login 后重试。";
 "Sign in to the provider's app or CLI, then restart TokenPlan to detect it. API keys can be entered in the service's settings." = "先在服务应用或命令行工具中登录，再重启 TokenPlan 检测。API 密钥可在对应服务的设置中填写。";
 "Sign in with Antigravity, then refresh." = "请在 Antigravity 中登录后刷新。";
@@ -764,6 +781,7 @@
 "Use This Reset Credit?" = "使用这份重置额度？";
 "Use the tray menu to reopen TokenPlan, refresh usage or quit. Enable background mode only if your desktop displays the tray icon." = "通过托盘菜单重新打开 TokenPlan、刷新或退出。请确认桌面能显示托盘图标后，再启用后台运行。";
 "Used" = "已用";
+"Uses a separate configuration directory and keeps your current login. Install the official CLI first if the command is unavailable." = "使用独立配置目录，不覆盖当前登录。若提示找不到命令，请先安装对应的官方 CLI。";
 "Uses your provider login. No TokenPlan sign-in is needed." = "读取服务已有登录，无需登录 TokenPlan。";
 "Using reset credit…" = "正在使用重置额度…";
 "Version" = "版本";
@@ -785,6 +803,7 @@
 "Will reach limit" = "将达到上限";
 "Window" = "窗口";
 "Windows and Linux show these indicators in the tray panel. The system tray keeps the TokenPlan icon." = "Windows 和 Linux 在托盘面板中显示这些指标，系统托盘保留 TokenPlan 图标。";
+"Working…" = "正在处理…";
 "Yesterday" = "昨天";
 "You are up to date." = "已是最新版本。";
 "You have no rate limit resets" = "你没有可用的额度重置";

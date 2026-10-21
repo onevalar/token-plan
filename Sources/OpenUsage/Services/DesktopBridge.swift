@@ -11,6 +11,7 @@ public final class DesktopBridge {
     private let enablement: ProviderEnablementStore
     private let layout: LayoutStore
     private let store: WidgetDataStore
+    private let observedIdentities: [String: String]
     private let notes: SubscriptionNotesStore
 
     public init(defaults: UserDefaults) async {
@@ -23,6 +24,8 @@ public final class DesktopBridge {
         let domain = ProcessInfo.processInfo.environment["TOKENPLAN_DEFAULTS_SUITE"] ?? "com.onevalar.tokenplan"
         let fresh = SettingsMigrator.isFreshInstall(defaults: defaults, domainName: domain)
         SettingsMigrator.migrate(defaults: defaults, domainName: domain)
+        LoginShellEnvironment.shared.prewarm()
+        await ShellEnvironmentSnapshotStore(defaults: defaults).startRefreshTask().value
         let assembly = await ProviderAccountAssembly.make(defaults: defaults, waitsForLoginShell: true)
         let accounts = ProviderAccountsStore(defaults: defaults)
         let enablement = ProviderEnablementStore(defaults: defaults)
@@ -30,7 +33,7 @@ public final class DesktopBridge {
             codex: assembly.codex, claudeIdentityKeys: assembly.identityKeysByCard)
         if let seed = FirstRunSeeder.seedIfNeeded(isFreshInstall: fresh, providers: runtimes, enablement: enablement, onboarding: OnboardingStore(defaults: defaults)) { await seed.value }
         if let seed = NewProviderSeeder.reconcileIfNeeded(providers: runtimes, enablement: enablement) { await seed.value }
-        let registry = WidgetRegistry.from(runtimes)
+        let registry = SavedAccountProjection.retainingRecords(in: WidgetRegistry.from(runtimes), records: accounts.records)
         let expand: ([String]) -> [String] = { DefaultLayout.expandingAccounts($0, providerIDs: registry.providers.map(\.id)) }
         let layout = LayoutStore(registry: registry, pinLimit: 3, defaults: defaults,
             defaultMetricIDs: expand(DefaultLayout.metricIDs),
@@ -38,6 +41,7 @@ public final class DesktopBridge {
             defaultExpandedMetricIDs: expand(DefaultLayout.expandedMetricIDs),
             isProviderEnabled: { enablement.isEnabled($0) && !accounts.isRemoved($0) })
         layout.isProviderRemoved = { accounts.isRemoved($0) }
+        self.observedIdentities = assembly.identityKeysByCard
         self.runtimes = runtimes; self.registry = registry
         self.accounts = accounts; self.enablement = enablement; self.layout = layout
         self.notes = SubscriptionNotesStore(defaults: defaults)
@@ -55,7 +59,7 @@ public final class DesktopBridge {
             let id = request["accountId"] as? String ?? ""
             let value = request["value"]
             if !["state", "refresh", "settings", "notificationPermission", "notify"].contains(method) {
-                guard registry.provider(id: id) != nil, !accounts.isRemoved(id) else { throw Failure.invalid }
+                guard (registry.provider(id: id) != nil || accounts.records.contains { $0.id == id }), !accounts.isRemoved(id) else { throw Failure.invalid }
             }
             switch method {
             case "state": break
@@ -75,7 +79,9 @@ public final class DesktopBridge {
             case "refresh":
                 if id.isEmpty { await store.refreshAll(force: false) }
                 else {
-                    guard registry.provider(id: id) != nil, enablement.isEnabled(id), !accounts.isRemoved(id) else { throw Failure.invalid }
+                    guard enablement.isEnabled(id), !accounts.isRemoved(id) else { throw Failure.invalid }
+                    if accounts.records.contains(where: { $0.id == id && observedIdentities[id] != $0.identityKey }) { break }
+                    guard registry.provider(id: id) != nil else { throw Failure.invalid }
                     _ = await store.refresh(providerID: id, force: false)
                 }
                 await PersistentJSONLScanCaches.flushPendingWrites()
@@ -93,7 +99,7 @@ public final class DesktopBridge {
                 notes.setNote(note, for: id)
             case "move":
                 guard let offset = value as? Int, abs(offset) == 1 else { throw Failure.invalid }
-                var order = registry.orderedProviderIDs(savedOrder: layout.providerOrder)
+                var order = accountIDs()
                 guard let index = order.firstIndex(of: id), order.indices.contains(index + offset) else { break }
                 order.swapAt(index, index + offset); layout.providerOrder = order; layout.persistProviderOrder()
             case "metric":
@@ -156,8 +162,18 @@ public final class DesktopBridge {
 
     private enum Failure: Error { case invalid, pinLimit, notification }
 
+    private func accountIDs() -> [String] {
+        SavedAccountProjection.orderedIDs(runtimeIDs: registry.orderedProviderIDs(savedOrder: layout.providerOrder),
+            records: accounts.records, order: layout.providerOrder)
+    }
+
     private func snapshot() -> [String: Any] {
-        let entries: [[String: Any]] = registry.orderedProviderIDs(savedOrder: layout.providerOrder).compactMap { id in
+        let entries: [[String: Any]] = accountIDs().compactMap { id in
+            if let record = accounts.records.first(where: { $0.id == id }), !record.removedTombstone,
+               observedIdentities[id] != record.identityKey {
+                return SavedAccountProjection.placeholder(record: record, enabled: enablement.isEnabled(id),
+                    tray: layout.isMenuBarAccountVisible(id) && layout.isMenuBarServiceVisible(id), note: notes.note(for: id))
+            }
             guard let provider = registry.provider(id: id), !accounts.isRemoved(id) else { return nil }
             let snapshot = store.snapshots[id]
             let history = snapshot?.usageHistory?.series.daily.map { entry in

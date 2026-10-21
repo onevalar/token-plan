@@ -216,3 +216,22 @@ against the existing local production configuration returned usage for all seven
 accounts with no account errors. The verification image was ejected afterward; the
 installed 2.0.1 application was not replaced. This verifies the downloaded helper and
 upgrade signatures, not an unattended installation on the user's Mac.
+
+### Account reconnection and panel sizing
+
+The tray panel sizes itself to the active page, up to 680 logical pixels and the available
+screen height. Short dashboards shrink; longer pages scroll. Linux's ordinary window
+fallback (when no tray host is available) remains user-resizable.
+
+Saved Claude/Codex accounts remain listed when their login disappears or expires. A
+missing login shows a reconnect message instead of another account's quota. Disabling
+an account and explicitly removing it remain separate actions. Account identity, rather
+than the current default login directory, determines which saved account is refreshed.
+
+In **Service Configuration → Add Service**, **Detect Accounts** rescans without restarting.
+**Sign In to Another Account** opens the official Claude/Codex CLI in a separate configuration
+directory; it does not replace the current CLI login. The official CLI must be installed.
+After completing browser/terminal authentication, return and detect again. If no terminal
+can be opened, the same command is available to copy. Existing custom configuration
+directories can also be connected explicitly. Only their paths are stored in
+`~/.tokenplan-account-directories.json`; passwords and tokens are not copied into this registry.

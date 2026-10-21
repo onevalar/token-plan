@@ -54,6 +54,7 @@
 "About TokenPlan" = "TokenPlan 정보";
 "Account" = "계정";
 "Account Management" = "계정 관리";
+"Account saved. Reconnect its login, then detect accounts again." = "계정이 저장되어 있습니다. 다시 로그인한 후 계정을 검색하세요.";
 "Accounts follow the order in Service Configuration." = "계정은 서비스 설정과 같은 순서로 표시됩니다.";
 "Activity" = "활동";
 "Add" = "추가";
@@ -148,10 +149,15 @@
 "Comfortable" = "넓게";
 "Command Line" = "명령줄";
 "Compact" = "간결";
+"Complete the official login in the terminal, then detect accounts again." = "터미널에서 공식 로그인을 완료한 후 계정을 다시 검색하세요.";
 "Complete the update in the installer." = "설치 프로그램에서 업데이트를 완료하세요.";
 "Completions" = "완성";
+"Configuration Directory" = "설정 폴더";
 "Confirm" = "확인";
+"Connect Account" = "계정 연결";
 "Connect Amp with amp login, then refresh." = "amp login으로 로그인한 후 새로 고침하세요.";
+"Connect Existing Configuration Directory" = "기존 설정 폴더 연결";
+"Connect and Detect" = "연결 및 검색";
 "Connected" = "연결됨";
 "Connected Providers" = "연결된 서비스";
 "Connection" = "연결";
@@ -159,17 +165,21 @@
 "Consumes one reset credit. Only the usage windows eligible on the server will be reset. This can't be undone." = "초기화 크레딧 하나를 소비합니다. 서버에서 허용하는 사용량 기간만 초기화됩니다. 되돌릴 수 없습니다.";
 "Content" = "내용";
 "Content Item" = "콘텐츠 항목";
+"Copied" = "복사됨";
 "Copilot usage data is unavailable for this account." = "이 계정에서는 Copilot 사용량 데이터를 사용할 수 없습니다.";
 "Copilot usage request failed (HTTP %lld). Try again later." = "Copilot 사용량 요청 실패 (HTTP %lld). 나중에 다시 시도하세요.";
 "Copilot usage response invalid. Try again later." = "Copilot 사용량 응답이 올바르지 않습니다. 나중에 다시 시도하세요.";
 "Copy Log Path" = "로그 경로 복사";
+"Copy Login Command" = "로그인 명령 복사";
 "Cost" = "비용";
 "Cost Estimates" = "비용 추정";
 "Cost/MTok" = "백만 토큰당 비용";
 "Could not apply this change. Refresh and try again." = "변경하지 못했습니다. 새로 고침 후 다시 시도하세요.";
 "Could not check for updates. Try again later." = "업데이트를 확인할 수 없습니다. 나중에 다시 시도하세요.";
 "Could not check or install the update. Try again later." = "업데이트를 확인하거나 설치하지 못했습니다. 나중에 다시 시도하세요.";
+"Could not complete this step. Check the directory or login and try again." = "완료하지 못했습니다. 폴더 또는 로그인 상태를 확인하고 다시 시도하세요.";
 "Could not install the update. Try again later." = "업데이트를 설치할 수 없습니다. 나중에 다시 시도하세요.";
+"Could not open a terminal. Copy this command and run it in your terminal." = "터미널을 열 수 없습니다. 이 명령을 복사해 터미널에서 실행하세요.";
 "Could not save. Try again." = "저장하지 못했습니다. 다시 시도하세요.";
 "Couldn't %@ the terminal helper: %@" = "터미널 도우미를 %1$@하지 못했습니다: %2$@";
 "Couldn't copy the log path to the clipboard." = "로그 경로를 클립보드에 복사하지 못했습니다.";
@@ -221,6 +231,8 @@
 "Details" = "상세";
 "Details Only" = "상세만";
 "Details only" = "상세만";
+"Detect Accounts" = "계정 다시 검색";
+"Detection complete. Choose an account below or return to its details." = "검색이 완료되었습니다. 아래에서 계정을 선택하거나 계정 상세로 돌아가세요.";
 "Detects provider logins again without resetting your display preferences." = "표시 설정을 초기화하지 않고 서비스 로그인을 다시 감지합니다.";
 "Devin quota data unavailable. Try again later." = "Devin 한도 데이터를 사용할 수 없습니다. 나중에 다시 시도하세요.";
 "Disabled" = "사용 안 함";
@@ -250,6 +262,7 @@
 "Enabled Accounts" = "활성 계정";
 "Enabled Services" = "활성화된 서비스";
 "Enter API Key" = "API 키 입력";
+"Enter the full directory path, not a credential or token file." = "인증 정보나 토큰 파일이 아닌 폴더의 전체 경로를 입력하세요.";
 "Enterprise usage data unavailable. Try again later." = "엔터프라이즈 사용량 데이터를 사용할 수 없습니다. 나중에 다시 시도하세요.";
 "Error" = "오류";
 "Estimate costs for models that don't have known pricing." = "가격을 알 수 없는 모델의 비용을 추정합니다.";
@@ -369,6 +382,8 @@
 "Local token totals are incomplete. Refresh again to continue scanning." = "토큰 집계가 아직 완료되지 않았습니다. 다시 새로고침하면 스캔을 계속합니다.";
 "Location" = "표시 위치";
 "Log Level" = "로그 수준";
+"Login Complete — Detect Again" = "로그인 완료 — 다시 검색";
+"Login Service" = "로그인 서비스";
 "Login Source" = "로그인 출처";
 "MTok" = "백만 토큰";
 "Manage" = "관리";
@@ -592,6 +607,7 @@
 "Run devin auth login or sign in to Devin and try again." = "devin auth login을 실행하거나 Devin에 로그인한 뒤 다시 시도하세요.";
 "Save" = "저장";
 "Saved" = "저장됨";
+"Saved accounts stay here when a login expires. Reconnect and detect again; no restart is needed." = "로그인이 만료되어도 계정은 유지됩니다. 다시 로그인한 후 검색하세요. 재시작은 필요 없습니다.";
 "Saved in App" = "앱에 저장됨";
 "Saving…" = "저장 중…";
 "Search Services" = "서비스 검색";
@@ -618,6 +634,7 @@
 "Show or hide TokenPlan" = "TokenPlan 표시 또는 숨기기";
 "Show remaining quota" = "남은 할당량 표시";
 "Shown Services" = "표시할 서비스";
+"Sign In to Another Account" = "새 계정 로그인";
 "Sign in to GitHub Copilot in your editor, or run gh auth login, and try again." = "편집기에서 GitHub Copilot에 로그인하거나 gh auth login을 실행한 뒤 다시 시도하세요.";
 "Sign in to the provider's app or CLI, then restart TokenPlan to detect it. API keys can be entered in the service's settings." = "서비스 앱이나 CLI에서 로그인한 후 TokenPlan을 다시 시작해 감지하세요. API 키는 해당 서비스 설정에 입력할 수 있습니다.";
 "Sign in with Antigravity, then refresh." = "Antigravity에 로그인한 후 새로 고침하세요.";
@@ -764,6 +781,7 @@
 "Use This Reset Credit?" = "이 초기화 크레딧을 사용할까요?";
 "Use the tray menu to reopen TokenPlan, refresh usage or quit. Enable background mode only if your desktop displays the tray icon." = "트레이 메뉴에서 TokenPlan을 다시 열거나 새로고침하거나 종료할 수 있습니다. 바탕 화면에 트레이 아이콘이 표시될 때만 백그라운드 실행을 사용하세요.";
 "Used" = "사용됨";
+"Uses a separate configuration directory and keeps your current login. Install the official CLI first if the command is unavailable." = "별도 설정 폴더를 사용하여 현재 로그인을 유지합니다. 명령을 찾을 수 없다면 공식 CLI를 먼저 설치하세요.";
 "Uses your provider login. No TokenPlan sign-in is needed." = "서비스의 기존 로그인을 사용합니다. TokenPlan 로그인은 필요 없습니다.";
 "Using reset credit…" = "초기화 크레딧 사용 중…";
 "Version" = "버전";
@@ -785,6 +803,7 @@
 "Will reach limit" = "한도에 도달할 예정";
 "Window" = "창";
 "Windows and Linux show these indicators in the tray panel. The system tray keeps the TokenPlan icon." = "Windows와 Linux에서는 트레이 패널에 지표를 표시하고 시스템 트레이에는 TokenPlan 아이콘을 유지합니다.";
+"Working…" = "처리 중…";
 "Yesterday" = "어제";
 "You are up to date." = "최신 버전입니다.";
 "You have no rate limit resets" = "사용 가능한 한도 초기화가 없습니다";

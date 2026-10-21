@@ -218,3 +218,19 @@ The earlier cloud-sync verification notes above describe historical builds. Sync
 and its signing/profile requirements have now been removed. Only local history is used;
 old local data and remote documents are not deleted. Provider authentication, notifications
 and updater signature verification retain their existing behavior.
+
+## Adaptive panel and durable accounts (2026-10-21)
+
+Regression fixtures cover a short dashboard, growing/shrinking when navigating, saved
+accounts surviving absent credentials and restart, account switching without replacing
+another identity, preserving notes/visibility, explicit removal, directory registration,
+login guidance, failed detection and retry. Authentication uses synthetic data in these
+tests; no real CLI login is switched or renewed.
+
+Local Swift tests passed (1,579 XCTest cases, five skipped; six CLI cases; three Swift
+Testing cases), along with 523 .NET core checks, bridge integration checks, 29 Rust checks
+(one ignored), and frontend unit/build checks. All 72 shared navigation scenarios passed across
+WebKit and the Windows/Linux Chromium configurations (including a targeted rerun after
+correcting ambiguous test selectors). Native terminal login completion on actual
+Windows/Linux desktops remains a separate acceptance check; browser platform variants
+verify the shared UI rather than installed operating systems.

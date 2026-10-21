@@ -9,6 +9,9 @@ export async function mockDesktop(page:Page,language='zh-Hans',cloud=false,data:
    transformCallback:(fn:unknown)=>{callbacks.set(++sequence,fn);return sequence;},
    unregisterCallback:(id:number)=>callbacks.delete(id),
    invoke:async(command:string,args:any)=>{
+    if(command==='panel_content_height'){((window as any).__panelHeights??=[]).push(args.height);return;}
+    if(command==='account_login'){((window as any).__loginProviders??=[]).push(args.provider);return {command:'env CLAUDE_CONFIG_DIR=/isolated claude auth login',directory:'/isolated',opened:true};}
+    if(command==='account_directory'){((window as any).__directories??=[]).push(args);if(args.directory==='invalid')throw 'invalid_directory';return;}
     if(command==='hide'){(window as any).__panelHides=((window as any).__panelHides??0)+1;return;}
     if(command==='shortcut_capture'){(window as any).__shortcutPaused=args.paused;return;}
     if(command==='plugin:app|version')return '0.0.0';

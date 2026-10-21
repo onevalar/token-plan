@@ -69,7 +69,12 @@ extension ProviderAccountAssembly {
             homeLogins.map(\.identity) + piScan.logins.map(\.identity) + swaps.map(\.identity)
                 + [keychainIdentity].compactMap { $0 }
         )
-        guard !swaps.isEmpty || hasEstablishedAccounts || knownIdentities.count > 1 else {
+        let hasDifferentSavedAccount = !knownIdentities.isEmpty && accountsStore.records.contains { record in
+            record.family == "codex" && !record.removedTombstone && !knownIdentities.contains {
+                $0.key == record.identityKey || $0.accountID == record.identityKey
+            }
+        }
+        guard !swaps.isEmpty || hasEstablishedAccounts || hasDifferentSavedAccount || knownIdentities.count > 1 else {
             let plainHomes = homeLogins.map(\.home).filter { !configuredHomes.contains($0) }
             return CodexAccountDiscovery(
                 plainAuthHomes: plainHomes,

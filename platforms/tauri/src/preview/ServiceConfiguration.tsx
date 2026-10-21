@@ -8,6 +8,7 @@ import {providerText} from '../providerText';
 import type {DesktopState,Send} from '../desktop';
 import type {Copy} from '../copy';
 import {useChange} from './shared';
+import {AccountOnboarding} from './AccountOnboarding';
 
 export function ServiceConfiguration({state,send,t,busy,language,open,adding=false}:{state:DesktopState;send:Send;t:Copy;busy:boolean;language:string;open:(id:string)=>void;adding?:boolean}) {
  const tr=(s:string)=>providerText(s,language),[search,setSearch]=useState(''),[reordering,setReordering]=useState(false),[moving,setMoving]=useState(false);
@@ -24,6 +25,7 @@ export function ServiceConfiguration({state,send,t,busy,language,open,adding=fal
  const rows=adding?available:active;
  return <div className="service-configuration">
   {notice}
+  {adding&&<AccountOnboarding send={send} busy={disabled} language={language}/>}
   {adding?<div className="service-search"><Input label={tr('Search Services')} value={search} onChange={e=>setSearch(e.target.value)}/></div>:<div className="section-heading"><h2>{tr('Enabled Accounts')} <span className="muted">{active.length}</span></h2><Button size="sm" variant="ghost" onClick={()=>setReordering(!reordering)}>{tr(reordering?'Done':'Reorder')}</Button></div>}
   {!adding&&<p className="group-description">{tr('Turning off an account keeps it available in Add Service.')}</p>}
   <div className="configured-accounts">{rows.map((a,index)=><div className="configured-account" key={a.id}>

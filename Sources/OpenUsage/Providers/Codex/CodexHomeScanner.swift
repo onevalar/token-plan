@@ -72,7 +72,7 @@ struct CodexHomeScanner: Sendable {
             .sorted()
             .map { "~/.config/\($0)" }
         return Self.uniqueHomes(
-            Self.configuredHomes(environment: environment, homeDirectory: home) + ["~/.config/codex", "~/.codex"] + siblingHomes,
+            Self.configuredHomes(environment: environment, homeDirectory: home) + ["~/.config/codex", "~/.codex"] + siblingHomes + AccountDirectoryRegistry.paths(family: "codex", files: files, home: home),
             homeDirectory: home
         )
     }
