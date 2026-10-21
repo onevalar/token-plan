@@ -2,8 +2,8 @@ import {Button} from '../components/arc/button/button';
 import {trayAccounts,type DesktopState} from '../desktop';
 import {TrayGlyph} from './TrayPreview';
 
-// Notification areas reserve a square slot. Keep readable account indicators in
-// the tray's popup rather than squeezing a menu-bar strip into that slot.
+// The panel keeps an ordered overview alongside the native system indicators;
+// desktop environments may space, reorder or collapse their own tray slots.
 export function TrayPanel({state,open,label}:{state:DesktopState;open:(id:string)=>void;label:string}) {
  const accounts=trayAccounts(state.accounts);
  if(!accounts.length)return null;

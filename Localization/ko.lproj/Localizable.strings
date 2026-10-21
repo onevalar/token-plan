@@ -319,6 +319,7 @@
 "Home Layout" = "홈 레이아웃";
 "Horizontal Bar" = "가로 막대";
 "Icon Position" = "아이콘 위치";
+"If an indicator is hidden, move it from the taskbar overflow area into the system tray." = "아이콘이 숨겨져 있다면 작업 표시줄의 숨겨진 아이콘 영역에서 시스템 트레이로 옮기세요.";
 "Increase Transparency" = "투명도 높이기";
 "Individual Credits" = "개인 크레딧";
 "Info" = "정보";
@@ -594,6 +595,7 @@
 "Saved in App" = "앱에 저장됨";
 "Saving…" = "저장 중…";
 "Search Services" = "서비스 검색";
+"Selected accounts appear as live system tray indicators. Each value uses its own icon in percentage mode. Your desktop controls icon spacing, order and overflow." = "선택한 계정의 사용량이 시스템 트레이에 실시간으로 표시됩니다. 백분율 모드에서는 각 값이 별도 아이콘으로 표시됩니다. 간격, 순서 및 숨김은 데스크톱에서 제어합니다.";
 "Service Configuration" = "서비스 설정";
 "Services & Subscriptions" = "서비스 및 구독";
 "Session" = "세션";

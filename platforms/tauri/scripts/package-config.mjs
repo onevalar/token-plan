@@ -1,6 +1,7 @@
 import {writeFileSync} from 'node:fs';
 import {execFileSync} from 'node:child_process';
 import {packageWindows} from './window-config.mjs';
+import {linuxDebConfig,linuxIcons} from './linux-deb-config.mjs';
 // Explicit release metadata only; never derive a shipping version from a preview build.
 const version=process.env.TOKENPLAN_VERSION??'0.0.0';
 const production=process.env.TOKENPLAN_PRODUCTION==='true';
@@ -17,6 +18,11 @@ if(production){
   config.bundle.macOS.files={'Helpers/TokenPlan Bridge.app':'binaries/TokenPlan Bridge.app'};
  }
  config.productName='TokenPlan';config.identifier='com.onevalar.tokenplan';
+ if(process.platform==='linux'){
+  config.bundle.linux={deb:linuxDebConfig(version)};
+  // The source artwork is 1254px. Freedesktop themes need standard icon sizes.
+  config.bundle.icon=linuxIcons;
+ }
  config.app={windows:packageWindows('TokenPlan')};
 }
 writeFileSync('src-tauri/tauri.package.json',JSON.stringify(config,null,2)+'\n');

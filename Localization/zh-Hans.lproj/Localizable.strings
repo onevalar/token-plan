@@ -319,6 +319,7 @@
 "Home Layout" = "首页布局";
 "Horizontal Bar" = "横条";
 "Icon Position" = "图标位置";
+"If an indicator is hidden, move it from the taskbar overflow area into the system tray." = "如果图标被隐藏，可从任务栏的折叠区域拖到系统托盘中。";
 "Increase Transparency" = "增加透明度";
 "Individual Credits" = "个人余额";
 "Info" = "信息";
@@ -594,6 +595,7 @@
 "Saved in App" = "已保存在应用中";
 "Saving…" = "正在保存…";
 "Search Services" = "搜索服务";
+"Selected accounts appear as live system tray indicators. Each value uses its own icon in percentage mode. Your desktop controls icon spacing, order and overflow." = "选中的账号会在系统托盘中实时显示用量。百分比模式下，每项数值单独显示。图标间距、排列和折叠由桌面系统控制。";
 "Service Configuration" = "服务配置";
 "Services & Subscriptions" = "服务与订阅";
 "Session" = "会话";

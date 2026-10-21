@@ -11,6 +11,11 @@ on:
         description: 'Verify production identity and native Mac transition signature'
         type: boolean
         default: false
+      platforms:
+        description: 'Platforms to verify (release workflows always default to all)'
+        type: choice
+        options: [all, windows-linux]
+        default: all
   workflow_call:
     inputs:
       source_ref:
@@ -22,6 +27,9 @@ on:
       production:
         type: boolean
         default: false
+      platforms:
+        type: string
+        default: all
 
 permissions:
   contents: read
@@ -31,7 +39,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-26, windows-latest, ubuntu-24.04]
+        os: ${{ fromJSON(inputs.platforms == 'windows-linux' && '["windows-latest","ubuntu-24.04"]' || '["macos-26","windows-latest","ubuntu-24.04"]') }}
     runs-on: ${{ matrix.os }}
     defaults:
       run:
@@ -77,6 +85,8 @@ jobs:
           TOKENPLAN_UNIVERSAL: ${{ runner.os == 'macOS' && 'true' || 'false' }}
         run: npm run prepare:bridge
       - name: Build and test Tauri shell
+        env:
+          TOKENPLAN_NATIVE_TRAY_REVIEW: tray-native-review.png
         run: |
           cargo build --locked --manifest-path src-tauri/Cargo.toml
           cargo test --locked --manifest-path src-tauri/Cargo.toml
@@ -139,6 +149,12 @@ jobs:
           fi
       - name: Verify packaged updater signature
         run: node scripts/verify-artifacts.mjs
+      - name: Verify Linux DEB migration from legacy and 2.0.4 packages
+        if: runner.os == 'Linux' && inputs.production
+        shell: bash
+        run: |
+          package=$(find src-tauri/target/release/bundle/deb -maxdepth 1 -name '*.deb' -print -quit)
+          python3 ../../script/ci/check_linux_deb.py "$package"
       - name: Sign the native Mac migration feed
         if: runner.os == 'macOS' && inputs.production
         env:
@@ -163,5 +179,6 @@ jobs:
             platforms/tauri/transition/appcast.xml
             platforms/tauri/test-results/
             platforms/tauri/test-results-navigation/
+            platforms/tauri/tray-native-review.png
           if-no-files-found: warn
       # Verification artifacts only. Published feeds require an approved stable version.

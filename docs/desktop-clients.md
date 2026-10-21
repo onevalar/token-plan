@@ -1,5 +1,10 @@
 # Windows and Linux clients
 
+> This document describes the legacy Avalonia client and its backend. Current 2.x
+> releases use the shared [Tauri + React interface](tauri-migration.md). Running
+> `TokenPlan.Desktop` directly opens the legacy UI; without an explicit build version
+> its About screen reports 1.0.0. Use `platforms/tauri` for current UI development.
+
 TokenPlan's macOS client uses SwiftUI/AppKit. Windows and Linux use the separate
 Avalonia/.NET client in `platforms/desktop`. They share provider conventions,
 translations and pricing resources; platform behavior still needs native testing.

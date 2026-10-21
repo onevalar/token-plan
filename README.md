@@ -126,14 +126,16 @@ Claude、Codex 的独立 CLI 登录可在满足条件时自动续期。账号切
 | 能力 | macOS | Windows / Linux |
 | --- | --- | --- |
 | 日常入口 | 菜单栏弹出面板 | 系统托盘面板；无兼容托盘时保留窗口 |
-| 常驻用量 | 多账号环形 / 百分比 | 托盘菜单中的用量摘要 |
+| 常驻用量 | 多账号环形 / 百分比 | 动态托盘环形 / 百分比；系统控制间距与折叠 |
 | Claude / Codex 多账号 | 多种本机凭据来源 | 独立配置目录及支持的账号切换工具 |
-| 版本更新 | Sparkle 下载、验证与安装 | 下载、验证后打开系统安装程序 |
+| 版本更新 | Tauri 签名自动更新；1.x 通过 Sparkle 迁移 | Windows / AppImage 支持签名自动更新；DEB 通过包管理器安装 |
 | 历史记录存储 | 仅本地 | 仅本地 |
 | 独立查询 CLI / 本地 HTTP API | 支持 | 不包含 Mac 的这些接口 |
 | 代理配置 | 支持应用专用配置文件 | 使用运行环境及平台支持的默认代理配置 |
 
-Windows/Linux 提供对应平台的桌面客户端，并非 Mac 全部功能的逐项复刻。更详细的差异见[桌面客户端说明](docs/desktop-clients.md)。
+源码中的 Windows/Linux 动态托盘修复尚待发布；已发布的 2.0.4 仍在弹出面板中显示环形和百分比。
+
+2.x 三个平台共用 Tauri + React / Arc 界面、导航和设置交互；系统托盘、凭据读取等平台能力仍有差异。更详细的说明见[共享桌面界面](docs/tauri-migration.md)。
 
 ## 常见问题
 
@@ -157,6 +159,12 @@ Windows/Linux 提供对应平台的桌面客户端，并非 Mac 全部功能的�
 
 是否能显示托盘面板取决于桌面环境提供的托盘支持。无兼容托盘时保留窗口是预期行为。可从托盘右键菜单，或面板右上角 **「⋯」→「退出」** 结束应用。
 
+### Ubuntu 安装 2.x 后，为什么仍打开旧界面或显示 1.0.0？
+
+已发布的 Tauri DEB 使用包名 `token-plan`，旧 Avalonia 客户端使用 `tokenplan`，因此可能同时安装。旧客户端未指定构建版本时会显示 1.0.0。先用 `dpkg-query -W tokenplan token-plan` 核对；如果已安装 `token-plan` 2.x，可用 `sudo apt remove tokenplan` 移除旧客户端，再运行 `tokenplan-shell` 打开新版。普通卸载不删除用户的账号配置和本地历史，不需要清空数据目录。
+
+2.0.4 的安装包不包含旧包替换规则。源码已补上替换关系和旧启动入口兼容，将随后续版本发布。
+
 ## 隐私与数据
 
 无需 TokenPlan 账号，不收集使用分析或崩溃报告。应用在本机处理可读取的登录与用量记录，向启用的服务请求额度，并下载公开价格数据和应用更新。凭据仅用于对应服务认证，不会上传到本项目仓库。
@@ -167,26 +175,18 @@ Windows/Linux 提供对应平台的桌面客户端，并非 Mac 全部功能的�
 
 欢迎通过 [Issues](https://github.com/onevalar/token-plan/issues) 提交问题或建议，通过 Pull Request 贡献修复。报告问题时请附上系统与桌面环境、TokenPlan 版本、涉及的服务、操作步骤及脱敏后的错误信息。
 
-### macOS 客户端
+### 当前 2.x 桌面客户端（三个平台）
 
-使用支持 Swift 6.2 的开发环境；当前云端构建使用 macOS 26 SDK，应用最低运行版本为 macOS 15。
-
-```sh
-swift build
-swift test
-./script/build_and_run.sh
-```
-
-### Windows / Linux 客户端
-
-使用 `platforms/desktop/global.json` 指定的 .NET SDK，在源码根目录执行：
+使用 Node 22 和项目指定的 Rust 1.90。macOS 还需要 Swift / Xcode；Windows / Linux 需要 `platforms/desktop/global.json` 指定的 .NET SDK，Linux 还需要 WebKitGTK 等系统依赖，详见[构建说明](docs/tauri-migration.md#building-and-checking)。
 
 ```sh
-cd platforms/desktop
-dotnet run --project TokenPlan.Desktop
-dotnet run --project TokenPlan.Core.Tests
-dotnet run --project TokenPlan.Desktop.Tests
+cd platforms/tauri
+npm ci
+npm run prepare:bridge
+npm run tauri -- dev
 ```
+
+旧 SwiftUI 主程序和 `platforms/desktop/TokenPlan.Desktop` Avalonia 主程序是 1.x 界面。直接运行这些项目不会打开当前 Tauri 界面；2.x 继续复用它们的服务读取后端。
 
 开发约定见 [AGENTS.md](AGENTS.md)；更多资料：[架构](docs/architecture.md) · [添加服务](docs/adding-a-provider.md) · [本地化](docs/localization.md) · [全部文档](docs/README.md)。
 

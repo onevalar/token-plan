@@ -319,6 +319,7 @@
 "Home Layout" = "ホームの表示";
 "Horizontal Bar" = "横棒";
 "Icon Position" = "アイコンの位置";
+"If an indicator is hidden, move it from the taskbar overflow area into the system tray." = "アイコンが隠れている場合は、タスクバーのオーバーフロー領域からシステムトレイに移動してください。";
 "Increase Transparency" = "透明度を上げる";
 "Individual Credits" = "個人クレジット";
 "Info" = "情報";
@@ -594,6 +595,7 @@
 "Saved in App" = "アプリに保存済み";
 "Saving…" = "保存中…";
 "Search Services" = "サービスを検索";
+"Selected accounts appear as live system tray indicators. Each value uses its own icon in percentage mode. Your desktop controls icon spacing, order and overflow." = "選択したアカウントの使用量をシステムトレイに表示します。割合モードでは各値を別のアイコンに表示します。間隔・並び順・折りたたみはデスクトップが制御します。";
 "Service Configuration" = "サービス設定";
 "Services & Subscriptions" = "サービスと契約";
 "Session" = "セッション";

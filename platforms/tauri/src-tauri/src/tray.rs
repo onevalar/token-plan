@@ -34,11 +34,8 @@ pub fn language(state: &DesktopState) -> &str {
     if state.settings.language == "system" { &state.settings.locale } else { &state.settings.language }
 }
 
-/// Every platform shows exactly one tray item, so the system never reorders separate
-/// account icons. A macOS menu bar fits a wide strip of every selected account; Windows
-/// notification areas only fit a small square, so they keep the app icon and list the
-/// readings in the tooltip and menu.
-#[cfg(not(target_os = "linux"))]
+/// macOS keeps the wide template-image strip; other platforms use square native cells.
+#[cfg(target_os = "macos")]
 pub fn update(app: &tauri::AppHandle, state: &DesktopState) -> tauri::Result<()> {
     let Some(tray) = app.tray_by_id("root") else { return Ok(()) };
     let lines = summaries(state);
@@ -68,6 +65,11 @@ pub fn update(app: &tauri::AppHandle, state: &DesktopState) -> tauri::Result<()>
         }
     }
     Ok(())
+}
+
+#[cfg(target_os = "windows")]
+pub fn update(app: &tauri::AppHandle, state: &DesktopState) -> tauri::Result<()> {
+    crate::windows_tray::update(app,state)
 }
 
 #[cfg(not(target_os = "linux"))]

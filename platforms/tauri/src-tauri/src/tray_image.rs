@@ -1,4 +1,4 @@
-//! The macOS menu-bar strip image. Windows and Linux trays use the app icon.
+//! macOS menu-bar strip rendering and shared provider artwork/font helpers.
 use crate::{model::{Account, DesktopState}, tray::visible};
 use resvg::{tiny_skia, usvg};
 use std::{collections::HashMap, sync::{Arc, OnceLock}};
@@ -26,13 +26,13 @@ fn fonts() -> Arc<usvg::fontdb::Database> {
 }
 
 /// Draws an SVG document onto the pixmap at its own coordinates.
-fn draw(pixmap: &mut tiny_skia::Pixmap, svg: &str, transform: tiny_skia::Transform) {
+pub(crate) fn draw(pixmap: &mut tiny_skia::Pixmap, svg: &str, transform: tiny_skia::Transform) {
     let options = usvg::Options { fontdb: fonts(), ..usvg::Options::default() };
     if let Ok(tree) = usvg::Tree::from_str(svg, &options) { resvg::render(&tree, transform, &mut pixmap.as_mut()); }
 }
 
 /// Draws a provider mark into a `side`-pixel square whose top-left corner is (x, y).
-fn draw_logo(pixmap: &mut tiny_skia::Pixmap, family: &str, x: f32, y: f32, side: f32) {
+pub(crate) fn draw_logo(pixmap: &mut tiny_skia::Pixmap, family: &str, x: f32, y: f32, side: f32) {
     let Ok(tree) = usvg::Tree::from_str(logo(family), &usvg::Options::default()) else { return };
     let size = tree.size();
     let scale = side / size.width().max(size.height());
@@ -54,7 +54,7 @@ fn text(pixmap: &mut tiny_skia::Pixmap, value: &str, x: f32, baseline: f32, size
     draw(pixmap, &svg, tiny_skia::Transform::identity());
 }
 
-fn reading(metric: &crate::model::Metric) -> String {
+pub(crate) fn reading(metric: &crate::model::Metric) -> String {
     if !metric.has_data { return "—".into(); }
     metric.percent.map(|v| format!("{:.0}%", v.clamp(0.0, 999.0)))
         .or_else(|| metric.amount.map(|v| if v >= 1000.0 { format!("{:.0}k", v / 1000.0) } else { format!("{v:.0}") }))

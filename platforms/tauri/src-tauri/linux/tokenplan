@@ -1,0 +1,3 @@
+#!/bin/sh
+# Compatibility for old desktop shortcuts, autostart entries and custom hotkeys.
+exec /usr/bin/tokenplan-shell "$@"

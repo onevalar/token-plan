@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=TokenPlan
+Exec=/usr/bin/tokenplan-shell
+Icon=tokenplan-shell
+Terminal=false
+StartupWMClass=tokenplan-shell
+# Keep pinned legacy launcher IDs working without a second application-menu entry.
+NoDisplay=true

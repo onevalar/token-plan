@@ -27,7 +27,8 @@ export function GeneralSettings({state,send,t,busy,language,densityPreference,pl
   <Group title={platform==='macos'?tr('Menu Bar'):t.tray} description={tr('Accounts follow the order in Service Configuration.')}>
    <SelectRow label={platform==='macos'?tr('Menu Bar Style'):t.trayStyle} value={state.settings.trayStyle} disabled={disabled} options={[{value:'ring',label:t.ring},{value:'percentage',label:t.percentage}]} onValueChange={trayStyle=>settings({trayStyle})}/>
    {state.settings.trayStyle==='ring'&&<RingLayoutPicker value={state.settings.ringIconPosition} disabled={disabled} tr={tr} onChange={ringIconPosition=>settings({ringIconPosition})}/>}
-   {platform&&platform!=='macos'&&<p className="group-description">{tr('Windows and Linux show these indicators in the tray panel. The system tray keeps the TokenPlan icon.')}</p>}
+   {platform&&platform!=='macos'&&<p className="group-description">{tr('Selected accounts appear as live system tray indicators. Each value uses its own icon in percentage mode. Your desktop controls icon spacing, order and overflow.')}</p>}
+   {platform==='windows'&&<p className="group-description">{tr('If an indicator is hidden, move it from the taskbar overflow area into the system tray.')}</p>}
    <div className="menu-bar-preview" aria-label={tr('Menu Bar Preview')}>
     {shown.map(a=><TrayGlyph key={a.id} family={a.family} badge={a.badge} metrics={a.metrics.filter(m=>m.pinned)} style={state.settings.trayStyle} position={state.settings.ringIconPosition}/>)}
     {!shown.length&&<span className="muted">{tr('No Accounts Selected')}</span>}

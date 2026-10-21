@@ -319,6 +319,7 @@
 "Home Layout" = "首頁配置";
 "Horizontal Bar" = "橫條";
 "Icon Position" = "圖示位置";
+"If an indicator is hidden, move it from the taskbar overflow area into the system tray." = "如果圖示被隱藏，可從工作列的收合區域拖到系統匣中。";
 "Increase Transparency" = "增加透明度";
 "Individual Credits" = "個人餘額";
 "Info" = "資訊";
@@ -594,6 +595,7 @@
 "Saved in App" = "已儲存在 App 中";
 "Saving…" = "正在儲存…";
 "Search Services" = "搜尋服務";
+"Selected accounts appear as live system tray indicators. Each value uses its own icon in percentage mode. Your desktop controls icon spacing, order and overflow." = "選取的帳號會在系統匣中即時顯示用量。百分比模式下，每項數值分開顯示。圖示間距、排列和收合由桌面系統控制。";
 "Service Configuration" = "服務設定";
 "Services & Subscriptions" = "服務與訂閱";
 "Session" = "工作階段";

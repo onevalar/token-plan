@@ -53,13 +53,22 @@ an automatic change to its saved pins.
 - History uses the native history sources. Mac account-scoped histories remain separate;
   device-scoped CLI logs on Windows/Linux are counted once per provider. Existing desktop
   quota-history files are read and extended. Missing/partial data is not rendered as zero.
-- Every platform shows exactly one tray item, so the system cannot reorder separate account
-  icons. On macOS it is one strip of every selected account, in saved order, as rings or
-  percentages drawn with the system font. Windows and Linux trays only fit a small square, so
-  they show the TokenPlan icon and list each selected account's readings in the tooltip and
-  menu. Their popup additionally shows the shared ring/percentage strip, with the same
-  icon-position setting, three-metric cap and compact center numbering for three rings. Account numbering is contiguous per
-  service; a single visible account of a service has no number.
+- macOS uses one wide template-image strip containing every selected account. Windows
+  and Linux now draw live native tray indicators instead of a permanent application icon.
+  Each inside-layout account uses a square ring indicator (up to three rings); the left
+  layout and three-ring groups have a separate provider mark. In percentage/value mode,
+  every selected metric gets a readable square cell after its provider mark. No selected
+  metric is dropped on style changes. Three-ring groups center the account number.
+- Native tray cells have a neutral dark plate and a light foreground so they remain visible
+  on light and dark panels independently of the application's theme. A faint complete track
+  remains visible at zero use; missing data remains an em dash in value mode. Each cell's
+  existing native tooltip and context menu identify its account and all pinned readings.
+- Account numbering is contiguous among visible accounts of each service; one visible
+  account has no ordinal. Stable positional slots update in place when values, order,
+  visibility or style change. Obsolete slots are removed and a TokenPlan mark remains when
+  all accounts are off. Desktop environments can still reorder, space or hide tray slots;
+  Windows users may need to move new indicators out of taskbar overflow. The panel retains
+  an ordered account strip as a companion, not as a substitute for native indicators.
 - Left-click opens the panel, and the native context menu includes open/quit. Linux uses
   StatusNotifierItem through `ksni` because Tauri's AppIndicator adapter does not deliver
   left-click activation. The window remains accessible when a desktop has no SNI host.
@@ -98,6 +107,37 @@ files; the helper smoke test uses an isolated Mac defaults domain and makes no r
 The UI tests never load real credentials or account data.
 
 ## Update transition
+
+### Ubuntu DEB package identity
+
+The published 2.0.4 DEB is named `token-plan`, while the legacy Avalonia package is
+`tokenplan`. Without replacement metadata both packages can coexist, with two entries
+named TokenPlan; the legacy build can report its default version 1.0.0. This is an
+installer migration issue, not a reason to delete user data.
+
+For affected 2.0.4 installations, check `dpkg-query -W tokenplan token-plan`. Once
+`token-plan` 2.x is installed, `sudo apt remove tokenplan` removes the legacy program
+without purging user settings/history; `tokenplan-shell` starts the shared interface.
+
+The next production DEB declares Conflicts/Replaces/Provides for the legacy package.
+It retains the current `token-plan` identity for upgrades from 2.0.4. Compatibility
+launchers at `/usr/bin/tokenplan` and `/opt/tokenplan/TokenPlan.Desktop` forward old
+shortcuts/autostart commands to the Tauri executable. The old `tokenplan.desktop` ID
+remains launchable but hidden from application menus, leaving one visible entry.
+Package migration never scans or rewrites users' home directories.
+
+Linux packaging also includes standard 32/48/128/256/512-pixel PNG icons. The 2.0.4
+DEB only installed the source image in a 1254x1254 theme directory, which may not be
+searched by desktop icon themes. The installer check verifies that the launcher's icon
+name resolves to the expected standard-size files.
+Install/remove hooks refresh desktop and icon caches when the system provides those
+helpers. On an affected existing installation, `update-desktop-database` can refresh
+the application database and `gtk-launch TokenPlan` checks the new desktop entry.
+
+Linux production CI installs the actual DEB over coexisting legacy and 2.0.4 fixtures,
+then checks package removal, the installed version, executable compatibility launchers
+and the single visible desktop entry. These checks complement frontend tests; they do
+not assert that every desktop environment or existing user shortcut was exercised.
 
 `updates/tauri.json` is a bootstrap manifest with no published migration release. Its key is
 separate from Sparkle's key. The private key is stored outside the repository and in the
