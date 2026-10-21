@@ -111,7 +111,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       {...props}
       // Loading keeps the button focusable (a disabled button would drop keyboard focus mid-action) and swallows presses instead.
       aria-disabled={loading || props["aria-disabled"] || undefined}
-      onClick={loading ? event => event.preventDefault() : onClick}
+      onClick={inert ? event => event.preventDefault() : onClick}
     >
       <AnimatePresence initial={false}>
         {loading ? <motion.span key="loader" className={styles.loader} aria-hidden="true" initial={reduceMotion ? { opacity: 0 } : { opacity: 0, scale: .6 }} animate={{ opacity: 1, scale: 1 }} exit={reduceMotion ? fadeOut : { ...iconOut, scale: .8 }} transition={reduceMotion ? { duration: motionTokens.duration.instant } : iconEnter}><span className={styles.spinner} /></motion.span> : null}

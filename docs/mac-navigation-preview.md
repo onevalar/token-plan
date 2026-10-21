@@ -10,10 +10,19 @@ tray integration remain platform-specific. This change does not publish a releas
   this device; the previous macOS preview preference is preserved on upgrade.
 - Home has matching icon-only Refresh/More actions. Inner pages have Back, a page
   title and only relevant actions. Back restores the prior screen, scroll, tab and
-  history range. Escape closes a dropdown before dismissing the panel.
+  history range, and returns keyboard focus to the entry that opened it when still
+  available. Escape closes a dropdown before dismissing the panel.
 - Account details group quotas, benefits and history. All home metrics can be
-  hidden. Notes save inline; removing an account requires confirmation and keeps
-  the existing terminal login and history behavior.
+  hidden. Percentages follow the used/remaining preference, including their screen
+  reader names. Home and quota details keep the values and reset countdowns without
+  a separate explanatory legend.
+- Note and API-key drafts survive page navigation separately for each account, only
+  in the running app's memory. They are not saved until Save is pressed and are lost
+  when the app quits. Successful saves clear the draft; removing an account clears
+  its drafts. Saving, success and retryable errors appear beside the field.
+- Removing an account requires confirmation and keeps the existing terminal login
+  and history behavior. Confirmation timers pause while keyboard focus is inside,
+  just as they do on hover. Reduced motion keeps loading feedback without rotation.
 - Settings group appearance, refresh, tray, notifications and shortcuts. Service
   configuration separates enabled accounts, adding accounts and reordering.
   History provides filtering, seven-day pagination and expandable model records.

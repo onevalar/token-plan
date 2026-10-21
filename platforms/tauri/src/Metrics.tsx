@@ -25,7 +25,7 @@ export function MetricRow({metric:m,now,missing,language,remaining=false}:{metri
  const bounded=m.percent!=null||m.periodSeconds!=null;
  return <div className="metric-block"><div className={`metric ${bounded?'':'text-metric'}`} data-tone={m.percent==null?'normal':usageTone(m.percent,remaining)}>
   <span className="metric-name">{name}</span>
-  {bounded?<><progress aria-label={name} max={100} value={m.hasData?Math.max(0,Math.min(100,m.percent??0)):0}/><span className="value">{m.hasData&&m.percent!=null?`${Math.round(m.percent)}%`:'—'}</span></>:<span className="amount">{!m.hasData?missing:m.values.length?m.values.map(v=>`${format(v.amount,v.unit)}${v.label?` ${providerText(v.label,language)}`:''}`).join(' · '):m.amount==null?missing:format(m.amount,m.unit)}</span>}
+  {bounded?<><progress aria-label={`${name} · ${providerText(remaining?'Remaining':'Used',language)}`} aria-valuetext={!m.hasData||m.percent==null?missing:undefined} max={100} value={m.hasData?Math.max(0,Math.min(100,m.percent??0)):0}/><span className="value">{m.hasData&&m.percent!=null?`${Math.round(m.percent)}%`:'—'}</span></>:<span className="amount">{!m.hasData?missing:m.values.length?m.values.map(v=>`${format(v.amount,v.unit)}${v.label?` ${providerText(v.label,language)}`:''}`).join(' · '):m.amount==null?missing:format(m.amount,m.unit)}</span>}
   {bounded&&<span className="reset">{reset&&!m.notStarted?<><Hourglass size={13} aria-hidden="true"/><span>{reset}</span></>:<span className="reset-label">{!m.hasData?missing:m.notStarted?t.notStarted:'—'}</span>}</span>}
  </div>{m.expiries.length>0&&<div className="expiries"><span>{t.expires}</span><ul>{m.expiries.map((date,i)=><li key={i}>{new Date(date).toLocaleString(language)}</li>)}</ul></div>}</div>;
 }

@@ -542,6 +542,7 @@
 "Remove this account from TokenPlan and stop adding it automatically. Your CLI login and saved usage history will not be deleted." = "TokenPlan からこのアカウントを削除し、自動追加を停止します。CLI のログインと保存済みの使用履歴は削除されません。";
 "Remove?" = "削除しますか？";
 "Removed from menu bar" = "メニューバーから削除しました";
+"Removing…" = "削除中…";
 "Reorder" = "並べ替え";
 "Report an Issue" = "問題を報告";
 "Requests" = "リクエスト";
@@ -591,6 +592,7 @@
 "Save" = "保存";
 "Saved" = "保存しました";
 "Saved in App" = "アプリに保存済み";
+"Saving…" = "保存中…";
 "Search Services" = "サービスを検索";
 "Service Configuration" = "サービス設定";
 "Services & Subscriptions" = "サービスと契約";
@@ -725,6 +727,7 @@
 "Unknown model found" = "不明なモデルが見つかりました";
 "Unknown models found" = "不明なモデルが見つかりました";
 "Unknown provider: %@" = "不明なプロバイダー：%@";
+"Unsaved Changes" = "未保存の変更";
 "Unstar" = "スターを外す";
 "Up to %lld stars per provider" = "プロバイダーごとにスターは最大 %lld つ";
 "Up to 2 stars per provider" = "プロバイダーごとにスターは最大 2 つ";

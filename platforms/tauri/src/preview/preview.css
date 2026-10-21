@@ -2,7 +2,7 @@
 :root[data-mac-preview="true"],:root[data-mac-preview="true"] body,:root[data-mac-preview="true"] #root { overflow:clip;scrollbar-gutter:auto; }
 .mac-preview { height:100%;max-width:none;padding:54px 0 0;display:flex;flex-direction:column;background:var(--background); }
 .mac-preview [hidden] { display:none !important; }
-.mac-preview .preview-header { position:fixed;top:0;left:0;right:0;z-index:20;height:54px;background:var(--background);border-radius:13px 13px 0 0;display:grid;grid-template-columns:40px minmax(0,1fr) 40px;align-items:center;gap:6px;padding:8px 12px;border-bottom:1px solid var(--border); }
+.mac-preview .preview-header { position:fixed;top:0;left:0;right:0;z-index:20;height:54px;background:var(--background);border-radius:13px 13px 0 0;display:grid;grid-template-columns:40px minmax(0,1fr) 40px;align-items:center;gap:6px;padding:8px 24px;border-bottom:1px solid var(--border); }
 .mac-preview .page-title { display:flex;align-items:center;justify-content:center;min-width:0;gap:7px; }
 .mac-preview .page-title h1 { font-size:15px;line-height:24px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;outline:none; }
 .mac-preview .page-title .provider-logo { width:18px;height:18px; }
@@ -13,7 +13,7 @@
 .mac-preview .header-actions { display:flex;align-items:center;justify-content:flex-end;gap:4px;min-width:36px;--control-height-md:var(--control-height-sm); }
 .mac-preview .icon-button { width:36px;padding:0;flex:none; }
 .mac-preview .page-stack { min-height:0;flex:1;display:flex; }
-.mac-preview .preview-page { flex:1;min-width:0;overflow:auto;overscroll-behavior:contain;padding:14px 16px 22px;scrollbar-width:thin; }
+.mac-preview .preview-page { flex:1;min-width:0;overflow:auto;overscroll-behavior:contain;padding:14px 24px 22px;scrollbar-width:thin; }
 .mac-preview .preview-page::-webkit-scrollbar { width:8px;background:transparent; }
 .mac-preview .preview-page::-webkit-scrollbar-track { background:transparent; }
 .mac-preview .preview-page::-webkit-scrollbar-thumb { background:transparent;border:2px solid transparent;border-radius:9999px;background-clip:padding-box; }
@@ -21,6 +21,7 @@
 .mac-preview .preview-page[data-page="home"] { padding-top:0; }
 .mac-preview .provider:last-child { border-bottom:0; }
 .mac-preview .provider { padding-block:14px; }
+.mac-preview .detail-group > p,.mac-preview .dashboard .notice { overflow-wrap:anywhere; }
 .mac-preview .inline-error { margin:10px 12px;padding:10px 12px;font-size:12px;border:1px solid var(--border);border-radius:var(--radius-control);color:var(--danger);overflow-wrap:anywhere; }
 .mac-preview .empty-state { color:var(--text-secondary);font-size:13px;padding:22px 8px;text-align:center; }
 .mac-preview .detail-identity { display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:6px 10px;margin:0 0 12px;font-size:12px;color:var(--text-secondary);overflow-wrap:anywhere; }
@@ -65,7 +66,7 @@
 .mac-preview .system-preferences input { font-size:13px;min-height:36px; }
 .mac-preview .system-preferences button:not([role="switch"]) { justify-self:start;min-height:32px;font-size:12px; }
 .mac-preview .metric-column-labels,.mac-preview .placement-row { display:grid;grid-template-columns:minmax(65px,1fr) minmax(114px,1.2fr) 46px;align-items:center;gap:8px; }
-.mac-preview .metric-column-labels { font-size:10px;color:var(--text-muted);padding:10px 0 4px; }
+.mac-preview .metric-column-labels { font-size:11px;color:var(--text-muted);padding:10px 0 4px; }
 .mac-preview .metric-column-labels > :last-child { text-align:center; }
 .mac-preview .placement-row { min-height:50px;border-bottom:1px solid var(--border);font-size:12px; }
 .mac-preview .placement-row:last-child { border:0; }
@@ -85,7 +86,7 @@
 .mac-preview .daily-trend { padding-top:6px; }
 .mac-preview .trend-bars { height:52px;display:flex;align-items:flex-end;gap:3px;border-bottom:1px solid var(--border); }
 .mac-preview .trend-bars > span { flex:1;min-width:0;background:var(--usage-normal);border-radius:2px 2px 0 0;opacity:.85; }
-.mac-preview .trend-caption { display:flex;justify-content:space-between;font-size:10px;color:var(--text-muted);margin-top:7px; }
+.mac-preview .trend-caption { display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted);margin-top:7px; }
 .mac-preview .history-account-context { font-size:13px;margin-bottom:12px; }
 .mac-preview .history-account-context span { display:block;font-size:11px;color:var(--text-secondary);overflow-wrap:anywhere; }
 .mac-preview .history-filter { margin:0 0 14px; }
@@ -136,6 +137,8 @@
 .mac-preview .inline-editor { grid-template-columns:minmax(0,1fr) auto;align-items:end;gap:8px; }
 .mac-preview .inline-editor > div { min-width:0; }
 .mac-preview .inline-editor input { width:100%;min-height:36px;height:36px;font-size:13px; }
+.mac-preview .inline-editor > button { align-self:start;margin-top:calc(13px * var(--leading-body) + var(--space-2)); }
+.mac-preview .save-status { grid-column:1 / -1;min-height:16px;margin:0;color:var(--text-secondary);font-size:11px;overflow-wrap:anywhere; }
 .mac-preview .editor-secondary-action { grid-column:1 / -1;justify-self:end; }
 .mac-preview .remove-account { display:flex;align-items:center;flex-wrap:wrap;gap:8px 12px;padding:10px 0; }
 .mac-preview .remove-account .group-description { flex:1;min-width:120px;margin:0;font-size:11px; }

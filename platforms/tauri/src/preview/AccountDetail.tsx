@@ -6,9 +6,9 @@ import {providerText} from '../providerText';
 import type {Account,DesktopState,Metric,Send} from '../desktop';
 import type {Copy} from '../copy';
 import {HistorySummary,isHistoryMetric} from './HistoryPage';
-import {AccountConfiguration} from './AccountConfiguration';
+import {AccountConfiguration,type AccountDraft} from './AccountConfiguration';
 
-export function AccountDetail({account,tab,onTab,history,send,t,busy,language,now,remaining,missing,traySettings,badge}:{badge?:number|null;traySettings:DesktopState['settings'];account:Account;tab:string;onTab:(tab:string)=>void;history:(range:string)=>void;send:Send;t:Copy;busy:boolean;language:string;now:number;remaining:boolean;missing:string}) {
+export function AccountDetail({account,tab,onTab,history,send,t,busy,language,now,remaining,missing,traySettings,badge,draft,onDraftChange}:{draft:AccountDraft;onDraftChange:(patch:AccountDraft)=>void;badge?:number|null;traySettings:DesktopState['settings'];account:Account;tab:string;onTab:(tab:string)=>void;history:(range:string)=>void;send:Send;t:Copy;busy:boolean;language:string;now:number;remaining:boolean;missing:string}) {
  const tr=(s:string)=>providerText(s,language),[range,setRange]=useState('30');
  const metrics=account.metrics.filter(m=>m.placement!=='hidden'&&!isHistoryMetric(m.id));
  const quota=metrics.filter(m=>m.unit==='percent'||m.percent!=null||m.periodSeconds!=null),other=metrics.filter(m=>!quota.includes(m));
@@ -27,6 +27,6 @@ export function AccountDetail({account,tab,onTab,history,send,t,busy,language,no
    {account.note&&<section className="detail-group"><h2>{t.note}</h2><p>{account.note}</p></section>}
    {account.fetchedAt&&<p className="last-updated">{tr('Last Updated')} {new Date(account.fetchedAt).toLocaleTimeString(language,{hour:'2-digit',minute:'2-digit'})}</p>}
   </div>
-  <div hidden={tab!=='settings'}><AccountConfiguration badge={badge} traySettings={traySettings} account={account} send={send} t={t} busy={busy} language={language}/></div>
+  <div hidden={tab!=='settings'}><AccountConfiguration draft={draft} onDraftChange={onDraftChange} badge={badge} traySettings={traySettings} account={account} send={send} t={t} busy={busy} language={language}/></div>
  </div>;
 }

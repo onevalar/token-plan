@@ -137,7 +137,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .surface, .surface::after, .trigger, .secondary, .confirm { transition-duration: 0ms; }
-  .spinner { animation-duration: 1.6s; }
+  .spinner { animation: none; }
 }
 
 @media (prefers-contrast: more) {

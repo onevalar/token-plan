@@ -61,9 +61,9 @@ export interface ConfirmMorphProps {
   /** Starting state when uncontrolled. */
   defaultState?: ConfirmMorphState;
   onStateChange?: (state: ConfirmMorphState) => void;
-  /** Milliseconds before an unanswered question returns to rest. Resting the pointer on the control pauses it. 0 turns it off. */
+  /** Milliseconds before an unanswered question returns to rest. Hover, focus within, or a hidden document pauses it. 0 turns it off. */
   confirmTimeout?: number;
-  /** Milliseconds a result stays before returning to rest. Resting the pointer on the control pauses it. 0 turns it off. */
+  /** Milliseconds a result stays before returning to rest. Hover, focus within, or a hidden document pauses it. 0 turns it off. */
   resultTimeout?: number;
   /** A press outside the control cancels an open question. Defaults to true. */
   cancelOnOutsidePress?: boolean;
@@ -261,15 +261,15 @@ export function ConfirmMorph({
     animate(width, w, w > (typeof now === "number" ? now : from) ? GROW : SHRINK).then(() => { if (token === flight.current) width.jump("auto"); });
   }, [reduced, width]);
 
-  /* The timeout runs as an invisible clock. A pointer resting on the control holds it, and so does a hidden tab. */
+  /* The timeout pauses while hovered, focused within, or in a hidden tab; each hold must clear before it resumes. */
   const drain = useMotionValue(1);
   const clock = useRef<AnimationPlaybackControls | null>(null);
-  const holds = useRef({ hover: false, hidden: false });
+  const holds = useRef({ hover: false, focus: false, hidden: false });
   const timeout = state === "confirming" && !counting ? confirmTimeout : state === "done" || state === "error" ? resultTimeout : 0;
   const sync = useCallback(() => {
     const control = clock.current;
     if (!control) return;
-    const held = holds.current.hover || holds.current.hidden;
+    const held = holds.current.hover || holds.current.focus || holds.current.hidden;
     if (held) control.pause(); else control.play();
   }, []);
   useEffect(() => {
@@ -431,6 +431,8 @@ export function ConfirmMorph({
 
   return <div ref={rootRef} className={[styles.root, className].filter(Boolean).join(" ")} data-state={state} data-face={faceKey} data-tone={tone} data-mode={confirmMode}
     data-disabled={disabled || undefined} tabIndex={-1} onKeyDown={onKeyDown} aria-busy={state === "pending" || undefined}
+    onFocusCapture={() => { holds.current.focus = true; sync(); }}
+    onBlurCapture={event => { if (!event.currentTarget.contains(event.relatedTarget)) { holds.current.focus = false; sync(); } }}
     onPointerEnter={() => { holds.current.hover = true; sync(); }} onPointerLeave={() => { holds.current.hover = false; sync(); }}
     onPointerCancel={() => { holds.current.hover = false; sync(); }}>
     <motion.div className={styles.surface} style={{ width }}>

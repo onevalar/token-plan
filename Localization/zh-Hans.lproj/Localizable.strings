@@ -542,6 +542,7 @@
 "Remove this account from TokenPlan and stop adding it automatically. Your CLI login and saved usage history will not be deleted." = "从 TokenPlan 中移除此账号，并停止自动添加。不会退出命令行工具的登录，也不会删除已保存的用量历史。";
 "Remove?" = "确认移除？";
 "Removed from menu bar" = "已从菜单栏移除";
+"Removing…" = "正在移除…";
 "Reorder" = "排序";
 "Report an Issue" = "反馈问题";
 "Requests" = "请求数";
@@ -591,6 +592,7 @@
 "Save" = "保存";
 "Saved" = "已保存";
 "Saved in App" = "已保存在应用中";
+"Saving…" = "正在保存…";
 "Search Services" = "搜索服务";
 "Service Configuration" = "服务配置";
 "Services & Subscriptions" = "服务与订阅";
@@ -725,6 +727,7 @@
 "Unknown model found" = "发现未知模型";
 "Unknown models found" = "发现未知模型";
 "Unknown provider: %@" = "未知的服务商：%@";
+"Unsaved Changes" = "尚未保存";
 "Unstar" = "取消星标";
 "Up to %lld stars per provider" = "每个服务商最多 %lld 个星标";
 "Up to 2 stars per provider" = "每个服务商最多 2 个星标";

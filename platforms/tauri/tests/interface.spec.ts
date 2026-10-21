@@ -98,3 +98,51 @@ test('Escape dismisses the panel from details but first closes an open menu',asy
  await page.keyboard.press('Escape');
  expect(await page.evaluate(()=>(window as any).__panelHides)).toBe(1);
 });
+
+test('confirmation timeout pauses for keyboard focus, including internal focus moves',async({page})=>{
+ await mockDesktop(page);await page.goto('/');
+ await page.getByRole('button',{name:'Claude first@example.com',exact:true}).click();
+ await page.getByRole('button',{name:'设置',exact:true}).click();
+ await page.mouse.move(0,0);
+ await page.getByRole('button',{name:'移除账号',exact:true}).focus();await page.keyboard.press('Enter');
+ const control=page.locator('.remove-account [data-mode]');
+ await expect(control.getByRole('group').getByRole('button',{name:'移除账号',exact:true})).toBeFocused();
+ await page.waitForTimeout(6200);
+ await expect(control).toHaveAttribute('data-state','confirming');
+ await page.keyboard.press('Shift+Tab');
+ await expect(control.getByRole('button',{name:'取消',exact:true})).toBeFocused();
+ await page.waitForTimeout(6200);
+ await expect(control).toHaveAttribute('data-state','confirming');
+ // Leaving by keyboard resumes the clock; an outside click would cancel immediately instead.
+ await page.keyboard.press('Shift+Tab');
+ await expect(control).toHaveAttribute('data-state','idle',{timeout:7000});
+});
+
+test('reduced motion stops the pending spinner without hiding its status',async({page})=>{
+ await page.emulateMedia({reducedMotion:'reduce'});
+ await mockDesktop(page);
+ await page.addInitScript(()=>{
+  const internals=(window as any).__TAURI_INTERNALS__,invoke=internals.invoke;
+  internals.invoke=async(command:string,args:any)=>{
+   if(command==='desktop_request'&&args.request.method==='remove')await new Promise(()=>{});
+   return invoke(command,args);
+  };
+ });
+ await page.goto('/');
+ await page.getByRole('button',{name:'Claude first@example.com',exact:true}).click();
+ await page.getByRole('button',{name:'设置',exact:true}).click();
+ await page.getByRole('button',{name:'移除账号',exact:true}).click();
+ await page.waitForTimeout(300);
+ await page.getByRole('group').getByRole('button',{name:'移除账号',exact:true}).click();
+ const control=page.locator('.remove-account [data-mode]'),spinner=control.locator('svg');
+ await expect(control).toHaveAttribute('data-state','pending');
+ await expect(control).toHaveAttribute('aria-busy','true');
+ await expect(control.locator('[data-face="pending"]')).toHaveText('正在移除…');
+ await expect(control.getByRole('status')).toHaveText('正在移除…');
+ await expect(spinner).toHaveCSS('animation-name','none');
+ await page.emulateMedia({reducedMotion:'no-preference'});
+ await expect(spinner).not.toHaveCSS('animation-name','none');
+ await page.emulateMedia({reducedMotion:'reduce'});
+ await expect(spinner).toHaveCSS('animation-name','none');
+ await expect(control.locator('[data-face="pending"]')).toBeVisible();
+});

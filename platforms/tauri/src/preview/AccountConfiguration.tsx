@@ -11,13 +11,24 @@ import type {Account,DesktopState,Send} from '../desktop';
 import type {Copy} from '../copy';
 import {Group,ToggleRow,useChange} from './shared';
 
-export function AccountConfiguration({account:a,send,t,busy,language,traySettings,badge}:{badge?:number|null;traySettings:DesktopState['settings'];account:Account;send:Send;t:Copy;busy:boolean;language:string}) {
+export type AccountDraft={note?:string;key?:string};
+
+export function AccountConfiguration({account:a,send,t,busy,language,traySettings,badge,draft,onDraftChange}:{draft:AccountDraft;onDraftChange:(patch:AccountDraft)=>void;badge?:number|null;traySettings:DesktopState['settings'];account:Account;send:Send;t:Copy;busy:boolean;language:string}) {
  const tr=(s:string)=>providerText(s,language);
- const [note,setNote]=useState(a.note),[key,setKey]=useState('');
+ const note=draft.note??a.note,key=draft.key??'';
+ const [saving,setSaving]=useState<'note'|'key'|null>(null),[feedback,setFeedback]=useState<Partial<Record<'note'|'key','saved'|'failed'>>>({});
  const {pending,change,notice}=useChange(send,t),disabled=busy||pending;
  const pinned=a.metrics.filter(m=>m.pinned).slice(0,3);
  const ring=traySettings.trayStyle==='ring'&&pinned.length>0&&pinned.every(m=>m.percent!=null||m.unit==='percent');
  const apply=(method:string,value:unknown)=>change({method,accountId:a.id,value});
+ const edit=(field:'note'|'key',value:string)=>{onDraftChange({[field]:value});setFeedback(f=>({...f,[field]:undefined}));};
+ const save=async(field:'note'|'key')=>{
+  if(disabled||saving||field==='note'&&note===a.note||field==='key'&&!key.trim())return;
+  setSaving(field);setFeedback(f=>({...f,[field]:undefined}));
+  try{await send({method:field,accountId:a.id,value:field==='note'?note:key});onDraftChange({[field]:undefined});setFeedback(f=>({...f,[field]:'saved'}));}
+  catch{setFeedback(f=>({...f,[field]:'failed'}));}
+  finally{setSaving(null);}
+ };
  return <div className="account-configuration">
   {notice}
   <Group title={t.placement}>
@@ -39,13 +50,18 @@ export function AccountConfiguration({account:a,send,t,busy,language,traySetting
    </div>)}
   </Group>
   <Group title={tr('Account Management')}>
-   <form className="preference-form inline-editor" onSubmit={async e=>{e.preventDefault();await apply('note',note);}}><Input label={t.note} value={note} maxLength={2000} onChange={e=>setNote(e.target.value)}/><Button size="sm" variant="secondary" type="submit" disabled={disabled||note===a.note}>{t.save}</Button></form>
-   {a.apiKey&&<form className="preference-form inline-editor" onSubmit={async e=>{e.preventDefault();if(await apply('key',key))setKey('');}}>
-    <Input label={t.key} type="password" autoComplete="off" value={key} maxLength={8192} onChange={e=>setKey(e.target.value)}/>
-    <Button size="sm" variant="secondary" type="submit" disabled={disabled||!key.trim()}>{t.save}</Button>
-    <div className="editor-secondary-action"><ConfirmMorph label={t.clearKey} prompt={tr('Remove?')} confirmLabel={tr('Confirm')} cancelLabel={t.cancel} pendingLabel={t.save} doneLabel={t.done} errorLabel={t.failed} retryLabel={t.save} disabled={disabled} onConfirm={()=>send({method:'key',accountId:a.id,value:''})}/></div>
+   <form className="preference-form inline-editor" onSubmit={e=>{e.preventDefault();void save('note');}}>
+    <Input label={t.note} value={note} readOnly={disabled||!!saving} maxLength={2000} error={feedback.note==='failed'?t.failed:undefined} onChange={e=>edit('note',e.target.value)}/>
+    <Button size="sm" variant="secondary" type="submit" loading={saving==='note'} aria-disabled={disabled||note===a.note}>{t.save}</Button>
+    <p className="save-status" role="status">{saving==='note'?tr('Saving…'):feedback.note==='saved'?t.done:note!==a.note?tr('Unsaved Changes'):''}</p>
+   </form>
+   {a.apiKey&&<form className="preference-form inline-editor" onSubmit={e=>{e.preventDefault();void save('key');}}>
+    <Input label={t.key} type="password" autoComplete="off" value={key} readOnly={disabled||!!saving} maxLength={8192} error={feedback.key==='failed'?t.failed:undefined} onChange={e=>edit('key',e.target.value)}/>
+    <Button size="sm" variant="secondary" type="submit" loading={saving==='key'} aria-disabled={disabled||!key.trim()}>{t.save}</Button>
+    <p className="save-status" role="status">{saving==='key'?tr('Saving…'):feedback.key==='saved'?t.done:key?tr('Unsaved Changes'):''}</p>
+    <div className="editor-secondary-action"><ConfirmMorph label={t.clearKey} prompt={tr('Remove?')} confirmLabel={tr('Confirm')} cancelLabel={t.cancel} pendingLabel={tr('Removing…')} doneLabel={t.done} errorLabel={t.failed} retryLabel={t.save} disabled={disabled} onConfirm={()=>send({method:'key',accountId:a.id,value:''})}/></div>
    </form>}
-   {a.removable&&<div className="remove-account"><p className="group-description">{tr('Terminal login and history are kept.')}</p><div className="account-action"><ConfirmMorph label={t.remove} prompt={tr('Remove?')} confirmLabel={t.remove} cancelLabel={t.cancel} pendingLabel={t.remove} doneLabel={t.done} errorLabel={t.failed} retryLabel={t.remove} disabled={disabled} onConfirm={()=>send({method:'remove',accountId:a.id})}/></div></div>}
+   {a.removable&&<div className="remove-account"><p className="group-description">{tr('Terminal login and history are kept.')}</p><div className="account-action"><ConfirmMorph label={t.remove} prompt={tr('Remove?')} confirmLabel={t.remove} cancelLabel={t.cancel} pendingLabel={tr('Removing…')} doneLabel={t.done} errorLabel={t.failed} retryLabel={t.remove} disabled={disabled} onConfirm={()=>send({method:'remove',accountId:a.id})}/></div></div>}
   </Group>
  </div>;
 }

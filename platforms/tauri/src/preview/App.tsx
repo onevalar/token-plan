@@ -13,6 +13,7 @@ import {messages} from '../i18n';
 import {textFor} from '../copy';
 import {providerText} from '../providerText';
 import {AccountDetail} from './AccountDetail';
+import type {AccountDraft} from './AccountConfiguration';
 import {GeneralSettings} from './GeneralSettings';
 import {ServiceConfiguration} from './ServiceConfiguration';
 import {HistoryPage} from './HistoryPage';
@@ -37,13 +38,20 @@ export function DesktopApp() {
  const densityPreference=useDensity();
  const [routes,setRoutes]=useState<Route[]>([{key:0,page:'home'}]);
  const sequence=useRef(0),heading=useRef<HTMLHeadingElement>(null);
+ const previousRoute=useRef(0),lastTrigger=useRef<HTMLElement|null>(null),returnFocus=useRef(new Map<number,HTMLElement|'menu'>());
+ // Drafts live only for this running app. They are never stored in browser storage.
+ const [drafts,setDrafts]=useState<Record<string,AccountDraft>>({});
  const [version,setVersion]=useState(''),[now,setNow]=useState(Date.now());
  const current=routes.at(-1)!;
  const language=state?.settings.language==='system'||!state?navigator.language:state.settings.language;
  const tr=(s:string)=>providerText(s,language);
  const t={...textFor(language),pin_limit:tr('Choose up to three menu bar metrics per account.')},basic=messages(language);
  const account=state?.accounts.find(a=>a.id===current.accountId);
- const push=(page:Page,details:Omit<Route,'page'|'key'>={})=>setRoutes(r=>[...r,{key:++sequence.current,page,...details}]);
+ const push=(page:Page,details:Omit<Route,'page'|'key'>={})=>{
+  const trigger=document.querySelector('[role="menu"]')?'menu':lastTrigger.current??document.activeElement;
+  if(trigger==='menu'||trigger instanceof HTMLElement)returnFocus.current.set(current.key,trigger);
+  setRoutes(r=>[...r,{key:++sequence.current,page,...details}]);
+ };
  const back=()=>setRoutes(r=>r.length>1?r.slice(0,-1):r);
  const refreshable=current.page==='home'||current.page==='history'||current.page==='detail'&&current.tab!=='settings';
  const refresh=()=>{if(refreshable&&!busy)void send({method:'refresh',accountId:current.accountId}).catch(()=>{});};
@@ -60,12 +68,19 @@ export function DesktopApp() {
   theme();media.addEventListener('change',theme);
   return()=>{media.removeEventListener('change',theme);delete document.documentElement.dataset.macPreview;};
  },[language,state?.settings.appearance]);
- useLayoutEffect(()=>{heading.current?.focus({preventScroll:true});},[current.key]);
+ useLayoutEffect(()=>{
+  const saved=current.key<previousRoute.current?returnFocus.current.get(current.key):null;
+  const target=saved==='menu'?document.querySelector<HTMLElement>('.header-actions [aria-haspopup="menu"]'):saved;
+  (target?.isConnected&&target.getClientRects().length&&!target.matches(':disabled')?target:heading.current)?.focus({preventScroll:true});
+  returnFocus.current.delete(current.key);previousRoute.current=current.key;
+ },[current.key]);
  useEffect(()=>{
+  for(const key of returnFocus.current.keys())if(!routes.some(r=>r.key===key))returnFocus.current.delete(key);
   if(!state)return;
   // A removed account also invalidates its deeper history route, returning to its real origin.
   const missing=routes.findIndex(r=>r.accountId&&!state.accounts.some(a=>a.id===r.accountId));
   if(missing>=0)setRoutes(r=>r.slice(0,Math.max(1,missing)));
+  setDrafts(d=>Object.keys(d).some(id=>!state.accounts.some(a=>a.id===id))?Object.fromEntries(Object.entries(d).filter(([id])=>state.accounts.some(a=>a.id===id))):d);
  },[state,routes]);
  useEffect(()=>{
   const key=(e:KeyboardEvent)=>{
@@ -77,7 +92,7 @@ export function DesktopApp() {
   window.addEventListener('keydown',key);return()=>window.removeEventListener('keydown',key);
  },[current,refreshable,busy,send]);
  const title=current.page==='detail'?account?.name??'':current.page==='settings'?t.settings:current.page==='configure'?t.configure:current.page==='add'?tr('Add Service'):current.page==='history'?t.history:current.page==='about'?basic.about:current.page==='updates'?t.checkUpdates:'TokenPlan';
- return <MotionConfig reducedMotion="user"><main className="mac-preview" data-density={densityPreference.density}>
+ return <MotionConfig reducedMotion="user"><main className="mac-preview" data-density={densityPreference.density} onClickCapture={e=>{lastTrigger.current=(e.target as Element).closest<HTMLElement>('button');}}>
   <header className={`preview-header ${current.page==='home'?'home-header':''}`}>
    {current.page!=='home'&&<Button className="icon-button back-button" size="sm" variant="ghost" aria-label={basic.back} onClick={back}><ChevronLeft size={21}/></Button>}
    <div className="page-title">{current.page==='home'?<img src="/capsule.png" alt=""/>:current.page==='detail'&&account?<ProviderLogo family={account.family}/>:null}<h1 ref={heading} tabIndex={-1}>{title}</h1></div>
@@ -98,7 +113,7 @@ export function DesktopApp() {
    const a=state?.accounts.find(a=>a.id===route.accountId);
    return <div className="preview-page" data-page={route.page} key={route.key} hidden={route.key!==current.key}>
     {state&&route.page==='home'&&<>{platform&&platform!=='macos'&&<TrayPanel state={state} label={t.tray} open={accountId=>push('detail',{accountId,tab:'usage'})}/>}{!state.accounts.some(a=>a.enabled)?<div className="empty-state"><p>{basic.empty}</p><Button size="sm" variant="secondary" onClick={()=>push('configure')}>{t.configure}</Button></div>:<Dashboard accounts={state.accounts} open={accountId=>push('detail',{accountId,tab:'usage'})} now={now} language={language} missing={basic.missing} remaining={state.settings.showRemaining}/>}</>}
-    {state&&a&&route.page==='detail'&&<AccountDetail badge={trayAccounts(state.accounts).find(item=>item.id===a.id)?.badge} traySettings={state.settings} account={a} tab={route.tab??'usage'} onTab={tab=>setRoutes(r=>r.map(item=>item.key===route.key?{...item,tab}:item))} history={range=>push('history',{accountId:a.id,range})} send={send} t={t} busy={busy} language={language} now={now} remaining={state.settings.showRemaining} missing={basic.missing}/>}
+    {state&&a&&route.page==='detail'&&<AccountDetail draft={drafts[a.id]??{}} onDraftChange={patch=>setDrafts(d=>({...d,[a.id]:{...d[a.id],...patch}}))} badge={trayAccounts(state.accounts).find(item=>item.id===a.id)?.badge} traySettings={state.settings} account={a} tab={route.tab??'usage'} onTab={tab=>setRoutes(r=>r.map(item=>item.key===route.key?{...item,tab}:item))} history={range=>push('history',{accountId:a.id,range})} send={send} t={t} busy={busy} language={language} now={now} remaining={state.settings.showRemaining} missing={basic.missing}/>}
     {state&&route.page==='settings'&&<GeneralSettings platform={platform} densityPreference={densityPreference} state={state} send={send} t={t} busy={busy} language={language}/>}
     {state&&(route.page==='configure'||route.page==='add')&&<ServiceConfiguration state={state} send={send} t={t} busy={busy} language={language} adding={route.page==='add'} open={accountId=>push('detail',{accountId,tab:'settings'})}/>}
     {state&&route.page==='history'&&<>{a&&<div className="history-account-context">{a.name}{a.email&&<span>{a.email}</span>}</div>}<HistoryPage accounts={a?[a]:state.accounts} t={t} language={language} initialRange={route.range}/></>}

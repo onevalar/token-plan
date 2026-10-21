@@ -283,3 +283,59 @@ test('production update entry preserves errors and the about page is not a desig
  await expect(visible(page)).not.toContainText('设计预览');
  await expect(page.getByRole('heading',{level:1})).toHaveText('关于');
 });
+
+test('account drafts survive navigation without being saved and return restores the trigger',async({page})=>{
+ const data=largeDesktop();data.accounts[0].apiKey=true;
+ await setup(page,data);
+ const first=page.locator('.dashboard').getByRole('button',{name:'Claude first@example.com',exact:true});
+ await first.focus();await page.keyboard.press('Enter');
+ await page.getByRole('button',{name:'设置',exact:true}).click();
+ await page.getByRole('textbox',{name:'备注',exact:true}).fill('Unsaved first account');
+ await page.getByRole('textbox',{name:'API 密钥',exact:true}).fill('synthetic-test-key');
+ await back(page);await expect(first).toBeFocused();
+ await page.locator('.dashboard').getByRole('button',{name:'Claude second.with.a.long.address@example.com',exact:true}).click();
+ await page.getByRole('button',{name:'设置',exact:true}).click();
+ await expect(page.getByRole('textbox',{name:'备注',exact:true})).not.toHaveValue('Unsaved first account');
+ await back(page);await first.click();await page.getByRole('button',{name:'设置',exact:true}).click();
+ await expect(page.getByRole('textbox',{name:'备注',exact:true})).toHaveValue('Unsaved first account');
+ const key=page.getByRole('textbox',{name:'API 密钥',exact:true});
+ await expect(key).toHaveValue('synthetic-test-key');
+ expect(await page.evaluate(()=>(window as any).__requests.filter((r:any)=>r.method==='note'))).toHaveLength(0);
+ await visible(page).locator('form').filter({has:key}).getByRole('button',{name:'保存',exact:true}).click();
+ await expect(key).toHaveValue('');
+ await expect(page.getByRole('textbox',{name:'备注',exact:true})).toHaveValue('Unsaved first account');
+ await page.getByRole('button',{name:'用量',exact:true}).click();
+ const history=page.getByRole('button',{name:'查看历史',exact:true});
+ await history.click();await back(page);await expect(history).toBeFocused();
+ await back(page);await menu(page,'通用设置');await back(page);
+ await expect(page.getByRole('button',{name:'更多',exact:true})).toBeFocused();
+});
+
+test('note saves report pending, failure and success nearby and long content stays within the panel',async({page})=>{
+ await setup(page);await page.locator('.dashboard').getByRole('button',{name:'Claude first@example.com',exact:true}).click();
+ await page.getByRole('button',{name:'设置',exact:true}).click();
+ const note=page.getByRole('textbox',{name:'备注',exact:true}),form=visible(page).locator('form').filter({has:note});
+ const value='audit_identifier_'.repeat(14);
+ await note.fill(value);
+ await page.evaluate(()=>{const api=(window as any).__TAURI_INTERNALS__,invoke=api.invoke;api.invoke=async(command:string,args:any)=>{if(args?.request?.method==='note')await new Promise(r=>setTimeout(r,700));return invoke(command,args);};(window as any).__failNextRequest=true;});
+ await form.getByRole('button',{name:'保存',exact:true}).click();
+ await expect(form.getByRole('button')).toHaveAttribute('aria-busy','true');
+ await expect(form.getByRole('alert')).toContainText('保存失败');
+ await expect(note).toHaveValue(value);
+ await form.getByRole('button',{name:'保存',exact:true}).click();
+ await expect(form.getByRole('status')).toHaveText('已保存');
+ await page.getByRole('button',{name:'用量',exact:true}).click();
+ await expect(visible(page)).toContainText(value);await noOverflow(page);
+});
+
+test('quota readings retain accessible used and remaining names without explanatory copy',async({page})=>{
+ await setup(page);
+ await expect(visible(page).getByRole('progressbar').first()).toHaveAccessibleName(/已用/);
+ await expect(visible(page).getByText(/已用|距重置/)).toHaveCount(0);
+ await menu(page,'通用设置');await page.getByRole('switch',{name:'显示剩余额度',exact:true}).click();await back(page);
+ await expect(visible(page).getByRole('progressbar').first()).toHaveAccessibleName(/剩余/);
+ await expect(visible(page).getByText(/剩余|距重置/)).toHaveCount(0);
+ await page.locator('.dashboard').getByRole('button',{name:'Claude first@example.com',exact:true}).click();
+ await expect(visible(page).getByRole('progressbar').first()).toHaveAccessibleName(/剩余/);
+ await expect(visible(page).getByText(/剩余|距重置/)).toHaveCount(0);
+});

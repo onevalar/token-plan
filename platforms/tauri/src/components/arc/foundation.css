@@ -18,7 +18,7 @@
   --surface-muted: var(--neutral-2);
   --foreground: var(--neutral-11);
   --text-secondary: var(--neutral-8);
-  --text-muted: var(--neutral-7);
+  --text-muted: oklch(54% 0 0);
   --border: oklch(93.5% 0 0);
   --border-subtle: oklch(96.5% 0 0);
   --border-strong: oklch(82% 0 0);
