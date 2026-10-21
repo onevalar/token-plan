@@ -12,6 +12,7 @@ export async function mockDesktop(page:Page,language='zh-Hans',cloud=false,data:
     if(command==='hide'){(window as any).__panelHides=((window as any).__panelHides??0)+1;return;}
     if(command==='shortcut_capture'){(window as any).__shortcutPaused=args.paused;return;}
     if(command==='plugin:app|version')return '0.0.0';
+    if(command==='panel_frame')return (window as any).__panelFrame??{platform:'macos',rounded:true};
     if(command.startsWith('plugin:event|'))return ++sequence;
     if(command==='plugin:updater|check')return {rid:8,version:'9.9.9',currentVersion:'0.0.0',body:'Fixture update',rawJson:{}};
     if(command==='plugin:updater|download_and_install')throw 'fixture_signature_error';

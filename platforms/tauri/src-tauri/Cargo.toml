@@ -12,7 +12,8 @@ tauri = { version = "2", features = ["tray-icon", "image-png"] }
 tauri-plugin-single-instance = "2"
 serde_json = "1"
 serde = { version = "1", features = ["derive"] }
-resvg = { version = "0.45", default-features = false }
+# Text renders menu-bar values with the system font instead of a bitmap font.
+resvg = { version = "0.45", default-features = false, features = ["text", "system-fonts"] }
 tauri-plugin-updater = "2"
 tauri-plugin-process = "2"
 tokio = { version = "1", features = ["process", "time", "io-util", "sync", "signal"] }
@@ -36,6 +37,14 @@ strip = "none"
 # Tauri's AppIndicator adapter does not forward Linux left-click activation.
 # SNI supplies Activate plus the standard right-click D-Bus menu.
 ksni = "0.3.6"
+# Detects a compositor before drawing transparent rounded corners (already a Tauri dependency).
+gtk = "0.18"
+
+[target.'cfg(target_os = "macos")'.dependencies]
+# A plain NSWindow cannot appear over another app's full-screen Space, so the menu-bar
+# panel is converted to a non-activating NSPanel, as the native app uses. Pinned to the
+# v2.1.1 tag's commit.
+tauri-nspanel = { git = "https://github.com/ahkohd/tauri-nspanel", rev = "ef6e3090a6083c653955ca0b6e7f6c6ae1453d40" }
 
 [target.'cfg(not(target_os = "macos"))'.dependencies]
 # Direct result handling: the Tauri notification plugin discards desktop delivery failures.

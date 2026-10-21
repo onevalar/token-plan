@@ -2,15 +2,26 @@
 :root { --font-geist:"Geist"; --font-inter:"Inter"; --usage-normal:#326fce; }
 :root[data-theme="dark"] { --usage-normal:#578fe6; }
 * { box-sizing:border-box; }
-body { margin:0; background:var(--background); color:var(--foreground); font:400 var(--text-sm)/var(--leading-body) var(--font-body); }
-main { max-width:620px; margin:auto; padding:0 16px 20px; }
-h1 { font:500 var(--text-xl)/var(--leading-display) var(--font-display); margin:0; }
+html,body { height:100%;overflow:hidden; }
+body { margin:0; background:transparent; color:var(--foreground); font:400 var(--text-sm)/var(--leading-body) var(--font-body); }
+/* The panel frame. The window itself is transparent so the corners can be rounded
+   where the platform supports it; the scrollbar only appears while hovering. */
+#root { height:100%;overflow:hidden auto;scrollbar-gutter:stable both-edges;background:var(--background); }
+:root[data-rounded="true"] #root { border-radius:13px;border:1px solid var(--border-subtle); }
+:root[data-platform="macos"][data-rounded="true"] #root { background:color-mix(in oklab,var(--background) 84%,transparent); }
+:root[data-platform="macos"][data-rounded="true"] .app-header { background:transparent;backdrop-filter:blur(24px); }
+#root::-webkit-scrollbar { width:10px;background:transparent; }
+#root::-webkit-scrollbar-track { background:transparent; }
+#root::-webkit-scrollbar-thumb { background:transparent;border:3px solid transparent;border-radius:9999px;background-clip:padding-box; }
+#root:hover::-webkit-scrollbar-thumb { background-color:color-mix(in oklab,var(--foreground) 28%,transparent); }
+main { max-width:620px; margin:auto; padding:0 10px 16px; }
+h1 { font:600 var(--text-base)/var(--leading-display) var(--font-display); margin:0; }
 h2 { font-size:var(--text-base);font-weight:500;margin:0;min-width:0; }
 h3 { font-size:var(--text-sm);font-weight:500;margin:0; }
 p { margin:8px 0; }
 .app-header,.brand,.actions,.provider-heading,.section-heading,.account-identity,.family-heading { display:flex;align-items:center;gap:8px;min-width:0; }
-.app-header { position:sticky;top:0;z-index:10;justify-content:space-between;background:var(--background);padding-block:14px;border-bottom:1px solid var(--border-subtle);--control-height-md:var(--control-height-sm); }
-.brand img { width:20px;height:28px;object-fit:contain; }
+.app-header { position:sticky;top:0;z-index:10;justify-content:space-between;background:var(--background);padding-block:10px;border-bottom:1px solid var(--border-subtle);--control-height-md:var(--control-height-sm); }
+.brand img { width:16px;height:22px;object-fit:contain; }
 .app-header .actions { gap:6px; }
 .muted,.notice,.email,.plan,.reset,small { color:var(--text-secondary); }
 .notice { font-size:var(--text-xs);margin-block:8px; }
@@ -111,7 +122,6 @@ progress::-moz-progress-bar { background:var(--meter-fill); }
 .tray-account-preview sup { position:absolute;left:28px;top:-3px;font-size:10px; }
 .tray-numbers { display:flex;flex-direction:column;font-variant-numeric:tabular-nums;font-size:12px; }
 @media(max-width:420px) {
- main { padding-inline:12px; }
  .metric { grid-template-columns:76px minmax(35px,1fr) 38px 72px;gap:7px; }
  .text-metric { grid-template-columns:minmax(110px,1fr) auto; }
  .history-summary { gap:16px; }

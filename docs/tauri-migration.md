@@ -10,8 +10,14 @@ The installed native app and stable update feeds are not replaced by development
 The default desktop panel is 390 logical pixels wide, without a native title bar.
 It closes on focus loss, Escape, or another click on its tray icon. Focus-loss dismissal
 is deferred briefly so a tray activation does not hide and immediately reopen it.
-The panel is placed inside the clicked monitor's work area. On Linux without a compatible
-tray host, a decorated taskbar-accessible window remains available instead.
+The panel opens centered under (or, for a bottom taskbar, above) the clicked tray icon,
+inside that monitor's work area. On macOS it starts closed, so the first click opens it.
+Like the native panel, it is a non-activating panel on macOS: it opens over another app's
+full-screen Space, leaves that app in front, and still takes keyboard input.
+Its corners are rounded on macOS and on Linux desktops with a compositor; without one,
+Linux keeps square corners instead of black ones. The scrollbar
+stays hidden until the pointer is over the panel. On Linux without a compatible tray host,
+a decorated taskbar-accessible window remains available instead.
 Production packaging inherits the preview's window configuration.
 
 The dashboard groups adjacent accounts of the same service without changing the saved
@@ -28,8 +34,8 @@ These views use the same existing data sources and do not change saved metric pl
 On macOS, every tray refresh must set the image and its template flag together. Calling
 `set_icon` alone resets that flag in the current tray library and makes black icons disappear
 on dark menu bars. Debug builds check the native NSImage flag after creation and refresh.
-An account without pinned metrics keeps a legible, centered icon in both styles, without
-the empty percentage-width space or an automatic change to its saved pins.
+An account without pinned metrics keeps a legible provider mark in both styles, without
+an automatic change to its saved pins.
 
 ## Implemented
 
@@ -43,13 +49,15 @@ the empty percentage-width space or an automatic change to its saved pins.
 - History uses the native history sources. Mac account-scoped histories remain separate;
   device-scoped CLI logs on Windows/Linux are counted once per provider. Existing desktop
   quota-history files are read and extended. Missing/partial data is not rendered as zero.
-- Tray rings and percentages share the same visibility/order list and contiguous per-service
-  numbering. Only one visible account of a service has no number. System-tray sizes differ;
-  square Windows/Linux percentage icons prioritize the values over a redundant logo.
+- Every platform shows exactly one tray item, so the system cannot reorder separate account
+  icons. On macOS it is one strip of every selected account, in saved order, as rings or
+  percentages drawn with the system font. Windows and Linux trays only fit a small square, so
+  they show the TokenPlan icon and list each selected account's readings in the tooltip and
+  menu; the tray style setting appears only on macOS. Account numbering is contiguous per
+  service; a single visible account of a service has no number.
 - Left-click opens the panel, and the native context menu includes open/quit. Linux uses
   StatusNotifierItem through `ksni` because Tauri's AppIndicator adapter does not deliver
   left-click activation. The window remains accessible when a desktop has no SNI host.
-  Desktop shells can still arrange tray items independently of application ordering.
 - General settings share language, appearance, refresh interval, used/remaining display and
   tray configuration. Provider text reuses the repository's five-language translation tables.
 - Tauri's updater checks in the background or on request, verifies signatures, shows install

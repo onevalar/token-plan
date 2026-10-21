@@ -1,6 +1,7 @@
 import {useEffect,useState} from 'react';
 import {createRoot} from 'react-dom/client';
 import {invoke} from '@tauri-apps/api/core';
+import {listen} from '@tauri-apps/api/event';
 import {getVersion} from '@tauri-apps/api/app';
 import {RefreshCw} from 'lucide-react';
 import {MotionConfig} from 'motion/react';
@@ -29,7 +30,16 @@ function App(){
  const {state,send,busy,error}=useDesktop();
  const updater=useUpdater(state?.settings.autoUpdates??false);
  const [page,setPage]=useState('home');const [selected,setSelected]=useState<string|null>(null);
- useEffect(()=>{window.scrollTo({top:0,behavior:'instant'});},[page,selected]);
+ useEffect(()=>{document.getElementById('root')?.scrollTo({top:0,behavior:'instant'});},[page,selected]);
+ const [platform,setPlatform]=useState('');
+ useEffect(()=>{
+  // The native shell reports whether this window can show transparent rounded corners.
+  type Frame={platform:string;rounded:boolean};
+  const apply=(frame:Frame|undefined)=>{if(!frame)return;document.documentElement.dataset.platform=frame.platform;document.documentElement.dataset.rounded=String(frame.rounded);setPlatform(frame.platform);};
+  void invoke<Frame>('panel_frame').then(apply).catch(()=>{});
+  const stop=listen<Frame>('panel-frame',e=>apply(e.payload));
+  return()=>{void stop.then(f=>f()).catch(()=>{});};
+ },[]);
  const [version,setVersion]=useState('');
  useEffect(()=>{void getVersion().then(setVersion).catch(()=>{});},[]);
  const [tab,setTab]=useState('usage');const [locale,setLocale]=useState<string|null>(null);const [now,setNow]=useState(0);
@@ -71,7 +81,7 @@ function App(){
   {page==='about'&&<section className="about"><img src="/capsule.png" alt=""/><h2>TokenPlan</h2><p>{version}</p></section>}
   {page!=='updates'&&updater.status==='available'&&<Button variant="secondary" onClick={()=>go('updates')}>{t.updateAvailable} {updater.version}</Button>}
   {page==='updates'&&<Updates t={t} updater={updater} automatic={state?.settings.autoUpdates??true} onAutomatic={autoUpdates=>act({method:'settings',value:{autoUpdates}})}/>}
-  {state&&page==='settings'&&<GeneralSettings state={state} send={send} t={t} busy={busy}/>}
+  {state&&page==='settings'&&<GeneralSettings state={state} send={send} t={t} busy={busy} platform={platform}/>}
   {state&&page==='configure'&&<ServiceConfiguration state={state} send={send} t={t} language={language} busy={busy} open={open} history={()=>go('history')}/>}
   {state&&(page==='history'||page==='accountHistory')&&<History synced={state.sync.enabled} accounts={page==='accountHistory'&&account?[account]:state.accounts} t={t} language={language}/>}
   {state&&page==='home'&&<div aria-busy={busy}>{!state.accounts.some(a=>a.enabled)&&<p>{basic.empty}</p>}<Dashboard accounts={state.accounts} open={open} now={now} language={language} missing={basic.missing} remaining={state.settings.showRemaining}/></div>}

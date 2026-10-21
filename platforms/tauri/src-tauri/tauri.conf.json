@@ -23,7 +23,15 @@
         "maximizable": false,
         "minimizable": false,
         "skipTaskbar": true,
-        "alwaysOnTop": true
+        "alwaysOnTop": true,
+        "transparent": true,
+        "windowEffects": {
+          "effects": [
+            "popover"
+          ],
+          "state": "active",
+          "radius": 13
+        }
       }
     ],
     "security": {
