@@ -99,7 +99,9 @@ test('Escape dismisses the panel from details but first closes an open menu',asy
  expect(await page.evaluate(()=>(window as any).__panelHides)).toBe(1);
 });
 
-test('confirmation timeout pauses for keyboard focus, including internal focus moves',async({page})=>{
+test('confirmation timeout pauses for keyboard focus, including internal focus moves',async({page,browserName})=>{
+ // macOS WebKit uses Option+Tab to include buttons regardless of the host's full-keyboard-access preference.
+ const previousControl=browserName==='webkit'&&process.platform==='darwin'?'Alt+Shift+Tab':'Shift+Tab';
  await mockDesktop(page);await page.goto('/');
  await page.getByRole('button',{name:'Claude first@example.com',exact:true}).click();
  await page.getByRole('button',{name:'设置',exact:true}).click();
@@ -109,12 +111,12 @@ test('confirmation timeout pauses for keyboard focus, including internal focus m
  await expect(control.getByRole('group').getByRole('button',{name:'移除账号',exact:true})).toBeFocused();
  await page.waitForTimeout(6200);
  await expect(control).toHaveAttribute('data-state','confirming');
- await page.keyboard.press('Shift+Tab');
+ await page.keyboard.press(previousControl);
  await expect(control.getByRole('button',{name:'取消',exact:true})).toBeFocused();
  await page.waitForTimeout(6200);
  await expect(control).toHaveAttribute('data-state','confirming');
  // Leaving by keyboard resumes the clock; an outside click would cancel immediately instead.
- await page.keyboard.press('Shift+Tab');
+ await page.keyboard.press(previousControl);
  await expect(control).toHaveAttribute('data-state','idle',{timeout:7000});
 });
 
