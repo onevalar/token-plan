@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Give the iCloud helper a real bundle/profile; bare sidecars cannot claim it."""
+"""Stage the signed, background-only helper with its stable settings identity."""
 import os
 from pathlib import Path
 import plistlib
@@ -15,7 +15,6 @@ contents = app/'Contents'
 (contents/'MacOS').mkdir(parents=True)
 (contents/'Resources').mkdir()
 shutil.copy2(bins/'tokenplan-bridge-universal-apple-darwin', contents/'MacOS/tokenplan-bridge')
-shutil.copy2(os.environ['TOKENPLAN_ICLOUD_PROFILE'], contents/'embedded.provisionprofile')
 shutil.copytree(bins/'OpenUsage_OpenUsage.bundle', contents/'Resources/OpenUsage_OpenUsage.bundle')
 # An escaping framework symlink fails strict bundle validation. Use a loader path instead.
 subprocess.run(['install_name_tool','-add_rpath','@executable_path/../../../../Frameworks',
@@ -27,7 +26,7 @@ info.update(CFBundleIdentifier='com.onevalar.tokenplan', CFBundleExecutable='tok
             LSUIElement=True, LSBackgroundOnly=True)
 (contents/'Info.plist').write_bytes(plistlib.dumps(info))
 subprocess.run(['codesign','--force','--options','runtime','--timestamp',
-                '--entitlements',os.environ['TOKENPLAN_ICLOUD_ENTITLEMENTS'],
+                '--entitlements',str(root/'script/TokenPlan.release.entitlements.plist'),
                 '--sign',os.environ['APPLE_SIGNING_IDENTITY'],str(app)],check=True)
 
 subprocess.run(['codesign','--verify','--strict',str(app)],check=True)

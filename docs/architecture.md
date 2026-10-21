@@ -64,21 +64,17 @@ reads. A command that reaches its deadline still terminates its process tree and
 
 The UI reads from a few observable stores:
 
-- `WidgetDataStore` — the latest snapshot per provider, plus refresh and caching. It keeps machine-local
-  cached snapshots separate from rendered snapshots so peer history can never be written back out and
-  counted again.
+- `WidgetDataStore` — the latest snapshot per provider, plus refresh and caching. Cached snapshots are local to this computer.
 - `LayoutStore` — which metrics are shown, the provider/metric order, and which metrics are starred for the
   menu bar.
 - `ProviderEnablementStore` — which providers the user has turned on or off.
-- `ICloudUsageSyncStore` — one coordinated, atomic history file per Mac, iCloud metadata notifications,
-  and the visible device/error state. File access is injected for lifecycle and failure tests.
 
 Refresh runs on a timer in `AppContainer`; each pass respects the cache, so the network is only hit once a
 snapshot has actually expired.
 
-Providers with spend tiles carry an explicit history scope beside their export descriptors. Machine-local
-sources can be summed across device files; account-wide sources such as Cursor cannot. `WidgetDataStore`
-re-renders only the spend rows from the union, leaving quota and error state local.
+Providers with spend tiles carry an explicit history scope beside their export descriptors. Local logs and account-wide sources such as Cursor keep their provider-specific scope.
+`WidgetDataStore` preserves last-good local history when an optional log scan has no result,
+while live quota and error state continue to refresh.
 
 ## The AppKit bridge
 

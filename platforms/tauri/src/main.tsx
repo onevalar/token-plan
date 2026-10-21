@@ -1,4 +1,4 @@
-import {useEffect,useState} from 'react';
+import {lazy,Suspense,useEffect,useState} from 'react';
 import {createRoot} from 'react-dom/client';
 import {invoke} from '@tauri-apps/api/core';
 import {listen} from '@tauri-apps/api/event';
@@ -25,6 +25,7 @@ import '@fontsource/inter/latin-400.css';
 import '@fontsource/inter/latin-500.css';
 import './components/arc/foundation.css';
 import './style.css';
+const MacPreviewApp=lazy(()=>import('./preview/App').then(module=>({default:module.MacPreviewApp})));
 
 function App(){
  const {state,send,busy,error}=useDesktop();
@@ -83,7 +84,7 @@ function App(){
   {page==='updates'&&<Updates t={t} updater={updater} automatic={state?.settings.autoUpdates??true} onAutomatic={autoUpdates=>act({method:'settings',value:{autoUpdates}})}/>}
   {state&&page==='settings'&&<GeneralSettings state={state} send={send} t={t} busy={busy} platform={platform}/>}
   {state&&page==='configure'&&<ServiceConfiguration state={state} send={send} t={t} language={language} busy={busy} open={open} history={()=>go('history')}/>}
-  {state&&(page==='history'||page==='accountHistory')&&<History synced={state.sync.enabled} accounts={page==='accountHistory'&&account?[account]:state.accounts} t={t} language={language}/>}
+  {state&&(page==='history'||page==='accountHistory')&&<History accounts={page==='accountHistory'&&account?[account]:state.accounts} t={t} language={language}/>}
   {state&&page==='home'&&<div aria-busy={busy}>{!state.accounts.some(a=>a.enabled)&&<p>{basic.empty}</p>}<Dashboard accounts={state.accounts} open={open} now={now} language={language} missing={basic.missing} remaining={state.settings.showRemaining}/></div>}
   {account&&page==='detail'&&<section className="provider detail">
    <div className="provider-heading"><div className="account-identity"><ProviderLogo family={account.family}/><div className="identity-text"><div className="identity-line"><h2>{account.name}</h2><span className="plan">{account.plan}</span></div>{account.email&&<span className="email">{accountTitle(account.email)}</span>}</div></div></div>
@@ -91,9 +92,20 @@ function App(){
    {tab==='settings'?<AccountSettings account={account} send={send} t={t} busy={busy} language={language}/>:<>
     {account.error&&<p role="status">{providerText(account.error,language)}</p>}
     {account.metrics.filter(m=>m.placement!=='hidden').map(m=><MetricRow key={m.id} metric={m} now={now} missing={basic.missing} language={language} remaining={state?.settings.showRemaining}/>)}
-    {account.note&&<p>{account.note}</p>}<History compact onOpen={()=>setPage('accountHistory')} synced={state?.sync.enabled??false} accounts={[account]} t={t} language={language}/>
+    {account.note&&<p>{account.note}</p>}<History compact onOpen={()=>setPage('accountHistory')} accounts={[account]} t={t} language={language}/>
    </>}
   </section>}
  </main></MotionConfig>;
 }
-createRoot(document.getElementById('root')!).render(<App/>);
+// The owner reviews this navigation on macOS before any Windows/Linux rollout.
+// Release builds keep their existing interface unless explicitly opted into the preview.
+function Entry(){
+ const [preview,setPreview]=useState<boolean|null>(import.meta.env.VITE_MAC_NAVIGATION_PREVIEW==='1'?null:false);
+ useEffect(()=>{if(preview===null)void invoke<{platform:string;rounded:boolean}>('panel_frame').then(frame=>{
+  document.documentElement.dataset.platform=frame.platform;
+  document.documentElement.dataset.rounded=String(frame.rounded);
+  setPreview(frame.platform==='macos');
+ }).catch(()=>setPreview(false));},[preview]);
+ return preview===null?null:preview?<Suspense fallback={null}><MacPreviewApp/></Suspense>:<App/>;
+}
+createRoot(document.getElementById('root')!).render(<Entry/>);

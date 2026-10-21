@@ -20,22 +20,17 @@ info = plistlib.loads((app/'Contents/Info.plist').read_bytes())
 if (info['CFBundleIdentifier'], info['CFBundleShortVersionString']) != ('com.onevalar.tokenplan', version):
     raise ValueError('Production app identity/version mismatch')
 validate_migration_key(info, json.loads((ROOT/'release/update-config.json').read_text()))
-container = 'iCloud.com.onevalar.tokenplan'
-if container not in info.get('NSUbiquitousContainers', {}):
-    raise ValueError('Production iCloud container metadata missing')
-if not (app/'Contents/embedded.provisionprofile').is_file():
-    raise ValueError('Production iCloud provisioning profile missing')
 helper = app/'Contents/Helpers/TokenPlan Bridge.app'
 helper_info = plistlib.loads((helper/'Contents/Info.plist').read_bytes())
-if helper_info.get('CFBundleIdentifier') != info['CFBundleIdentifier'] or not (helper/'Contents/embedded.provisionprofile').is_file():
-    raise ValueError('Helper bundle identity/profile mismatch')
+if helper_info.get('CFBundleIdentifier') != info['CFBundleIdentifier']:
+    raise ValueError('Helper bundle identity mismatch')
 if helper_info.get('LSBackgroundOnly') is not True or helper_info.get('CFBundleName') != 'TokenPlan Bridge':
     raise ValueError('Helper must be a distinctly named background-only component')
 for target in [app, helper]:
     entitlements = subprocess.run(['codesign','-d','--entitlements',':-',str(target)], check=True, capture_output=True).stdout
-    signed = plistlib.loads(entitlements)
-    if container not in signed.get('com.apple.developer.icloud-container-identifiers', []) or 'CloudDocuments' not in signed.get('com.apple.developer.icloud-services', []):
-        raise ValueError('Signed shell or helper is missing iCloud access')
+    signed = plistlib.loads(entitlements) if entitlements.strip() else {}
+    if any('icloud' in key.lower() or 'ubiquity' in key.lower() for key in signed):
+        raise ValueError('Retired cloud entitlements must not be present')
 subprocess.run(['codesign','--verify','--deep','--strict','-R=notarized',str(app)], check=True)
 subprocess.run(['xcrun','stapler','validate',str(app)], check=True)
 archives = list((base/'dmg').glob('*.dmg'))

@@ -127,7 +127,6 @@ Usage or login data could not be read. Sign in again.
 Available Usage
 Reads existing logins on this device. Credentials are never copied or synced.
 Claude and Codex use CLI logins. Cursor uses its desktop login. Sign in again in the corresponding app if a session expires.
-This desktop preview does not yet include spending history, tray integration, iCloud sync or automatic updates.
 Sign in with the Cursor desktop app, then refresh.
 Your Cursor session has expired. Sign in with Cursor again.
 Cursor login could not be read. Open Cursor and sign in again.
@@ -172,7 +171,6 @@ Cache Write
 Show TokenPlan
 Keep Running When Window Closes
 Use the tray menu to reopen TokenPlan, refresh usage or quit. Enable background mode only if your desktop displays the tray icon.
-This desktop preview does not yet include spending history, iCloud sync or automatic updates.
 Quit
 From the signed-in Cursor account's usage export. Only reported token counts are included.
 Enable a provider to view token history.

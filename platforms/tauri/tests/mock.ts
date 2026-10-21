@@ -18,6 +18,8 @@ export async function mockDesktop(page:Page,language='zh-Hans',cloud=false,data:
     if(command==='plugin:updater|download_and_install')throw 'fixture_signature_error';
     if(command==='plugin:resources|close')return;
     if(command!=='desktop_request')return;
+    ((window as any).__requests??=[]).push(structuredClone(args.request));
+    if((window as any).__failNextRequest){(window as any).__failNextRequest=false;throw 'request_failed';}
     const r=args.request,a=state.accounts.find((a:any)=>a.id===r.accountId);
     if(r.method==='notificationPermission')return structuredClone(state);
     if(r.method==='enabled'&&a)a.enabled=r.value;
@@ -25,7 +27,7 @@ export async function mockDesktop(page:Page,language='zh-Hans',cloud=false,data:
     if(r.method==='note'&&a)a.note=r.value;
     if(r.method==='remove')state.accounts=state.accounts.filter((a:any)=>a.id!==r.accountId);
     if(r.method==='metric'&&a)Object.assign(a.metrics.find((m:any)=>m.id===r.metricId)!,r.value);
-    if(r.method==='settings'){Object.assign(state.settings,r.value);if(r.value.iCloudEnabled!=null)state.sync.enabled=r.value.iCloudEnabled;}
+    if(r.method==='settings'){Object.assign(state.settings,r.value);}
     if(r.method==='move'&&a){const i=state.accounts.indexOf(a);[state.accounts[i],state.accounts[i+r.value]]=[state.accounts[i+r.value],a];}
     return structuredClone(state);
    }

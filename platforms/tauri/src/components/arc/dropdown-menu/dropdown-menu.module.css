@@ -36,3 +36,8 @@
   .trigger, .chevron, .item, .highlight { transition: none; }
   .menu, .menu[data-state="closed"] { transform: none; transition: opacity var(--duration-instant) linear; }
 }
+
+/* Optional toolbar trigger; the menu retains the same Arc behavior and focus handling. */
+.iconOnly { width:var(--control-height-sm);height:var(--control-height-sm);padding:0;justify-content:center;border-color:transparent;background:transparent; }
+.iconOnly:hover,.iconOnly[data-state="open"],.iconOnly:active { border-color:transparent;box-shadow:none;background:var(--surface-muted); }
+.iconOnly:focus-visible { outline:2px solid var(--foreground);outline-offset:2px; }

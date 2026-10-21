@@ -2,14 +2,11 @@
 
 ## When data updates
 
-- All enabled providers refresh together: once at launch, then every refresh interval — 5 minutes by default, adjustable from 1 to 60 minutes in **Settings → General → Refresh Interval** (a change takes effect immediately). Opening the popover does not start a second automatic pass. Providers fetch in parallel, so fast cards update without waiting for a slow one. The batch itself still finishes only after every provider returns; notifications, history sync, and the next wait begin after that point.
+- All enabled providers refresh together: once at launch, then every refresh interval — 5 minutes by default, adjustable from 1 to 60 minutes in **Settings → General → Refresh Interval** (a change takes effect immediately). Opening the popover does not start a second automatic pass. Providers fetch in parallel, so fast cards update without waiting for a slow one. The batch itself still finishes only after every provider returns; notifications and the next wait begin after that point.
 - Turning a provider on (yourself in Customize, or automatically by first-launch/new-provider detection) fetches it promptly instead of waiting out the interval — even when the change lands in the middle of a refresh that's already running.
 - The Dashboard and Settings footer shows `Next refresh in Nm`. **Clicking it (or pressing ⌘R while that footer is present)** refreshes immediately, skipping the cache.
 - The one-shot `tokenplan` command reuses this same persisted cache for one refresh interval, refreshes missing or stale entries without starting the app, and exits. `tokenplan --force` runs the same forced provider refresh as ⌘R regardless of cache age.
 - While a provider is fetching, a small spinner appears next to its name (and one shows in the footer beside the countdown), so you can tell a refresh is in flight rather than wondering if the numbers are stale.
-- With [iCloud Sync](icloud-sync.md) on, a refresh batch writes one machine-history file after the whole
-  batch finishes. Manual provider refreshes write after that provider finishes, and adjacent changes are
-  debounced into one write.
 
 ## Caching
 
@@ -41,8 +38,7 @@ a healthy provider on a slow network can legitimately take over a minute, and it
 slow, not as broken.
 
 The last good normalized history is preserved too, so a temporary provider failure—or a successful
-limit refresh whose local log scan is temporarily unavailable—does not remove this Mac's previous
-contribution from an iCloud-combined spend total.
+limit refresh whose local log scan is temporarily unavailable—does not erase previously recorded local usage.
 
 Rows that have never had data show "No data" rather than made-up numbers.
 

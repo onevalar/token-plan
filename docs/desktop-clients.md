@@ -144,7 +144,7 @@ confirmation dialogs, close/reopen, OS shutdown, monitor scaling, login startup,
 shortcut conflicts, Linux tray-host loss/recovery, notifications and real Antigravity
 quota. The user performs these checks with the new packages.
 
-iCloud remains Mac-specific. Silent unattended update installation, all Mac account-source
+History is local on every platform. Silent unattended update installation, all Mac account-source
 variants, arbitrary shortcut recording and Antigravity's legacy per-model RPCs are
 not implemented here. Do not describe the clients as fully equivalent on every OS.
 

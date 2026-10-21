@@ -18,9 +18,9 @@ test('daily history expands real model amounts',async({page})=>{
  await expect(page.locator('.model-history-row')).toContainText('claude-test');await expect(page.locator('.model-history-row')).toContainText('$1.20');
 });
 
-test('iCloud is offered only by a capable helper and persists its selection',async({page})=>{
+test('retired cloud state cannot expose synchronization controls',async({page})=>{
  await mockDesktop(page,'zh-Hans',true);await page.goto('/');
  await page.getByRole('button',{name:'更多',exact:true}).click();await page.getByRole('menuitem',{name:'通用设置'}).click();
- const toggle=page.getByRole('switch',{name:'跨 Mac 同步',exact:true});
- await toggle.click();await expect(toggle).toBeChecked();await toggle.click();await expect(toggle).not.toBeChecked();
+ await expect(page.getByText('iCloud',{exact:true})).toHaveCount(0);
+ await expect(page.getByRole('switch',{name:'跨 Mac 同步',exact:true})).toHaveCount(0);
 });

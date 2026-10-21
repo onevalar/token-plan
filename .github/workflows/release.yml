@@ -77,27 +77,22 @@ jobs:
           CERT_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
           NOTARY_ID: ${{ secrets.APPLE_ID }}
           NOTARY_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
-          PROFILE: ${{ secrets.APPLE_DEVELOPER_ID_ICLOUD_PROFILE }}
           SPARKLE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
         run: |
-          for key in CERT CERT_PASSWORD NOTARY_ID NOTARY_PASSWORD PROFILE SPARKLE_KEY; do
+          for key in CERT CERT_PASSWORD NOTARY_ID NOTARY_PASSWORD SPARKLE_KEY; do
             test -n "${!key}" || { echo "::error::Missing cloud release credential: $key"; exit 1; }
           done
       - uses: apple-actions/import-codesign-certs@v7
         with:
           p12-file-base64: ${{ secrets.APPLE_CERTIFICATE }}
           p12-password: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
-      - name: Prepare signing profile and update configuration
-        env:
-          PROFILE: ${{ secrets.APPLE_DEVELOPER_ID_ICLOUD_PROFILE }}
+      - name: Prepare signing and update configuration
         run: |
           python3 - <<'PY'
-          import base64,json,os,pathlib,subprocess,time
+          import json,os,pathlib,time
           cfg=json.loads(pathlib.Path('release/update-config.json').read_text())
-          profile=pathlib.Path(os.environ['RUNNER_TEMP'])/'tokenplan.provisionprofile'
-          profile.write_bytes(base64.b64decode(os.environ['PROFILE']))
           with open(os.environ['GITHUB_ENV'],'a') as f:
-              f.write(f"ICLOUD_PROVISIONING_PROFILE={profile}\nSPARKLE_PUBLIC_KEY={cfg['sparkle_public_key']}\nFEED_URL={cfg['feed_url']}\nTOKENPLAN_BUILD={int(time.time())}\n")
+              f.write(f"SPARKLE_PUBLIC_KEY={cfg['sparkle_public_key']}\nFEED_URL={cfg['feed_url']}\nTOKENPLAN_BUILD={int(time.time())}\n")
           PY
           identity=$(security find-identity -v -p codesigning | awk -F'"' '/Developer ID Application/ {print $2; exit}')
           test -n "$identity"

@@ -21,18 +21,12 @@ pub struct Observation { pub date: String, pub label: String, pub value: Option<
 #[serde(rename_all = "camelCase")]
 pub struct Account { pub id: String, pub family: String, pub name: String, pub email: String, pub plan: String, pub enabled: bool, pub tray: bool, pub removable: bool, pub api_key: bool, pub note: String, pub error: String, pub fetched_at: String, pub metrics: Vec<Metric>, #[serde(default)] pub observations: Vec<Observation>, pub history_scope: String, pub history_partial: bool, pub history: Vec<Day> }
 #[derive(Clone, Debug, Deserialize, Serialize)]
-pub struct DesktopState { pub schema: String, pub accounts: Vec<Account>, pub settings: Settings, #[serde(default)] pub sync: SyncStatus }
+pub struct DesktopState { pub schema: String, pub accounts: Vec<Account>, pub settings: Settings }
 impl DesktopState {
     pub fn validate(&self) -> bool {
         self.schema == "tokenplan.desktop.v1" && self.accounts.len() < 512 && [1,2,5,10,15,30,60].contains(&self.settings.refresh_minutes)
             && self.accounts.iter().all(|a| a.metrics.len() < 128 && a.history.len() < 1000 && a.observations.len() <= 2400)
     }
 }
-
-#[derive(Clone, Debug, Default, Deserialize, Serialize)]
-pub struct SyncStatus { pub available: bool, pub enabled: bool, pub syncing: bool, pub error: String, pub devices: Vec<SyncDevice> }
-#[derive(Clone, Debug, Deserialize, Serialize)]
-#[serde(rename_all = "camelCase")]
-pub struct SyncDevice { pub id: String, pub name: String, pub current: bool, pub updated_at: String }
 
 fn default_true()->bool{true}

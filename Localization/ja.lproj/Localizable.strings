@@ -53,6 +53,8 @@
 "About" = "情報";
 "About TokenPlan" = "TokenPlan について";
 "Account" = "アカウント";
+"Account Management" = "アカウント管理";
+"Accounts follow the order in Service Configuration." = "アカウントはサービス設定と同じ順序で表示されます。";
 "Activity" = "アクティビティ";
 "Add" = "追加";
 "Add Service" = "サービスを追加";
@@ -84,6 +86,7 @@
 "Antigravity usage is temporarily unavailable. Try again shortly." = "Antigravity の使用量は一時的に利用できません。しばらくしてからお試しください。";
 "App Interface" = "アプリの外観";
 "Appearance" = "外観";
+"Appearance and Language" = "外観と言語";
 "Application" = "アプリ情報";
 "Argon Weekly" = "Argon 週間";
 "Assign tokenplan --toggle in your desktop's keyboard settings." = "デスクトップのキーボード設定で tokenplan --toggle にショートカットを割り当ててください。";
@@ -97,6 +100,7 @@
 "Back to History" = "履歴に戻る";
 "Background" = "バックグラウンド";
 "Balance" = "残高";
+"Balance and Benefits" = "残高と特典";
 "Beta Updates" = "ベータ版アップデート";
 "Billing" = "請求";
 "Blended cost per megatoken %@ across %lld providers" = "%2$lld 社のプロバイダーの百万トークンあたり平均コスト %1$@";
@@ -140,16 +144,19 @@
 "Codex auth data is invalid." = "Codex の認証データが無効です。";
 "Codex logs" = "Codex ログ";
 "Collapsed" = "折りたたみ";
+"Comfortable" = "ゆったり";
 "Command Line" = "コマンドライン";
 "Compact" = "コンパクト";
 "Complete the update in the installer." = "インストーラーで更新を完了してください。";
 "Completions" = "補完";
+"Confirm" = "確認";
 "Connect Amp with amp login, then refresh." = "amp login でログインしてから更新してください。";
 "Connected" = "接続済み";
 "Connected Providers" = "接続済みサービス";
 "Connection" = "接続";
 "Console" = "コンソール";
 "Consumes one reset credit. Only the usage windows eligible on the server will be reset. This can't be undone." = "リセットクレジットを1つ消費します。サーバーが対象とする利用枠のみリセットされます。この操作は取り消せません。";
+"Content" = "項目";
 "Content Item" = "表示項目";
 "Copilot usage data is unavailable for this account." = "このアカウントでは Copilot の使用量データを取得できません。";
 "Copilot usage request failed (HTTP %lld). Try again later." = "Copilot の使用量リクエストに失敗しました（HTTP %lld）。後でもう一度お試しください。";
@@ -184,6 +191,7 @@
 "Couldn't save the Z.ai API key." = "Z.ai の API キーを保存できませんでした。";
 "Credits" = "クレジット";
 "Ctrl + Alt + U" = "Ctrl + Alt + U";
+"Current Quota" = "現在の使用枠";
 "Cursor Models" = "Cursor モデル";
 "Cursor login changed during refresh. Refresh again for the current account." = "更新中に Cursor のログインが変更されました。現在のアカウントで再度更新してください。";
 "Cursor login could not be read. Open Cursor and sign in again." = "Cursor のログイン情報を読み取れません。Cursor を開いて再ログインしてください。";
@@ -197,14 +205,18 @@
 "Cutting It Close" = "上限間近";
 "Daily" = "日次";
 "Daily Details" = "日別の詳細";
+"Daily Records" = "日別の記録";
+"Daily Token Usage" = "日別トークン使用量";
 "Daily quota" = "日次の上限";
 "Dark" = "ダーク";
 "Dashboard" = "ダッシュボード";
+"Data Refresh" = "データ更新";
 "Date" = "日付";
 "Date Range" = "期間";
 "Debug" = "デバッグ";
 "Default" = "標準";
 "Density" = "密度";
+"Design Preview" = "デザインプレビュー";
 "Details" = "詳細";
 "Details Only" = "詳細のみ";
 "Details only" = "詳細のみ";
@@ -234,6 +246,7 @@
 "Enable services in Service Configuration to configure their menu-bar visibility." = "サービス設定でサービスを有効にして、メニューバーの表示を設定します。";
 "Enable services in Services & Subscriptions to configure their menu-bar visibility." = "「サービスと契約」でサービスを有効にすると、メニューバーの表示を設定できます。";
 "Enabled" = "有効";
+"Enabled Accounts" = "有効なアカウント";
 "Enabled Services" = "有効なサービス";
 "Enter API Key" = "APIキーを入力";
 "Enterprise usage data unavailable. Try again later." = "Enterprise の使用量データを取得できません。後でもう一度お試しください。";
@@ -302,6 +315,7 @@
 "History" = "履歴";
 "History comes from logs on this device. It may not cover every account or device." = "この端末のログによる履歴です。すべてのアカウントや端末を含むとは限りません。";
 "Home" = "ホーム";
+"Home Layout" = "ホームの表示";
 "Horizontal Bar" = "横棒";
 "Increase Transparency" = "透明度を上げる";
 "Individual Credits" = "個人クレジット";
@@ -325,6 +339,7 @@
 "Last 4 Weeks" = "過去 4 週間";
 "Last 7 Days" = "直近7日間";
 "Last Successful Update" = "最後の正常な更新";
+"Last Updated" = "最終更新";
 "Last updated %@ ago" = "%@ 前に更新";
 "Launch at Login" = "ログイン時に起動";
 "Left" = "残り";
@@ -346,6 +361,7 @@
 "Local token history is still updating." = "ローカルのトークン履歴はまだ更新中です。";
 "Local token logs could not be read. Try refreshing again." = "ローカルのトークンログを読み取れませんでした。再度更新してください。";
 "Local token totals are incomplete. Refresh again to continue scanning." = "トークン集計はまだ完了していません。再度更新するとスキャンを続行します。";
+"Location" = "表示場所";
 "Log Level" = "ログレベル";
 "Login Source" = "ログイン元";
 "MTok" = "百万トークン";
@@ -353,6 +369,7 @@
 "Manage Providers" = "プロバイダーの管理";
 "Manage services, logins and metrics" = "サービス、ログイン、表示項目の管理";
 "Menu Bar" = "メニューバー";
+"Menu Bar Preview" = "メニューバープレビュー";
 "Menu Bar Services" = "メニューバーのサービス";
 "Menu Bar Settings" = "メニューバー設定";
 "Menu Bar Style" = "メニューバーのスタイル";
@@ -361,6 +378,8 @@
 "Menu Bar: Percentage shows up to 2 starred metrics; Ring shows one primary quota per selected account." = "メニューバー：パーセントはスター付き項目を最大2つ、リングは選択した各アカウントの主要な利用枠を1つ表示します。";
 "Menu bar / system tray" = "メニューバー / トレイ";
 "Metric" = "項目";
+"Metrics" = "表示項目";
+"Minutes" = "分";
 "Model Breakdown" = "モデル別内訳";
 "Monitor Your AI Subscriptions with TokenPlan" = "TokenPlan で AI サブスクリプションを監視";
 "Monthly" = "月間";
@@ -377,6 +396,8 @@
 "Next refresh in %llds" = "%lld 秒後に更新";
 "No %@ API key. Open this service’s Settings to add it." = "%1$@ の API キーがありません。このサービスの「設定」で追加してください。";
 "No %@ API key. Set %@ or add it to %@." = "%1$@ の API キーがありません。%2$@ を設定するか、%3$@ に追加してください。";
+"No Accounts Selected" = "アカウントが選択されていません";
+"No Enabled Accounts" = "有効なアカウントがありません";
 "No Enabled Providers" = "有効なプロバイダーがありません";
 "No Matching Services" = "該当するサービスはありません";
 "No Ollama key found. Install Ollama and run `ollama signin` to track cloud usage." = "Ollama のキーが見つかりません。Ollama をインストールして `ollama signin` を実行するとクラウド使用量を追跡できます。";
@@ -413,7 +434,6 @@
 "Nothing is being tracked yet. Choose which services and metrics to show." = "まだ何も追跡していません。表示するサービスと指標を選んでください。";
 "Nothing to reset right now" = "今はリセットするものがありません";
 "Notifications" = "通知";
-"Notifications & Sync" = "通知と同期";
 "Notifications are turned off for TokenPlan. Enable them in System Settings." = "TokenPlan の通知はオフです。システム設定でオンにしてください。";
 "Notifications could not be delivered. Check system notification settings." = "通知を送信できません。システムの通知設定を確認してください。";
 "Notifications, appearance and more" = "通知、外観など";
@@ -512,7 +532,9 @@
 "Remove from TokenPlan? Your CLI login and history are kept." = "TokenPlan から削除しますか？CLI のログインと履歴は残ります。";
 "Remove saved key" = "保存キーを削除";
 "Remove this account from TokenPlan and stop adding it automatically. Your CLI login and saved usage history will not be deleted." = "TokenPlan からこのアカウントを削除し、自動追加を停止します。CLI のログインと保存済みの使用履歴は削除されません。";
+"Remove?" = "削除しますか？";
 "Removed from menu bar" = "メニューバーから削除しました";
+"Reorder" = "並べ替え";
 "Report an Issue" = "問題を報告";
 "Requests" = "リクエスト";
 "Reset" = "リセット";
@@ -548,7 +570,7 @@
 "Restore Defaults?" = "デフォルトに戻しますか？";
 "Restore Defaults…" = "デフォルトに戻す…";
 "Restore preferences to their defaults? Saved credentials and usage history are kept." = "設定を初期化しますか？保存済みの認証情報と利用履歴は保持されます。";
-"Restores every setting and customization to its default and turns providers back on for the tools you have installed. If iCloud sync is on, it turns off and this Mac's synced history is removed. This cannot be undone." = "すべての設定とカスタマイズを初期値に戻し、インストール済みのツールのプロバイダーを再度有効にします。iCloud 同期がオンの場合はオフになり、この Mac の同期済み履歴が削除されます。この操作は取り消せません。";
+"Restores every setting and customization to its default and turns providers back on for the tools you have installed. This cannot be undone." = "すべての設定とカスタマイズを初期値に戻し、インストール済みのツールのプロバイダーを再度有効にします。この操作は取り消せません。";
 "Restores service visibility, metric order and menu-bar selections to their defaults. Connection details and notes are unchanged." = "サービスの表示、項目の順序、メニューバーの選択をデフォルトに戻します。接続情報とメモは変更しません。";
 "Restores this subscription's metric visibility, order and menu-bar selection. Other subscriptions are unchanged." = "この契約の項目表示、順序、メニューバーの選択を復元します。他の契約は変更しません。";
 "Restores this subscription's metric visibility, order and tray selection. Other subscriptions are unchanged." = "この契約の表示項目、順序、トレイ選択を初期化します。他の契約は変更されません。";
@@ -571,13 +593,13 @@
 "Sessions start after you send your first message." = "最初のメッセージを送信するとセッションが始まります。";
 "Settings" = "設定";
 "Settings…" = "設定…";
-"Shares usage history through iCloud, so you can see one combined summary for all your Macs." = "iCloud で使用履歴を共有し、すべての Mac をまとめた概要を確認できます。";
 "Show" = "表示";
 "Show Log Folder" = "ログフォルダーを開く";
 "Show Note in Overview" = "概要にメモを表示";
 "Show TokenPlan" = "TokenPlan を表示";
 "Show Usage As" = "使用量の表示方法";
 "Show account" = "アカウントを表示";
+"Show in Menu Bar" = "メニューバーに表示";
 "Show less" = "表示を減らす";
 "Show more" = "もっと見る";
 "Show on Home" = "ホームに表示";
@@ -594,7 +616,6 @@
 "Some history could not be read. Totals may be incomplete." = "一部の履歴を取得できません。合計が不完全な場合があります。";
 "Some local token logs were skipped or could not be read. Totals may be incomplete." = "一部のローカルログを読み取れないかスキップしました。集計が不完全な可能性があります。";
 "Some models could not be priced. This estimate is incomplete." = "一部モデルの料金が不明なため、推定は不完全です。";
-"Some synced usage data couldn’t be read. Check the log for details." = "同期された使用量データの一部を読み取れませんでした。詳細はログを確認してください。";
 "Some usage data is unavailable. Available readings are shown below." = "一部の使用量を取得できません。取得できたデータを表示しています。";
 "Sonnet" = "Sonnet";
 "Spark" = "Spark";
@@ -609,8 +630,6 @@
 "Subscription" = "契約";
 "Subscription Details" = "契約の詳細";
 "Support & Acknowledgments" = "サポートと謝辞";
-"Sync Across Macs" = "Mac 間で同期";
-"Syncing usage history" = "使用履歴を同期中";
 "System" = "システム";
 "System Default" = "システムの設定に従う";
 "System Menu Bar" = "システムメニューバー";
@@ -620,6 +639,7 @@
 "Team accounts have no personal quota. Spend below is still from your Grok logs." = "チームアカウントには個人の上限がありません。以下の支出は引き続き Grok のログから取得しています。";
 "Team request-based usage data unavailable. Try again later." = "チームのリクエスト単位の使用量データを取得できません。後でもう一度お試しください。";
 "Terminal Helper" = "ターミナルヘルパー";
+"Terminal login and history are kept." = "ターミナルのログインと履歴は保持されます。";
 "TestFlight requires folder authorization to read existing service logins and usage history. API keys can be entered directly in service settings." = "TestFlight 版では既存のログインと使用履歴を読むためフォルダの許可が必要です。API キーはサービス設定に直接入力できます。";
 "That reset is no longer available" = "そのリセットはもう利用できません";
 "The API key could not be removed. Check local folder permissions." = "API キーを削除できません。フォルダーの権限を確認してください。";
@@ -643,25 +663,14 @@
 "The renewed login could not be saved. Check credential file permissions before retrying." = "更新したログイン情報を保存できません。認証ファイルの書き込み権限を確認して再試行してください。";
 "The renewed login was rejected by the usage service. Check account access before signing in again." = "ログインは更新されましたが、使用量サービスがアクセスを拒否しました。アカウントの権限を確認してください。";
 "The saved API key could not be read. Enter it again." = "保存済み API キーを読み取れません。再入力してください。";
-"The synced Mac identity is invalid." = "同期された Mac の識別情報が無効です。";
-"The synced account appears more than once." = "同期されたアカウントが複数回現れます。";
-"The synced account identity is invalid." = "同期されたアカウントの識別情報が無効です。";
-"The synced history contains an invalid date." = "同期された履歴に無効な日付が含まれています。";
-"The synced history contains an invalid usage value." = "同期された履歴に無効な使用量の値が含まれています。";
-"The synced history contains the same date more than once." = "同期された履歴に同じ日付が複数含まれています。";
-"The synced history contains the same model more than once." = "同期された履歴に同じモデルが複数含まれています。";
-"The synced provider identifier is invalid." = "同期されたプロバイダー識別子が無効です。";
 "The system credential reader is missing. Install libsecret-tools, or open Antigravity and refresh." = "資格情報ツールがありません。libsecret-tools をインストールするか、Antigravity を開いて更新してください。";
 "The update could not be installed. Your current version is unchanged." = "更新をインストールできませんでした。現在のバージョンは変更されていません。";
 "Theme" = "テーマ";
 "These three readings share one allowance. More expensive models use it up faster. They are not each model's own remaining amount." = "この3つは同じ利用枠です。高いモデルほど早く消費され、モデルごとの残りではありません。";
 "This Mac" = "この Mac";
-"This Mac wrote a newer usage-history format. Update TokenPlan." = "この Mac はより新しい使用履歴の形式で書き込みました。TokenPlan を更新してください。";
 "This Month" = "今月";
 "This Week" = "今週";
 "This account does not expose a personal quota. Organization billing requires billing permissions." = "個人の使用枠は公開されていません。組織の請求情報には管理権限が必要です。";
-"This desktop preview does not yet include spending history, iCloud sync or automatic updates." = "このデスクトッププレビューは、料金履歴、iCloud 同期、自動更新にはまだ対応していません。";
-"This desktop preview does not yet include spending history, tray integration, iCloud sync or automatic updates." = "このデスクトッププレビューには費用履歴、トレイ統合、iCloud 同期、自動更新はまだ含まれません。";
 "This login cannot renew automatically. Open the CLI for this account to refresh its login, then retry." = "このログインは自動更新できません。このアカウントの CLI でログイン状態を更新して再試行してください。";
 "This model's pricing is unavailable. Choose another model or None." = "このモデルの価格は利用できません。別のモデルか「なし」を選んでください。";
 "This period used a model with unknown pricing" = "この期間に価格不明のモデルが使われました";
@@ -669,6 +678,7 @@
 "This service integration is not available in this build." = "このバージョンではこのサービスに対応していません。";
 "This shortcut is unavailable. Choose another combination." = "このショートカットは使用できません。別の組み合わせを選んでください。";
 "Time Format" = "時刻形式";
+"Time Range" = "期間";
 "Today" = "今日";
 "Token Usage" = "トークン使用量";
 "Token conflict. Run `codex` to log in again." = "トークンが競合しています。`codex` を実行して再ログインしてください。";
@@ -678,8 +688,6 @@
 "Token revoked. Run `codex` to log in again." = "トークンが失効しました。`codex` を実行して再ログインしてください。";
 "TokenPlan" = "TokenPlan";
 "TokenPlan %@ is ready to download." = "TokenPlan %@ をダウンロードできます。";
-"TokenPlan calculates costs and tokens for Claude, Codex, and other providers from files stored on each Mac. Account limits, credentials, and logs are never shared." = "TokenPlan は、各 Mac に保存されたファイルから Claude、Codex などのコストとトークン数を計算します。アカウントの上限、認証情報、ログは共有されません。";
-"TokenPlan couldn’t save this Mac’s sync identity in Keychain. Sync may create a duplicate device if app preferences are reset." = "TokenPlan はこの Mac の同期用 ID をキーチェーンに保存できませんでした。アプリの設定をリセットすると、同期で重複したデバイスが作られる場合があります。";
 "TokenPlan is open-source software, made possible by its contributors and open-source dependencies." = "TokenPlan は、貢献者とオープンソースプロジェクトに支えられたオープンソースソフトウェアです。";
 "TokenPlan needs permission to send alerts." = "TokenPlan がアラートを送信する許可が必要です。";
 "TokenPlan reads credentials on this device to retrieve your usage. No analytics or crash reporting is collected." = "TokenPlan はこのデバイスの資格情報を使用して使用量を取得します。分析データやクラッシュレポートは収集しません。";
@@ -693,6 +701,7 @@
 "Total usage" = "合計使用量";
 "Total usage limit missing from API response." = "API の応答に合計使用量の上限がありません。";
 "Tray Style" = "トレイの表示";
+"Turning off an account keeps it available in Add Service." = "無効にしたアカウントは「サービスを追加」から再び有効にできます。";
 "Turns providers back on for the tools you have installed and resets every provider's metrics and order. Are you sure?" = "インストール済みのツールのプロバイダーを再度有効にし、各プロバイダーの指標と順序をリセットします。よろしいですか？";
 "Two items selected. Deselect one to choose another." = "2項目を選択済みです。変更するには1項目を解除してください。";
 "Type Shortcut…" = "ショートカットを入力…";
@@ -749,7 +758,6 @@
 "Visible appears in the overview; Details appears only here; Hidden removes the metric. Drag the handle to reorder." = "「表示」は概要、「詳細」はこのページのみ、「非表示」は表示しません。左のハンドルで並べ替えます。";
 "Vouchers" = "バウチャー";
 "Waiting for the first update…" = "初回の更新を待っています…";
-"Waiting for this Mac’s first iCloud update…" = "この Mac の最初の iCloud 更新を待っています…";
 "Warning" = "警告";
 "We set you up with the AI tools found on your Mac. Add or hide providers any time." = "Mac で見つかった AI ツールに合わせて設定しました。プロバイダーはいつでも追加・非表示にできます。";
 "Web Searches" = "Web 検索";
@@ -774,8 +782,6 @@
 "billion" = "十億";
 "credits" = "クレジット";
 "dollars" = "ドル";
-"iCloud Drive isn’t available. Check that this Mac is signed into iCloud and iCloud Drive is on." = "iCloud Drive を利用できません。この Mac が iCloud にサインインし、iCloud Drive がオンになっているか確認してください。";
-"iCloud Sync" = "iCloud 同期";
 "just now" = "たった今";
 "left" = "残り";
 "limit" = "上限";

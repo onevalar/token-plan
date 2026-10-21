@@ -1,5 +1,9 @@
 # Shared desktop interface migration
 
+The October 21 navigation redesign is currently an opt-in macOS review, documented
+in [mac-navigation-preview.md](mac-navigation-preview.md). It has not been enabled
+for normal releases or Windows/Linux builds.
+
 TokenPlan's new desktop interface lives in `platforms/tauri`. React and the free Arc
 components provide one interface for macOS, Windows and Linux. A fixed bundled helper
 continues to use the existing Swift providers on Mac and .NET providers on Windows/Linux.
@@ -127,12 +131,12 @@ Arc's upstream MIT license is bundled; no Arc Pro source is redistributed.
 
 A passing browser test does not prove platform tray behavior, notarization or installed
 updates. Keep native views until packaged acceptance and the first production upgrade have
-been validated. The shared settings now expose the original Mac iCloud history store, all three quota
-notification triggers and a recorded global shortcut. Mac imports the original notification
-preferences and Carbon shortcut; clearing a shortcut explicitly prevents re-import. iCloud
-remains Mac-only, preserves the existing device identity and shares only normalized history.
-Production packaging embeds the original provisioning profile and derived entitlements in
-both the shell and bundled helper; preview identities do not have production cloud access.
+been validated. The shared settings expose all three quota notification triggers and a recorded global
+shortcut. Mac imports the original notification preferences and Carbon shortcut; clearing
+a shortcut explicitly prevents re-import. At the owner’s request (2026-10-21), synchronization has been removed from the
+Swift client, Tauri protocol, settings and packaging. Local history is preserved.
+Developer ID packages no longer require a cloud provisioning profile or entitlements.
+The existing background helper bundle and signing identity remain in use.
 The helper shares the production bundle identifier. It must open that settings domain with
 `UserDefaults.standard`; using its own identifier as a named suite is rejected by Foundation.
 Explicit test-suite overrides still use named suites. Packaged acceptance runs both the

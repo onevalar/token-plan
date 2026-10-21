@@ -43,7 +43,7 @@ The ring and ranked legend follow the selected metric. Cost/MTok shows each prov
 
 Per-provider spend rows, 30-day trends and model breakdowns remain on subscription details. Missing data is not presented as real zero usage. Large numbers are abbreviated, with exact values available on hover. Unknown-price warnings name models excluded from priced totals; see [Pricing](pricing.md).
 
-With [iCloud Sync](icloud-sync.md) enabled, machine-local history combines across synced Macs. Cursor remains account-wide. Quotas, plans, balances and provider errors describe this Mac's refresh. Countdown rows tick every 30 seconds between refreshes.
+History uses this computer’s logs or provider-reported totals. Cursor remains account-wide. Quotas, plans, balances and provider errors describe this Mac's refresh. Countdown rows tick every 30 seconds between refreshes.
 
 ## Management and menus
 

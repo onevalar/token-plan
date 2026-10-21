@@ -8,7 +8,7 @@ import {providerText} from './providerText';
 import {historyRange,historyBounds,summarizeHistory,historyColor,dateKey} from './historyModel';
 import {accountTitle} from './usage';
 
-export function History({accounts,t,language,synced=false,compact=false,onOpen}:{accounts:Account[];t:Copy;language:string;synced?:boolean;compact?:boolean;onOpen?:()=>void}) {
+export function History({accounts,t,language,compact=false,onOpen}:{accounts:Account[];t:Copy;language:string;compact?:boolean;onOpen?:()=>void}) {
  const [family,setFamily]=useState('all'),[range,setRange]=useState('30');
  const [page,setPage]=useState(0),[expanded,setExpanded]=useState<string|null>(null),[modelRow,setModelRow]=useState<string|null>(null);
  const [showQuota,setShowQuota]=useState(false),[quotaPage,setQuotaPage]=useState(0);
@@ -36,7 +36,7 @@ export function History({accounts,t,language,synced=false,compact=false,onOpen}:
    <div className="history-legend">{providers.map(p=><div key={p.name}><span><i style={{background:historyColor(p.name)}}/>{p.name}</span><strong>{money(p.cost)}</strong></div>)}{!providers.length&&<p className="muted">{t.noHistory}</p>}</div>
   </div>
   {!compact&&<>
-   <p className="notice">{synced?tr('Shares usage history through iCloud, so you can see one combined summary for all your Macs.'):t.deviceHistory}</p>
+   <p className="notice">{t.deviceHistory}</p>
    <div className="history-controls"><Select label={tr('Filter by Service')} value={family} onValueChange={v=>{setFamily(v);setPage(0);setQuotaPage(0);setExpanded(null);setModelRow(null);}} options={[{value:'all',label:t.all},...families.map(([value,label])=>({value,label}))]}/><span className="muted">{number(total.tokens)} {t.tokens}</span></div>
    {accounts.some(a=>a.historyPartial)&&<p role="status" className="notice">{t.historyWarning}</p>}
    <div className="history-days">{dates.map(date=>{

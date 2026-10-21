@@ -13,8 +13,6 @@ final class AppContainer {
     let subscriptionNotes = SubscriptionNotesStore()
     /// Launch-discovered login sources, used only to explain a subscription's connection.
     let accounts: ProviderAccountsStore
-    /// Opt-in private iCloud document sync for additive machine-local daily history.
-    let iCloudSync: ICloudUsageSyncStore
     /// Single source of truth for which providers the user has turned off. Both stores consult it (via
     /// injected closures) and the Customize provider list drives it.
     let enablement: ProviderEnablementStore
@@ -100,14 +98,9 @@ final class AppContainer {
             notificationSettings: { notificationSettings },
             providerIdentityKeys: accountAssembly.identityKeysByCard
         )
-        let iCloudSync = ICloudUsageSyncStore(dataStore: dataStore)
         // Re-enabling a provider should fetch it promptly, so clear any leftover failure backoff before
         // the enablement wake refreshes. `weak` breaks the cycle (dataStore already captures enablement).
         enablement.onProviderEnabled = { [weak dataStore] id in dataStore?.clearFailureBackoff(for: id) }
-        enablement.onChange = { [weak dataStore, weak iCloudSync] in
-            dataStore?.providerEnablementDidChange()
-            iCloudSync?.scheduleWrite()
-        }
         // Fresh installs start minimal: seed the enabled-provider list (Claude/Codex/Cursor right away,
         // then the detected set once the local credential probe finishes). No-op on every later launch.
         let onboarding = OnboardingStore()
@@ -132,7 +125,6 @@ final class AppContainer {
         self.notificationSettings = notificationSettings
         self.layout = layout
         self.dataStore = dataStore
-        self.iCloudSync = iCloudSync
 
         // The resets popover's claim service, sharing the Codex provider's credential loading and HTTP
         // client so the claim's auth can't drift from the provider's. A successful claim forces a Codex
@@ -214,7 +206,7 @@ final class AppContainer {
     /// its default (see `docs/settings.md` § Reset). Composes the Customize reset (`resetToDefault` +
     /// provider reseed) with the Settings-only preferences. Deliberately untouched: telemetry (the
     /// optional-analytics choice and install id stay independent of settings changes — see the
-    /// `TelemetryStore` note above), the iCloud sync device identity, provider credentials, and
+    /// `TelemetryStore` note above), provider credentials, and
     /// cached usage snapshots.
     /// Launch at Login and the Sparkle update preferences live outside the container; the Settings
     /// screen resets those alongside this call.
@@ -228,9 +220,6 @@ final class AppContainer {
         RefreshSetting.reset()
         transparency.resetToDefaults()
         privacy.hideUsageWhileScreenSharing = false
-        // Same as flipping the Settings toggle off: stops syncing and removes this Mac's document
-        // from the shared iCloud container (peers keep their own history).
-        iCloudSync.enabled = false
         // Removing an `@AppStorage` key restores its declared default; the Settings screen's
         // `@AppStorage` properties observe the change. New settings must be added here.
         for key in [

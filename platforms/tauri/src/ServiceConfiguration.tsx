@@ -25,7 +25,7 @@ export function ServiceConfiguration({state,send,t,language,busy,open,history}:{
   finally{setMoving(false);}
  };
  return <>
-  <History compact onOpen={history} synced={state.sync.enabled} accounts={state.accounts} t={t} language={language}/>
+  <History compact onOpen={history} accounts={state.accounts} t={t} language={language}/>
   <section className="service-settings"><div className="section-heading"><h2>{t.configure}</h2><Button size="sm" variant="secondary" disabled={busy} onClick={()=>{setAdding(!adding);if(!adding)act({method:'discover'});}}><Plus size={16}/>{tr('Add Service')}</Button></div>
    {visible.map((a,index)=>{return <div className="service-row" key={a.id}>
     <Button className="service-identity" size="sm" variant="ghost" onClick={()=>open(a.id)}><ProviderLogo family={a.family}/><span className="service-label"><strong>{a.name}</strong>{a.email&&<small>{accountTitle(a.email)}</small>}</span><ChevronRight size={14}/></Button>

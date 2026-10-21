@@ -64,7 +64,6 @@ struct SettingsScreen: View {
                 case .appearance: SettingsAppearanceSection()
                 case .notifications:
                     notificationsSection
-                    ICloudSyncSettingsSection(sync: container.iCloudSync)
                 case .advanced:
                     privacySection
                     #if !APP_STORE_BUILD
@@ -390,7 +389,7 @@ struct SettingsScreen: View {
                 }
                 Button("Cancel", role: .cancel) {}
             } message: {
-                Text("Restores every setting and customization to its default and turns providers back on for the tools you have installed. If iCloud sync is on, it turns off and this Mac's synced history is removed. This cannot be undone.")
+                Text("Restores every setting and customization to its default and turns providers back on for the tools you have installed. This cannot be undone.")
             }
         }
     }

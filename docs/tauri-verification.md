@@ -175,3 +175,10 @@ signature against that installed app's designated requirement, validated the sta
 notarization ticket, and successfully launched the bundled data helper. Both public
 update feeds announce 2.0.1 and their assets/checksums were checked. The mounted image
 was ejected; the installed app was not replaced, and the full installer flow was not run.
+
+## Local-only history (2026-10-21)
+
+The earlier cloud-sync verification notes above describe historical builds. Synchronization
+and its signing/profile requirements have now been removed. Only local history is used;
+old local data and remote documents are not deleted. Provider authentication, notifications
+and updater signature verification retain their existing behavior.

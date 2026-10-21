@@ -1,6 +1,7 @@
 import { defineConfig } from "@playwright/test";
 export default defineConfig({
   testDir: "./tests",
+  testIgnore: "**/navigation-preview.spec.ts",
   workers: 1,
   use: {
     browserName: process.env.TOKENPLAN_TEST_ENGINE === "webkit" ? "webkit" : "chromium",

@@ -31,15 +31,9 @@ Reset countdowns always use an hourglass and `d/h/m`, regardless of language or 
 | Launch at Login | on/off | Registers the app as a login item (the system's login-item registry is the source of truth). |
 | Global Shortcut | record a shortcut | Global shortcut that toggles the popover from anywhere. Click the field and press a combo; the ⓧ clears it and disables the shortcut. |
 
-## iCloud Sync
+## Local History
 
-Under **Notifications & Sync**.
-
-**Sync Across Macs** is off by default. Turning it on shares normalized TokenPlan history through the
-app's private iCloud container and combines machine-local tokens and spend across Macs signed into the
-same iCloud account. Settings shows the five-minute write cadence and each Mac's relative **Updated**
-time; it also reports unavailable iCloud, loading, write, and malformed-file states. See
-[iCloud Sync](icloud-sync.md) for what is included and which surfaces use the combined values.
+History stays on this computer. There is no cross-device synchronization setting.
 
 ## Appearance
 
@@ -100,9 +94,9 @@ Under **Privacy & Advanced**, alongside the command-line tool, logging, reset, a
 
 See [Logging](logging.md) for the full behavior: subsystem tags, the file size cap, and the guarantee that secrets are never written.
 
-**Reset All Settings…** restores every setting on this screen to its default — appearance, usage display, notifications, privacy, log level, refresh interval, the global shortcut (cleared), Launch at Login (turned off), iCloud sync (turned off), and the update preferences (stable channel, automatic checks on) — and also resets all customization, exactly like Customize's Reset All: default layout, order, and menu-bar stars, with providers turned back on for the tools you have installed. The reset cannot be undone.
+**Reset All Settings…** restores every setting on this screen to its default — appearance, usage display, notifications, privacy, log level, refresh interval, the global shortcut (cleared), Launch at Login (turned off), and the update preferences (stable channel, automatic checks on) — and also resets all customization, exactly like Customize's Reset All: default layout, order, and menu-bar stars, with providers turned back on for the tools you have installed. The reset cannot be undone.
 
-Not touched: provider logins and API keys, cached usage data, subscription notes, and your language choice. Turning iCloud sync off as part of the reset works exactly like flipping its toggle off: this Mac's synced history is removed from the shared iCloud data, and your other Macs keep their own.
+Not touched: provider logins and API keys, cached usage data, subscription notes, and your language choice.
 
 ## Updates
 

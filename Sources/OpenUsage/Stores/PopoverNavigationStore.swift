@@ -39,7 +39,7 @@ enum SettingsPage: CaseIterable, Hashable {
         switch self {
         case .history: tr("Usage History")
         case .appearance: tr("Display & Appearance")
-        case .notifications: tr("Notifications & Sync")
+        case .notifications: tr("Notifications")
         case .advanced: tr("Privacy & Advanced")
         }
     }

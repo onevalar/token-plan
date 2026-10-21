@@ -66,12 +66,8 @@ final class WidgetDataStore {
     /// deadline is already reported separately by `slowProviderRefreshThreshold`.
     static let defaultProviderRefreshTimeout: TimeInterval = 120
 
-    /// Rendered snapshots consumed by every UI/API surface. Equal to `localSnapshots` when iCloud sync
-    /// is off; machine-local history rows are rebuilt from the union while sync is on.
+    /// Last-good snapshots produced on this Mac, shared by the UI and local API.
     var snapshots: [String: ProviderSnapshot] = [:]
-    /// Last-good snapshots produced on this Mac. These alone are cached and exported to iCloud, so a
-    /// peer contribution can never echo back out and multiply on the next device.
-    private(set) var localSnapshots: [String: ProviderSnapshot] = [:]
     var refreshingProviderIDs: Set<String> = []
     /// Wall-clock time the most recent full refresh pass finished. Together with the chosen refresh
     /// cadence it drives the dashboard footer's live "Next update in …" countdown, so the footer reflects
@@ -90,10 +86,6 @@ final class WidgetDataStore {
     /// Owns the quota pace-notification subsystem (dedup state, fire/deliver decision, trace). This store
     /// just gathers each pass's enabled bounded metrics and delegates.
     @ObservationIgnored private let notificationEvaluator = QuotaNotificationEvaluator()
-
-    /// Wired by `ICloudUsageSyncStore`; debounced there so a concurrent provider batch produces one file.
-    @ObservationIgnored var onLocalHistoryChanged: (@MainActor () -> Void)?
-    @ObservationIgnored private var peerHistoryDocuments: [UsageHistoryDocument] = []
 
     /// Global meter style: whether every bounded tile (and the menu-bar value) renders as "used" or
     /// "left/remaining". Persisted so the choice survives relaunch; defaults to `.remaining`.
@@ -161,7 +153,6 @@ final class WidgetDataStore {
                 AppLog.info(.cache, "stale account cache discarded for \(cardID)")
                 return false
             }
-        self.localSnapshots = loaded
         self.snapshots = loaded
         // Only a snapshot the card's current account provably produced may seed a provider's fallback.
         for (cardID, snapshot) in loaded {
@@ -184,7 +175,7 @@ final class WidgetDataStore {
         let start = monotonicNow()
         AppLog.info(.refresh, "batch start (\(providerIDs.count) providers, force=\(force))")
         let tasks = providerIDs.map { providerID in
-            Task { await self.refresh(providerID: providerID, force: force, notifyHistoryChange: false) }
+            Task { await self.refresh(providerID: providerID, force: force) }
         }
         var outcomes: [RefreshOutcome] = []
         outcomes.reserveCapacity(tasks.count)
@@ -202,7 +193,6 @@ final class WidgetDataStore {
         let failed = outcomes.count { $0 == .failed }
         let cached = outcomes.count { $0 == .cacheHit }
         let backedOff = outcomes.count { $0 == .backedOff }
-        if refreshed > 0 { onLocalHistoryChanged?() }
         AppLog.info(.refresh, "batch end (\(durationMs)ms, \(refreshed) ok / \(failed) failed / \(cached) cached / \(backedOff) backed off)")
     }
 
@@ -254,8 +244,7 @@ final class WidgetDataStore {
     @discardableResult
     func refresh(
         providerID: String,
-        force: Bool = false,
-        notifyHistoryChange: Bool = true
+        force: Bool = false
     ) async -> RefreshOutcome {
         guard isProviderEnabled(providerID) else { return .skipped }
         // A TTL-fresh entry that provably belongs to another account (swap since it was written) must
@@ -269,9 +258,8 @@ final class WidgetDataStore {
             // Skip the no-op write: `@Observable` doesn't compare values, so unconditionally
             // re-assigning an unchanged snapshot would re-render the menu-bar label every pass.
             AppLog.debug(.refresh, "cache hit \(providerID)")
-            if localSnapshots[providerID] != cached {
-                localSnapshots[providerID] = cached
-                rebuildRenderedSnapshots()
+            if snapshots[providerID] != cached {
+                snapshots[providerID] = cached
             }
             return .cacheHit
         }
@@ -338,7 +326,7 @@ final class WidgetDataStore {
         // limits, warnings, and timestamp still win. A non-nil empty history remains authoritative and
         // clears the old rows, because it proves the scan completed and found no usage.
         if snapshot.usageHistory == nil,
-           let history = localSnapshots[providerID]?.usageHistory,
+           let history = snapshots[providerID]?.usageHistory,
            let descriptor = registry.historyDescriptorsByProvider[providerID]
         {
             snapshot.usageHistory = history
@@ -346,17 +334,14 @@ final class WidgetDataStore {
                 local: snapshot,
                 history: history,
                 descriptor: descriptor,
-                now: now(),
-                combined: false
+                now: now()
             )
             AppLog.debug(.refresh, "preserved last-good history for \(providerID) after scan miss")
         }
-        localSnapshots[providerID] = snapshot
+        snapshots[providerID] = snapshot
         // Stamp the write with the card's launch-resolved account identity; nil (no stamp) for
         // non-account providers and for cards whose identity didn't resolve this launch.
         cache.store(snapshot, producedByIdentityKey: providerIdentityKeys[providerID])
-        rebuildRenderedSnapshots()
-        if notifyHistoryChange { onLocalHistoryChanged?() }
         AppLog.info(.refresh, "\(providerID) ok (\(durationMs)ms)")
         return .refreshed
     }
@@ -371,121 +356,6 @@ final class WidgetDataStore {
     /// retry until the 5-minute heartbeat). The periodic loop never calls this — only the user action does.
     func clearFailureBackoff(for providerID: String) {
         failureRetryAfter[providerID] = nil
-    }
-
-    /// Rebuild the in-memory union immediately after a provider toggle. Local cached data remains
-    /// available to direct API reads, but disabled providers stop receiving peer contributions.
-    func providerEnablementDidChange() {
-        rebuildRenderedSnapshots()
-    }
-
-    /// Replaces the downloaded peer set. A conflicted duplicate device file resolves to the newest
-    /// valid document, and this Mac's own downloaded copy is excluded in favor of current memory.
-    func setPeerHistoryDocuments(_ documents: [UsageHistoryDocument], ownDeviceID: String) {
-        peerHistoryDocuments = UsageHistoryDocument.newestByDevice(documents)
-            .filter { $0.deviceID != ownDeviceID }
-        rebuildRenderedSnapshots()
-    }
-
-    func clearPeerHistoryDocuments() {
-        guard !peerHistoryDocuments.isEmpty else { return }
-        peerHistoryDocuments = []
-        rebuildRenderedSnapshots()
-    }
-
-    func localHistoryDocument(deviceID: String, deviceName: String, updatedAt: Date = Date()) -> UsageHistoryDocument {
-        var providers: [String: ProviderUsageHistory] = [:]
-        var identities: [String: String] = [:]
-        let hasMultipleClaudeCards = registry.providers.count {
-            ProviderAccountID.family(of: $0.id) == "claude"
-        } > 1
-        for (providerID, descriptor) in registry.historyDescriptorsByProvider
-        where descriptor.scope == .machineLocal && isProviderEnabled(providerID) {
-            if let history = localSnapshots[providerID]?.usageHistory {
-                if ProviderAccountID.family(of: providerID) == "claude" {
-                    if let identity = providerIdentityKeys[providerID] {
-                        identities[providerID] = identity.lowercased()
-                    } else if hasMultipleClaudeCards || providerID != "claude" {
-                        AppLog.warn(.config, "sync: omitting Claude history without account ownership")
-                        continue
-                    }
-                }
-                if ProviderAccountID.family(of: providerID) == "codex",
-                   let identity = providerIdentityKeys[providerID], identity.contains("|") {
-                    guard CodexAccountIdentity.isComplete(key: identity) else { continue }
-                    identities[providerID] = identity.lowercased()
-                }
-                providers[providerID] = history
-            }
-        }
-        let exportedClaudeIDs = providers.keys.filter {
-            ProviderAccountID.family(of: $0) == "claude"
-        }
-        if let onlyClaudeID = exportedClaudeIDs.first,
-           exportedClaudeIDs.count == 1, onlyClaudeID != "claude"
-        {
-            providers["claude"] = providers.removeValue(forKey: onlyClaudeID)
-            identities["claude"] = identities.removeValue(forKey: onlyClaudeID)
-        }
-        let hasClaudeAccountCards = providers.keys.contains {
-            ProviderAccountID.family(of: $0) == "claude" && $0 != "claude"
-        }
-        let usesAccountSchema = hasClaudeAccountCards || identities.keys.contains {
-            ProviderAccountID.family(of: $0) == "codex"
-        }
-        // v2 requires ownership for every Claude entry, even a legacy bare card. One unresolved
-        // login must not invalidate the document and block syncing every other provider.
-        if usesAccountSchema, providers["claude"] != nil, identities["claude"] == nil {
-            providers.removeValue(forKey: "claude")
-            AppLog.warn(.config, "sync: omitting unresolved Claude history from account-aware export")
-        }
-        return UsageHistoryDocument(
-            schema: usesAccountSchema ? UsageHistoryDocument.accountSchema : UsageHistoryDocument.currentSchema,
-            deviceID: deviceID,
-            deviceName: deviceName,
-            updatedAt: updatedAt,
-            providers: providers,
-            identities: identities.isEmpty ? nil : identities
-        )
-    }
-
-    private func rebuildRenderedSnapshots() {
-        guard !peerHistoryDocuments.isEmpty else {
-            snapshots = localSnapshots
-            return
-        }
-        let renderDate = now()
-        let enabledDescriptors = registry.historyDescriptorsByProvider.reduce(
-            into: [String: UsageHistoryDescriptor]()
-        ) { result, entry in
-            if isProviderEnabled(entry.key) { result[entry.key] = entry.value }
-        }
-        let merged = UsageHistoryAggregator.merged(
-            localSnapshots: localSnapshots,
-            peerDocuments: peerHistoryDocuments,
-            descriptors: enabledDescriptors,
-            providerIdentityKeys: providerIdentityKeys,
-            now: renderDate
-        )
-        var rendered = localSnapshots
-        for (providerID, history) in merged {
-            guard let descriptor = registry.historyDescriptorsByProvider[providerID],
-                  let provider = registry.provider(id: providerID)
-            else { continue }
-            let local = localSnapshots[providerID] ?? ProviderSnapshot(
-                providerID: providerID,
-                displayName: provider.displayName,
-                lines: [],
-                refreshedAt: peerHistoryDocuments.map(\.updatedAt).max() ?? renderDate
-            )
-            rendered[providerID] = UsageHistorySnapshotRenderer.render(
-                local: local,
-                history: history,
-                descriptor: descriptor,
-                now: renderDate
-            )
-        }
-        snapshots = rendered
     }
 
     /// The provider's latest refresh error, or `nil` when its last refresh succeeded.

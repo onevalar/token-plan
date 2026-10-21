@@ -53,6 +53,8 @@
 "About" = "关于";
 "About TokenPlan" = "关于 TokenPlan";
 "Account" = "账号";
+"Account Management" = "账号管理";
+"Accounts follow the order in Service Configuration." = "账号顺序与服务配置保持一致。";
 "Activity" = "活动";
 "Add" = "添加";
 "Add Service" = "添加服务";
@@ -84,6 +86,7 @@
 "Antigravity usage is temporarily unavailable. Try again shortly." = "Antigravity 用量暂时不可用，请稍后重试。";
 "App Interface" = "界面外观";
 "Appearance" = "外观";
+"Appearance and Language" = "外观与语言";
 "Application" = "应用信息";
 "Argon Weekly" = "Argon 每周";
 "Assign tokenplan --toggle in your desktop's keyboard settings." = "可在桌面的键盘设置中为 tokenplan --toggle 分配快捷键。";
@@ -97,6 +100,7 @@
 "Back to History" = "返回用量历史";
 "Background" = "后台运行";
 "Balance" = "余额";
+"Balance and Benefits" = "余额与权益";
 "Beta Updates" = "测试版更新";
 "Billing" = "账单";
 "Blended cost per megatoken %@ across %lld providers" = "%2$lld 个服务商的每百万 token 综合费用 %1$@";
@@ -140,16 +144,19 @@
 "Codex auth data is invalid." = "Codex 认证数据无效。";
 "Codex logs" = "Codex 日志";
 "Collapsed" = "已收起";
+"Comfortable" = "宽松";
 "Command Line" = "命令行";
 "Compact" = "紧凑";
 "Complete the update in the installer." = "请在安装程序中完成更新。";
 "Completions" = "补全";
+"Confirm" = "确认";
 "Connect Amp with amp login, then refresh." = "运行 amp login 登录账号后刷新。";
 "Connected" = "已连接";
 "Connected Providers" = "已连接的服务";
 "Connection" = "连接";
 "Console" = "控制台";
 "Consumes one reset credit. Only the usage windows eligible on the server will be reset. This can't be undone." = "将消耗一份重置额度，仅重置服务端允许的用量周期。此操作无法撤销。";
+"Content" = "内容";
 "Content Item" = "内容项";
 "Copilot usage data is unavailable for this account." = "该账户无法获取 Copilot 用量数据。";
 "Copilot usage request failed (HTTP %lld). Try again later." = "Copilot 用量请求失败（HTTP %lld），请稍后重试。";
@@ -184,6 +191,7 @@
 "Couldn't save the Z.ai API key." = "无法保存 Z.ai 的 API 密钥。";
 "Credits" = "额度";
 "Ctrl + Alt + U" = "Ctrl + Alt + U";
+"Current Quota" = "当前额度";
 "Cursor Models" = "Cursor 模型";
 "Cursor login changed during refresh. Refresh again for the current account." = "刷新期间 Cursor 登录已变更，请再次刷新当前账户。";
 "Cursor login could not be read. Open Cursor and sign in again." = "无法读取 Cursor 登录信息，请打开 Cursor 并重新登录。";
@@ -197,14 +205,18 @@
 "Cutting It Close" = "接近上限";
 "Daily" = "每日";
 "Daily Details" = "每日明细";
+"Daily Records" = "每日记录";
+"Daily Token Usage" = "每日 token 用量";
 "Daily quota" = "每日额度";
 "Dark" = "深色";
 "Dashboard" = "仪表盘";
+"Data Refresh" = "数据刷新";
 "Date" = "日期";
 "Date Range" = "日期范围";
 "Debug" = "调试";
 "Default" = "默认";
 "Density" = "密度";
+"Design Preview" = "设计预览";
 "Details" = "详情";
 "Details Only" = "仅详情";
 "Details only" = "仅详情";
@@ -234,6 +246,7 @@
 "Enable services in Service Configuration to configure their menu-bar visibility." = "在服务配置中启用服务，即可配置其菜单栏显示。";
 "Enable services in Services & Subscriptions to configure their menu-bar visibility." = "在“服务与订阅”中启用服务，即可设置它们在菜单栏中的显示。";
 "Enabled" = "已启用";
+"Enabled Accounts" = "已启用账号";
 "Enabled Services" = "已启用服务";
 "Enter API Key" = "输入 API Key";
 "Enterprise usage data unavailable. Try again later." = "企业版用量数据暂不可用，请稍后重试。";
@@ -302,6 +315,7 @@
 "History" = "历史记录";
 "History comes from logs on this device. It may not cover every account or device." = "历史来自本机日志，不一定涵盖所有账号和设备。";
 "Home" = "首页显示";
+"Home Layout" = "首页布局";
 "Horizontal Bar" = "横条";
 "Increase Transparency" = "增加透明度";
 "Individual Credits" = "个人余额";
@@ -325,6 +339,7 @@
 "Last 4 Weeks" = "最近 4 周";
 "Last 7 Days" = "最近 7 天";
 "Last Successful Update" = "上次成功更新";
+"Last Updated" = "最近更新";
 "Last updated %@ ago" = "%@ 前更新";
 "Launch at Login" = "登录时启动";
 "Left" = "剩余";
@@ -346,6 +361,7 @@
 "Local token history is still updating." = "本地 token 历史仍在更新。";
 "Local token logs could not be read. Try refreshing again." = "无法读取本机 Token 日志，请重新刷新。";
 "Local token totals are incomplete. Refresh again to continue scanning." = "Token 统计尚不完整，再次刷新可继续扫描。";
+"Location" = "显示位置";
 "Log Level" = "日志级别";
 "Login Source" = "登录来源";
 "MTok" = "百万 token";
@@ -353,6 +369,7 @@
 "Manage Providers" = "管理提供方";
 "Manage services, logins and metrics" = "管理服务、登录来源和显示指标";
 "Menu Bar" = "菜单栏";
+"Menu Bar Preview" = "菜单栏预览";
 "Menu Bar Services" = "菜单栏服务";
 "Menu Bar Settings" = "菜单栏设置";
 "Menu Bar Style" = "菜单栏样式";
@@ -361,6 +378,8 @@
 "Menu Bar: Percentage shows up to 2 starred metrics; Ring shows one primary quota per selected account." = "菜单栏：百分比显示最多 2 项星标指标；环形为每个所选账号显示一项主要额度。";
 "Menu bar / system tray" = "菜单栏 / 系统托盘";
 "Metric" = "指标";
+"Metrics" = "显示指标";
+"Minutes" = "分钟";
 "Model Breakdown" = "模型明细";
 "Monitor Your AI Subscriptions with TokenPlan" = "用 TokenPlan 监控你的 AI 订阅";
 "Monthly" = "每月";
@@ -377,6 +396,8 @@
 "Next refresh in %llds" = "%lld 秒后刷新";
 "No %@ API key. Open this service’s Settings to add it." = "尚未添加 %1$@ API 密钥，请在此服务的“设置”中添加。";
 "No %@ API key. Set %@ or add it to %@." = "没有 %1$@ 的 API 密钥。请设置 %2$@，或将其添加到 %3$@。";
+"No Accounts Selected" = "尚未选择账号";
+"No Enabled Accounts" = "尚未启用账号";
 "No Enabled Providers" = "没有已启用的服务商";
 "No Matching Services" = "没有匹配的服务";
 "No Ollama key found. Install Ollama and run `ollama signin` to track cloud usage." = "没有找到 Ollama 密钥。请安装 Ollama 并运行 `ollama signin` 以追踪云端用量。";
@@ -413,7 +434,6 @@
 "Nothing is being tracked yet. Choose which services and metrics to show." = "目前还没有追踪任何内容。请选择要显示的服务和指标。";
 "Nothing to reset right now" = "目前无需重置";
 "Notifications" = "通知";
-"Notifications & Sync" = "通知与同步";
 "Notifications are turned off for TokenPlan. Enable them in System Settings." = "TokenPlan 的通知已关闭。请在“系统设置”中开启。";
 "Notifications could not be delivered. Check system notification settings." = "无法发送通知，请检查系统通知设置。";
 "Notifications, appearance and more" = "通知、外观等";
@@ -512,7 +532,9 @@
 "Remove from TokenPlan? Your CLI login and history are kept." = "从 TokenPlan 移除？终端登录和历史记录会保留。";
 "Remove saved key" = "删除已保存密钥";
 "Remove this account from TokenPlan and stop adding it automatically. Your CLI login and saved usage history will not be deleted." = "从 TokenPlan 中移除此账号，并停止自动添加。不会退出命令行工具的登录，也不会删除已保存的用量历史。";
+"Remove?" = "确认移除？";
 "Removed from menu bar" = "已从菜单栏移除";
+"Reorder" = "排序";
 "Report an Issue" = "反馈问题";
 "Requests" = "请求数";
 "Reset" = "重置";
@@ -548,7 +570,7 @@
 "Restore Defaults?" = "恢复默认？";
 "Restore Defaults…" = "恢复默认…";
 "Restore preferences to their defaults? Saved credentials and usage history are kept." = "将设置恢复为默认值？已保存的凭据和用量历史会保留。";
-"Restores every setting and customization to its default and turns providers back on for the tools you have installed. If iCloud sync is on, it turns off and this Mac's synced history is removed. This cannot be undone." = "将所有设置和自定义恢复为默认值，并为你已安装的工具重新启用对应服务商。如果开启了 iCloud 同步，它会被关闭，并移除这台 Mac 已同步的历史。此操作无法撤销。";
+"Restores every setting and customization to its default and turns providers back on for the tools you have installed. This cannot be undone." = "将所有设置和自定义恢复为默认值，并为你已安装的工具重新启用对应服务商。此操作无法撤销。";
 "Restores service visibility, metric order and menu-bar selections to their defaults. Connection details and notes are unchanged." = "恢复服务显示、指标顺序和菜单栏选择，连接信息和备注不变。";
 "Restores this subscription's metric visibility, order and menu-bar selection. Other subscriptions are unchanged." = "恢复本订阅的指标显示、顺序和菜单栏选择，其他订阅不变。";
 "Restores this subscription's metric visibility, order and tray selection. Other subscriptions are unchanged." = "恢复此订阅的显示内容、顺序和托盘选择，其他订阅不受影响。";
@@ -571,13 +593,13 @@
 "Sessions start after you send your first message." = "发送第一条消息后，会话才会开始计时。";
 "Settings" = "设置";
 "Settings…" = "设置…";
-"Shares usage history through iCloud, so you can see one combined summary for all your Macs." = "通过 iCloud 共享用量历史，这样你可以看到所有 Mac 的合并汇总。";
 "Show" = "显示";
 "Show Log Folder" = "打开日志文件夹";
 "Show Note in Overview" = "在总览显示备注";
 "Show TokenPlan" = "打开 TokenPlan";
 "Show Usage As" = "用量显示方式";
 "Show account" = "显示账号";
+"Show in Menu Bar" = "在菜单栏显示";
 "Show less" = "收起";
 "Show more" = "展开";
 "Show on Home" = "首页显示";
@@ -594,7 +616,6 @@
 "Some history could not be read. Totals may be incomplete." = "部分历史记录无法读取，统计可能不完整。";
 "Some local token logs were skipped or could not be read. Totals may be incomplete." = "部分本机日志已跳过或无法读取，统计可能不完整。";
 "Some models could not be priced. This estimate is incomplete." = "部分模型无法计价，此估算不完整。";
-"Some synced usage data couldn’t be read. Check the log for details." = "部分已同步的用量数据无法读取。详情请查看日志。";
 "Some usage data is unavailable. Available readings are shown below." = "部分用量暂时无法获取，下方显示已获取的数据。";
 "Sonnet" = "Sonnet";
 "Spark" = "Spark";
@@ -609,8 +630,6 @@
 "Subscription" = "订阅";
 "Subscription Details" = "订阅详情";
 "Support & Acknowledgments" = "支持与致谢";
-"Sync Across Macs" = "跨 Mac 同步";
-"Syncing usage history" = "正在同步用量历史";
 "System" = "跟随系统";
 "System Default" = "跟随系统";
 "System Menu Bar" = "系统菜单栏";
@@ -620,6 +639,7 @@
 "Team accounts have no personal quota. Spend below is still from your Grok logs." = "团队账户没有个人额度。下方花费仍来自你的 Grok 日志。";
 "Team request-based usage data unavailable. Try again later." = "团队按请求计费的用量数据暂不可用，请稍后重试。";
 "Terminal Helper" = "终端助手";
+"Terminal login and history are kept." = "终端登录与历史记录会保留。";
 "TestFlight requires folder authorization to read existing service logins and usage history. API keys can be entered directly in service settings." = "TestFlight 版需授权文件夹后才能读取现有服务登录和用量历史。API Key 可直接在服务设置中填写。";
 "That reset is no longer available" = "该重置已不可用";
 "The API key could not be removed. Check local folder permissions." = "无法移除 API 密钥，请检查本地文件夹权限。";
@@ -643,25 +663,14 @@
 "The renewed login could not be saved. Check credential file permissions before retrying." = "无法写入续期后的登录信息，请检查凭据文件的写入权限后重试。";
 "The renewed login was rejected by the usage service. Check account access before signing in again." = "登录已续期，但用量接口仍拒绝访问。请先检查账号访问权限。";
 "The saved API key could not be read. Enter it again." = "无法读取已保存的 API 密钥，请重新输入。";
-"The synced Mac identity is invalid." = "同步的 Mac 标识无效。";
-"The synced account appears more than once." = "同步的账户出现了多次。";
-"The synced account identity is invalid." = "同步的账户标识无效。";
-"The synced history contains an invalid date." = "同步的历史中包含无效日期。";
-"The synced history contains an invalid usage value." = "同步的历史中包含无效的用量数值。";
-"The synced history contains the same date more than once." = "同步的历史中同一日期出现了多次。";
-"The synced history contains the same model more than once." = "同步的历史中同一模型出现了多次。";
-"The synced provider identifier is invalid." = "同步的服务商标识无效。";
 "The system credential reader is missing. Install libsecret-tools, or open Antigravity and refresh." = "缺少系统凭据读取工具。请安装 libsecret-tools，或打开 Antigravity 后刷新。";
 "The update could not be installed. Your current version is unchanged." = "更新安装失败，当前版本未变更。";
 "Theme" = "主题";
 "These three readings share one allowance. More expensive models use it up faster. They are not each model's own remaining amount." = "这三条是同一份额度。贵的模型会更快用完，不是每个模型各自的剩余量。";
 "This Mac" = "这台 Mac";
-"This Mac wrote a newer usage-history format. Update TokenPlan." = "这台 Mac 写入了更新的用量历史格式。请更新 TokenPlan。";
 "This Month" = "本月";
 "This Week" = "本周";
 "This account does not expose a personal quota. Organization billing requires billing permissions." = "此账号不提供个人额度，组织账单需要账单管理权限。";
-"This desktop preview does not yet include spending history, iCloud sync or automatic updates." = "此桌面预览版暂不支持费用历史、iCloud 同步和自动更新。";
-"This desktop preview does not yet include spending history, tray integration, iCloud sync or automatic updates." = "此桌面预览版暂不包含费用历史、托盘集成、iCloud 同步和自动更新。";
 "This login cannot renew automatically. Open the CLI for this account to refresh its login, then retry." = "此登录信息无法自动续期。请打开该账号的 CLI 更新登录状态后重试。";
 "This model's pricing is unavailable. Choose another model or None." = "该模型的定价不可用。请选择其他模型或“无”。";
 "This period used a model with unknown pricing" = "这段时间使用了价格未知的模型";
@@ -669,6 +678,7 @@
 "This service integration is not available in this build." = "此版本暂未接入这项服务。";
 "This shortcut is unavailable. Choose another combination." = "此快捷键不可用，请选择其他组合。";
 "Time Format" = "时间格式";
+"Time Range" = "时间范围";
 "Today" = "今天";
 "Token Usage" = "Token 用量";
 "Token conflict. Run `codex` to log in again." = "令牌冲突。请运行 `codex` 重新登录。";
@@ -678,8 +688,6 @@
 "Token revoked. Run `codex` to log in again." = "令牌已被撤销。请运行 `codex` 重新登录。";
 "TokenPlan" = "TokenPlan";
 "TokenPlan %@ is ready to download." = "TokenPlan %@ 已可下载。";
-"TokenPlan calculates costs and tokens for Claude, Codex, and other providers from files stored on each Mac. Account limits, credentials, and logs are never shared." = "TokenPlan 根据每台 Mac 上保存的文件，计算 Claude、Codex 等服务商的费用和 token 用量。账户额度、凭据和日志不会被共享。";
-"TokenPlan couldn’t save this Mac’s sync identity in Keychain. Sync may create a duplicate device if app preferences are reset." = "TokenPlan 无法将这台 Mac 的同步标识保存到钥匙串。如果重置了应用偏好设置，同步可能会产生重复设备。";
 "TokenPlan is open-source software, made possible by its contributors and open-source dependencies." = "TokenPlan 是开源软件，感谢所有贡献者和开源项目的支持。";
 "TokenPlan needs permission to send alerts." = "TokenPlan 需要获得发送提醒的权限。";
 "TokenPlan reads credentials on this device to retrieve your usage. No analytics or crash reporting is collected." = "TokenPlan 使用本机凭据获取用量，不收集分析数据或崩溃报告。";
@@ -693,6 +701,7 @@
 "Total usage" = "总用量";
 "Total usage limit missing from API response." = "API 响应中缺少总用量上限。";
 "Tray Style" = "托盘样式";
+"Turning off an account keeps it available in Add Service." = "关闭后保留账号，可在“添加服务”中重新启用。";
 "Turns providers back on for the tools you have installed and resets every provider's metrics and order. Are you sure?" = "将为你已安装的工具重新启用对应服务商，并重置每个服务商的指标和顺序。确定吗？";
 "Two items selected. Deselect one to choose another." = "已选两项，请先取消一项再选择其他内容。";
 "Type Shortcut…" = "输入快捷键…";
@@ -749,7 +758,6 @@
 "Visible appears in the overview; Details appears only here; Hidden removes the metric. Drag the handle to reorder." = "“显示”放在首页，“详情”仅在详情页显示，“隐藏”则不显示。拖动左侧手柄可排序。";
 "Vouchers" = "代金券";
 "Waiting for the first update…" = "等待首次更新…";
-"Waiting for this Mac’s first iCloud update…" = "正在等待这台 Mac 的首次 iCloud 更新…";
 "Warning" = "警告";
 "We set you up with the AI tools found on your Mac. Add or hide providers any time." = "我们已根据你 Mac 上找到的 AI 工具完成了初始设置。你随时可以添加或隐藏服务商。";
 "Web Searches" = "网络搜索";
@@ -774,8 +782,6 @@
 "billion" = "十亿";
 "credits" = "额度";
 "dollars" = "美元";
-"iCloud Drive isn’t available. Check that this Mac is signed into iCloud and iCloud Drive is on." = "iCloud 云盘不可用。请确认这台 Mac 已登录 iCloud 并开启了 iCloud 云盘。";
-"iCloud Sync" = "iCloud 同步";
 "just now" = "刚刚";
 "left" = "剩余";
 "limit" = "上限";

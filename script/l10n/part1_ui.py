@@ -65,12 +65,12 @@ T = {
 "About TokenPlan": ("关于 TokenPlan", "關於 TokenPlan", "TokenPlan について", "TokenPlan 정보"),
 "Quit TokenPlan": ("退出 TokenPlan", "結束 TokenPlan", "TokenPlan を終了", "TokenPlan 종료"),
 "No Enabled Providers": ("没有已启用的服务商", "沒有已啟用的服務商", "有効なプロバイダーがありません", "활성화된 제공업체 없음"),
-"iCloud Sync": ("iCloud 同步", "iCloud 同步", "iCloud 同期", "iCloud 동기화"),
-"TokenPlan calculates costs and tokens for Claude, Codex, and other providers from files stored on each Mac. Account limits, credentials, and logs are never shared.": ("TokenPlan 根据每台 Mac 上保存的文件，计算 Claude、Codex 等服务商的费用和 token 用量。账户额度、凭据和日志不会被共享。", "TokenPlan 會根據每台 Mac 上儲存的檔案，計算 Claude、Codex 等服務商的費用與 token 用量。帳號額度、憑證與記錄檔不會被分享。", "TokenPlan は、各 Mac に保存されたファイルから Claude、Codex などのコストとトークン数を計算します。アカウントの上限、認証情報、ログは共有されません。", "TokenPlan은 각 Mac에 저장된 파일로 Claude, Codex 등의 비용과 토큰 사용량을 계산합니다. 계정 한도, 자격 증명, 로그는 공유되지 않습니다."),
-"Sync Across Macs": ("跨 Mac 同步", "跨 Mac 同步", "Mac 間で同期", "Mac 간 동기화"),
-"Syncing usage history": ("正在同步用量历史", "正在同步用量記錄", "使用履歴を同期中", "사용 기록 동기화 중"),
-"Shares usage history through iCloud, so you can see one combined summary for all your Macs.": ("通过 iCloud 共享用量历史，这样你可以看到所有 Mac 的合并汇总。", "透過 iCloud 分享用量記錄，讓你看到所有 Mac 的合併彙總。", "iCloud で使用履歴を共有し、すべての Mac をまとめた概要を確認できます。", "iCloud로 사용 기록을 공유하여 모든 Mac의 통합 요약을 볼 수 있습니다."),
-"Waiting for this Mac’s first iCloud update…": ("正在等待这台 Mac 的首次 iCloud 更新…", "正在等待這台 Mac 的首次 iCloud 更新…", "この Mac の最初の iCloud 更新を待っています…", "이 Mac의 첫 iCloud 업데이트를 기다리는 중…"),
+
+
+
+
+
+
 "This Mac": ("这台 Mac", "這台 Mac", "この Mac", "이 Mac"),
 "Updated %@": ("更新于 %@", "更新於 %@", "%@ に更新", "%@ 업데이트됨"),
 "just now": ("刚刚", "剛剛", "たった今", "방금"),
@@ -179,7 +179,7 @@ T = {
 "Reveal in Finder": ("在访达中显示", "在 Finder 中顯示", "Finder で表示", "Finder에서 보기"),
 "Reset All Settings…": ("重置所有设置…", "重置所有設定…", "すべての設定をリセット…", "모든 설정 초기화…"),
 "Reset All Settings?": ("重置所有设置？", "重置所有設定？", "すべての設定をリセットしますか？", "모든 설정을 초기화할까요?"),
-"Restores every setting and customization to its default and turns providers back on for the tools you have installed. If iCloud sync is on, it turns off and this Mac's synced history is removed. This cannot be undone.": ("将所有设置和自定义恢复为默认值，并为你已安装的工具重新启用对应服务商。如果开启了 iCloud 同步，它会被关闭，并移除这台 Mac 已同步的历史。此操作无法撤销。", "將所有設定與自訂恢復為預設值，並為你已安裝的工具重新啟用對應服務商。若已開啟 iCloud 同步，將會關閉，並移除這台 Mac 已同步的記錄。此操作無法復原。", "すべての設定とカスタマイズを初期値に戻し、インストール済みのツールのプロバイダーを再度有効にします。iCloud 同期がオンの場合はオフになり、この Mac の同期済み履歴が削除されます。この操作は取り消せません。", "모든 설정과 사용자화를 기본값으로 되돌리고 설치된 도구의 제공업체를 다시 켭니다. iCloud 동기화가 켜져 있으면 꺼지고 이 Mac의 동기화된 기록이 삭제됩니다. 되돌릴 수 없습니다."),
+
 "Monitor Your AI Subscriptions with TokenPlan": ("用 TokenPlan 监控你的 AI 订阅", "用 TokenPlan 監控你的 AI 訂閱", "TokenPlan で AI サブスクリプションを監視", "TokenPlan으로 AI 구독을 모니터링하세요"),
 "No metrics to show": ("没有可显示的指标", "沒有可顯示的指標", "表示する指標がありません", "표시할 지표가 없습니다"),
 "Clear Shortcut": ("清除快捷键", "清除快速鍵", "ショートカットを消去", "단축키 지우기"),
@@ -207,7 +207,7 @@ T = {
 "Menu Bar Settings": ("菜单栏设置", "選單列設定", "メニューバー設定", "메뉴 막대 설정"),
 "Overview and details always use horizontal bars. Ring is available only in the menu bar.": ("总览和详情始终使用横向进度条，环形仅用于菜单栏。", "總覽和詳情一律使用橫向進度條，環形僅用於選單列。", "概要と詳細には常に横棒を使用します。リングはメニューバーでのみ利用できます。", "개요와 상세에는 항상 가로 막대를 사용합니다. 링은 메뉴 막대에서만 사용할 수 있습니다."),
 "Individual Credits": ("个人余额", "個人餘額", "個人クレジット", "개인 크레딧"),
-"Notifications & Sync": ("通知与同步", "通知與同步", "通知と同期", "알림 및 동기화"),
+"Notifications": ("通知", "通知", "通知", "알림"),
 "Privacy & Advanced": ("隐私与高级", "隱私與進階", "プライバシーと詳細設定", "개인정보 및 고급"),
 "More": ("更多", "更多", "その他", "더 보기"),
 "Preview": ("预览", "預覽", "プレビュー", "미리보기"),

@@ -93,28 +93,7 @@ T = {'AI Usage': ('AI 用量', 'AI 用量', 'AI 使用状況', 'AI 사용량'),
                                                            '服務未能傳回用量，請稍後重試。',
                                                            'サービスから使用状況を取得できませんでした。後で再試行してください。',
                                                            '서비스에서 사용량을 반환하지 못했습니다. 나중에 다시 시도하세요.'),
- 'This desktop preview does not yet include spending history, tray integration, iCloud sync or automatic updates.': ('此桌面预览版暂不包含费用历史、托盘集成、iCloud '
-                                                                                                                     '同步和自动更新。',
-                                                                                                                     '此桌面預覽版暫不包含費用記錄、系統匣整合、iCloud '
-                                                                                                                     '同步和自動更新。',
-                                                                                                                     'このデスクトッププレビューには費用履歴、トレイ統合、iCloud '
-                                                                                                                     '同期、自動更新はまだ含まれません。',
-                                                                                                                     '이 '
-                                                                                                                     '데스크톱 '
-                                                                                                                     '미리 '
-                                                                                                                     '보기에는 '
-                                                                                                                     '아직 '
-                                                                                                                     '지출 '
-                                                                                                                     '기록, '
-                                                                                                                     '트레이 '
-                                                                                                                     '통합, '
-                                                                                                                     'iCloud '
-                                                                                                                     '동기화 '
-                                                                                                                     '및 '
-                                                                                                                     '자동 '
-                                                                                                                     '업데이트가 '
-                                                                                                                     '포함되지 '
-                                                                                                                     '않습니다.'),
+
  'Updated': ('更新于', '更新於', '更新日時', '업데이트'),
  'Usage or login data could not be read. Sign in again.': ('无法读取用量或登录信息，请重新登录。',
                                                            '無法讀取用量或登入資訊，請重新登入。',
@@ -215,7 +194,7 @@ T.update({
     'Cache Write': ('缓存写入', '快取寫入', 'キャッシュ書き込み', '캐시 쓰기'),
 })
 
-T.update({'Show TokenPlan': ('打开 TokenPlan', '開啟 TokenPlan', 'TokenPlan を表示', 'TokenPlan 열기'), 'Keep Running When Window Closes': ('关闭窗口后继续运行', '關閉視窗後繼續執行', 'ウィンドウを閉じても実行を続ける', '창을 닫아도 계속 실행'), 'Use the tray menu to reopen TokenPlan, refresh usage or quit. Enable background mode only if your desktop displays the tray icon.': ('通过托盘菜单重新打开 TokenPlan、刷新或退出。请确认桌面能显示托盘图标后，再启用后台运行。', '透過系統匣選單重新開啟 TokenPlan、重新整理或結束。請確認桌面能顯示系統匣圖示後，再啟用背景執行。', 'トレイメニューから TokenPlan を再表示、更新、終了できます。デスクトップにトレイアイコンが表示される場合のみ、バックグラウンド実行を有効にしてください。', '트레이 메뉴에서 TokenPlan을 다시 열거나 새로고침하거나 종료할 수 있습니다. 바탕 화면에 트레이 아이콘이 표시될 때만 백그라운드 실행을 사용하세요.'), 'This desktop preview does not yet include spending history, iCloud sync or automatic updates.': ('此桌面预览版暂不支持费用历史、iCloud 同步和自动更新。', '此桌面預覽版暫不支援費用歷史、iCloud 同步和自動更新。', 'このデスクトッププレビューは、料金履歴、iCloud 同期、自動更新にはまだ対応していません。', '이 데스크톱 미리보기는 아직 비용 기록, iCloud 동기화, 자동 업데이트를 지원하지 않습니다.')})
+T.update({'Show TokenPlan': ('打开 TokenPlan', '開啟 TokenPlan', 'TokenPlan を表示', 'TokenPlan 열기'), 'Keep Running When Window Closes': ('关闭窗口后继续运行', '關閉視窗後繼續執行', 'ウィンドウを閉じても実行を続ける', '창을 닫아도 계속 실행'), 'Use the tray menu to reopen TokenPlan, refresh usage or quit. Enable background mode only if your desktop displays the tray icon.': ('通过托盘菜单重新打开 TokenPlan、刷新或退出。请确认桌面能显示托盘图标后，再启用后台运行。', '透過系統匣選單重新開啟 TokenPlan、重新整理或結束。請確認桌面能顯示系統匣圖示後，再啟用背景執行。', 'トレイメニューから TokenPlan を再表示、更新、終了できます。デスクトップにトレイアイコンが表示される場合のみ、バックグラウンド実行を有効にしてください。', '트레이 메뉴에서 TokenPlan을 다시 열거나 새로고침하거나 종료할 수 있습니다. 바탕 화면에 트레이 아이콘이 표시될 때만 백그라운드 실행을 사용하세요.'), })
 
 T.update({'Quit': ('退出', '結束', '終了', '종료')})
 

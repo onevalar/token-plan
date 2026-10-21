@@ -73,8 +73,9 @@ folder authorization as a verified fix for Claude Keychain access or Amp CLI exe
 `script/release.sh` accepts `NOTARY_KEYCHAIN_PROFILE` for credentials already saved by
 `xcrun notarytool store-credentials`. This avoids putting an app-specific password in
 shell history or environment variables. The existing environment credential method
-remains supported for CI. A Developer ID provisioning profile must match the signing
-certificate and production iCloud container; a Mac App Store profile is not interchangeable.
+remains supported for CI. Developer ID distribution requires its signing certificate and notarization credentials;
+it no longer requires a cloud-container provisioning profile. Store exports still use
+Apple’s separate provisioning process.
 
 Before replacing the installed app, verify the final app and DMG signatures, notarization
 and stapled tickets. Launch the packaged app from Finder and confirm fresh Claude,
@@ -83,7 +84,7 @@ older non-sandboxed build are preliminary diagnostics, not final package accepta
 
 For a locally installed Xcode account, Organizer also supports notarization without a
 separate notarytool password: import the signed app archive, select Custom → Direct
-Distribution → Upload, and choose the matching Developer ID profile. Export the
+Distribution → Upload, and choose the matching Developer ID signing identity. Export the
 notarized app only after Apple reports success, then package that exported app.
 `DISABLE_UPDATES=1` produces a standalone package without an unconfigured update feed;
 `TOKENPLAN_DIST_DIR` keeps these artifacts separate from an existing development build.
@@ -132,7 +133,7 @@ Sparkle signing key and Apple signing identity.
 The publication job uses this repository's temporary `GITHUB_TOKEN` with Contents write.
 Build jobs have read-only repository permissions. A cross-repository GitHub App is no
 longer needed. Signing credentials stay in Actions secrets, never in the source tree:
-`APPLE_CERTIFICATE`, `APPLE_CERTIFICATE_PASSWORD`, `APPLE_DEVELOPER_ID_ICLOUD_PROFILE`,
+`APPLE_CERTIFICATE`, `APPLE_CERTIFICATE_PASSWORD`,
 `SPARKLE_PRIVATE_KEY`, `APPLE_ID`, `APPLE_PASSWORD`. Apple team: H4982D35ZR.
 
 To verify without publishing, dispatch with `tag=main`, `verify_only=true`, and an

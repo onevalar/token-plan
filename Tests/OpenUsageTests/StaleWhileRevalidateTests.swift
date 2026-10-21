@@ -110,8 +110,7 @@ final class StaleWhileRevalidateTests: XCTestCase {
             local: firstSnapshot,
             history: history,
             descriptor: historyDescriptor,
-            now: fixedNow,
-            combined: false
+            now: fixedNow
         )
         let runtime = MutableProviderRuntime(
             provider: provider,
@@ -130,7 +129,7 @@ final class StaleWhileRevalidateTests: XCTestCase {
         runtime.snapshot = snapshot(used: 60, plan: "Current", refreshedAt: fixedNow.addingTimeInterval(300))
         await store.refreshAll(force: true)
 
-        let refreshed = try XCTUnwrap(store.localSnapshots[provider.id])
+        let refreshed = try XCTUnwrap(store.snapshots[provider.id])
         XCTAssertEqual(refreshed.plan, "Current")
         XCTAssertEqual(store.data(for: quota).used, 60)
         XCTAssertEqual(refreshed.usageHistory, history)
@@ -225,8 +224,6 @@ final class StaleWhileRevalidateTests: XCTestCase {
             defaults: defaults
         )
         _ = await store.refresh(providerID: provider.id, force: true)
-        var historyChangeCount = 0
-        store.onLocalHistoryChanged = { historyChangeCount += 1 }
 
         runtime.snapshot = snapshot(
             used: 0, plan: "Partial cancelled result",
@@ -253,10 +250,9 @@ final class StaleWhileRevalidateTests: XCTestCase {
         guard case .skipped = outcome else {
             return XCTFail("a canceled provider refresh must be skipped")
         }
-        let retained = try XCTUnwrap(store.localSnapshots[provider.id])
+        let retained = try XCTUnwrap(store.snapshots[provider.id])
         XCTAssertEqual(retained.plan, "Last good")
         XCTAssertEqual(retained.usageHistory, history)
-        XCTAssertEqual(historyChangeCount, 0)
         XCTAssertFalse(store.refreshingProviderIDs.contains(provider.id))
         XCTAssertEqual(cache.loadSnapshots(providerIDs: [provider.id])[provider.id]?.plan, "Last good")
     }
@@ -289,7 +285,7 @@ final class StaleWhileRevalidateTests: XCTestCase {
         )
         _ = await store.refresh(providerID: provider.id, force: true)
 
-        let refreshed = try XCTUnwrap(store.localSnapshots[provider.id])
+        let refreshed = try XCTUnwrap(store.snapshots[provider.id])
         XCTAssertEqual(refreshed.plan, "Completed empty scan")
         XCTAssertEqual(refreshed.usageHistory?.series.daily, [])
     }

@@ -32,13 +32,13 @@ To avoid re-reading unchanged Claude, Codex, and pi logs after every relaunch, T
 parsed usage events in `~/Library/Application Support/TokenPlan/log-scan-cache/`. These records contain
 the usage metadata needed for local totals, including any per-event cost already recorded by a provider,
 but not raw JSONL lines or conversation text. They are private to your macOS account and are never sent
-to a provider or iCloud. Old source-file records are dropped as the scan window advances, and
+to a provider or cloud storage. Old source-file records are dropped as the scan window advances, and
 identity caches that have not been used for 35 days are removed. TokenPlan's pricing engine runs after
 the cache is read, so its computed aggregates and totals are not persisted in this cache.
 
-If you explicitly turn on [iCloud Sync](icloud-sync.md), TokenPlan writes normalized daily tokens,
-spend, and model totals to its private iCloud container so your own Macs can show one combined summary.
-Credentials, account limits, provider responses, and raw logs are never written there. iCloud Sync defaults off and uses your own iCloud account.
+History is stored locally only. TokenPlan does not upload or synchronize usage history
+between devices. Removing synchronization does not erase existing local records or
+previously uploaded documents from older versions.
 
 Application update checks and installer downloads use this project’s public GitHub release
 metadata and assets. They do not upload usage history or provider credentials.

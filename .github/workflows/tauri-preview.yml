@@ -119,20 +119,6 @@ jobs:
           # Developer ID, hardened runtime and secure timestamp before notarization.
           codesign --force --deep --options runtime --timestamp --sign "$APPLE_SIGNING_IDENTITY" src-tauri/binaries/Sparkle.framework
           codesign --verify --deep --strict src-tauri/binaries/Sparkle.framework
-      - name: Prepare production iCloud entitlements
-        if: runner.os == 'macOS' && inputs.production
-        shell: bash
-        env:
-          PROFILE: ${{ secrets.APPLE_DEVELOPER_ID_ICLOUD_PROFILE }}
-        run: |
-          python3 - <<'PYCODE'
-          import base64, os, pathlib
-          profile=pathlib.Path(os.environ['RUNNER_TEMP'])/'tokenplan.provisionprofile'
-          profile.write_bytes(base64.b64decode(os.environ['PROFILE'],validate=True))
-          with open(os.environ['GITHUB_ENV'],'a') as env:
-              env.write(f"TOKENPLAN_ICLOUD_PROFILE={profile}\nTOKENPLAN_ICLOUD_ENTITLEMENTS={profile.parent}/tokenplan.entitlements.plist\n")
-          PYCODE
-          ../../script/render_icloud_entitlements.sh ../../script/TokenPlan.release.entitlements.plist "$RUNNER_TEMP/tokenplan.provisionprofile" "$RUNNER_TEMP/tokenplan.entitlements.plist" iCloud.com.onevalar.tokenplan
       - name: Package signed updater artifacts
         shell: bash
         env:

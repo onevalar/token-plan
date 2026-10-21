@@ -1,13 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0"><dict>
-<key>LSUIElement</key><true/>
-<!-- Retained for validation by native 1.x Sparkle during migration. -->
-<key>SUPublicEDKey</key><string>YTX65u7BPZbjy9Dz5o1EhtPcZpw22WJnu7S+6x2ZRqE=</string>
-<key>NSUbiquitousContainers</key><dict>
-<key>iCloud.com.onevalar.tokenplan</key><dict>
-<key>NSUbiquitousContainerIsDocumentScopePublic</key><false/>
-<key>NSUbiquitousContainerName</key><string>TokenPlan</string>
-<key>NSUbiquitousContainerSupportedFolderLevels</key><string>None</string>
-</dict></dict>
-</dict></plist>
+<plist version="1.0">
+<dict>
+	<key>LSUIElement</key>
+	<true/>
+	<key>SUPublicEDKey</key>
+	<string>YTX65u7BPZbjy9Dz5o1EhtPcZpw22WJnu7S+6x2ZRqE=</string>
+</dict>
+</plist>

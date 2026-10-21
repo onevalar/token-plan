@@ -66,9 +66,9 @@ def prerequisites():
     run('gh', 'auth', 'status')
     run('git', 'var', 'GIT_AUTHOR_IDENT', capture=True)
     run('xcrun', 'notarytool', 'history', '--keychain-profile', 'TokenPlan-Notary', '--output-format', 'json', capture=True)
-    identity, profile = find_signing()
+    identity = find_signing()
     if shutil.disk_usage(ROOT).free < 5 * 1024**3: raise ValueError('请至少保留 5 GB 磁盘空间。')
-    return identity, profile
+    return identity
 
 
 def package(version):
@@ -77,7 +77,7 @@ def package(version):
     tree = snapshot()
     tested = json.loads((STATE / 'tested.json').read_text())
     if tested['tree'] != tree: raise ValueError('代码与上次本地测试不一致，请先重新安装并测试。')
-    identity, profile = prerequisites()
+    identity = prerequisites()
     unique = dt.datetime.now(dt.timezone.utc).strftime('%Y%m%d%H%M%S') + '-' + uuid.uuid4().hex[:8]
     folder = OUTPUT / f'{version}-{unique}'
     folder.mkdir(parents=True)
@@ -85,7 +85,7 @@ def package(version):
     statefile = folder / 'build-status.json'
     save(statefile, state)
     submit_snapshot(version, tree, statefile)
-    build_mac(statefile, identity, profile)
+    build_mac(statefile, identity)
     finish(statefile)
 
 
@@ -104,16 +104,16 @@ def submit_snapshot(version, tree, statefile):
     return state
 
 
-def build_mac(statefile, identity=None, profile=None):
+def build_mac(statefile, identity=None):
     statefile = Path(statefile)
     state = json.loads(statefile.read_text())
     if state['macReady']: return
-    if identity is None: identity, profile = prerequisites()
+    if identity is None: identity = prerequisites()
     folder, version, commit = Path(state['folder']), state['version'], state['commit']
     # Build the same immutable snapshot locally; source edits cannot contaminate it.
     work = STATE / Path(state['folder']).name
     if not work.exists(): run('git', 'worktree', 'add', '--detach', str(work), commit)
-    env = dict(os.environ, CODESIGN_IDENTITY=identity, ICLOUD_PROVISIONING_PROFILE=profile,
+    env = dict(os.environ, CODESIGN_IDENTITY=identity,
                NOTARY_KEYCHAIN_PROFILE='TokenPlan-Notary', DISABLE_UPDATES='1', TOKENPLAN_VERSION=version,
                TOKENPLAN_BUILD=str(int(time.time())), TOKENPLAN_DIST_DIR=str(folder / 'mac'))
     env.pop('ALLOW_UNNOTARIZED', None)

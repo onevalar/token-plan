@@ -38,7 +38,7 @@ final class ProviderEnablementEnforcementTests: XCTestCase {
         XCTAssertNil(store.snapshots["codex"])
     }
 
-    func testDisablingProviderRemovesPeerHistoryButKeepsLocalSnapshot() async throws {
+    func testDisablingProviderKeepsLocalHistorySnapshot() async throws {
         let enablement = ProviderEnablementStore(defaults: makeDefaults("history-enablement"))
         let provider = Provider(id: "claude", displayName: "Claude", icon: .providerMark("claude"))
         let historyDescriptor = UsageHistoryDescriptor(
@@ -64,8 +64,7 @@ final class ProviderEnablementEnforcementTests: XCTestCase {
             ),
             history: localHistory,
             descriptor: historyDescriptor,
-            now: now,
-            combined: false
+            now: now
         )
         let runtime = CountingProviderRuntime(
             provider: provider,
@@ -81,24 +80,12 @@ final class ProviderEnablementEnforcementTests: XCTestCase {
             isProviderEnabled: { enablement.isEnabled($0) },
             now: { now }
         )
-        enablement.onChange = { store.providerEnablementDidChange() }
 
         await store.refreshAll(force: true)
-        store.setPeerHistoryDocuments([
-            UsageHistoryDocument(
-                deviceID: "peer",
-                deviceName: "Peer Mac",
-                updatedAt: now,
-                providers: [provider.id: history(tokens: 200, cost: 2, now: now)]
-            )
-        ], ownDeviceID: "this-mac")
-        XCTAssertEqual(try spendTokens(store.snapshots[provider.id], label: "Today"), 300)
-
         enablement.setEnabled(false, for: provider.id)
 
         XCTAssertEqual(try spendTokens(store.snapshots[provider.id], label: "Today"), 100)
-        XCTAssertNotNil(store.localSnapshots[provider.id])
-        XCTAssertNil(store.localHistoryDocument(deviceID: "this-mac", deviceName: "This Mac").providers[provider.id])
+        XCTAssertNotNil(store.snapshots[provider.id])
     }
 
     // Tray ownership by layout order + disabled-provider exclusion is exercised on the real tray path

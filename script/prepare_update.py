@@ -62,7 +62,7 @@ def main():
     output = ROOT / 'dist/updates' / args.version
     if output.exists() and not args.verify_existing:
         parser.error(f'Output already exists; preserve it and use a fresh version or move it aside: {output}')
-    identity, profile = find_signing()
+    identity = find_signing()
     run('xcrun', 'notarytool', 'history', '--keychain-profile', config['notary_keychain_profile'],
         '--output-format', 'json', capture=True)
     bins = ROOT / '.build/artifacts/sparkle/Sparkle/bin'
@@ -83,7 +83,7 @@ def main():
         previous = subprocess.check_output(['curl', '--fail', '--silent', '--show-error', '--location', '--max-time', '30', config['feed_url']])
         (feed_dir / 'appcast.xml').write_bytes(previous)
         previous_items = {i.findtext(NS + 'version') for i in ET.fromstring(previous).findall('./channel/item')}
-    env = dict(os.environ, CODESIGN_IDENTITY=identity, ICLOUD_PROVISIONING_PROFILE=profile,
+    env = dict(os.environ, CODESIGN_IDENTITY=identity,
                NOTARY_KEYCHAIN_PROFILE=config['notary_keychain_profile'], TOKENPLAN_VERSION=args.version,
                TOKENPLAN_BUILD=str(build), TOKENPLAN_DIST_DIR=str(output / 'mac'),
                SPARKLE_PUBLIC_KEY=public, FEED_URL=config['feed_url'], DISABLE_UPDATES='0')

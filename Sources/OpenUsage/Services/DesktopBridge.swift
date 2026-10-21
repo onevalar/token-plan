@@ -12,7 +12,6 @@ public final class DesktopBridge {
     private let layout: LayoutStore
     private let store: WidgetDataStore
     private let notes: SubscriptionNotesStore
-    private let cloud: ICloudUsageSyncStore
 
     public init(defaults: UserDefaults) async {
         self.defaults = defaults
@@ -46,8 +45,6 @@ public final class DesktopBridge {
             cache: ProviderSnapshotCache(userDefaults: defaults, allowsPersistedFreshness: true),
             defaults: defaults, isProviderEnabled: { enablement.isEnabled($0) && !accounts.isRemoved($0) },
             providerIdentityKeys: assembly.identityKeysByCard)
-        self.cloud = ICloudUsageSyncStore(dataStore: store, defaults: defaults,
-            deviceIDStore: KeychainICloudDeviceIDStore(bundleIdentifier: "com.onevalar.tokenplan"))
     }
 
     public func execute(_ input: Data) async -> Data {
@@ -61,7 +58,7 @@ public final class DesktopBridge {
                 guard registry.provider(id: id) != nil, !accounts.isRemoved(id) else { throw Failure.invalid }
             }
             switch method {
-            case "state": Task { await cloud.refreshIfNeeded() }
+            case "state": break
             case "notificationPermission":
                 AppNotifications.shared.registerAsDelegate()
                 let status = await AppNotifications.shared.authorizationStatus()
@@ -124,7 +121,6 @@ public final class DesktopBridge {
                     for (key, flag) in zip(["underTenPercent", "healthyToClose", "closeToRunningOut"], flags) { defaults.set(flag, forKey: "tokenplan.notifications.\(key)") }
                 }
                 if let shortcut = settings["shortcut"] as? String, shortcut.count <= 100 { defaults.set(shortcut, forKey: "tokenplan.desktop.shortcut") }
-                if let enabled = settings["iCloudEnabled"] as? Bool { cloud.enabled = enabled }
                 if let remaining = settings["showRemaining"] as? Bool { store.meterStyle = remaining ? .remaining : .used }
                 if let style = settings["trayStyle"] as? String {
                     guard let parsed = MenuBarStyle(rawValue: style) else { throw Failure.invalid }
@@ -201,12 +197,7 @@ public final class DesktopBridge {
                 "fetchedAt": snapshot.map { OpenUsageISO8601.string(from: $0.refreshedAt) } ?? ""
             ]
         }
-        return ["schema": "tokenplan.desktop.v1", "accounts": entries, "sync": [
-            "available": true, "enabled": cloud.enabled, "syncing": cloud.isSyncing,
-            "error": cloud.serviceError ?? "", "devices": cloud.displayedDocuments.map {
-                ["id": $0.deviceID, "name": $0.deviceName, "current": $0.deviceID == cloud.deviceID, "updatedAt": OpenUsageISO8601.string(from: $0.updatedAt)] as [String: Any]
-            }
-        ], "settings": [
+        return ["schema": "tokenplan.desktop.v1", "accounts": entries, "settings": [
             "showRemaining": store.meterStyle == .remaining,
             "notifications": ["underTenPercent", "healthyToClose", "closeToRunningOut"].map { defaults.bool(forKey: "tokenplan.notifications.\($0)") },
             "shortcut": DesktopShortcutMigration.read(defaults: defaults),
