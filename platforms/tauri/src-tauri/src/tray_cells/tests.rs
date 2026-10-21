@@ -82,6 +82,18 @@ fn a_single_menu_dispatcher_handles_only_native_slot_actions() {
 }
 
 #[test]
+fn percentage_digits_never_clip_against_the_native_icon_edges() {
+    let mut metric=fixture().accounts[0].metrics[0].clone();metric.has_data=true;
+    for percent in [0.,25.,65.,92.,100.,999.] {
+        metric.percent=Some(percent);
+        let image=reading(&metric,None);
+        for x in [0,1,2,61,62,63]{for y in 24..57{
+            assert!(image.rgba()[((y*SIDE+x)*4) as usize]<180,"{percent}% clips at {x},{y}");
+        }}
+    }
+}
+
+#[test]
 fn export_native_tray_review() {
     let Ok(path)=std::env::var("TOKENPLAN_NATIVE_TRAY_REVIEW")else{return};
     let mut state=fixture();

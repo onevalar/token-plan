@@ -87,8 +87,15 @@ fn reading(metric:&Metric,n:Option<usize>)->Image<'static> {
     label(&mut ink,&cycle,22.,18.,15.);
     badge(&mut ink,n,false);
     let value=tray_image::reading(metric);
-    let size=if value.chars().count()>4{23.}else if value.chars().count()>3{26.}else{32.};
-    label(&mut ink,&value,32.,50.,size);
+    if let Some(digits)=value.strip_suffix('%') {
+        let size=if digits.len()>2{26}else{38};
+        // Keep the digits large; a smaller percent sign leaves a real horizontal gutter,
+        // including 100% and 999%, with Arial on Windows and DejaVu Sans on Linux.
+        draw(&mut ink,&format!(r#"<text x="32" y="52" text-anchor="middle" font-family="Arial,'DejaVu Sans',sans-serif" font-weight="700" font-size="{size}" fill="black">{digits}<tspan font-size="14">%</tspan></text>"#));
+    }else{
+        let size=(54./(value.chars().count().max(1) as f32*0.65)).min(36.);
+        label(&mut ink,&value,32.,50.,size);
+    }
     finish(ink)
 }
 
