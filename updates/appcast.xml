@@ -1,7 +1,21 @@
 <?xml version='1.0' encoding='utf-8'?>
 <rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
     <channel>
-        <item><title>TokenPlan 2.0.4</title><sparkle:version>1792577512</sparkle:version><sparkle:shortVersionString>2.0.4</sparkle:shortVersionString><sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion><description>&lt;pre&gt;# TokenPlan 2.0.4
+        <item><title>TokenPlan 2.0.5</title><sparkle:version>1792593411</sparkle:version><sparkle:shortVersionString>2.0.5</sparkle:shortVersionString><sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion><description>&lt;pre&gt;# TokenPlan 2.0.5
+
+- 首页面板高度随内容自适应：服务较少时自动缩短，内容较多时在可用屏幕范围内滚动。
+- 修复 Claude、Codex 已添加账号在登录失效、登录来源变化或重启后从界面消失的问题；保留账号记录、备注及显示配置，避免切换登录后将另一账号的用量写入原账号。
+- 完善添加账号流程：支持手动重新检测、官方 CLI 登录引导和连接已有配置目录，无需重启 TokenPlan。新账号使用独立配置目录，不覆盖当前 CLI 登录；登录引导需要预先安装对应的官方 CLI。
+- 补齐 Windows、Linux 原生托盘的环形和百分比用量显示，支持多账号、连续编号、最多三项指标，以及浅色和深色背景；改善百分比数字的宽度和可读性。
+- 修复 Ubuntu DEB 从旧版迁移时两个软件包并存、启动旧版和应用列表入口异常的问题，统一新版启动入口及应用图标。
+- 重新构建 macOS、Windows 和 Linux 安装包，继续保留 macOS 1.0.12 经典版下载。
+
+## 更新说明
+
+2.x 用户可通过“检查更新”升级。Linux 应用内自动更新使用 AppImage；DEB 用户请下载安装新版 DEB，由包管理器升级。Windows／Linux 1.x 用户需手动安装一次 2.x。
+
+Linux 托盘图标的排列、间距和溢出由桌面环境控制；未提供托盘支持时保留普通窗口模式。账号重新检测不会绕过服务商登录授权，失效凭据仍需通过官方登录流程重新连接。
+&lt;/pre&gt;</description><enclosure url="https://github.com/onevalar/token-plan/releases/download/v2.0.5/TokenPlan_2.0.5_universal.dmg" length="30404969" type="application/octet-stream" sparkle:edSignature="Fi5GB52LqUizP6uz7wZGLHvdp0v7e5mCROp5V0ff1AnTy5hY0QrRWVGVIzm271qa4fokA7CHf0NgcheVEXeqBQ==" /></item><item><title>TokenPlan 2.0.4</title><sparkle:version>1792577512</sparkle:version><sparkle:shortVersionString>2.0.4</sparkle:shortVersionString><sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion><description>&lt;pre&gt;# TokenPlan 2.0.4
 
 - 统一 macOS、Windows 和 Linux 的导航、账号详情、通用设置、服务配置和历史页面。子页面使用返回导航和对应操作，首页提供紧凑／宽松两种布局。
 - 优化环形用量显示：保留浅色完整轨道，支持图标位于圆环内或左侧，每个账号最多选择三项指标。三环时将账号编号放入圆环中心，缩短图标与圆环的间距；切换百分比样式仍保留全部选中指标。
