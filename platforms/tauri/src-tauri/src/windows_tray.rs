@@ -5,6 +5,14 @@ use tauri::{Manager,menu::{Menu,MenuItem,PredefinedMenuItem},tray::{TrayIconBuil
 #[derive(Default)]
 pub struct WindowsTrays(Mutex<Vec<Vec<u8>>>);
 
+pub fn listen(app:&tauri::AppHandle) {
+    // Tauri builder menu callbacks are global and remain registered after an icon is
+    // removed. Install one dispatcher, not another callback on every style switch.
+    app.on_menu_event(|app,event|match tray_cells::menu_action(event.id.as_ref()){
+        Some("open")=>crate::show(app),Some("quit")=>app.exit(0),_=>{}
+    });
+}
+
 fn menu(app:&tauri::AppHandle,id:&str,cell:&tray_cells::Cell,language:&str)->tauri::Result<Menu<tauri::Wry>> {
     let menu=Menu::new(app)?;
     menu.append(&MenuItem::with_id(app,format!("{id}-open"),"TokenPlan",true,None::<&str>)?)?;
@@ -31,13 +39,8 @@ pub fn update(app:&tauri::AppHandle,state:&DesktopState)->tauri::Result<()> {
             icon.set_tooltip(Some(tooltip))?;
             icon.set_menu(Some(menu))?;
         }else{
-            let open=format!("{id}-open");let quit=format!("{id}-quit");
             TrayIconBuilder::with_id(id)
                 .icon(cell.image.clone()).tooltip(tooltip).menu(&menu).show_menu_on_left_click(false)
-                .on_menu_event(move|app,event|{
-                    if event.id.as_ref()==open{crate::show(app);}
-                    else if event.id.as_ref()==quit{app.exit(0);}
-                })
                 .on_tray_icon_event(|icon,event|{
                     if let TrayIconEvent::Click{button:MouseButton::Left,button_state:MouseButtonState::Up,rect,..}=event {
                         let p=rect.position.to_physical::<f64>(1.);let s=rect.size.to_physical::<f64>(1.);

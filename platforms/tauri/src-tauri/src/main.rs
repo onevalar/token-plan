@@ -56,7 +56,10 @@ fn main() {
         .invoke_handler(tauri::generate_handler![bridge::desktop_request, shortcuts::shortcut_capture, panel::panel_frame, quit, hide])
         .setup(|app| {
             #[cfg(target_os="windows")]
-            app.manage(windows_tray::WindowsTrays::default());
+            {
+                app.manage(windows_tray::WindowsTrays::default());
+                windows_tray::listen(app.handle());
+            }
             // A missing global-hotkey backend (e.g. a Wayland-only session) must not prevent startup.
             if app.handle().plugin(tauri_plugin_global_shortcut::Builder::new().with_handler(|app,_,event| {
                 if event.state()==tauri_plugin_global_shortcut::ShortcutState::Pressed {

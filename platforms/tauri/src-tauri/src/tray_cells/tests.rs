@@ -73,6 +73,15 @@ fn stable_slots_and_opaque_contrast_do_not_depend_on_system_or_application_theme
 }
 
 #[test]
+fn a_single_menu_dispatcher_handles_only_native_slot_actions() {
+    assert_eq!(menu_action("TokenPlan-0002-open"),Some("open"));
+    assert_eq!(menu_action("TokenPlan-0020-quit"),Some("quit"));
+    for id in ["open","TokenPlan-0002-metric-0","TokenPlan-0002-account","TokenPlan-other-open"]{
+        assert_eq!(menu_action(id),None);
+    }
+}
+
+#[test]
 fn export_native_tray_review() {
     let Ok(path)=std::env::var("TOKENPLAN_NATIVE_TRAY_REVIEW")else{return};
     let mut state=fixture();

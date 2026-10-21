@@ -95,6 +95,10 @@ fn reading(metric:&Metric,n:Option<usize>)->Image<'static> {
 /// Slot IDs stay constant when accounts reorder. Existing OS positions then receive
 /// the new ordered content rather than retaining an old account's badge or reading.
 pub fn slot_id(index:usize)->String {format!("TokenPlan-{index:04}")}
+pub fn menu_action(id:&str)->Option<&str> {
+    let (slot,action)=id.strip_prefix("TokenPlan-")?.rsplit_once('-')?;
+    if slot.len()==4&&slot.bytes().all(|b|b.is_ascii_digit())&&["open","quit"].contains(&action){Some(action)}else{None}
+}
 pub fn cells(state:&DesktopState)->Vec<Cell> {
     let mut cells=Vec::new();
     for (account,n) in tray::visible(state) {
