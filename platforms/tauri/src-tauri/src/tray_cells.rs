@@ -26,6 +26,20 @@ fn badge(ink:&mut Pixmap,n:Option<usize>,center:bool) {
     }
 }
 
+fn fit_reading(ink:&mut Pixmap,body:&str) {
+    // Measure the rasterized glyphs, since Linux fallback fonts can be wider than Arial.
+    // Render off-canvas first so clipping cannot hide the real width from this measurement.
+    let mut text=Pixmap::new(256,SIDE).unwrap();
+    let svg=format!(r#"<svg xmlns="http://www.w3.org/2000/svg" width="256" height="64">{body}</svg>"#);
+    tray_image::draw(&mut text,&svg,Transform::identity());
+    let filled=|x:u32|(0..SIDE).any(|y|text.pixel(x,y).unwrap().alpha()>0);
+    let (Some(first),Some(last))=((0..256).find(|&x|filled(x)),(0..256).rev().find(|&x|filled(x)))else{return};
+    let width=last-first+1;
+    let crop=text.clone_rect(resvg::tiny_skia::IntRect::from_xywh(first as i32,0,width,SIDE).unwrap()).unwrap();
+    let scale=(56./width as f32).min(1.);
+    ink.draw_pixmap(0,0,crop.as_ref(),&Default::default(),Transform::from_scale(scale,1.).post_translate((64.-width as f32*scale)/2.,0.),None);
+}
+
 /// A neutral opaque plate guarantees contrast on both dark and light system panels,
 /// independently of the app theme (which may not match the taskbar theme).
 fn finish(ink:Pixmap)->Image<'static> {
@@ -91,10 +105,10 @@ fn reading(metric:&Metric,n:Option<usize>)->Image<'static> {
         let size=if digits.len()>2{26}else{38};
         // Keep the digits large; a smaller percent sign leaves a real horizontal gutter,
         // including 100% and 999%, with Arial on Windows and DejaVu Sans on Linux.
-        draw(&mut ink,&format!(r#"<text x="32" y="52" text-anchor="middle" font-family="Arial,'DejaVu Sans',sans-serif" font-weight="700" font-size="{size}" fill="black">{digits}<tspan font-size="14">%</tspan></text>"#));
+        fit_reading(&mut ink,&format!(r#"<text x="128" y="52" text-anchor="middle" font-family="Arial,'DejaVu Sans',sans-serif" font-weight="700" font-size="{size}" fill="black">{digits}<tspan font-size="14">%</tspan></text>"#));
     }else{
         let size=(54./(value.chars().count().max(1) as f32*0.65)).min(36.);
-        label(&mut ink,&value,32.,50.,size);
+        fit_reading(&mut ink,&format!(r#"<text x="128" y="50" text-anchor="middle" font-family="Arial,'DejaVu Sans',sans-serif" font-weight="700" font-size="{size}" fill="black">{}</text>"#,xml(&value)));
     }
     finish(ink)
 }
