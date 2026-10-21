@@ -99,6 +99,8 @@ jobs:
         env:
           TOKENPLAN_TEST_ENGINE: webkit
         run: npm run test:ui
+      - name: Verify shared navigation and three-metric layouts
+        run: npm run test:mac-preview -- --project=${{ runner.os == 'macOS' && 'macos' || runner.os == 'Windows' && 'windows' || 'linux' }}
       - uses: apple-actions/import-codesign-certs@v7
         if: runner.os == 'macOS'
         with:
@@ -160,5 +162,6 @@ jobs:
             platforms/tauri/src-tauri/target/**/release/bundle/**/*.deb
             platforms/tauri/transition/appcast.xml
             platforms/tauri/test-results/
+            platforms/tauri/test-results-navigation/
           if-no-files-found: warn
       # Verification artifacts only. Published feeds require an approved stable version.

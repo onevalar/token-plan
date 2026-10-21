@@ -40,8 +40,8 @@ export function useUpdater(automatic:boolean) {
  };
  return {status,version,progress,checkNow,install};
 }
-export function Updates({t,updater:u,automatic,onAutomatic}:{t:Copy;updater:ReturnType<typeof useUpdater>;automatic:boolean;onAutomatic:(value:boolean)=>void}) {
- return <section className="settings-list"><h2>{t.checkUpdates}</h2>
+export function Updates({t,updater:u,automatic,onAutomatic,showHeading=true}:{showHeading?:boolean;t:Copy;updater:ReturnType<typeof useUpdater>;automatic:boolean;onAutomatic:(value:boolean)=>void}) {
+ return <section className="settings-list">{showHeading&&<h2>{t.checkUpdates}</h2>}
   <Switch label={t.autoUpdates} checked={automatic} onCheckedChange={onAutomatic}/>
   <p role="status">{u.status==='available'?`${t.updateAvailable} ${u.version}`:u.status==='checking'?t.updateCheck:u.status==='latest'?t.latest:u.status==='checkError'?t.checkError:u.status==='installError'?t.installError:u.status==='installing'?t.installing:''}</p>
   {u.status==='installing'&&<progress aria-label={t.installing} max={100} value={u.progress??undefined}/>}

@@ -22,7 +22,7 @@ pub fn visible(state: &DesktopState) -> Vec<(&Account, Option<usize>)> {
 /// One line per selected account, for the tooltip and the tray menu.
 pub fn summaries(state: &DesktopState) -> Vec<String> {
     visible(state).into_iter().map(|(account, badge)| {
-        let readings = account.metrics.iter().filter(|m| m.pinned && m.has_data).take(2)
+        let readings = account.metrics.iter().filter(|m| m.pinned && m.has_data).take(3)
             .map(|m| m.percent.map(|v| format!("{} {:.0}%", m.label, v)).unwrap_or_else(|| format!("{} {}", m.label, m.amount.map(|v| v.to_string()).unwrap_or_else(|| "—".into()))))
             .collect::<Vec<_>>().join(" · ");
         let name = match badge { Some(n) => format!("{} {}", account.name, n), None => account.name.clone() };

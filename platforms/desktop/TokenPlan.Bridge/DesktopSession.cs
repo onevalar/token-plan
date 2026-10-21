@@ -13,6 +13,7 @@ public sealed partial class DesktopSession : IDisposable
     readonly System.Collections.Concurrent.ConcurrentDictionary<string, DateTimeOffset> nextRefresh = new();
     readonly string stateFile;
     string trayStyle = "ring";
+    string ringIconPosition = "inside";
     bool autoUpdates = true;
     bool[] notifications = [false, false, false];
     string shortcut = "";
@@ -20,7 +21,7 @@ public sealed partial class DesktopSession : IDisposable
     public DesktopSession(string? preferencesPath = null)
     {
         file = preferencesPath ?? Preferences.DefaultPath;
-        preferences = Preferences.Load(file);
+        preferences = Preferences.Load(file, preserveRefreshSetting: true);
         var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
         var codex = Environment.GetEnvironmentVariable("CODEX_HOME") ?? Path.Combine(home, ".codex");
         var claude = Environment.GetEnvironmentVariable("CLAUDE_CONFIG_DIR") ?? Path.Combine(home, ".claude");
@@ -43,6 +44,7 @@ public sealed partial class DesktopSession : IDisposable
                 }
             if (doc.RootElement.TryGetProperty("notifications", out var alerts)) { var flags = alerts.Deserialize<bool[]>(); if (flags?.Length == 3) notifications = flags; }
             if (doc.RootElement.TryGetProperty("shortcut", out var binding)) shortcut = binding.GetString() ?? "";
+            if (doc.RootElement.TryGetProperty("ringIconPosition", out var position)) ringIconPosition = position.GetString() == "left" ? "left" : "inside";
             if (doc.RootElement.TryGetProperty("autoUpdates", out var automatic)) autoUpdates = automatic.GetBoolean();
             trayStyle = doc.RootElement.GetProperty("trayStyle").GetString() is "percentage" ? "percentage" : "ring";
             if (doc.RootElement.TryGetProperty("cooldowns", out var cooldowns)) service.RestoreCooldowns(cooldowns.Deserialize<Dictionary<string, DateTimeOffset>>() ?? []);
@@ -107,9 +109,9 @@ public sealed partial class DesktopSession : IDisposable
                 if (value.TryGetProperty("pinned", out var pinned))
                 {
                     var current = preferences.PinnedMetrics.GetValueOrDefault(id) ?? windows.Take(2).Select(w => w.Label).ToArray();
-                    if (pinned.GetBoolean() && current.Length >= 2 && !current.Contains(metric)) throw new InvalidDataException();
+                    if (pinned.GetBoolean() && current.Length >= 3 && !current.Contains(metric)) throw new InvalidDataException();
                     preferences = preferences with { PinnedMetrics = new(preferences.PinnedMetrics) { [id] = current } };
-                    preferences = preferences.Pin(id, metric, pinned.GetBoolean());
+                    preferences = preferences.Pin(id, metric, pinned.GetBoolean(), maxPins: 3);
                 }
                 break;
             case "key":
@@ -145,6 +147,7 @@ public sealed partial class DesktopSession : IDisposable
         }
         if (value.TryGetProperty("autoUpdates", out var updates)) autoUpdates = updates.GetBoolean();
         if (value.TryGetProperty("autoRefresh", out var automatic)) preferences = preferences with { AutoRefresh = automatic.GetBoolean() };
+        if (value.TryGetProperty("ringIconPosition", out var position)) ringIconPosition = position.GetString() is "inside" or "left" ? position.GetString()! : throw new InvalidDataException();
         if (value.TryGetProperty("trayStyle", out var style)) trayStyle = style.GetString() is "ring" or "percentage" ? style.GetString()! : throw new InvalidDataException();
     }
     readonly object persistenceLock = new();
@@ -153,7 +156,7 @@ public sealed partial class DesktopSession : IDisposable
         lock (persistenceLock) {
         Directory.CreateDirectory(Path.GetDirectoryName(stateFile)!);
         var temp = stateFile + ".tmp";
-        File.WriteAllText(temp, JsonSerializer.Serialize(new { trayStyle, autoUpdates, notifications, shortcut, nextRefresh, accountOrder, cooldowns = service.ExportCooldowns(), accounts = results.Values.Select(a => new ProviderResult(a.Id, a.Name, null, null, AccountKey: a.AccountKey, AccountEmail: a.AccountEmail, AccountIdentity: a.AccountIdentity)).ToArray() }));
+        File.WriteAllText(temp, JsonSerializer.Serialize(new { trayStyle, ringIconPosition, autoUpdates, notifications, shortcut, nextRefresh, accountOrder, cooldowns = service.ExportCooldowns(), accounts = results.Values.Select(a => new ProviderResult(a.Id, a.Name, null, null, AccountKey: a.AccountKey, AccountEmail: a.AccountEmail, AccountIdentity: a.AccountIdentity)).ToArray() }));
         File.Move(temp, stateFile, true);
         }
     }

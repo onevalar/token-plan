@@ -45,3 +45,5 @@ output/
 
 # Orb runtime state (portal registrations)
 .amp/portals/
+
+platforms/tauri/test-results-navigation/

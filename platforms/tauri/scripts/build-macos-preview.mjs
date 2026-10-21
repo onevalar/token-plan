@@ -11,7 +11,7 @@ const scratch=join(homedir(),'Library/Caches/TokenPlan/NavigationPreview.noindex
 const source=join(project,'src-tauri/target/debug/bundle/macos/TokenPlan Preview.app');
 const app=join(scratch,'TokenPlan Design Preview.app');
 mkdirSync(scratch,{recursive:true});
-// Build with a separate identifier; release/default builds do not enable this interface.
+// Build shared UI with a separate identifier and disable real updater actions.
 execFileSync('npm',['run','tauri','build','--','--debug','--bundles','app'],{cwd:project,stdio:'inherit',env:{...process.env,VITE_MAC_NAVIGATION_PREVIEW:'1'}});
 await build({entryPoints:[join(project,'tests/fixtures/designPreview.ts')],bundle:true,format:'esm',platform:'node',outfile:join(scratch,'fixture.mjs')});
 const {designPreview}=await import(pathToFileURL(join(scratch,'fixture.mjs')));

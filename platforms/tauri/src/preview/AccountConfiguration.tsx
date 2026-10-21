@@ -6,14 +6,17 @@ import {Input} from '../components/arc/input/input';
 import {ConfirmMorph} from '../components/arc/confirm-morph/confirm-morph';
 import {metricName} from '../Metrics';
 import {providerText} from '../providerText';
-import type {Account,Send} from '../desktop';
+import {TrayGlyph} from './TrayPreview';
+import type {Account,DesktopState,Send} from '../desktop';
 import type {Copy} from '../copy';
 import {Group,ToggleRow,useChange} from './shared';
 
-export function AccountConfiguration({account:a,send,t,busy,language}:{account:Account;send:Send;t:Copy;busy:boolean;language:string}) {
+export function AccountConfiguration({account:a,send,t,busy,language,traySettings,badge}:{badge?:number|null;traySettings:DesktopState['settings'];account:Account;send:Send;t:Copy;busy:boolean;language:string}) {
  const tr=(s:string)=>providerText(s,language);
  const [note,setNote]=useState(a.note),[key,setKey]=useState('');
  const {pending,change,notice}=useChange(send,t),disabled=busy||pending;
+ const pinned=a.metrics.filter(m=>m.pinned).slice(0,3);
+ const ring=traySettings.trayStyle==='ring'&&pinned.length>0&&pinned.every(m=>m.percent!=null||m.unit==='percent');
  const apply=(method:string,value:unknown)=>change({method,accountId:a.id,value});
  return <div className="account-configuration">
   {notice}
@@ -21,12 +24,18 @@ export function AccountConfiguration({account:a,send,t,busy,language}:{account:A
    <ToggleRow label={t.enabled} checked={a.enabled} disabled={disabled} onCheckedChange={value=>void apply('enabled',value)}/>
    <ToggleRow label={tr('Show in Menu Bar')} checked={a.tray} disabled={disabled||!a.enabled} onCheckedChange={value=>void apply('tray',value)}/>
   </Group>
-  <Group title={tr('Metrics')} description={t.pin_limit}>
+  <Group title={tr('Metrics')} description={tr('Choose up to three menu bar metrics per account.')}>
+   {pinned.length>0&&<div className="account-tray-preview" aria-label={tr('Menu Bar Preview')}>
+    <TrayGlyph badge={badge} family={a.family} metrics={pinned} style={traySettings.trayStyle} position={traySettings.ringIconPosition}/>
+    <ol className="ring-legend">{pinned.map((m,i)=><li key={m.id}><span>{ring?tr(i===0?'Outer Ring':pinned.length===3&&i===1?'Middle Ring':'Inner Ring'):String(i+1)}</span><strong>{metricName(m,language)}</strong></li>)}</ol>
+   </div>}
+   {pinned.length===3&&ring&&<p className="group-description">{tr('Three rings use the left icon layout.')}</p>}
+   {pinned.length>0&&traySettings.trayStyle==='ring'&&!ring&&<p className="group-description">{tr('Metrics without a percentage are shown as values.')}</p>}
    <div className="metric-column-labels"><span>{tr('Content')}</span><span>{tr('Location')}</span><span>{tr('Menu Bar')}</span></div>
    {a.metrics.map(m=><div className="placement-row" key={m.id}>
     <span>{metricName(m,language)}</span>
     <div className="visually-labelled-select"><Select label={`${metricName(m,language)} · ${t.placement}`} value={m.placement} disabled={disabled} options={(['home','details','hidden'] as const).map(value=>({value,label:t[value]}))} onValueChange={placement=>void change({method:'metric',accountId:a.id,metricId:m.id,value:{placement}})}/></div>
-    {m.pinnable?<Switch aria-label={`${metricName(m,language)} · ${t.pin}`} checked={m.pinned} disabled={disabled||(!m.pinned&&a.metrics.filter(x=>x.pinned).length>=2)} onCheckedChange={pinned=>void change({method:'metric',accountId:a.id,metricId:m.id,value:{pinned}})}/>:<span className="muted unavailable-pin">—</span>}
+    {m.pinnable?<Switch aria-label={`${metricName(m,language)} · ${t.pin}`} checked={m.pinned} disabled={disabled||(!m.pinned&&a.metrics.filter(x=>x.pinned).length>=3)} onCheckedChange={pinned=>void change({method:'metric',accountId:a.id,metricId:m.id,value:{pinned}})}/>:<span className="muted unavailable-pin">—</span>}
    </div>)}
   </Group>
   <Group title={tr('Account Management')}>

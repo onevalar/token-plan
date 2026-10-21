@@ -15,6 +15,23 @@ final class MenuBarPinTests: XCTestCase {
         XCTAssertFalse(store.displayGroups.contains { $0.id == "claude@removed" })
     }
 
+    func testDesktopThreePinsPersistAndRejectFourthWithoutChangingClassicCap() {
+        let defaults = makeDefaults("desktop-three")
+        let registry = makeRegistry(metricCount: 4)
+        let desktop = LayoutStore(registry: registry, pinLimit: 3, defaults: defaults, storageKey: "layout")
+        for n in 1...4 { desktop.setPinned(true, for: "a.m\(n)") }
+        XCTAssertEqual(desktop.pinnedCount(forProvider: "a"), 3)
+        XCTAssertFalse(desktop.isPinned("a.m4"))
+        let reload = LayoutStore(registry: registry, pinLimit: 3, defaults: defaults, storageKey: "layout")
+        XCTAssertTrue(reload.isPinned("a.m3"))
+        reload.menuBarStyle = .ring
+        reload.menuBarStyle = .percentage
+        XCTAssertTrue(reload.isPinned("a.m3"))
+        let classic = LayoutStore(registry: registry, defaults: makeDefaults("classic-two"))
+        for n in 1...3 { classic.setPinned(true, for: "a.m\(n)") }
+        XCTAssertEqual(classic.pinnedCount(forProvider: "a"), 2)
+    }
+
     func testNoPinsByDefault() {
         let store = makeStore("default")
         XCTAssertTrue(store.pinnedMetricIDs.isEmpty)
@@ -442,12 +459,12 @@ final class MenuBarPinTests: XCTestCase {
     }
 
     /// Two providers, each with three percent metrics, are sufficient to exercise provider-local caps.
-    private func makeRegistry(providerIDs: [String] = ["a", "b"]) -> WidgetRegistry {
+    private func makeRegistry(providerIDs: [String] = ["a", "b"], metricCount: Int = 3) -> WidgetRegistry {
         let providers = providerIDs.map { id in
             Provider(id: id, displayName: id.uppercased(), icon: .providerMark("cursor"))
         }
         let descriptors = providers.flatMap { provider in
-            (1...3).map { n in metric(provider, id: "\(provider.id).m\(n)", label: "M\(n)") }
+            (1...metricCount).map { n in metric(provider, id: "\(provider.id).m\(n)", label: "M\(n)") }
         }
         return WidgetRegistry(providers: providers, descriptors: descriptors)
     }

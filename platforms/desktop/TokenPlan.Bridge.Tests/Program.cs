@@ -19,7 +19,19 @@ try {
   var accounts=state.GetProperty("accounts").EnumerateArray().ToArray();
   Assert(!accounts.Single(a=>a.GetProperty("id").GetString()=="claude").GetProperty("enabled").GetBoolean(),"Primary disabled");
   Assert(accounts.Single(a=>a.GetProperty("id").GetString()=="claude:second").GetProperty("enabled").GetBoolean(),"Secondary must remain enabled");
-  await Call(session,new{method="settings",value=new{trayStyle="percentage",autoUpdates=false,language="zh-Hans"}});
+  await Call(session,new{method="settings",value=new{trayStyle="percentage",ringIconPosition="left",autoUpdates=false,autoRefresh=false,language="zh-Hans"}});
+  try { await Call(session,new{method="settings",value=new{ringIconPosition="invalid"}}); throw new Exception("Invalid position accepted"); } catch(InvalidDataException) { }
+  // Synthetic quota results exercise the actual bridge cap, not just the UI switch.
+  var cache=(System.Collections.Concurrent.ConcurrentDictionary<string,ProviderResult>)typeof(DesktopSession).GetField("results",System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic)!.GetValue(session)!;
+  cache["claude"]=new("claude","Claude",new("claude","Claude","Pro",new[]{"a","b","c","d"}.Select(label=>new UsageWindow(label,25,null)).ToArray(),DateTimeOffset.UtcNow),null);
+  state=await Call(session,new{method="metric",accountId="claude",metricId="c",value=new{pinned=true}});
+  Assert(state.GetProperty("accounts").EnumerateArray().Single(a=>a.GetProperty("id").GetString()=="claude").GetProperty("metrics").EnumerateArray().Count(m=>m.GetProperty("pinned").GetBoolean())==3,"Bridge accepts third pin");
+  try { await Call(session,new{method="metric",accountId="claude",metricId="d",value=new{pinned=true}}); throw new Exception("Fourth pin accepted"); } catch(InvalidDataException) { }
+  var pinned = new Preferences().Pin("claude","a",true,3).Pin("claude","b",true,3).Pin("claude","c",true,3).Pin("claude","d",true,3);
+  Assert(pinned.PinnedMetrics["claude"].SequenceEqual(new[]{"a","b","c"}),"Three pins, fourth rejected");
+  pinned.Save(Path.Combine(root,"pins.json"));
+  Assert(Preferences.Load(Path.Combine(root,"pins.json")).PinnedMetrics["claude"].Length==3,"Three pins persist");
+  Assert(new Preferences().Pin("claude","a",true).Pin("claude","b",true).Pin("claude","c",true).PinnedMetrics["claude"].Length==2,"Classic default stays two");
   await Call(session,new{method="move",accountId="claude:second",value=-1});
   state=await Call(session,new{method="remove",accountId="claude:second"});
   Assert(!state.GetProperty("accounts").EnumerateArray().Any(a=>a.GetProperty("id").GetString()=="claude:second"),"Removed account hidden");
@@ -28,6 +40,8 @@ try {
  using(var session=new DesktopSession(file)){
   var state=await Call(session,new{method="state"});
   Assert(state.GetProperty("settings").GetProperty("trayStyle").GetString()=="percentage","Persisted style");
+  Assert(state.GetProperty("settings").GetProperty("ringIconPosition").GetString()=="left","Persisted ring position");
+  Assert(!state.GetProperty("settings").GetProperty("autoRefresh").GetBoolean(),"Refresh preference survives restart");
   Assert(!state.GetProperty("settings").GetProperty("autoUpdates").GetBoolean(),"Persisted updater preference");
   Assert(!state.GetProperty("accounts").EnumerateArray().Any(a=>a.GetProperty("id").GetString()=="claude:second"),"Tombstone survives relaunch");
   Assert(!state.ToString().Contains("CredentialFingerprint"),"No authentication fields exported");

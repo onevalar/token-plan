@@ -1,11 +1,11 @@
 import {useState} from 'react';
 
 export type Density='compact'|'comfortable';
-const key='tokenplan.mac.homeDensity';
-// This presentation preference belongs to this Mac's webview, never to a cloud account.
+const key='tokenplan.homeDensity';
+// Local to this device; preserve the earlier macOS preview choice when upgrading.
 export function useDensity() {
  const [density,setDensity]=useState<Density>(()=>{
-  try {return localStorage.getItem(key)==='comfortable'?'comfortable':'compact';}
+  try {return (localStorage.getItem(key)??localStorage.getItem('tokenplan.mac.homeDensity'))==='comfortable'?'comfortable':'compact';}
   catch {return 'compact';}
  });
  const [failed,setFailed]=useState(false);

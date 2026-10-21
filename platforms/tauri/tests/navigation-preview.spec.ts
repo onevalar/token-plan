@@ -4,6 +4,8 @@ import {largeDesktop} from './fixtures/largeDesktop';
 import {textFor} from '../src/copy';
 import {messages} from '../src/i18n';
 
+test.beforeEach(async({page},info)=>{await page.addInitScript(platform=>{(window as any).__panelFrame={platform,rounded:platform!=='linux'};},String(info.project.metadata.platform??'macos'));});
+
 const visible=(page:Page)=>page.locator('.preview-page:not([hidden])');
 async function menu(page:Page,item:string){await page.getByRole('button',{name:'更多',exact:true}).click();await page.getByRole('menuitem',{name:item,exact:true}).click();}
 const back=(page:Page)=>page.getByRole('button',{name:'返回',exact:true}).click();
@@ -38,7 +40,7 @@ test('contextual navigation scopes refresh and restores origin, tab, range and s
  await back(page);
  await visible(page).evaluate(e=>e.scrollTop=180);
  const scroll=await visible(page).evaluate(e=>e.scrollTop);
- await visible(page).getByRole('button',{name:'Codex',exact:true}).click();
+ await visible(page).locator('.dashboard').getByRole('button',{name:'Codex',exact:true}).click();
  await back(page);
  expect(await visible(page).evaluate(e=>e.scrollTop)).toBe(scroll);
 });
@@ -76,7 +78,7 @@ test('service switches preserve accounts; add, reorder and remove return to conf
  await page.getByRole('switch',{name:'显示账号 Claude first@example.com',exact:true}).click();
  await back(page);
  await expect(visible(page).locator('.configured-account')).toHaveCount(7);
- await page.getByRole('button',{name:'Claude first@example.com',exact:true}).click();
+ await visible(page).getByRole('button',{name:'Claude first@example.com',exact:true}).click();
  await page.getByRole('button',{name:'移除账号',exact:true}).click();
  await expect(page.getByRole('group').getByRole('button',{name:'移除账号',exact:true})).toBeEnabled();
  // Arc ignores presses within 280ms of opening, preventing the original click from confirming.
@@ -105,11 +107,11 @@ test('history supports account filtering, pagination and model details without d
 test('missing history and unknown prices stay unknown; popup Escape keeps panel open',async({page})=>{
  const data=largeDesktop();data.accounts[0].history=[];data.accounts[1].history.forEach(r=>r.cost=null);
  await setup(page,data);
- await page.getByRole('button',{name:'Claude first@example.com',exact:true}).click();
+ await page.locator('.dashboard').getByRole('button',{name:'Claude first@example.com',exact:true}).click();
  await expect(visible(page).getByText('暂无用量历史。',{exact:true})).toBeVisible();
  await expect(visible(page).locator('.history-totals')).toHaveCount(0);
  await back(page);
- await page.getByRole('button',{name:'Claude second.with.a.long.address@example.com',exact:true}).click();
+ await page.locator('.dashboard').getByRole('button',{name:'Claude second.with.a.long.address@example.com',exact:true}).click();
  await expect(visible(page).locator('.history-totals dd').first()).toHaveText('—');
  await back(page);await menu(page,'通用设置');
  await page.getByRole('combobox',{name:'语言',exact:true}).click();
@@ -126,7 +128,7 @@ for(const theme of ['light','dark'] as const)test(`390px visual review ${theme}`
  codex.metrics.push({...codex.metrics[0],id:'codex.rateLimitResets',label:'Rate Limit Resets',percent:null,periodSeconds:null,placement:'details',unit:'count',amount:3,hasData:true,expiries:['2026-10-23T04:47:31Z','2026-10-30T03:01:06Z','2026-11-07T07:31:20Z']});
  await setup(page,data);
  for(const screen of ['home','detail','account-settings','configure','settings','history']){
-  if(screen==='detail')await page.getByRole('button',{name:'Codex',exact:true}).click();
+  if(screen==='detail')await page.locator('.dashboard').getByRole('button',{name:'Codex',exact:true}).click();
   if(screen==='account-settings')await page.getByRole('button',{name:'设置',exact:true}).click();
   if(screen==='configure'){await back(page);await menu(page,'服务配置');}
   if(screen==='settings'){await back(page);await menu(page,'通用设置');}
@@ -140,7 +142,7 @@ for(const theme of ['light','dark'] as const)test(`390px visual review ${theme}`
 test('summary keeps metric-only history when daily records are unavailable',async({page})=>{
  const data=largeDesktop(),a=data.accounts[0];a.history=[];
  a.metrics.push({...a.metrics[0],id:'claude.last30',label:'Last 30 Days',percent:null,periodSeconds:null,unit:'dollars',amount:12.5,values:[]});
- await setup(page,data);await page.getByRole('button',{name:'Claude first@example.com',exact:true}).click();
+ await setup(page,data);await page.locator('.dashboard').getByRole('button',{name:'Claude first@example.com',exact:true}).click();
  await expect(visible(page).locator('.history-fallback')).toContainText('$12.50');
  await expect(visible(page).getByText('暂无用量历史。',{exact:true})).toHaveCount(0);
 });
@@ -153,7 +155,7 @@ for(const language of ['en','zh-Hant','ja','ko'])test(`compact controls and remo
  await page.getByRole('button',{name:basic.back,exact:true}).click();
  await page.getByRole('button',{name:basic.more,exact:true}).click();
  await page.getByRole('menuitem',{name:t.configure,exact:true}).click();
- await page.getByRole('button',{name:'Claude first@example.com',exact:true}).click();
+ await visible(page).getByRole('button',{name:'Claude first@example.com',exact:true}).click();
  await page.getByRole('button',{name:t.remove,exact:true}).click();
  await expect(page.getByRole('group').getByRole('button',{name:t.remove,exact:true})).toBeVisible();
  await noOverflow(page);
@@ -189,7 +191,7 @@ test('home density persists, reduces space without dropping metrics, and toolbar
 });
 
 test('account note saves inline and removal shares its right alignment',async({page})=>{
- await setup(page);await page.getByRole('button',{name:'Claude first@example.com',exact:true}).click();
+ await setup(page);await page.locator('.dashboard').getByRole('button',{name:'Claude first@example.com',exact:true}).click();
  await page.getByRole('button',{name:'设置',exact:true}).click();
  const note=page.getByRole('textbox',{name:'备注',exact:true});
  await note.fill('Local note');
@@ -203,4 +205,81 @@ test('account note saves inline and removal shares its right alignment',async({p
  const removeBox=(await page.getByRole('button',{name:'移除账号',exact:true}).boundingBox())!;
  expect(Math.abs(removeBox.x+removeBox.width-saveBox.x-saveBox.width)).toBeLessThan(1);
  await noOverflow(page);
+});
+
+for(const theme of ['light','dark'] as const)test(`ring layout and three metrics stay consistent in ${theme}`,async({page},info)=>{
+ await page.emulateMedia({colorScheme:theme});
+ const data=largeDesktop(),a=data.accounts[0];data.settings.trayStyle='ring';
+ data.accounts.forEach(x=>x.tray=x.id===a.id);
+ a.metrics=[0,1,2,3].map((i)=>({...a.metrics[0],id:`test.${i}`,label:['Session','Weekly','Monthly','Extra'][i],periodSeconds:[18000,604800,2592000,3600][i],percent:[25,50,75,90][i],pinned:i<2,pinnable:true,hasData:true}));
+ await setup(page,data);await menu(page,'通用设置');
+ await expect(page.getByRole('button',{name:'圆环内',exact:true})).toHaveAttribute('aria-pressed','true');
+ await page.getByRole('button',{name:'圆环左侧',exact:true}).click();
+ await expect(page.getByRole('button',{name:'圆环左侧',exact:true})).toHaveAttribute('aria-pressed','true');
+ await expect(visible(page).locator('.menu-bar-preview .tray-glyph')).toHaveAttribute('data-layout','left');
+ expect(await page.evaluate(()=>(window as any).__requests.at(-1))).toEqual({method:'settings',value:{ringIconPosition:'left'}});
+ await back(page);await page.locator('.dashboard').getByRole('button',{name:'Claude first@example.com',exact:true}).click();
+ await page.getByRole('button',{name:'设置',exact:true}).click();
+ const rows=visible(page).locator('.placement-row');
+ await rows.nth(2).getByRole('switch').click();
+ await expect(rows.nth(2).getByRole('switch')).toBeChecked();
+ await expect(rows.nth(3).getByRole('switch')).toBeDisabled();
+ await expect(visible(page).locator('.ring-legend')).toContainText('外环');
+ await expect(visible(page).locator('.ring-legend')).toContainText('中环');
+ await expect(visible(page).locator('.ring-legend')).toContainText('内环');
+ await expect(visible(page).locator('.account-tray-preview svg > g')).toHaveCount(3);
+ await noOverflow(page);
+ await page.screenshot({path:info.outputPath(`three-metric-account-${theme}.png`),animations:'disabled'});
+ await back(page);await menu(page,'通用设置');
+ await page.getByRole('button',{name:'圆环内',exact:true}).click();
+ // Preserve inside preference, but keep a legible logo beside three rings.
+ await expect(visible(page).locator('.menu-bar-preview .tray-glyph')).toHaveAttribute('data-layout','left');
+ await page.getByRole('button',{name:'圆环左侧',exact:true}).click();
+ await visible(page).locator('.ring-layout-picker').scrollIntoViewIfNeeded();
+ await page.screenshot({path:info.outputPath(`ring-layout-settings-${theme}.png`),animations:'disabled'});
+ await page.getByRole('combobox',{name:/菜单栏样式|托盘样式/,exact:true}).click();
+ await page.getByRole('option',{name:'百分比',exact:true}).click();
+ await expect(visible(page).locator('.ring-layout-picker')).toHaveCount(0);
+ await expect(visible(page).locator('.menu-bar-preview .tray-values > span')).toHaveCount(3);
+ await expect(visible(page).locator('.menu-bar-preview .tray-values')).toHaveText('25%50%75%');
+ await page.getByRole('combobox',{name:/菜单栏样式|托盘样式/,exact:true}).click();
+ await page.getByRole('option',{name:'环形',exact:true}).click();
+ await expect(page.getByRole('button',{name:'圆环左侧',exact:true})).toHaveAttribute('aria-pressed','true');
+ await expect(visible(page).locator('.menu-bar-preview svg > g')).toHaveCount(3);
+ // Failed persistence must leave the selected layout and preview unchanged.
+ await page.evaluate(()=>{(window as any).__failNextRequest=true;});
+ await page.getByRole('button',{name:'圆环内',exact:true}).click();
+ await expect(page.getByRole('alert')).toBeVisible();
+ await expect(page.getByRole('button',{name:'圆环左侧',exact:true})).toHaveAttribute('aria-pressed','true');
+});
+
+test('three-ring badges share the center and keep a compact stable footprint',async({page},info)=>{
+ const data=largeDesktop();
+ data.accounts.forEach(a=>a.tray=a.family==='claude');
+ for(const a of data.accounts.filter(a=>a.family==='claude'))a.metrics=[25,50,75].map((percent,i)=>({...a.metrics[0],id:`ring.${i}`,label:`Ring ${i+1}`,percent,pinned:true,hasData:true,unit:'percent'}));
+ await setup(page,data);await menu(page,'通用设置');
+ const glyphs=visible(page).locator('.menu-bar-preview .tray-glyph');
+ await expect(glyphs).toHaveCount(2);
+ await expect(glyphs.locator('.tray-center-badge')).toHaveText(['1','2']);
+ await expect(glyphs.locator('sup')).toHaveCount(0);
+ for(const glyph of await glyphs.all())expect((await glyph.boundingBox())!.width).toBeCloseTo(53.2,0);
+ await glyphs.first().scrollIntoViewIfNeeded();
+ await page.screenshot({path:info.outputPath('compact-three-ring-badges.png'),animations:'disabled'});
+ await back(page);
+ if(info.project.metadata.platform!=='macos'){
+  await expect(visible(page).locator('.tray-panel-strip .tray-center-badge')).toHaveText(['1','2']);
+  await visible(page).locator('.tray-panel-account').first().click();
+  await expect(page.getByRole('heading',{level:1})).toHaveText('Claude');
+ }
+});
+
+test('production update entry preserves errors and the about page is not a design preview',async({page})=>{
+ await setup(page);await menu(page,'检查更新');
+ await page.getByRole('button',{name:'检查更新',exact:true}).click();
+ await expect(page.getByRole('status')).toContainText('9.9.9');
+ await page.getByRole('button',{name:'安装并重启',exact:true}).click();
+ await expect(page.getByRole('status')).toContainText('更新安装失败');
+ await back(page);await menu(page,'关于');
+ await expect(visible(page)).not.toContainText('设计预览');
+ await expect(page.getByRole('heading',{level:1})).toHaveText('关于');
 });

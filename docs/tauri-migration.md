@@ -1,8 +1,8 @@
 # Shared desktop interface migration
 
-The October 21 navigation redesign is currently an opt-in macOS review, documented
-in [mac-navigation-preview.md](mac-navigation-preview.md). It has not been enabled
-for normal releases or Windows/Linux builds.
+The October 21 navigation redesign is enabled in normal builds on all three platforms
+following the owner’s approval. See [mac-navigation-preview.md](mac-navigation-preview.md)
+for behavior, platform tray differences and the isolated design-review bundle.
 
 TokenPlan's new desktop interface lives in `platforms/tauri`. React and the free Arc
 components provide one interface for macOS, Windows and Linux. A fixed bundled helper
@@ -44,7 +44,7 @@ an automatic change to its saved pins.
 ## Implemented
 
 - Account discovery, individual visibility, removal with confirmation, saved notes and API
-  keys, ordering, metric placement and up to two tray metrics per account. Removing a card
+  keys, ordering, metric placement and up to three tray metrics per account. Removing a card
   preserves the external CLI login and historical files. All metrics may be off the homepage.
 - Existing preference files, native account identities and removal records are reused.
   Windows/Linux retain discovered account headings across restart without treating them as
@@ -57,7 +57,8 @@ an automatic change to its saved pins.
   icons. On macOS it is one strip of every selected account, in saved order, as rings or
   percentages drawn with the system font. Windows and Linux trays only fit a small square, so
   they show the TokenPlan icon and list each selected account's readings in the tooltip and
-  menu; the tray style setting appears only on macOS. Account numbering is contiguous per
+  menu. Their popup additionally shows the shared ring/percentage strip, with the same
+  icon-position setting, three-metric cap and compact center numbering for three rings. Account numbering is contiguous per
   service; a single visible account of a service has no number.
 - Left-click opens the panel, and the native context menu includes open/quit. Linux uses
   StatusNotifierItem through `ksni` because Tauri's AppIndicator adapter does not deliver

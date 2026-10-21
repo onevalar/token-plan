@@ -120,6 +120,7 @@
 "Choose at most two tray metrics per account." = "계정당 트레이 지표를 최대 2개 선택하세요.";
 "Choose services and accounts to show. Hiding them keeps stars, overview and refresh unchanged." = "표시할 서비스와 계정을 선택하세요. 숨겨도 별표, 개요 및 새로고침은 바뀌지 않습니다.";
 "Choose the service's local folder, such as .claude or .codex, to read its login and usage history." = "로그인 및 사용 기록을 읽으려면 .claude 또는 .codex 같은 서비스 폴더를 선택하세요。";
+"Choose up to three menu bar metrics per account." = "계정당 메뉴 막대 지표를 최대 3개 선택할 수 있습니다.";
 "Choose up to two items." = "최대 두 항목을 선택하세요.";
 "Choose what's visible and where" = "표시할 항목과 위치를 선택합니다";
 "Choose where each item appears. Menu Bar shows up to two values beside the app icon; uncheck one before choosing a replacement." = "각 항목의 표시 위치를 선택하세요. 메뉴 막대에는 앱 아이콘 옆에 최대 두 값을 표시할 수 있습니다. 바꾸려면 먼저 하나를 해제하세요.";
@@ -317,10 +318,13 @@
 "Home" = "홈";
 "Home Layout" = "홈 레이아웃";
 "Horizontal Bar" = "가로 막대";
+"Icon Position" = "아이콘 위치";
 "Increase Transparency" = "투명도 높이기";
 "Individual Credits" = "개인 크레딧";
 "Info" = "정보";
+"Inner Ring" = "안쪽 링";
 "Input" = "입력";
+"Inside the Ring" = "링 안쪽";
 "Install Update" = "업데이트 설치";
 "Install and restart" = "설치 후 다시 시작";
 "Installing update…" = "업데이트 설치 중…";
@@ -343,6 +347,7 @@
 "Last updated %@ ago" = "%@ 전에 업데이트됨";
 "Launch at Login" = "로그인 시 실행";
 "Left" = "남음";
+"Left of the Rings" = "링 왼쪽";
 "License" = "라이선스";
 "Light" = "라이트";
 "Limit %@" = "한도 %@";
@@ -379,6 +384,8 @@
 "Menu bar / system tray" = "메뉴 막대 / 트레이";
 "Metric" = "지표";
 "Metrics" = "표시 지표";
+"Metrics without a percentage are shown as values." = "백분율이 없는 지표가 포함되면 숫자로 표시합니다.";
+"Middle Ring" = "가운데 링";
 "Minutes" = "분";
 "Model Breakdown" = "모델별 내역";
 "Monitor Your AI Subscriptions with TokenPlan" = "TokenPlan으로 AI 구독을 모니터링하세요";
@@ -463,6 +470,7 @@
 "Other Reported Tokens" = "기타 보고된 토큰";
 "Other Services" = "다른 서비스";
 "Outdated" = "오래됨";
+"Outer Ring" = "바깥쪽 링";
 "Output" = "출력";
 "Override With a Custom Key" = "사용자 키로 덮어쓰기";
 "Overview" = "개요";
@@ -677,6 +685,8 @@
 "This saved account shares its login with a CLI. Open it in your account switcher to renew safely, then retry." = "저장된 계정이 CLI와 로그인 정보를 공유합니다. 계정 전환 도구에서 해당 계정을 열어 안전하게 갱신한 후 다시 시도하세요.";
 "This service integration is not available in this build." = "이 버전에서는 이 서비스가 아직 지원되지 않습니다.";
 "This shortcut is unavailable. Choose another combination." = "이 단축키를 사용할 수 없습니다. 다른 조합을 선택하세요.";
+"Three metrics automatically place the icon on the left. Your selections are kept when switching styles." = "지표가 3개이면 아이콘이 자동으로 왼쪽에 표시됩니다. 스타일을 바꿔도 선택 항목은 유지됩니다.";
+"Three rings use the left icon layout." = "링 3개 모드에서는 아이콘을 왼쪽에 표시합니다.";
 "Time Format" = "시간 형식";
 "Time Range" = "기간";
 "Today" = "오늘";
@@ -769,6 +779,7 @@
 "Will Run Out" = "소진 예상";
 "Will reach limit" = "한도에 도달할 예정";
 "Window" = "창";
+"Windows and Linux show these indicators in the tray panel. The system tray keeps the TokenPlan icon." = "Windows와 Linux에서는 트레이 패널에 지표를 표시하고 시스템 트레이에는 TokenPlan 아이콘을 유지합니다.";
 "Yesterday" = "어제";
 "You are up to date." = "최신 버전입니다.";
 "You have no rate limit resets" = "사용 가능한 한도 초기화가 없습니다";

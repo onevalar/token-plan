@@ -12,7 +12,7 @@ public sealed partial class DesktopSession
     }
     object Snapshot() => new {
         schema = "tokenplan.desktop.v1",
-        settings = new { notifications, shortcut, showRemaining = preferences.ShowRemaining, locale = System.Globalization.CultureInfo.CurrentUICulture.Name, appearance = preferences.Appearance, language = preferences.Language, trayStyle, autoUpdates, refreshMinutes = preferences.RefreshMinutes, autoRefresh = preferences.AutoRefresh },
+        settings = new { notifications, shortcut, showRemaining = preferences.ShowRemaining, locale = System.Globalization.CultureInfo.CurrentUICulture.Name, appearance = preferences.Appearance, language = preferences.Language, trayStyle, ringIconPosition, autoUpdates, refreshMinutes = preferences.RefreshMinutes, autoRefresh = preferences.AutoRefresh },
         accounts = Accounts().Select(a => new {
             id = a.SettingsKey, family = a.Id, name = ProviderCatalog.Get(a.Id).Name,
             email = a.AccountEmail ?? "", plan = a.Snapshot?.Plan ?? "",

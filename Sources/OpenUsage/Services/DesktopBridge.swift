@@ -32,7 +32,7 @@ public final class DesktopBridge {
         if let seed = NewProviderSeeder.reconcileIfNeeded(providers: runtimes, enablement: enablement) { await seed.value }
         let registry = WidgetRegistry.from(runtimes)
         let expand: ([String]) -> [String] = { DefaultLayout.expandingAccounts($0, providerIDs: registry.providers.map(\.id)) }
-        let layout = LayoutStore(registry: registry, defaults: defaults,
+        let layout = LayoutStore(registry: registry, pinLimit: 3, defaults: defaults,
             defaultMetricIDs: expand(DefaultLayout.metricIDs),
             defaultPinnedMetricIDs: expand(DefaultLayout.pinnedMetricIDs),
             defaultExpandedMetricIDs: expand(DefaultLayout.expandedMetricIDs),
@@ -122,6 +122,10 @@ public final class DesktopBridge {
                 }
                 if let shortcut = settings["shortcut"] as? String, shortcut.count <= 100 { defaults.set(shortcut, forKey: "tokenplan.desktop.shortcut") }
                 if let remaining = settings["showRemaining"] as? Bool { store.meterStyle = remaining ? .remaining : .used }
+                if let position = settings["ringIconPosition"] as? String {
+                    guard ["inside", "left"].contains(position) else { throw Failure.invalid }
+                    defaults.set(position, forKey: "tokenplan.desktop.ringIconPosition")
+                }
                 if let style = settings["trayStyle"] as? String {
                     guard let parsed = MenuBarStyle(rawValue: style) else { throw Failure.invalid }
                     layout.menuBarStyle = parsed
@@ -205,6 +209,7 @@ public final class DesktopBridge {
             "appearance": defaults.string(forKey: AppearanceSetting.key) ?? "system",
             "language": defaults.string(forKey: LanguageSetting.key) ?? "system",
             "trayStyle": layout.menuBarStyle.rawValue,
+            "ringIconPosition": defaults.string(forKey: "tokenplan.desktop.ringIconPosition") == "left" ? "left" : "inside",
             "refreshMinutes": RefreshSetting.minutes(defaults: defaults),
             "autoUpdates": defaults.object(forKey: "SUAutomaticallyCheckForUpdates") as? Bool ?? true,
             "autoRefresh": defaults.object(forKey: "tokenplan.desktop.autoRefresh") as? Bool ?? true

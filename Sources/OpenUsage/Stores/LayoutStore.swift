@@ -111,6 +111,7 @@ final class LayoutStore {
 
     init(
         registry: WidgetRegistry,
+        pinLimit: Int = LayoutStore.maxPinsPerProvider,
         defaults: UserDefaults = .standard,
         storageKey: String = "tokenplan.layout.v1",
         defaultMetricIDs: [String] = DefaultLayout.metricIDs,
@@ -120,6 +121,7 @@ final class LayoutStore {
         isProviderEnabled: @escaping @MainActor (String) -> Bool = { _ in true }
     ) {
         self.registry = registry
+        self.pinLimit = pinLimit
         let persistence = LayoutPersistence(defaults: defaults, storageKey: storageKey)
         self.persistence = persistence
         self.defaultMetricIDs = defaultMetricIDs
@@ -279,6 +281,8 @@ final class LayoutStore {
     /// Per-provider cap is a rendering constraint — the text strip stacks a provider's values two to a
     /// column, so a third would not fit the menu bar height.
     static let maxPinsPerProvider = 2
+    /// The desktop shell can render three metrics; the classic client keeps its two-value cap.
+    private let pinLimit: Int
 
     func isPinned(_ descriptorID: String) -> Bool { pinnedMetricIDs.contains(descriptorID) }
 
@@ -291,7 +295,7 @@ final class LayoutStore {
     func canPin(_ descriptorID: String) -> Bool {
         if pinnedMetricIDs.contains(descriptorID) { return true }
         guard let descriptor = registry.descriptor(id: descriptorID), descriptor.pinnable else { return false }
-        if pinnedCount(forProvider: descriptor.providerID) >= Self.maxPinsPerProvider { return false }
+        if pinnedCount(forProvider: descriptor.providerID) >= pinLimit { return false }
         return true
     }
 
@@ -300,8 +304,8 @@ final class LayoutStore {
     func pinDenialReason(_ descriptorID: String) -> String? {
         guard !canPin(descriptorID) else { return nil }
         if let providerID = registry.descriptor(id: descriptorID)?.providerID,
-           pinnedCount(forProvider: providerID) >= Self.maxPinsPerProvider {
-            return String(localized: "Up to \(Self.maxPinsPerProvider) stars per provider")
+           pinnedCount(forProvider: providerID) >= pinLimit {
+            return String(localized: "Up to \(pinLimit) stars per provider")
         }
         return nil
     }

@@ -1,4 +1,4 @@
-/* Opt-in macOS design preview. Keep every rule scoped until platform review. */
+/* Shared desktop navigation; native shell supplies platform frame behavior. */
 :root[data-mac-preview="true"],:root[data-mac-preview="true"] body,:root[data-mac-preview="true"] #root { overflow:clip;scrollbar-gutter:auto; }
 .mac-preview { height:100%;max-width:none;padding:54px 0 0;display:flex;flex-direction:column;background:var(--background); }
 .mac-preview [hidden] { display:none !important; }
@@ -54,11 +54,7 @@
 .mac-preview .setting-toggle p { font-size:12px;color:var(--text-secondary);margin:2px 0 6px; }
 .mac-preview .group-description { color:var(--text-secondary);font-size:11px;line-height:1.6;margin:7px 2px 12px; }
 .mac-preview .menu-bar-preview { display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:16px;padding:16px 4px;border-bottom:1px solid var(--border);font-size:12px; }
-.mac-preview .tray-symbol { width:28px;height:28px; }
-.mac-preview .tray-symbol svg { width:28px;height:28px; }
-.mac-preview .tray-symbol .provider-logo { width:var(--ring-logo-size);height:var(--ring-logo-size);left:calc((28px - var(--ring-logo-size))/2);top:calc((28px - var(--ring-logo-size))/2); }
-.mac-preview .tray-symbol[data-rings="0"] .provider-logo { width:22px;height:22px;top:3px;left:3px; }
-.mac-preview .tray-account-preview sup { left:24px; }
+
 .mac-preview .system-preferences .settings-list { gap:12px;padding:0 0 20px; }
 .mac-preview .system-preferences h3 { font-size:12px;font-weight:500;color:var(--text-secondary);margin-top:4px; }
 .mac-preview .system-preferences .settings-list > div:has(> [role="switch"]) { background:var(--surface-muted);border:1px solid var(--border);border-radius:var(--radius-control);padding:10px 12px; }
@@ -144,3 +140,31 @@
 .mac-preview .remove-account { display:flex;align-items:center;flex-wrap:wrap;gap:8px 12px;padding:10px 0; }
 .mac-preview .remove-account .group-description { flex:1;min-width:120px;margin:0;font-size:11px; }
 .mac-preview .account-action { margin-left:auto;max-width:100%; }
+
+.mac-preview .ring-layout-picker h3 { font-size:12px;font-weight:500;color:var(--text-secondary);margin:0 0 8px; }
+.mac-preview .ring-layout-options { display:grid;grid-template-columns:1fr 1fr;gap:8px; }
+.mac-preview .ring-layout-option { display:flex;flex-direction:column;height:86px;gap:10px;padding:10px 8px;font-size:12px;white-space:normal; }
+.mac-preview .ring-layout-option[aria-pressed="true"] { border-color:var(--foreground);box-shadow:inset 0 0 0 1px var(--foreground);background:var(--background); }
+.mac-preview .tray-glyph { display:inline-flex;align-items:center;position:relative;color:var(--foreground);flex-shrink:0; }
+.mac-preview .tray-mark-cell { position:relative;width:28px;height:28px;flex-shrink:0; }
+.mac-preview .tray-mark-cell .provider-logo { position:absolute;width:var(--mark-side);height:var(--mark-side);left:calc((28px - var(--mark-side))/2);top:calc((28px - var(--mark-side))/2); }
+.mac-preview .tray-mark-cell .tray-rings { position:absolute;inset:0; }
+.mac-preview .tray-glyph > .tray-rings { margin-left:4.2px;flex-shrink:0; }
+.mac-preview .tray-badge { align-self:flex-start;position:static;width:8.4px;font-size:9.1px;line-height:12px;padding-top:1px;font-weight:600;opacity:.85;text-align:center;font-variant-numeric:tabular-nums; }
+.mac-preview .tray-values { display:flex;flex-direction:column;gap:0;margin-left:2.8px;font-size:12px;line-height:14px;font-weight:600;font-variant-numeric:tabular-nums; }
+.mac-preview .tray-values.three-values { flex-direction:row;align-items:center;font-size:14px;gap:5px; }
+.mac-preview .tray-values.three-values span+span::before { content:'·';margin-right:5px; }
+.mac-preview .account-tray-preview { display:flex;align-items:center;gap:16px;padding:4px 0 12px;border-bottom:1px solid var(--border);margin-bottom:8px; }
+.mac-preview .ring-legend { list-style:none;display:grid;gap:5px;margin:0;padding:0;font-size:12px; }
+.mac-preview .ring-legend li { display:flex;gap:10px;align-items:baseline; }
+.mac-preview .ring-legend span { color:var(--text-secondary);min-width:52px; }
+.mac-preview .ring-legend strong { font-weight:500; }
+
+.mac-preview .ring-layout-card-content { display:flex;flex-direction:column;align-items:center;gap:10px; }
+
+.mac-preview .tray-glyph[data-triple="true"] > .tray-rings { margin-left:-2.8px; }
+.mac-preview .tray-center-badge { font-family:Arial,sans-serif;font-variant-numeric:tabular-nums; }
+:root[data-rounded="false"] .mac-preview .preview-header { border-radius:0; }
+
+.mac-preview .tray-panel-strip { display:flex;gap:6px;overflow-x:auto;padding:8px 0;border-bottom:1px solid var(--border); }
+.mac-preview .tray-panel-account { flex:none;min-height:36px;padding:4px 6px; }

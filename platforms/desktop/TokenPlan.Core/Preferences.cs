@@ -33,10 +33,10 @@ public partial record Preferences(string Appearance = "system", string Language 
     public Dictionary<string, string[]> PinnedMetrics { get; init; } = new();
     public Dictionary<string, string[]> ExpandedMetrics { get; init; } = new();
     public IEnumerable<string> OrderedProviders => ProviderOrder.Concat(ProviderCatalog.All.Select(p => p.Id)).Distinct().Where(id => ProviderCatalog.All.Any(p => p.Id == id));
-    public Preferences Pin(string id, string metric, bool pinned)
+    public Preferences Pin(string id, string metric, bool pinned, int maxPins = 2)
     {
         var current = (PinnedMetrics.GetValueOrDefault(id) ?? Array.Empty<string>()).ToList();
-        if (pinned && !current.Contains(metric)) { if (current.Count >= 2) return this; current.Add(metric); }
+        if (pinned && !current.Contains(metric)) { if (current.Count >= maxPins) return this; current.Add(metric); }
         if (!pinned) current.Remove(metric);
         return this with { PinnedMetrics = new(PinnedMetrics) { [id] = current.ToArray() } };
     }
@@ -56,17 +56,17 @@ public partial record Preferences(string Appearance = "system", string Language 
         "cursor" => this with { CursorEnabled = enabled }, _ => this with { AdditionalProviders = new(AdditionalProviders) { [ProviderCatalog.Get(id).Id] = enabled } }
     };
     public static string DefaultPath => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "TokenPlan", "desktop", "preferences.json");
-    public static Preferences Load(string file)
+    public static Preferences Load(string file, bool preserveRefreshSetting = false)
     {
         if (!File.Exists(file)) return new();
         var value = JsonSerializer.Deserialize<Preferences>(File.ReadAllText(file)) ?? throw new InvalidDataException();
         if (value.Appearance is not ("system" or "light" or "dark") || value.Language is not ("system" or "en" or "zh-Hans" or "zh-Hant" or "ja" or "ko") || value.HistoryDays is not (7 or 30) || value.TokenDays is not (7 or 30)) throw new InvalidDataException();
         if (value.TokenProvider is not ("codex" or "claude" or "cursor" or "grok")) throw new InvalidDataException();
-        if (value.RefreshMinutes is not (1 or 2 or 5 or 10 or 15 or 30 or 60) || value.ProviderOrder == null || value.PinnedMetrics == null || value.ExpandedMetrics == null || value.NotificationThreshold is < 50 or > 100 || value.PinnedMetrics.Values.Any(v => v == null || v.Length > 2) || value.ExpandedMetrics.Values.Any(v => v == null) || (value.HiddenMetrics == null || value.HiddenMetrics.Values.Any(v => v == null)) || value.AdditionalProviders == null || value.ProviderNotes == null || value.HiddenMetrics == null || value.AdditionalProviders.Keys.Any(id => !ProviderCatalog.All.Any(p => p.Id == id))) throw new InvalidDataException();
+        if (value.RefreshMinutes is not (1 or 2 or 5 or 10 or 15 or 30 or 60) || value.ProviderOrder == null || value.PinnedMetrics == null || value.ExpandedMetrics == null || value.NotificationThreshold is < 50 or > 100 || value.PinnedMetrics.Values.Any(v => v == null || v.Length > 3) || value.ExpandedMetrics.Values.Any(v => v == null) || (value.HiddenMetrics == null || value.HiddenMetrics.Values.Any(v => v == null)) || value.AdditionalProviders == null || value.ProviderNotes == null || value.HiddenMetrics == null || value.AdditionalProviders.Keys.Any(id => !ProviderCatalog.All.Any(p => p.Id == id))) throw new InvalidDataException();
         if (value.RemovedAccounts == null || value.AccountVisibility == null || value.TrayAccounts == null) throw new InvalidDataException();
         if (value.LogLevel is < 0 or > 3 || value.TrayServices == null || value.MetricOrder == null || value.MetricOrder.Values.Any(v => v == null) || value.SpendPeriod is < 0 or > 2 || value.SpendMetric is < 0 or > 2) throw new InvalidDataException();
         if (value.NotificationsEnabled) value = value with { NotifyAlmostOut = true, NotificationsEnabled = false };
-        return value with { AutoRefresh = true };
+        return preserveRefreshSetting ? value : value with { AutoRefresh = true };
     }
     public void Save(string file)
     {

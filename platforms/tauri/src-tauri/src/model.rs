@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
-pub struct Settings { #[serde(default = "default_true")] pub shortcut_available: bool, #[serde(default)] pub notifications: [bool;3], #[serde(default)] pub shortcut: String, #[serde(default)] pub show_remaining: bool, pub appearance: String, pub language: String, #[serde(default)] pub locale: String, pub tray_style: String, pub refresh_minutes: u64, pub auto_refresh: bool, pub auto_updates: bool }
+pub struct Settings { #[serde(default = "default_true")] pub shortcut_available: bool, #[serde(default)] pub notifications: [bool;3], #[serde(default)] pub shortcut: String, #[serde(default)] pub show_remaining: bool, pub appearance: String, pub language: String, #[serde(default)] pub locale: String, pub tray_style: String, #[serde(default = "default_ring_position")] pub ring_icon_position: String, pub refresh_minutes: u64, pub auto_refresh: bool, pub auto_updates: bool }
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Metric { pub id: String, pub label: String, pub placement: String, pub pinned: bool, pub pinnable: bool, pub has_data: bool, #[serde(default)] pub not_started: bool, #[serde(default)] pub expiries: Vec<String>, #[serde(default)] pub chart: Vec<ChartPoint>, pub unit: String, pub percent: Option<f64>, pub amount: Option<f64>, pub resets_at: Option<String>, pub period_seconds: Option<f64>, pub values: Vec<MetricValue> }
@@ -28,5 +28,7 @@ impl DesktopState {
             && self.accounts.iter().all(|a| a.metrics.len() < 128 && a.history.len() < 1000 && a.observations.len() <= 2400)
     }
 }
+
+fn default_ring_position()->String{"inside".into()}
 
 fn default_true()->bool{true}

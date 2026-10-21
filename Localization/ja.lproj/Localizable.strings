@@ -120,6 +120,7 @@
 "Choose at most two tray metrics per account." = "アカウントごとに最大2項目です。";
 "Choose services and accounts to show. Hiding them keeps stars, overview and refresh unchanged." = "表示するサービスとアカウントを選択します。非表示にしてもスター、概要、更新は変わりません。";
 "Choose the service's local folder, such as .claude or .codex, to read its login and usage history." = "ログインと使用履歴を読むため、.claude や .codex などのサービスフォルダを選択してください。";
+"Choose up to three menu bar metrics per account." = "アカウントごとにメニューバーの表示項目を最大3つ選べます。";
 "Choose up to two items." = "最大2項目を選択できます。";
 "Choose what's visible and where" = "表示する内容と場所を選びます";
 "Choose where each item appears. Menu Bar shows up to two values beside the app icon; uncheck one before choosing a replacement." = "各項目の表示場所を選びます。メニューバーにはアイコンの横に最大2つの値を表示できます。変更するには先に1つ選択を解除してください。";
@@ -317,10 +318,13 @@
 "Home" = "ホーム";
 "Home Layout" = "ホームの表示";
 "Horizontal Bar" = "横棒";
+"Icon Position" = "アイコンの位置";
 "Increase Transparency" = "透明度を上げる";
 "Individual Credits" = "個人クレジット";
 "Info" = "情報";
+"Inner Ring" = "内側";
 "Input" = "入力";
+"Inside the Ring" = "リングの内側";
 "Install Update" = "アップデートをインストール";
 "Install and restart" = "インストールして再起動";
 "Installing update…" = "更新をインストール中…";
@@ -343,6 +347,7 @@
 "Last updated %@ ago" = "%@ 前に更新";
 "Launch at Login" = "ログイン時に起動";
 "Left" = "残り";
+"Left of the Rings" = "リングの左側";
 "License" = "ライセンス";
 "Light" = "ライト";
 "Limit %@" = "上限 %@";
@@ -379,6 +384,8 @@
 "Menu bar / system tray" = "メニューバー / トレイ";
 "Metric" = "項目";
 "Metrics" = "表示項目";
+"Metrics without a percentage are shown as values." = "割合のない項目を含む場合は数値で表示します。";
+"Middle Ring" = "中央";
 "Minutes" = "分";
 "Model Breakdown" = "モデル別内訳";
 "Monitor Your AI Subscriptions with TokenPlan" = "TokenPlan で AI サブスクリプションを監視";
@@ -463,6 +470,7 @@
 "Other Reported Tokens" = "その他の報告済みトークン";
 "Other Services" = "その他のサービス";
 "Outdated" = "古い";
+"Outer Ring" = "外側";
 "Output" = "出力";
 "Override With a Custom Key" = "カスタムキーで上書き";
 "Overview" = "概要";
@@ -677,6 +685,8 @@
 "This saved account shares its login with a CLI. Open it in your account switcher to renew safely, then retry." = "この保存済みアカウントは CLI と認証情報を共有しています。アカウント切替ツールで開いて安全に更新し、再試行してください。";
 "This service integration is not available in this build." = "このバージョンではこのサービスに対応していません。";
 "This shortcut is unavailable. Choose another combination." = "このショートカットは使用できません。別の組み合わせを選んでください。";
+"Three metrics automatically place the icon on the left. Your selections are kept when switching styles." = "3項目ではアイコンを自動的に左側へ配置します。表示形式を切り替えても選択は保持されます。";
+"Three rings use the left icon layout." = "3つのリングではアイコンを左側に表示します。";
 "Time Format" = "時刻形式";
 "Time Range" = "期間";
 "Today" = "今日";
@@ -769,6 +779,7 @@
 "Will Run Out" = "上限に達する見込み";
 "Will reach limit" = "上限に達する見込み";
 "Window" = "ウィンドウ";
+"Windows and Linux show these indicators in the tray panel. The system tray keeps the TokenPlan icon." = "Windows と Linux ではトレイパネルにこれらの項目を表示し、システムトレイには TokenPlan アイコンを表示します。";
 "Yesterday" = "昨日";
 "You are up to date." = "最新バージョンです。";
 "You have no rate limit resets" = "利用できるレート制限リセットはありません";

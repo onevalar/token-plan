@@ -29,3 +29,19 @@ T = {
     'Remove?': ('确认移除？', '確認移除？', '削除しますか？', '제거할까요?'),
     'Confirm': ('确认', '確認', '確認', '확인'),
 }
+
+T.update({
+ 'Icon Position': ('图标位置','圖示位置','アイコンの位置','아이콘 위치'),
+ 'Inside the Ring': ('圆环内','圓環內','リングの内側','링 안쪽'),
+ 'Left of the Rings': ('圆环左侧','圓環左側','リングの左側','링 왼쪽'),
+ 'Three metrics automatically place the icon on the left. Your selections are kept when switching styles.': ('选择三项指标时，图标自动放在左侧。切换样式会保留所选指标。','選擇三項指標時，圖示自動放在左側。切換樣式會保留所選指標。','3項目ではアイコンを自動的に左側へ配置します。表示形式を切り替えても選択は保持されます。','지표가 3개이면 아이콘이 자동으로 왼쪽에 표시됩니다. 스타일을 바꿔도 선택 항목은 유지됩니다.'),
+ 'Choose up to three menu bar metrics per account.': ('每个账号最多选择三项菜单栏指标。','每個帳號最多選擇三項選單列指標。','アカウントごとにメニューバーの表示項目を最大3つ選べます。','계정당 메뉴 막대 지표를 최대 3개 선택할 수 있습니다.'),
+ 'Outer Ring': ('外环','外環','外側','바깥쪽 링'),
+ 'Middle Ring': ('中环','中環','中央','가운데 링'),
+ 'Inner Ring': ('内环','內環','内側','안쪽 링'),
+ 'Three rings use the left icon layout.': ('三环模式使用左侧图标布局。','三環模式使用左側圖示配置。','3つのリングではアイコンを左側に表示します。','링 3개 모드에서는 아이콘을 왼쪽에 표시합니다.'),
+})
+
+T['Metrics without a percentage are shown as values.'] = ('包含非百分比指标时以数值显示。','包含非百分比指標時以數值顯示。','割合のない項目を含む場合は数値で表示します。','백분율이 없는 지표가 포함되면 숫자로 표시합니다.')
+
+T['Windows and Linux show these indicators in the tray panel. The system tray keeps the TokenPlan icon.'] = ('Windows 和 Linux 在托盘面板中显示这些指标，系统托盘保留 TokenPlan 图标。','Windows 和 Linux 在系統匣面板中顯示這些指標，系統匣保留 TokenPlan 圖示。','Windows と Linux ではトレイパネルにこれらの項目を表示し、システムトレイには TokenPlan アイコンを表示します。','Windows와 Linux에서는 트레이 패널에 지표를 표시하고 시스템 트레이에는 TokenPlan 아이콘을 유지합니다.')

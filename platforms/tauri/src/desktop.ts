@@ -13,7 +13,7 @@ export const accountSchema = z.object({
  historyScope:z.enum(["device","account"]).default("account"),historyPartial:z.boolean().default(false),
  history:z.array(z.object({date:z.string(),tokens:z.number(),cost:n,models:z.array(z.object({model:z.string(),tokens:z.number(),cost:n,variants:z.array(z.object({model:z.string(),tokens:z.number(),cost:n})).default([])})).default([])})),
 });
-export const desktopSchema = z.object({schema:z.literal('tokenplan.desktop.v1'),accounts:z.array(accountSchema),settings:z.object({shortcutAvailable:z.boolean().default(true),notifications:z.tuple([z.boolean(),z.boolean(),z.boolean()]).default([false,false,false]),shortcut:z.string().default(""),showRemaining:z.boolean().default(false),appearance:z.enum(['system','light','dark']),language:z.string(),trayStyle:z.enum(['ring','percentage']),refreshMinutes:z.number(),autoRefresh:z.boolean(),autoUpdates:z.boolean().default(true)})});
+export const desktopSchema = z.object({schema:z.literal('tokenplan.desktop.v1'),accounts:z.array(accountSchema),settings:z.object({shortcutAvailable:z.boolean().default(true),notifications:z.tuple([z.boolean(),z.boolean(),z.boolean()]).default([false,false,false]),shortcut:z.string().default(""),showRemaining:z.boolean().default(false),appearance:z.enum(['system','light','dark']),language:z.string(),trayStyle:z.enum(['ring','percentage']),ringIconPosition:z.enum(['inside','left']).default('inside'),refreshMinutes:z.number(),autoRefresh:z.boolean(),autoUpdates:z.boolean().default(true)})});
 export type DesktopState=z.infer<typeof desktopSchema>;
 export type Account=z.infer<typeof accountSchema>;
 export type Metric=z.infer<typeof metricSchema>;

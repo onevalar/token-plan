@@ -120,6 +120,7 @@
 "Choose at most two tray metrics per account." = "每個帳號最多選擇兩項系統匣指標。";
 "Choose services and accounts to show. Hiding them keeps stars, overview and refresh unchanged." = "選擇顯示的服務和帳號。隱藏不會改變星號、總覽或重新整理。";
 "Choose the service's local folder, such as .claude or .codex, to read its login and usage history." = "選擇服務的本機資料夾（如 .claude 或 .codex），以讀取登入和用量記錄。";
+"Choose up to three menu bar metrics per account." = "每個帳號最多選擇三項選單列指標。";
 "Choose up to two items." = "最多選擇兩項。";
 "Choose what's visible and where" = "選擇要顯示哪些內容與位置";
 "Choose where each item appears. Menu Bar shows up to two values beside the app icon; uncheck one before choosing a replacement." = "顯示設定決定內容出現在首頁、詳細資訊或隱藏。勾選「選單列」可在 App 圖示旁顯示數值，最多兩項；更換時先取消一項。";
@@ -317,10 +318,13 @@
 "Home" = "首頁顯示";
 "Home Layout" = "首頁配置";
 "Horizontal Bar" = "橫條";
+"Icon Position" = "圖示位置";
 "Increase Transparency" = "增加透明度";
 "Individual Credits" = "個人餘額";
 "Info" = "資訊";
+"Inner Ring" = "內環";
 "Input" = "輸入";
+"Inside the Ring" = "圓環內";
 "Install Update" = "安裝更新";
 "Install and restart" = "安裝並重新啟動";
 "Installing update…" = "正在安裝更新…";
@@ -343,6 +347,7 @@
 "Last updated %@ ago" = "%@ 前更新";
 "Launch at Login" = "登入時啟動";
 "Left" = "剩餘";
+"Left of the Rings" = "圓環左側";
 "License" = "授權條款";
 "Light" = "淺色";
 "Limit %@" = "上限 %@";
@@ -379,6 +384,8 @@
 "Menu bar / system tray" = "選單列 / 系統匣";
 "Metric" = "指標";
 "Metrics" = "顯示指標";
+"Metrics without a percentage are shown as values." = "包含非百分比指標時以數值顯示。";
+"Middle Ring" = "中環";
 "Minutes" = "分鐘";
 "Model Breakdown" = "模型明細";
 "Monitor Your AI Subscriptions with TokenPlan" = "用 TokenPlan 監控你的 AI 訂閱";
@@ -463,6 +470,7 @@
 "Other Reported Tokens" = "其他已報告 Token";
 "Other Services" = "其他服務";
 "Outdated" = "已過期";
+"Outer Ring" = "外環";
 "Output" = "輸出";
 "Override With a Custom Key" = "以自訂金鑰覆寫";
 "Overview" = "概覽";
@@ -677,6 +685,8 @@
 "This saved account shares its login with a CLI. Open it in your account switcher to renew safely, then retry." = "此儲存帳號與 CLI 共用登入憑證。請在帳號切換工具中開啟該帳號以安全續期，然後重試。";
 "This service integration is not available in this build." = "此版本尚未支援這項服務。";
 "This shortcut is unavailable. Choose another combination." = "此快捷鍵無法使用，請選擇其他組合。";
+"Three metrics automatically place the icon on the left. Your selections are kept when switching styles." = "選擇三項指標時，圖示自動放在左側。切換樣式會保留所選指標。";
+"Three rings use the left icon layout." = "三環模式使用左側圖示配置。";
 "Time Format" = "時間格式";
 "Time Range" = "時間範圍";
 "Today" = "今天";
@@ -769,6 +779,7 @@
 "Will Run Out" = "將會用完";
 "Will reach limit" = "將達到上限";
 "Window" = "視窗";
+"Windows and Linux show these indicators in the tray panel. The system tray keeps the TokenPlan icon." = "Windows 和 Linux 在系統匣面板中顯示這些指標，系統匣保留 TokenPlan 圖示。";
 "Yesterday" = "昨天";
 "You are up to date." = "已是最新版本。";
 "You have no rate limit resets" = "你沒有可用的額度重置";
