@@ -179,6 +179,6 @@ jobs:
             platforms/tauri/transition/appcast.xml
             platforms/tauri/test-results/
             platforms/tauri/test-results-navigation/
-            platforms/tauri/tray-native-review.png
+            platforms/tauri/src-tauri/tray-native-review.png
           if-no-files-found: warn
       # Verification artifacts only. Published feeds require an approved stable version.

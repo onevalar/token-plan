@@ -4,6 +4,42 @@ The migration keeps the native provider engines and uses a shared React/Arc inte
 Tests use synthetic accounts, isolated preferences and disposable signing fixtures; they do
 not change the installed application or refresh real credentials.
 
+## Windows/Linux native tray and Ubuntu installer repair (2026-10-21)
+
+The source repair replaces the static Windows/Linux application icon with native account
+indicators. Regression coverage includes all pinned values in percentage mode, three rings,
+zero-use tracks, missing values, account removal/reordering, continuous numbering, and
+contrast on light/dark panels. Percentage text is fitted to the measured glyph width;
+Linux's fallback font exposed clipping that did not occur with the Mac/Windows fonts.
+
+Local checks passed: 27 Rust tests (one existing ignored test), the frontend build and unit
+tests, 28 Chromium interaction scenarios, and 63 navigation scenarios across the Mac,
+Windows and Linux browser projects. These browser projects exercise shared interactions;
+they do not constitute installed native Windows/Linux desktop acceptance.
+
+The cloud packaging check installs its actual production DEB over coexisting legacy
+`tokenplan` 1.0.0 and `token-plan` 2.0.4 fixtures on a disposable runner. It checks that only
+the current package remains installed, old commands forward to the new executable, one
+application entry is visible, and standard-size icons are installed. No user home directory
+is rewritten or purged.
+
+At source commit `1fd15db`, the Ubuntu 24.04 job in
+[run 39591089636](https://github.com/onevalar/token-plan/actions/runs/39591089636)
+passed the actual DEB installation/replacement check, AppImage update-signature
+verification, 27 Rust tests, Chromium/WebKit interactions (28 each), and the 21 Linux
+navigation scenarios. The same source passed the
+[macOS CI suite](https://github.com/onevalar/token-plan/actions/runs/39591063549).
+The Windows job in the same packaging run also passed: 27 Rust tests, 28 Chromium
+interaction scenarios, 21 navigation scenarios, installer generation, and verification
+of the actual updater signature against the application's public key.
+The subsequent artifact-path correction collects the render review PNG from Cargo's
+package working directory; it changes artifact collection only, not application code.
+
+Physical GNOME/KDE/Windows notification-area acceptance, including desktop-controlled
+spacing/order/overflow and pointer activation, remains separate from these automated
+checks. The installed Mac app and published 2.0.4 binaries are unchanged; this repair
+requires a newly approved release before it reaches normal downloads or auto-update.
+
 ## Desktop layout and tray repair after 2.0.2
 
 The 2.0.2 helper startup checks did not validate the complete interface. The reported
