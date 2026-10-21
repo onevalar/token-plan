@@ -1,7 +1,19 @@
 <?xml version='1.0' encoding='utf-8'?>
 <rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
     <channel>
-        <item><title>TokenPlan 2.0.3</title><sparkle:version>1792514291</sparkle:version><sparkle:shortVersionString>2.0.3</sparkle:shortVersionString><sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion><description>&lt;pre&gt;# TokenPlan 2.0.3
+        <item><title>TokenPlan 2.0.4</title><sparkle:version>1792577512</sparkle:version><sparkle:shortVersionString>2.0.4</sparkle:shortVersionString><sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion><description>&lt;pre&gt;# TokenPlan 2.0.4
+
+- 统一 macOS、Windows 和 Linux 的导航、账号详情、通用设置、服务配置和历史页面。子页面使用返回导航和对应操作，首页提供紧凑／宽松两种布局。
+- 优化环形用量显示：保留浅色完整轨道，支持图标位于圆环内或左侧，每个账号最多选择三项指标。三环时将账号编号放入圆环中心，缩短图标与圆环的间距；切换百分比样式仍保留全部选中指标。
+- Windows／Linux 的系统托盘保留 TokenPlan 图标，点击后的面板显示环形或百分比账号指标，原生托盘菜单显示所选用量。修复这两个平台自动刷新开关在重启后无法保持关闭的问题。
+- 改善账号备注和密钥编辑：保留当前运行期间未保存的草稿，增加保存状态与失败反馈，并优化键盘返回焦点、移除确认、小字号对比度和减少动态效果设置的响应。
+- 移除 iCloud 同步，使用本地历史数据；已有本地记录保留。
+- 重新构建 macOS、Windows 和 Linux 安装包，保留 macOS 1.0.12 经典版下载。
+
+## 更新说明
+
+2.x 用户可通过“检查更新”升级。Linux 应用内自动更新使用 AppImage，DEB 由包管理器升级。Windows／Linux 1.x 用户需手动安装一次 2.x。macOS 1.0.12 经典版仍可独立下载，建议与 2.x 择一运行。
+&lt;/pre&gt;</description><enclosure url="https://github.com/onevalar/token-plan/releases/download/v2.0.4/TokenPlan_2.0.4_universal.dmg" length="30324439" type="application/octet-stream" sparkle:edSignature="YHcO6ZAO03UiCrKUm0DXM9wjseC4JDZvPSYe4t/nQLnzklyITwAgQEL9VWzNmPXA6ZNwZ8TPvtH7Feo+IwgiBw==" /></item><item><title>TokenPlan 2.0.3</title><sparkle:version>1792514291</sparkle:version><sparkle:shortVersionString>2.0.3</sparkle:shortVersionString><sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion><description>&lt;pre&gt;# TokenPlan 2.0.3
 
 - 将默认面板从 480 收窄到 390，恢复菜单栏／托盘临时面板：不显示普通窗口标题栏和红黄绿按钮，点击面板外自动收起，再次点击托盘图标可开关面板。Linux 没有兼容托盘时保留可操作的普通窗口。
 - 修复 macOS 菜单栏图标刷新后丢失明暗适配、在深色背景下看不见的问题，并改善未固定指标账号的图标大小和空白。
