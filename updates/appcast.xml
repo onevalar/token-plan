@@ -1,7 +1,20 @@
 <?xml version='1.0' encoding='utf-8'?>
 <rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
     <channel>
-        <item><title>TokenPlan 2.0.5</title><sparkle:version>1792593411</sparkle:version><sparkle:shortVersionString>2.0.5</sparkle:shortVersionString><sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion><description>&lt;pre&gt;# TokenPlan 2.0.5
+        <item><title>TokenPlan 2.0.6</title><sparkle:version>1792598906</sparkle:version><sparkle:shortVersionString>2.0.6</sparkle:shortVersionString><sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion><description>&lt;pre&gt;# TokenPlan 2.0.6
+
+- 修复 macOS Codex 已在终端登录却被误报为未连接的问题：正确匹配文件和钥匙串中的账号身份，保留原账号及显示配置，避免混用不同账号的额度。
+- 完善账号连接诊断：区分身份暂未识别、当前连接其他账号、登录授权失效，以及目录权限、网络和服务限流问题；不再将无法读取登录信息统一提示为需要重新登录。
+- 重新检测后按账号展示结果、具体错误及是否读取到用量。macOS 检测后会接着刷新已启用账号，无需重启；检测和刷新继续遵守服务商限流。
+- 同步 Windows/Linux 的连接状态和错误处理，修正包括 Cursor 在内的文件或数据库读取错误提示。保留账号、备注、显示配置和历史文件；只有用户明确移除时才移除账号记录。
+- 重新构建 macOS、Windows、Linux 安装包，保留 macOS 1.0.12 经典版下载。
+
+## 更新说明
+
+2.x 用户可通过“检查更新”升级；Linux 应用内自动更新使用 AppImage，DEB 用户请下载安装新版 DEB。已在终端登录的 Codex 用户更新后先点击“重新检测账号”，不必先退出登录或重新添加账号。
+
+尚未识别到的旧账号可通过“连接已有配置目录”重新关联；确实需要授权时再使用官方登录引导。网络失败或限流无需重新登录。
+&lt;/pre&gt;</description><enclosure url="https://github.com/onevalar/token-plan/releases/download/v2.0.6/TokenPlan_2.0.6_universal.dmg" length="30423655" type="application/octet-stream" sparkle:edSignature="mnOJGmhuJO6QGrd+8mYLjKIyZwPoji2xpJRSCl4DJgSEOMUaL6AizqAfe/33l4ZcMrUTNoAExTNwqQGSL4obCA==" /></item><item><title>TokenPlan 2.0.5</title><sparkle:version>1792593411</sparkle:version><sparkle:shortVersionString>2.0.5</sparkle:shortVersionString><sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion><description>&lt;pre&gt;# TokenPlan 2.0.5
 
 - 首页面板高度随内容自适应：服务较少时自动缩短，内容较多时在可用屏幕范围内滚动。
 - 修复 Claude、Codex 已添加账号在登录失效、登录来源变化或重启后从界面消失的问题；保留账号记录、备注及显示配置，避免切换登录后将另一账号的用量写入原账号。
