@@ -7,7 +7,7 @@ export function useDesktop() {
  const alive=useRef(true);const initiallyRefreshed=useRef(false);
  const send=useCallback(async(request:Request)=>{
   setPending(n=>n+1);setError('');
-  try {const data=desktopSchema.parse(await invoke('desktop_request',{request}));if(alive.current)setState(data);}
+  try {const data=desktopSchema.parse(await invoke('desktop_request',{request}));if(alive.current)setState(data);return data;}
   catch(e){const code=typeof e==='string'?e:'invalid_response';if(alive.current)setError(code);throw new Error(code);}
   finally {if(alive.current)setPending(n=>Math.max(0,n-1));}
  },[]);

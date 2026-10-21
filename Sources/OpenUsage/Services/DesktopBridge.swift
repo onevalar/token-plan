@@ -172,7 +172,7 @@ public final class DesktopBridge {
             if let record = accounts.records.first(where: { $0.id == id }), !record.removedTombstone,
                observedIdentities[id] != record.identityKey {
                 return SavedAccountProjection.placeholder(record: record, enabled: enablement.isEnabled(id),
-                    tray: layout.isMenuBarAccountVisible(id) && layout.isMenuBarServiceVisible(id), note: notes.note(for: id))
+                    tray: layout.isMenuBarAccountVisible(id) && layout.isMenuBarServiceVisible(id), note: notes.note(for: id), differentAccount: observedIdentities.contains { ProviderAccountID.family(of: $0.key) == record.family && $0.value != record.identityKey })
             }
             guard let provider = registry.provider(id: id), !accounts.isRemoved(id) else { return nil }
             let snapshot = store.snapshots[id]
@@ -211,9 +211,10 @@ public final class DesktopBridge {
                 "plan": snapshot?.plan ?? "", "enabled": enablement.isEnabled(id),
                 "tray": layout.isMenuBarAccountVisible(id) && layout.isMenuBarServiceVisible(id),
                 "removable": accounts.records.contains { $0.id == id }, "apiKey": runtimes.first { $0.provider.id == id } is any APIKeyManaging,
+                "connection": observedIdentities[id] == nil ? "unchecked" : "available",
                 "note": notes.note(for: id), "metrics": metrics, "history": history,
                 "historyScope": "account", "historyPartial": !(snapshot?.usageHistory?.unknownModelsByDay.isEmpty ?? true),
-                "error": store.errorMessage(for: id) ?? store.warningMessage(for: id) ?? "",
+                "error": store.errorMessage(for: id) ?? "", "warning": store.warningMessage(for: id) ?? "",
                 "fetchedAt": snapshot.map { OpenUsageISO8601.string(from: $0.refreshedAt) } ?? ""
             ]
         }

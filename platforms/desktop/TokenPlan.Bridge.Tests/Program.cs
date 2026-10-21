@@ -59,6 +59,7 @@ try {
   var state=await Call(session,new{method="state"});
   var accounts=state.GetProperty("accounts").EnumerateArray().Where(a=>a.GetProperty("family").GetString()=="claude").ToArray();
   Assert(accounts.Length==2,"Switching preserves both account headings");
+  Assert(accounts.Single(a=>a.GetProperty("id").GetString()=="claude").GetProperty("connection").GetString()=="different_account","A switched identity is distinguished from an expired session");
   Assert(accounts.Single(a=>a.GetProperty("id").GetString()=="claude").GetProperty("note").GetString()=="first note","Old identity retains notes");
   remember.Invoke(session,[new ProviderResult("claude","Claude",null,"login unavailable")]);
   remember.Invoke(session,[new ProviderResult("claude","Claude",null,null,AccountKey:"claude:other-source",AccountEmail:"first@example.com",AccountIdentity:"first|org")]);
@@ -70,6 +71,7 @@ try {
  using(var session=new DesktopSession(switchFile)) {
   var state=await Call(session,new{method="state"});
   Assert(state.GetProperty("accounts").EnumerateArray().Count(a=>a.GetProperty("family").GetString()=="claude")==2,"Both accounts survive a process restart");
+  Assert(state.GetProperty("accounts").EnumerateArray().Where(a=>a.GetProperty("family").GetString()=="claude").All(a=>a.GetProperty("connection").GetString()=="unchecked"),"Restored headings require a check, not a premature login failure");
  }
  var registeredHome=Path.Combine(root,"registered");Directory.CreateDirectory(registeredHome);
  File.WriteAllText(Path.Combine(root,".tokenplan-account-directories.json"),JsonSerializer.Serialize(new Dictionary<string,string[]>{{"claude",[registeredHome]}}));

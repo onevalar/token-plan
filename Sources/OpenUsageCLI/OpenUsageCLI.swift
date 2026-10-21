@@ -18,7 +18,7 @@ struct OpenUsageCLI {
                        let object = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
                        object["method"] as? String == "discover" {
                         bridge = await DesktopBridge(defaults: defaults)
-                        FileHandle.standardOutput.write(await bridge.execute(Data(#"{"method":"state"}"#.utf8)))
+                        FileHandle.standardOutput.write(await bridge.execute(Data(#"{"method":"refresh"}"#.utf8)))
                     } else {
                         FileHandle.standardOutput.write(await bridge.execute(Data(line.utf8)))
                     }

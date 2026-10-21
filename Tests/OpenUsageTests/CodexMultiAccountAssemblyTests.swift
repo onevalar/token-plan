@@ -11,12 +11,13 @@ final class CodexMultiAccountAssemblyTests: XCTestCase {
         directories: [String: [String]] = [:],
         environment: [String: String] = [:],
         home: URL = Fixtures.home,
-        defaults: UserDefaults? = nil
+        defaults: UserDefaults? = nil,
+        keychain: KeychainAccessing = FakeKeychain()
     ) async -> ProviderAccountAssembly {
         let observer = DefaultAccountObserver(
             environment: FakeEnvironment(environment),
             files: files,
-            keychain: FakeKeychain(),
+            keychain: keychain,
             homeDirectory: { home }
         )
         return await ProviderAccountAssembly.make(
@@ -38,6 +39,23 @@ final class CodexMultiAccountAssemblyTests: XCTestCase {
             usageClient: CodexUsageClient(http: http),
             now: { now }
         )
+    }
+
+    func testSingleFileLoginWithUnusableKeychainRetainsSavedCardAndBindsIdentity() async {
+        let defaults = makeScratchDefaults()
+        let files = FakeFiles(["/Users/dev/.codex/auth.json": Fixtures.codexAuth(accountID: "ACCT-A", email: "alice@test")])
+        _ = await assemble(files: files, defaults: defaults)
+        let result = await assemble(files: files, defaults: defaults, keychain: FakeKeychain("unreadable-old-format"))
+        XCTAssertEqual(result.codexCards.map(\.id), ["codex"])
+        XCTAssertEqual(result.identityKeysByCard["codex"], "acct-a|alice@test")
+        XCTAssertEqual(ProviderAccountsStore(defaults: defaults).records.count, 1)
+        XCTAssertEqual(result.identityKeysByCard["codex"], ProviderAccountsStore(defaults: defaults).records.first?.identityKey)
+    }
+
+    func testSingleKeychainOnlyLoginIsBoundInsteadOfMarkedDisconnected() async {
+        let result = await assemble(files: FakeFiles([:]), keychain: FakeKeychain(Fixtures.codexAuth(accountID: "ACCT-A", email: "alice@test")))
+        XCTAssertEqual(result.codexCards.map(\.id), ["codex"])
+        XCTAssertEqual(result.identityKeysByCard["codex"], "acct-a|alice@test")
     }
 
     func testSwitchingTheOnlyLoginKeepsThePreviousAccountAndBindsTheNewRuntime() async {

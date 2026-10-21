@@ -40,7 +40,7 @@ public sealed partial class DesktopSession : IDisposable
                 {
                     _ = ProviderCatalog.Get(account.Id);
                     // Restored headings are not authenticated quota snapshots.
-                    results[account.SettingsKey] = new(account.Id, account.Name, null, "Account saved. Reconnect its login, then detect accounts again.", AccountKey: account.AccountKey, AccountEmail: account.AccountEmail, AccountIdentity: account.AccountIdentity);
+                    results[account.SettingsKey] = new(account.Id, account.Name, null, "Saved account. Refresh to check its current connection.", AccountKey: account.AccountKey, AccountEmail: account.AccountEmail, AccountIdentity: account.AccountIdentity);
                 }
             if (doc.RootElement.TryGetProperty("notifications", out var alerts)) { var flags = alerts.Deserialize<bool[]>(); if (flags?.Length == 3) notifications = flags; }
             if (doc.RootElement.TryGetProperty("shortcut", out var binding)) shortcut = binding.GetString() ?? "";

@@ -235,3 +235,13 @@ After completing browser/terminal authentication, return and detect again. If no
 can be opened, the same command is available to copy. Existing custom configuration
 directories can also be connected explicitly. Only their paths are stored in
 `~/.tokenplan-account-directories.json`; passwords and tokens are not copied into this registry.
+
+### Connection diagnosis
+
+Connection identity and the result of loading usage are separate. A saved account that
+cannot be attributed stays visible as unverified; a different active identity is reported
+separately. Neither case alone proves an expired credential. Network/rate-limit failures
+suggest retry, while file/database access failures suggest checking paths and permissions.
+Only authorization failures suggest signing in again. The Add Service detector lists each
+account's result and original error, rather than reporting generic success. Mac discovery
+also refreshes enabled accounts using the existing cache and provider cooldowns.

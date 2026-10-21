@@ -54,6 +54,8 @@
 "About TokenPlan" = "關於 TokenPlan";
 "Account" = "帳號";
 "Account Management" = "帳號管理";
+"Account identified. Enable it and refresh to load usage." = "帳號已辨識，啟用並重新整理後可讀取用量。";
+"Account kept. Its login could not be identified. Check the configuration directory and access permissions, then detect again." = "帳號已保留，但尚未辨識對應登入。請檢查設定目錄及存取權限後重新偵測。";
 "Account saved. Reconnect its login, then detect accounts again." = "帳號已保留。請重新連接登入後，再偵測帳號。";
 "Accounts follow the order in Service Configuration." = "帳號順序與服務設定保持一致。";
 "Activity" = "活動";
@@ -81,6 +83,8 @@
 "Amp is not logged in. Run amp login in Terminal, then refresh." = "Amp 尚未登入。請在終端機執行 amp login，然後重新整理。";
 "Amp usage failed. Run amp usage in Terminal to check your connection." = "Amp 用量讀取失敗。請在終端機執行 amp usage 檢查連線。";
 "Amp usage timed out. Check your connection and refresh." = "Amp 用量讀取逾時。請檢查連線後重新整理。";
+"Another account is connected." = "目前連線的是另一個帳號。";
+"Another account is currently connected. This saved account is kept; connect its configuration directory or sign in to it." = "目前連線的是另一個帳號。此帳號仍會保留，可連接其設定目錄或登入此帳號。";
 "Anthropic has temporarily limited usage queries. Data may be out of date." = "Anthropic 暫時限制了用量查詢，目前資料可能不是最新。";
 "Antigravity credentials are invalid. Open Antigravity or run `agy` to sign in again." = "Antigravity 憑證無效。請開啟 Antigravity 或執行 `agy` 重新登入。";
 "Antigravity sign-in expired. Open Antigravity or run `agy` to refresh." = "Antigravity 登入已過期。請開啟 Antigravity 或執行 `agy` 重新整理。";
@@ -202,6 +206,7 @@
 "Couldn't save the Z.ai API key." = "無法儲存 Z.ai 的 API 金鑰。";
 "Credits" = "額度";
 "Ctrl + Alt + U" = "Ctrl + Alt + U";
+"Current Account" = "目前帳號";
 "Current Quota" = "目前額度";
 "Cursor Models" = "Cursor 模型";
 "Cursor login changed during refresh. Refresh again for the current account." = "重新整理期間 Cursor 登入已變更，請再次重新整理目前帳號。";
@@ -232,9 +237,12 @@
 "Details Only" = "僅詳情";
 "Details only" = "僅詳細資料";
 "Detect Accounts" = "重新偵測帳號";
+"Detection Results" = "偵測結果";
+"Detection complete." = "偵測完成。";
 "Detection complete. Choose an account below or return to its details." = "偵測完成。可在下方選取帳號，或返回帳號詳情。";
 "Detects provider logins again without resetting your display preferences." = "重新偵測服務登入，不會重置顯示設定。";
 "Devin quota data unavailable. Try again later." = "Devin 額度資料暫時無法使用，請稍後再試。";
+"Directory not found or inaccessible. Check the full path and permissions." = "目錄不存在或無法存取，請檢查完整路徑及權限。";
 "Disabled" = "已停用";
 "Disabling a provider stops its requests. Its existing login remains unchanged." = "停用提供方後將停止請求，既有登入不受影響。";
 "Dismiss" = "關閉";
@@ -385,6 +393,8 @@
 "Login Complete — Detect Again" = "已完成登入，重新偵測";
 "Login Service" = "登入服務";
 "Login Source" = "登入來源";
+"Login authorization is required." = "需要完成登入授權。";
+"Login source needs checking." = "需要檢查登入來源。";
 "MTok" = "百萬 token";
 "Manage" = "管理";
 "Manage Providers" = "管理提供方";
@@ -433,6 +443,8 @@
 "No cost data for this period" = "這段期間沒有費用資料";
 "No cost-per-token data for this period" = "這段期間沒有單 token 費用資料";
 "No data" = "無資料";
+"No login or usage confirmed." = "尚未確認登入或用量。";
+"No matching account was identified. Check the directory and access permissions." = "未辨識到相符帳號，請檢查目錄及存取權限。";
 "No metrics to show" = "沒有可顯示的指標";
 "No providers are enabled." = "尚未啟用提供方。";
 "No quota data is available." = "暫無可用額度資料。";
@@ -607,7 +619,9 @@
 "Run devin auth login or sign in to Devin and try again." = "請執行 devin auth login 或登入 Devin 後再試。";
 "Save" = "儲存";
 "Saved" = "已儲存";
+"Saved account. Refresh to check its current connection." = "帳號已保留，重新整理後檢查目前連線。";
 "Saved accounts stay here when a login expires. Reconnect and detect again; no restart is needed." = "登入失效後帳號仍會保留。重新登入後再次偵測即可，無需重新啟動。";
+"Saved accounts stay here. Detect existing logins first; only sign in again when authorization is required." = "已儲存的帳號會保留。請先偵測現有登入，僅在需要授權時重新登入。";
 "Saved in App" = "已儲存在 App 中";
 "Saving…" = "正在儲存…";
 "Search Services" = "搜尋服務";
@@ -764,8 +778,10 @@
 "Usage Notifications" = "用量通知";
 "Usage Overview" = "用量總覽";
 "Usage Trend" = "用量趨勢";
+"Usage could not be read; see the details below." = "用量讀取失敗，請查看下方原因。";
 "Usage history could not be read. New readings will start a fresh history." = "無法讀取歷史記錄，新的讀數將重新建立記錄。";
 "Usage history could not be saved. Check the app data folder permissions." = "無法儲存歷史記錄，請檢查應用程式資料目錄的權限。";
+"Usage loaded." = "用量已讀取。";
 "Usage not available for API key." = "使用 API 金鑰登入時無法查看用量。";
 "Usage or login data could not be read. Check credential file permissions and format, then retry." = "無法讀取用量或登入資訊，請檢查憑證檔案的權限與格式後重試。";
 "Usage or login data could not be read. Sign in again." = "無法讀取用量或登入資訊，請重新登入。";
@@ -775,6 +791,7 @@
 "Usage request failed after refresh. Try again." = "重新整理後用量請求仍然失敗，請重試。";
 "Usage request failed. Check your connection." = "用量請求失敗，請檢查網路。";
 "Usage response invalid. Try again later." = "用量回應無效，請稍後再試。";
+"Usage temporarily unavailable; retry later." = "用量暫時無法讀取，請稍後重試。";
 "Use" = "使用";
 "Use Control, Alt or Command with another key." = "請使用 Control、Alt 或 Command 加其他按鍵。";
 "Use Credit" = "使用額度";

@@ -15,6 +15,7 @@ public sealed partial class DesktopSession
                 try
                 {
                     var fresh = await service.Refresh(provider, cancellation);
+                    var primaryIdentity = fresh.AccountIdentity;
                     fresh = RememberAccount(fresh);
                     lock (persistenceLock) ObserveQuota(fresh);
                     var extras = await service.RefreshAdditionalAccounts(provider, cancellation);
@@ -23,10 +24,10 @@ public sealed partial class DesktopSession
                         var remembered = RememberAccount(extra);
                         lock (persistenceLock) ObserveQuota(remembered);
                     }
-                    if (provider is "claude" or "codex") {
+                    if ((provider is "claude" or "codex") && (primaryIdentity != null || fresh.ErrorKey == null)) {
                         var identities = extras.Append(fresh).Select(a => a.AccountIdentity).Where(i => i != null).ToHashSet();
                         foreach (var saved in results.Values.Where(a => a.Id == provider && a.AccountIdentity != null && !identities.Contains(a.AccountIdentity)))
-                            results[saved.SettingsKey] = saved with { Snapshot = null, ErrorKey = "Account saved. Reconnect its login, then detect accounts again." };
+                            results[saved.SettingsKey] = saved with { Snapshot = null, ErrorKey = identities.Count > 0 ? "Another account is currently connected. This saved account is kept; connect its configuration directory or sign in to it." : "Account kept. Its login could not be identified. Check the configuration directory and access permissions, then detect again." };
                     }
                     await RefreshHistory(provider, cancellation);
                 }

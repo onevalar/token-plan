@@ -8,7 +8,7 @@ export const metricSchema = z.object({
 });
 export const accountSchema = z.object({
  id:z.string(), family:z.string(), name:z.string(), email:z.string(), plan:z.string(), enabled:z.boolean(), tray:z.boolean(), removable:z.boolean(), apiKey:z.boolean(),
- note:z.string(), error:z.string(), fetchedAt:z.string(), metrics:z.array(metricSchema),
+ warning:z.string().optional(), connection:z.string().optional(), note:z.string(), error:z.string(), fetchedAt:z.string(), metrics:z.array(metricSchema),
  observations:z.array(z.object({date:z.string(),label:z.string(),value:n,unit:z.string().nullable()})).default([]),
  historyScope:z.enum(["device","account"]).default("account"),historyPartial:z.boolean().default(false),
  history:z.array(z.object({date:z.string(),tokens:z.number(),cost:n,models:z.array(z.object({model:z.string(),tokens:z.number(),cost:n,variants:z.array(z.object({model:z.string(),tokens:z.number(),cost:n})).default([])})).default([])})),
@@ -18,7 +18,7 @@ export type DesktopState=z.infer<typeof desktopSchema>;
 export type Account=z.infer<typeof accountSchema>;
 export type Metric=z.infer<typeof metricSchema>;
 export type Request={method:string;accountId?:string;metricId?:string;value?:unknown};
-export type Send=(request:Request)=>Promise<void>;
+export type Send=(request:Request)=>Promise<DesktopState|void>;
 export function trayAccounts(accounts:Account[]) {
  const shown=accounts.filter(a=>a.enabled&&a.tray);
  const counts=new Map<string,number>();const indices=new Map<string,number>();

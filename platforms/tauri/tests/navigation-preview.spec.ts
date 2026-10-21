@@ -370,7 +370,7 @@ test('account setup guides isolated login and detection without restarting',asyn
  await page.getByRole('button',{name:'连接已有配置目录',exact:true}).click();
  await page.getByRole('textbox',{name:'配置目录',exact:true}).fill('invalid');
  await page.getByRole('button',{name:'连接并检测',exact:true}).click();
- await expect(visible(page).getByRole('alert').filter({hasText:'操作未完成'})).toBeVisible();
+ await expect(visible(page).getByRole('alert').filter({hasText:'目录不存在或无法访问'})).toBeVisible();
  await page.getByRole('textbox',{name:'配置目录',exact:true}).fill('/custom/account');
  await page.getByRole('button',{name:'连接并检测',exact:true}).click();
  await expect(visible(page).getByRole('status')).toContainText('检测完成');
@@ -387,4 +387,30 @@ test('unavailable saved account remains configurable and offers reconnect guidan
  await page.getByRole('button',{name:'设置',exact:true}).click();
  await expect(page.getByRole('textbox',{name:'备注',exact:true})).toBeVisible();
  await noOverflow(page);
+});
+
+
+test('detection reports per-account outcomes and network failures do not request login',async({page})=>{
+ const data=largeDesktop();data.accounts[0].error='The connection timed out. Try again later.';
+ data.accounts[1].error='Another account is currently connected. This saved account is kept; connect its configuration directory or sign in to it.';
+ data.accounts[1].connection='different_account';
+ await setup(page,data);
+ await visible(page).locator('.dashboard').getByRole('button',{name:`Claude ${data.accounts[0].email}`,exact:true}).click();
+ await expect(visible(page).getByRole('button',{name:'登录新账号',exact:true})).toHaveCount(0);
+ await back(page);await menu(page,'服务配置');await page.getByRole('button',{name:'添加服务',exact:true}).click();
+ await page.getByRole('button',{name:'重新检测账号',exact:true}).click();
+ const results=visible(page).getByRole('list',{name:'检测结果'});
+ await expect(results).toContainText(data.accounts[0].email);
+ await expect(results).toContainText('用量暂时无法读取，请稍后重试。');
+ await expect(results).toContainText('当前连接的是另一个账号。');
+ await noOverflow(page);
+});
+
+test('background history notices retain quota without a reconnect prompt',async({page})=>{
+ const data=largeDesktop();const a=data.accounts[0];a.error='';a.warning='Local token history is still updating.';
+ await setup(page,data);
+ await visible(page).locator('.dashboard').getByRole('button',{name:`Claude ${a.email}`,exact:true}).click();
+ await expect(visible(page).getByRole('button',{name:'登录新账号',exact:true})).toHaveCount(0);
+ await expect(visible(page).getByRole('progressbar').first()).toBeVisible();
+ await expect(visible(page).locator('.group-description').filter({hasText:'历史'}).first()).toBeVisible();
 });

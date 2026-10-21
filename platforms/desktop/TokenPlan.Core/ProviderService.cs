@@ -102,13 +102,13 @@ public sealed partial class ProviderService : IDisposable
             return await RefreshOAuth(id, operationToken);
         }
         catch (ProviderFailure e) { return Fail(e.Message == "Your session has expired. Sign in with the CLI again." && id == "cursor" ? "Your Cursor session has expired. Sign in with Cursor again." : e.Message); }
-        catch (Microsoft.Data.Sqlite.SqliteException) { return Fail(id == "cursor" ? "Cursor login could not be read. Open Cursor and sign in again." : "Usage or login data could not be read. Sign in again."); }
+        catch (Microsoft.Data.Sqlite.SqliteException) { return Fail("Usage or login data could not be read. Check credential file permissions and format, then retry."); }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (OperationCanceledException) { return Fail(id is "claude" or "codex" ? NetworkTimeout : "The connection timed out. Try again later."); }
         catch (HttpRequestException e) { return Fail(NetworkError(e)); }
         catch (Exception e) when (e is JsonException or InvalidDataException or FormatException or ArgumentException or IOException or UnauthorizedAccessException or InvalidOperationException or CryptographicException)
         {
-            return Fail(id is "claude" or "codex" ? "Usage or login data could not be read. Check credential file permissions and format, then retry." : "Usage or login data could not be read. Sign in again.");
+            return Fail("Usage or login data could not be read. Check credential file permissions and format, then retry.");
         }
     }
     CancellationTokenSource OptionalMetadataDeadline(CancellationToken cancellation)

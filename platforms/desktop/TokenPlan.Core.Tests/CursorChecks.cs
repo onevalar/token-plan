@@ -90,7 +90,7 @@ static class CursorChecks
         check(CursorAuth.Load(database, CancellationToken.None) == null, "Empty desktop access token is not treated as connected");
         await File.WriteAllTextAsync(database, "not a database");
         using (var service = Service(database, new Stub((_, _) => throw new Exception("Corrupt DB dispatched"))))
-            check((await service.Refresh("cursor", CancellationToken.None)).ErrorKey == "Cursor login could not be read. Open Cursor and sign in again.", "Corrupt database produces a friendly logged error");
+            check((await service.Refresh("cursor", CancellationToken.None)).ErrorKey == "Usage or login data could not be read. Check credential file permissions and format, then retry.", "Corrupt database reports a read failure rather than falsely asking for sign-in");
         ProviderService Service(string db, HttpMessageHandler handler) => new(root, root, handler, (_, _) => {}, cursorDatabase: db);
     }
     static HttpResponseMessage Json(string body) => new(HttpStatusCode.OK) { Content = new StringContent(body, Encoding.UTF8, "application/json") };

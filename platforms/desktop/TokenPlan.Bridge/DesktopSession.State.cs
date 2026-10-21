@@ -15,6 +15,7 @@ public sealed partial class DesktopSession
         settings = new { notifications, shortcut, showRemaining = preferences.ShowRemaining, locale = System.Globalization.CultureInfo.CurrentUICulture.Name, appearance = preferences.Appearance, language = preferences.Language, trayStyle, ringIconPosition, autoUpdates, refreshMinutes = preferences.RefreshMinutes, autoRefresh = preferences.AutoRefresh },
         accounts = Accounts().Select(a => new {
             id = a.SettingsKey, family = a.Id, name = ProviderCatalog.Get(a.Id).Name,
+            connection = a.ErrorKey == "Saved account. Refresh to check its current connection." ? "unchecked" : a.ErrorKey?.StartsWith("Another account is currently connected.") == true ? "different_account" : a.ErrorKey?.StartsWith("Account kept.") == true ? "unverified" : a.AccountIdentity != null ? "available" : "unchecked",
             email = a.AccountEmail ?? "", plan = a.Snapshot?.Plan ?? "",
             enabled = preferences.IsEnabled(a.Id) && preferences.AccountVisibility.GetValueOrDefault(a.SettingsKey, true),
             tray = preferences.TrayServices.GetValueOrDefault(a.Id, true) && preferences.TrayAccounts.GetValueOrDefault(a.SettingsKey, true),

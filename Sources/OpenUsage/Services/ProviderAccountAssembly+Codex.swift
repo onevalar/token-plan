@@ -74,7 +74,13 @@ extension ProviderAccountAssembly {
                 $0.key == record.identityKey || $0.accountID == record.identityKey
             }
         }
-        guard !swaps.isEmpty || hasEstablishedAccounts || hasDifferentSavedAccount || knownIdentities.count > 1 else {
+        // The legacy plain observer deliberately refuses attribution whenever a keychain
+        // item may exist. Bind even one discovered identity here, so a valid file login
+        // is not discarded by that fallback. Scoped auth still rejects other accounts.
+        let needsKeychainBinding = await loadOffMainActor {
+            observer.keychain.genericPasswordExists(service: CodexAuthStore.keychainService) != false
+        }
+        guard !swaps.isEmpty || hasEstablishedAccounts || hasDifferentSavedAccount || needsKeychainBinding || knownIdentities.count > 1 else {
             let plainHomes = homeLogins.map(\.home).filter { !configuredHomes.contains($0) }
             return CodexAccountDiscovery(
                 plainAuthHomes: plainHomes,

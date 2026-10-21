@@ -54,6 +54,8 @@
 "About TokenPlan" = "TokenPlan について";
 "Account" = "アカウント";
 "Account Management" = "アカウント管理";
+"Account identified. Enable it and refresh to load usage." = "アカウントを識別しました。有効にして更新すると使用量を取得できます。";
+"Account kept. Its login could not be identified. Check the configuration directory and access permissions, then detect again." = "アカウントは保持されています。対応するログインを識別できません。設定ディレクトリとアクセス権を確認して再検出してください。";
 "Account saved. Reconnect its login, then detect accounts again." = "アカウントは保存されています。再ログインしてから再検出してください。";
 "Accounts follow the order in Service Configuration." = "アカウントはサービス設定と同じ順序で表示されます。";
 "Activity" = "アクティビティ";
@@ -81,6 +83,8 @@
 "Amp is not logged in. Run amp login in Terminal, then refresh." = "Ampにログインしていません。ターミナルでamp loginを実行してから更新してください。";
 "Amp usage failed. Run amp usage in Terminal to check your connection." = "Ampの使用量を取得できません。ターミナルでamp usageを実行し、接続を確認してください。";
 "Amp usage timed out. Check your connection and refresh." = "Ampの使用量取得がタイムアウトしました。接続を確認してから更新してください。";
+"Another account is connected." = "別のアカウントが接続されています。";
+"Another account is currently connected. This saved account is kept; connect its configuration directory or sign in to it." = "別のアカウントが接続されています。保存済みアカウントの設定ディレクトリを接続するか、そのアカウントにログインしてください。";
 "Anthropic has temporarily limited usage queries. Data may be out of date." = "Anthropic が使用量の照会を一時的に制限しています。データが最新でない可能性があります。";
 "Antigravity credentials are invalid. Open Antigravity or run `agy` to sign in again." = "Antigravity の認証情報が無効です。Antigravity を開くか `agy` を実行して再度サインインしてください。";
 "Antigravity sign-in expired. Open Antigravity or run `agy` to refresh." = "Antigravity のサインインの有効期限が切れました。Antigravity を開くか `agy` を実行して更新してください。";
@@ -202,6 +206,7 @@
 "Couldn't save the Z.ai API key." = "Z.ai の API キーを保存できませんでした。";
 "Credits" = "クレジット";
 "Ctrl + Alt + U" = "Ctrl + Alt + U";
+"Current Account" = "現在のアカウント";
 "Current Quota" = "現在の使用枠";
 "Cursor Models" = "Cursor モデル";
 "Cursor login changed during refresh. Refresh again for the current account." = "更新中に Cursor のログインが変更されました。現在のアカウントで再度更新してください。";
@@ -232,9 +237,12 @@
 "Details Only" = "詳細のみ";
 "Details only" = "詳細のみ";
 "Detect Accounts" = "アカウントを再検出";
+"Detection Results" = "検出結果";
+"Detection complete." = "検出が完了しました。";
 "Detection complete. Choose an account below or return to its details." = "検出が完了しました。下から選択するか、アカウント詳細に戻ってください。";
 "Detects provider logins again without resetting your display preferences." = "表示設定をリセットせずにログインを再検出します。";
 "Devin quota data unavailable. Try again later." = "Devin の上限データを取得できません。後でもう一度お試しください。";
+"Directory not found or inaccessible. Check the full path and permissions." = "ディレクトリが存在しないかアクセスできません。フルパスと権限を確認してください。";
 "Disabled" = "無効";
 "Disabling a provider stops its requests. Its existing login remains unchanged." = "プロバイダーを無効にするとリクエストが停止します。既存のログインは変更されません。";
 "Dismiss" = "閉じる";
@@ -385,6 +393,8 @@
 "Login Complete — Detect Again" = "ログイン完了・再検出";
 "Login Service" = "ログインするサービス";
 "Login Source" = "ログイン元";
+"Login authorization is required." = "ログイン認証が必要です。";
+"Login source needs checking." = "ログイン元の確認が必要です。";
 "MTok" = "百万トークン";
 "Manage" = "管理";
 "Manage Providers" = "プロバイダーの管理";
@@ -433,6 +443,8 @@
 "No cost data for this period" = "この期間のコストデータはありません";
 "No cost-per-token data for this period" = "この期間のトークン単価データはありません";
 "No data" = "データなし";
+"No login or usage confirmed." = "ログインまたは使用量をまだ確認できません。";
+"No matching account was identified. Check the directory and access permissions." = "一致するアカウントが見つかりません。ディレクトリとアクセス権を確認してください。";
 "No metrics to show" = "表示する指標がありません";
 "No providers are enabled." = "有効なプロバイダーがありません。";
 "No quota data is available." = "利用可能な割り当てデータがありません。";
@@ -607,7 +619,9 @@
 "Run devin auth login or sign in to Devin and try again." = "devin auth login を実行するか Devin にサインインしてから、もう一度お試しください。";
 "Save" = "保存";
 "Saved" = "保存しました";
+"Saved account. Refresh to check its current connection." = "アカウントは保存されています。更新して接続を確認してください。";
 "Saved accounts stay here when a login expires. Reconnect and detect again; no restart is needed." = "ログインが失効してもアカウントは保持されます。再ログイン後に再検出してください。再起動は不要です。";
+"Saved accounts stay here. Detect existing logins first; only sign in again when authorization is required." = "保存済みアカウントは保持されます。既存のログインを検出し、認証が必要な場合のみ再ログインしてください。";
 "Saved in App" = "アプリに保存済み";
 "Saving…" = "保存中…";
 "Search Services" = "サービスを検索";
@@ -764,8 +778,10 @@
 "Usage Notifications" = "使用量の通知";
 "Usage Overview" = "使用量の概要";
 "Usage Trend" = "使用量の推移";
+"Usage could not be read; see the details below." = "使用量を読み取れません。以下の詳細を確認してください。";
 "Usage history could not be read. New readings will start a fresh history." = "履歴を読み込めませんでした。新しい取得結果から履歴を作り直します。";
 "Usage history could not be saved. Check the app data folder permissions." = "履歴を保存できませんでした。アプリのデータフォルダーのアクセス権を確認してください。";
+"Usage loaded." = "使用量を取得しました。";
 "Usage not available for API key." = "API キーでは使用量を取得できません。";
 "Usage or login data could not be read. Check credential file permissions and format, then retry." = "使用量またはログイン情報を読み取れません。認証ファイルの権限と形式を確認して再試行してください。";
 "Usage or login data could not be read. Sign in again." = "使用状況またはログイン情報を読み取れません。再ログインしてください。";
@@ -775,6 +791,7 @@
 "Usage request failed after refresh. Try again." = "更新後も使用量のリクエストに失敗しました。もう一度お試しください。";
 "Usage request failed. Check your connection." = "使用量のリクエストに失敗しました。接続を確認してください。";
 "Usage response invalid. Try again later." = "使用量の応答が無効です。後でもう一度お試しください。";
+"Usage temporarily unavailable; retry later." = "使用量は一時的に取得できません。後で再試行してください。";
 "Use" = "使用";
 "Use Control, Alt or Command with another key." = "Control、Alt、Commandと別のキーを組み合わせてください。";
 "Use Credit" = "クレジットを使用";

@@ -176,3 +176,6 @@
 .mac-preview .account-onboarding { margin-bottom:16px; }
 .mac-preview .account-onboarding .onboarding-actions { display:flex;gap:8px;flex-wrap:wrap;margin-block:10px; }
 .mac-preview .login-command { display:block;white-space:pre-wrap;overflow-wrap:anywhere;font-size:11px;padding:10px;background:var(--surface);border:1px solid var(--border);border-radius:8px; }
+.mac-preview .detection-results { padding:0;list-style:none;margin:10px 0; }
+.mac-preview .detection-results li { display:grid;gap:4px;padding:10px 0;border-top:1px solid var(--border);overflow-wrap:anywhere;font-size:12px; }
+.mac-preview .detection-results small { color:var(--text-secondary);line-height:1.5; }

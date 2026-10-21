@@ -29,12 +29,13 @@ enum SavedAccountProjection {
         return ordered + ids.filter { !ordered.contains($0) }
     }
 
-    static func placeholder(record: ProviderAccountRecord, enabled: Bool, tray: Bool, note: String) -> [String: Any] {
+    static func placeholder(record: ProviderAccountRecord, enabled: Bool, tray: Bool, note: String, differentAccount: Bool = false) -> [String: Any] {
         ["id": record.id, "family": record.family, "name": record.family == "claude" ? "Claude" : "Codex",
          "email": ProviderAccountAssembly.accountEmail(from: record.label) ?? record.label ?? "",
          "plan": "", "enabled": enabled, "tray": tray, "removable": true, "apiKey": false,
          "note": note, "metrics": [[String: Any]](), "history": [[String: Any]](),
          "historyScope": "account", "historyPartial": false,
-         "error": "Account saved. Reconnect its login, then detect accounts again.", "fetchedAt": ""]
+         "connection": differentAccount ? "different_account" : "unverified",
+         "error": differentAccount ? "Another account is currently connected. This saved account is kept; connect its configuration directory or sign in to it." : "Account kept. Its login could not be identified. Check the configuration directory and access permissions, then detect again.", "fetchedAt": ""]
     }
 }

@@ -234,3 +234,31 @@ WebKit and the Windows/Linux Chromium configurations (including a targeted rerun
 correcting ambiguous test selectors). Native terminal login completion on actual
 Windows/Linux desktops remains a separate acceptance check; browser platform variants
 verify the shared UI rather than installed operating systems.
+
+### Codex reconnect correction after 2.0.5
+
+A saved single Codex account could be shown as disconnected when a Keychain item existed
+(or its presence could not be verified), even though `auth.json` identified the same
+account. The legacy plain observer intentionally leaves this case unresolved to avoid
+misattribution. Account assembly now binds the discovered identity to a scoped runtime
+in this case, including a Keychain-only login; it preserves the existing card ID and
+continues rejecting credentials for another account. Regression fixtures cover a valid
+file with an unusable Keychain entry and a Keychain-only login. This correction is not
+included in the already published 2.0.5 installers.
+
+The 2.0.6 correction adds explicit connection attribution in both bridges and the shared
+protocol. UI regression checks distinguish network failure, access problems, expired login,
+usage loaded and another active account. Keychain probing runs off the main thread, with
+existing cross-account rejection tests retained. Windows/Linux database/file exceptions
+no longer automatically tell users to sign in again. Local checks include the full Swift
+suite, .NET core/bridge checks, Rust, and three-platform browser interaction tests.
+
+Final local verification for 2.0.6: 1,581 Swift XCTest cases (five skipped), six CLI tests,
+three Swift Testing cases, 523 .NET core checks, bridge integration checks, 29 Rust tests
+(one ignored), 14 frontend unit tests, eight packaging-script tests, and 78 browser
+navigation scenarios including targeted reruns. An isolated preferences suite was also
+used against the user's existing Codex login: the saved card was attributed correctly
+and three usage metrics were returned. No installed application was replaced. A separate
+nonfatal local-history notice is now carried as `warning`, rather than reported as a
+connection error. Synthetic fixtures cover incorrect-account rejection and reconnect UI;
+real Windows/Linux terminal OAuth completion is not claimed by browser tests.

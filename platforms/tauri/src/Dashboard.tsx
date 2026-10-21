@@ -32,7 +32,7 @@ export function Dashboard({accounts,open,now,language,missing,remaining}:{accoun
     </div>
     <Button size="sm" className="detail-button" variant="ghost" aria-label={`${a.name} ${a.email}`} onClick={()=>open(a.id)}><ChevronRight size={18}/></Button>
    </div>
-   {a.error&&<p role="status" className="notice">{providerText(a.error,language)}</p>}
+   {(a.error||a.warning)&&<p role="status" className="notice">{providerText(a.error||a.warning||"",language)}</p>}
    {a.metrics.filter(m=>m.placement==='home').map(m=><MetricRow key={m.id} metric={m} now={now} missing={missing} language={language} remaining={remaining}/>)}
   </div>)}
  </section>)}</div>;

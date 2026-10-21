@@ -54,6 +54,8 @@
 "About TokenPlan" = "TokenPlan 정보";
 "Account" = "계정";
 "Account Management" = "계정 관리";
+"Account identified. Enable it and refresh to load usage." = "계정을 확인했습니다. 활성화하고 새로 고치면 사용량을 읽을 수 있습니다.";
+"Account kept. Its login could not be identified. Check the configuration directory and access permissions, then detect again." = "계정은 유지됩니다. 해당 로그인을 확인하지 못했습니다. 설정 디렉터리와 접근 권한을 확인한 뒤 다시 검색하세요。";
 "Account saved. Reconnect its login, then detect accounts again." = "계정이 저장되어 있습니다. 다시 로그인한 후 계정을 검색하세요.";
 "Accounts follow the order in Service Configuration." = "계정은 서비스 설정과 같은 순서로 표시됩니다.";
 "Activity" = "활동";
@@ -81,6 +83,8 @@
 "Amp is not logged in. Run amp login in Terminal, then refresh." = "Amp에 로그인하지 않았습니다. 터미널에서 amp login을 실행한 뒤 새로고침하세요.";
 "Amp usage failed. Run amp usage in Terminal to check your connection." = "Amp 사용량을 가져오지 못했습니다. 터미널에서 amp usage를 실행하여 연결을 확인하세요.";
 "Amp usage timed out. Check your connection and refresh." = "Amp 사용량 요청 시간이 초과되었습니다. 연결을 확인한 뒤 새로고침하세요.";
+"Another account is connected." = "다른 계정이 연결되어 있습니다.";
+"Another account is currently connected. This saved account is kept; connect its configuration directory or sign in to it." = "현재 다른 계정이 연결되어 있습니다. 저장된 계정의 설정 디렉터리를 연결하거나 해당 계정으로 로그인하세요.";
 "Anthropic has temporarily limited usage queries. Data may be out of date." = "Anthropic이 사용량 조회를 일시적으로 제한했습니다. 데이터가 최신이 아닐 수 있습니다.";
 "Antigravity credentials are invalid. Open Antigravity or run `agy` to sign in again." = "Antigravity 자격 증명이 올바르지 않습니다. Antigravity를 열거나 `agy`를 실행해 다시 로그인하세요.";
 "Antigravity sign-in expired. Open Antigravity or run `agy` to refresh." = "Antigravity 로그인이 만료되었습니다. Antigravity를 열거나 `agy`를 실행해 갱신하세요.";
@@ -202,6 +206,7 @@
 "Couldn't save the Z.ai API key." = "Z.ai API 키를 저장하지 못했습니다.";
 "Credits" = "크레딧";
 "Ctrl + Alt + U" = "Ctrl + Alt + U";
+"Current Account" = "현재 계정";
 "Current Quota" = "현재 할당량";
 "Cursor Models" = "Cursor 모델";
 "Cursor login changed during refresh. Refresh again for the current account." = "새로고침 중 Cursor 로그인이 변경되었습니다. 현재 계정으로 다시 새로고침하세요.";
@@ -232,9 +237,12 @@
 "Details Only" = "상세만";
 "Details only" = "상세만";
 "Detect Accounts" = "계정 다시 검색";
+"Detection Results" = "검색 결과";
+"Detection complete." = "검색이 완료되었습니다.";
 "Detection complete. Choose an account below or return to its details." = "검색이 완료되었습니다. 아래에서 계정을 선택하거나 계정 상세로 돌아가세요.";
 "Detects provider logins again without resetting your display preferences." = "표시 설정을 초기화하지 않고 서비스 로그인을 다시 감지합니다.";
 "Devin quota data unavailable. Try again later." = "Devin 한도 데이터를 사용할 수 없습니다. 나중에 다시 시도하세요.";
+"Directory not found or inaccessible. Check the full path and permissions." = "디렉터리가 없거나 접근할 수 없습니다. 전체 경로와 권한을 확인하세요.";
 "Disabled" = "사용 안 함";
 "Disabling a provider stops its requests. Its existing login remains unchanged." = "제공업체를 사용하지 않으면 요청이 중지됩니다. 기존 로그인은 변경되지 않습니다.";
 "Dismiss" = "닫기";
@@ -385,6 +393,8 @@
 "Login Complete — Detect Again" = "로그인 완료 — 다시 검색";
 "Login Service" = "로그인 서비스";
 "Login Source" = "로그인 출처";
+"Login authorization is required." = "로그인 인증이 필요합니다.";
+"Login source needs checking." = "로그인 소스를 확인해야 합니다.";
 "MTok" = "백만 토큰";
 "Manage" = "관리";
 "Manage Providers" = "제공업체 관리";
@@ -433,6 +443,8 @@
 "No cost data for this period" = "이 기간의 비용 데이터가 없습니다";
 "No cost-per-token data for this period" = "이 기간의 토큰당 비용 데이터가 없습니다";
 "No data" = "데이터 없음";
+"No login or usage confirmed." = "로그인 또는 사용량을 아직 확인하지 못했습니다.";
+"No matching account was identified. Check the directory and access permissions." = "일치하는 계정을 찾지 못했습니다. 디렉터리와 접근 권한을 확인하세요.";
 "No metrics to show" = "표시할 지표가 없습니다";
 "No providers are enabled." = "사용 중인 제공업체가 없습니다.";
 "No quota data is available." = "사용 가능한 할당량 데이터가 없습니다.";
@@ -607,7 +619,9 @@
 "Run devin auth login or sign in to Devin and try again." = "devin auth login을 실행하거나 Devin에 로그인한 뒤 다시 시도하세요.";
 "Save" = "저장";
 "Saved" = "저장됨";
+"Saved account. Refresh to check its current connection." = "계정이 저장되어 있습니다. 새로 고쳐 현재 연결을 확인하세요.";
 "Saved accounts stay here when a login expires. Reconnect and detect again; no restart is needed." = "로그인이 만료되어도 계정은 유지됩니다. 다시 로그인한 후 검색하세요. 재시작은 필요 없습니다.";
+"Saved accounts stay here. Detect existing logins first; only sign in again when authorization is required." = "저장된 계정은 유지됩니다. 기존 로그인을 먼저 검색하고 인증이 필요할 때만 다시 로그인하세요.";
 "Saved in App" = "앱에 저장됨";
 "Saving…" = "저장 중…";
 "Search Services" = "서비스 검색";
@@ -764,8 +778,10 @@
 "Usage Notifications" = "사용량 알림";
 "Usage Overview" = "사용량 개요";
 "Usage Trend" = "사용량 추세";
+"Usage could not be read; see the details below." = "사용량을 읽지 못했습니다. 아래 세부 정보를 확인하세요.";
 "Usage history could not be read. New readings will start a fresh history." = "기록을 읽을 수 없습니다. 새로운 조회 결과부터 기록을 다시 시작합니다.";
 "Usage history could not be saved. Check the app data folder permissions." = "기록을 저장할 수 없습니다. 앱 데이터 폴더 권한을 확인하세요.";
+"Usage loaded." = "사용량을 읽었습니다.";
 "Usage not available for API key." = "API 키로는 사용량을 확인할 수 없습니다.";
 "Usage or login data could not be read. Check credential file permissions and format, then retry." = "사용량 또는 로그인 정보를 읽을 수 없습니다. 인증 파일의 권한과 형식을 확인한 후 다시 시도하세요.";
 "Usage or login data could not be read. Sign in again." = "사용량 또는 로그인 정보를 읽을 수 없습니다. 다시 로그인하세요.";
@@ -775,6 +791,7 @@
 "Usage request failed after refresh. Try again." = "새로고침 후에도 사용량 요청에 실패했습니다. 다시 시도하세요.";
 "Usage request failed. Check your connection." = "사용량 요청에 실패했습니다. 연결을 확인하세요.";
 "Usage response invalid. Try again later." = "사용량 응답이 올바르지 않습니다. 나중에 다시 시도하세요.";
+"Usage temporarily unavailable; retry later." = "사용량을 일시적으로 읽을 수 없습니다. 나중에 다시 시도하세요.";
 "Use" = "사용";
 "Use Control, Alt or Command with another key." = "Control, Alt 또는 Command와 다른 키를 함께 누르세요.";
 "Use Credit" = "크레딧 사용";
