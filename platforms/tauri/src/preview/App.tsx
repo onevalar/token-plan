@@ -75,6 +75,8 @@ export function DesktopApp() {
   const tick=setInterval(()=>{if(!document.hidden)setNow(Date.now());},30_000);
   return()=>clearInterval(tick);
  },[]);
+ // Fresh data must render against the current time; otherwise reset countdowns wait for the next 30-second tick.
+ useEffect(()=>{setNow(Date.now());},[state]);
  useEffect(()=>{
   document.documentElement.lang=language;
   document.documentElement.dataset.macPreview='true';

@@ -606,6 +606,19 @@ test('manual refresh spins the button, prevents duplicate requests, and reports 
  await expect(button).toHaveAttribute('aria-busy','false');
 });
 
+test('manual refresh shows reset countdowns against the time the data arrived',async({page})=>{
+ // The first session resets three hours after 10:00. Jumping the clock does not fire the page's 30-second tick, so only the refresh itself can update the countdown.
+ const start=new Date('2026-10-25T10:00:00Z');
+ await page.clock.install({time:start});
+ await setup(page,largeDesktop(start));
+ const reset=page.locator('.dashboard .reset').first(),status=page.locator('.refresh-status');
+ await expect(reset).toHaveText('3h');
+ await page.clock.setSystemTime(new Date('2026-10-25T10:20:00Z'));
+ await page.getByRole('button',{name:'刷新',exact:true}).click();
+ await expect(status).toHaveText('已刷新');
+ await expect(reset).toHaveText('2h 40m');
+});
+
 test('reduced motion keeps the busy state without spinning and other actions do not spin refresh',async({page})=>{
  await setup(page);await page.emulateMedia({reducedMotion:'reduce'});
  await page.evaluate(()=>{(window as any).__beforeRefresh=()=>new Promise<void>(resolve=>{(window as any).__finishRefresh=resolve;});});
