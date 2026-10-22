@@ -44,10 +44,12 @@ p { margin:8px 0; }
 .metric:not(.text-metric) .metric-name { text-align:left; }
 .metric-meter { position:relative;display:flex;align-items:center;min-width:0; }
 /* Caption occupies the track column's existing inter-row space, never a second row. */
-.metric-scope { position:absolute;inset-inline:0;bottom:calc(100% + 2px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:var(--text-xs);line-height:1;font-weight:400;color:var(--text-muted); }
+.metric-scope { position:absolute;inset-inline:0;bottom:calc(100% + 1px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:calc(var(--text-xs) - 1px);line-height:1.4;font-weight:400;color:var(--text-muted); }
 .value { text-align:right;font-weight:400;white-space:nowrap;color:var(--text-muted); }
 .reset { display:grid;grid-template-columns:minmax(0,1fr) 13px;gap:4px;align-items:center;font-size:var(--text-xs);white-space:nowrap;color:var(--text-muted); }
 .reset > span { text-align:right; }
+.reset-status { grid-column:1/-1; }
+.reset > svg { transform:translateY(-1px); }
 .amount { text-align:right;overflow-wrap:anywhere;font-variant-numeric:tabular-nums; }
 .text-metric { grid-template-columns:minmax(120px,1fr) auto; }
 progress { width:100%;height:6px;border:0;border-radius:var(--radius-pill);overflow:hidden;background:var(--surface-muted);accent-color:var(--meter-fill); }

@@ -66,19 +66,24 @@ for(const colorScheme of ['light','dark'] as const)for(const width of [390,768,1
 }
 for(const language of ['en','zh-Hans','zh-Hant','ja','ko'])test(`quota labels and countdown alignment ${language}`,async({page},info)=>{
  const now=new Date(),data=largeDesktop(now),account=data.accounts[0],base=account.metrics[0];
- const labels=['Session','Weekly','Sonnet 1w','Sonnet 4.5 · Extended Context Weekly','Web Searches','Fable Weekly','Monthly'];
+ const labels=['Session','Weekly','Argon Weekly','Sonnet 4.5 · Extended Context Weekly','Web Searches','Fable Weekly','Monthly'];
  account.metrics=labels.map((label,i)=>({...base,id:`quota-${i}`,label,
   periodSeconds:[18000,604800,604800,604800,2592000,null,2592000][i],
   percent:[46,92,29,65,24,null,0][i],hasData:i!==5,notStarted:i===6,
   resetsAt:new Date(now.getTime()+[59*60,3600,6*86400+13*3600,29*86400+23*3600,2*86400,0,0][i]*1000).toISOString(),
  }));
- data.accounts=[account,data.accounts.find(a=>a.family==='deepseek')!];
+ const amp=data.accounts.find(a=>a.family==='amp')!;
+ amp.metrics=[{...amp.metrics[0],id:'amp.orb'},{...amp.metrics[0],id:'Orb Usage'}];
+ data.accounts=[account,amp,data.accounts.find(a=>a.family==='deepseek')!];
  await mockDesktop(page,language,false,data);await page.goto('/');
- const rows=page.locator('.dashboard .metric').filter({has:page.getByRole('progressbar')});
+ const rows=page.locator('.dashboard [data-provider="claude"] .metric');
+ const orbs=page.locator('.dashboard [data-provider="amp"] .metric');
+ await expect(orbs.locator('.metric-name')).toHaveText(['Orb','Orb']);
+ await expect(orbs.locator('.metric-scope')).toHaveCount(0);
  await expect(rows).toHaveCount(7);
  await expect(rows.locator('.metric-name')).toHaveText(['5h','1w','1w','1w','30d','—','30d']);
  await expect(rows.nth(0).locator('.metric-scope')).toHaveCount(0);
- await expect(rows.nth(2).locator('.metric-scope')).toHaveText('Sonnet');
+ await expect(rows.nth(2).locator('.metric-scope')).toHaveText('Argon');
  await expect(rows.nth(3).locator('.metric-scope')).toHaveText('Sonnet 4.5 · Extended Context');
  await expect(rows.nth(5).getByRole('progressbar')).toHaveAccessibleName(/Fable Weekly/);
  await expect(rows.nth(5).locator('.value')).toHaveText('—');
@@ -96,14 +101,14 @@ for(const language of ['en','zh-Hans','zh-Hant','ja','ko'])test(`quota labels an
    expect(b.height).toBe(28);
    expect(b.bar.x).toBeCloseTo(boxes[0].bar.x,1);
    expect(b.bar.right).toBeCloseTo(boxes[0].bar.right,1);
-   expect(b.time.right).toBeCloseTo(boxes[0].time.right,1);
+   expect(b.time.right).toBeCloseTo(b.icon?boxes[0].time.right:boxes[0].icon!.right,1);
    expect(b.bar.y+b.bar.height/2).toBeCloseTo(b.name.y+b.name.height/2,1);
    expect(b.bar.y+b.bar.height/2).toBeCloseTo(b.value.y+b.value.height/2,1);
    if(b.icon){expect(b.icon.x-b.time.right).toBeCloseTo(4,1);expect(b.icon.right).toBeCloseTo(boxes[0].icon!.right,1);}
-   if(b.scope){expect(b.scope.x).toBeCloseTo(b.bar.x,1);expect(b.bar.y-b.scope.y-b.scope.height).toBeCloseTo(2,1);}
+   if(b.scope){expect(b.scope.x).toBeCloseTo(b.bar.x,1);expect(b.bar.y-b.scope.y-b.scope.height).toBeCloseTo(1,1);}
   }
   expect(boxes[3].scope!.height).toBe(boxes[2].scope!.height);
-  expect(await rows.nth(3).locator('.metric-scope').evaluate(e=>e.scrollWidth>e.clientWidth)).toBe(true);
+  if(width===350)expect(await rows.nth(3).locator('.metric-scope').evaluate(e=>e.scrollWidth>e.clientWidth)).toBe(true);
   await expect(rows.nth(3).getByRole('progressbar')).toHaveAccessibleName(/Sonnet 4.5 · Extended Context/);
   expect(await page.locator('.dashboard').evaluate(e=>e.scrollWidth<=e.clientWidth+1)).toBe(true);
   if(language==='zh-Hans')await page.screenshot({path:info.outputPath(`quota-${colorScheme}-${width}.png`),animations:'disabled'});
@@ -159,9 +164,36 @@ test('ring and percentage keep the same accounts and removal is confirmed',async
 test('update installation errors stay visible and do not restart',async({page})=>{
  await mockDesktop(page);await page.goto('/');
  await page.getByRole('button',{name:'更多',exact:true}).click();await page.getByRole('menuitem',{name:'检查更新',exact:true}).click();
- await page.getByRole('button',{name:'检查更新',exact:true}).click();
  await expect(page.getByRole('status')).toContainText('9.9.9');
  await page.getByRole('button',{name:'安装并重启',exact:true}).click();await expect(page.getByRole('status')).toContainText('更新安装失败');
+});
+test('update entry checks immediately, preserves pending work and allows retry after failure',async({page})=>{
+ await mockDesktop(page);
+ await page.addInitScript(()=>{
+  const api=(window as any).__TAURI_INTERNALS__,invoke=api.invoke;
+  (window as any).__checks=0;
+  api.invoke=async(command:string,args:unknown)=>{
+   if(command==='plugin:updater|check'){
+    (window as any).__checks++;
+    await new Promise<void>(resolve=>{(window as any).__finishCheck=resolve;});
+    if((window as any).__checks===1)throw 'offline';
+   }
+   return invoke(command,args);
+  };
+ });
+ await page.goto('/');
+ const open=async()=>{await page.getByRole('button',{name:'更多',exact:true}).click();await page.getByRole('menuitem',{name:'检查更新',exact:true}).click();};
+ await open();
+ await expect(page.getByRole('button',{name:'检查更新',exact:true})).toHaveAttribute('aria-busy','true');
+ await page.getByRole('button',{name:'返回',exact:true}).click();await open();
+ expect(await page.evaluate(()=>(window as any).__checks)).toBe(1);
+ await page.evaluate(()=>(window as any).__finishCheck());
+ await expect(page.getByRole('status')).toHaveText('无法检查更新，请稍后重试。');
+ await page.getByRole('button',{name:'检查更新',exact:true}).click();
+ await expect(page.getByRole('button',{name:'检查更新',exact:true})).toHaveAttribute('aria-busy','true');
+ await page.evaluate(()=>(window as any).__finishCheck());
+ await expect(page.getByRole('status')).toContainText('9.9.9');
+ expect(await page.evaluate(()=>(window as any).__checks)).toBe(2);
 });
 for(const [locale,settings] of [['en','General Settings'],['zh-Hant','一般設定'],['ja','一般設定'],['ko','일반 설정']])test(`localized navigation ${locale}`,async({page})=>{
  await mockDesktop(page,locale);await page.goto('/');await page.locator('header button').last().click();

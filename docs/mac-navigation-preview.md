@@ -23,6 +23,8 @@ tray integration remain platform-specific. This change does not publish a releas
   an unknown period stays unknown rather than being guessed from the name.
   Countdown text precedes the hourglass. Missing readings and windows that have
   not started retain their status; balances and cumulative amounts remain text.
+  Amp's non-periodic Orb allowance uses the short label Orb rather than a missing
+  period and separate caption.
 - Quota bars retain the service color until at least 80% is used (20% or less
   remaining), then both the bar and percentage turn red. The threshold is the same
   in Used and Remaining modes. Missing readings never signal a low quota.
@@ -68,7 +70,10 @@ tray integration remain platform-specific. This change does not publish a releas
   how many are selected. The three alerts
   share one card, and the tray account list is labelled as such.
   History provides filtering, seven-day pagination and expandable model records.
-- The production updater and About page remain available from More. Automatic
+- The production updater and About page remain available from More. Choosing Check
+  for Updates immediately starts a check and opens its status page. The page's check
+  button remains available for retrying; reopening during a check does not start a
+  second request. Opening an already-found update preserves that result. Automatic
   updates keep the existing signed updater flow. iCloud sync remains removed.
 
 ## Tray indicators

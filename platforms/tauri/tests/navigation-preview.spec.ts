@@ -281,7 +281,6 @@ test('production update entry preserves errors and the about page is not a desig
  await expect(page.getByRole('menuitem')).toHaveText(['账号管理','用量历史','通用设置','检查更新','关于','退出']);
  await expect(page.getByRole('separator')).toHaveCount(2);
  await page.getByRole('menuitem',{name:'检查更新',exact:true}).click();
- await page.getByRole('button',{name:'检查更新',exact:true}).click();
  await expect(page.getByRole('status')).toContainText('9.9.9');
  await page.getByRole('button',{name:'安装并重启',exact:true}).click();
  await expect(page.getByRole('status')).toContainText('更新安装失败');

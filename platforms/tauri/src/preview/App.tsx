@@ -118,7 +118,7 @@ export function DesktopApp() {
     {current.page==='configure'&&<Button size="sm" variant="ghost" onClick={addAccount}><Plus size={16}/>{tr('Add Account')}</Button>}
     {current.page==='home'&&<DropdownMenu label={basic.more} iconOnly icon={<Ellipsis size={19}/>} items={[
      {label:t.configure,onSelect:()=>push('configure')},{label:t.history,onSelect:()=>push('history')},
-     {label:t.settings,onSelect:()=>push('settings')},...(import.meta.env.VITE_MAC_NAVIGATION_PREVIEW==='1'?[]:[{label:t.checkUpdates,separatorBefore:true,onSelect:()=>push('updates')}]),{label:basic.about,separatorBefore:import.meta.env.VITE_MAC_NAVIGATION_PREVIEW==='1',onSelect:()=>push('about')},
+     {label:t.settings,onSelect:()=>push('settings')},...(import.meta.env.VITE_MAC_NAVIGATION_PREVIEW==='1'?[]:[{label:t.checkUpdates,separatorBefore:true,onSelect:()=>{push('updates');void updater.checkNow();}}]),{label:basic.about,separatorBefore:import.meta.env.VITE_MAC_NAVIGATION_PREVIEW==='1',onSelect:()=>push('about')},
      {label:basic.quit,separatorBefore:true,onSelect:()=>{void invoke('quit');}},
     ]}/>}
    </div>
