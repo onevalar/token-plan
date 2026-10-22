@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import type {HomeUsageStyle} from '../HomeMetrics';
+import {isHomeUsageStyle,type HomeUsageStyle} from '../homeUsage';
 
 const key='tokenplan.homeUsageStyle';
 type Preference={style:HomeUsageStyle;error:string};
@@ -7,7 +7,7 @@ export function useHomeUsageStyle() {
  const [preference,setPreference]=useState<Preference>(()=>{
   try {
    const value=localStorage.getItem(key);
-   if(value!==null&&value!=='bars'&&value!=='gauges'&&value!=='cells')throw new Error('Unknown Home usage style');
+   if(value!==null&&!isHomeUsageStyle(value))throw new Error('Unknown Home usage style');
    return {style:value??'bars',error:''};
   }catch(error){
    console.error('Home usage style could not be read',error);

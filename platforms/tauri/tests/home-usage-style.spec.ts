@@ -10,6 +10,7 @@ test.beforeEach(async({page},info)=>{await page.addInitScript(platform=>{(window
 const providerText=(key:string,language:string)=>(translations as Record<string,Record<string,string>>)[language]?.[key]??key;
 const visible=(page:Page)=>page.locator('.preview-page:not([hidden])');
 const home=(page:Page)=>page.locator('.dashboard');
+const extraStyles={rings:'Compact Rings',ruler:'Quota Ruler',concentric:'Concentric Rings',numbers:'Numbers',segments:'Segmented Bar'};
 async function settings(page:Page,language='en') {
  await page.getByRole('button',{name:messages(language).more,exact:true}).click();
  await page.getByRole('menuitem',{name:textFor(language).settings,exact:true}).click();
@@ -47,6 +48,12 @@ test('Home style persists independently of density, tray and details, with keybo
  await expect(page.locator('.mac-preview')).toHaveAttribute('data-density','comfortable');
  await settings(page);await choose(page,'Bars');await back(page);
  await expect(home(page).getByRole('progressbar')).toHaveCount(4);await expect(home(page).getByRole('meter')).toHaveCount(0);
+ for(const [style,label] of Object.entries(extraStyles)){
+  await settings(page);await choose(page,label);await back(page);await page.reload();
+  await expect(home(page)).toHaveAttribute('data-usage-style',style);
+  await expect(page.locator('.mac-preview')).toHaveAttribute('data-density','comfortable');
+  await settings(page);await expect(page.getByRole('combobox',{name:'Home Usage Style',exact:true})).toContainText(label);await back(page);
+ }
 });
 
 test('unreadable preferences and failed saves stay visible and recover without changing the previous style',async({page})=>{
@@ -62,7 +69,7 @@ test('unreadable preferences and failed saves stay visible and recover without c
  await expect(visible(page).getByRole('alert')).toHaveCount(0);await expect(home(page)).toHaveAttribute('data-usage-style','cells');
 });
 
-for(const style of ['gauges','cells'] as const)for(const remaining of [false,true])test(`${style} preserves ${remaining?'remaining':'used'} readings, limits, missing data and metric order`,async({page})=>{
+for(const style of ['gauges','cells','rings','ruler','concentric','numbers','segments'] as const)for(const remaining of [false,true])test(`${style} preserves ${remaining?'remaining':'used'} readings, limits, missing data and metric order`,async({page})=>{
  const data=largeDesktop(),account=data.accounts[0],base=account.metrics[0];data.accounts=[account];data.settings.showRemaining=remaining;
  // Asymmetric readings make a double inversion and rounded threshold visibly wrong.
  const values=remaining?[100,20.4,20,0,-12,62.4]:[0,79.6,80,100,112,37.6];
@@ -81,23 +88,33 @@ for(const style of ['gauges','cells'] as const)for(const remaining of [false,tru
  for(let i=0;i<values.length;i++){
   const tile=home(page).locator(`[data-metric="quota-${i}"]`);
   await expect(tile).toContainText(shown[i]);await expect(tile).toHaveAttribute('data-tone',i>=2&&i<=4?'critical':'normal');
-  if(style==='gauges'){
+  if(style!=='cells'&&style!=='numbers'){
    const meter=tile.getByRole('meter',{name:`Quota ${i} · 5h · ${mode}`,exact:true});
    await expect(meter).toHaveAttribute('aria-valuetext',new RegExp(`^${shown[i]}`));
    await expect(meter).toHaveAttribute('aria-valuenow',String(Math.max(0,Math.min(100,values[i]))));
-  }else{
+  }else if(style==='cells'){
    await expect(tile.locator('[data-category="reading"]')).toHaveCount(cells[i]);
    await expect(tile.locator('[data-category]')).toHaveCount(i===4?0:100);
    expect(await tile.locator('.quota-number strong').evaluate(e=>{const range=document.createRange();range.selectNodeContents(e);return range.getClientRects().length;})).toBe(1);
+  }else if(style==='numbers'){
+   const color=await tile.locator('.home-number-value strong').evaluate(e=>getComputedStyle(e).color);
+   await expect(tile.locator('.home-number-value > span')).toHaveCSS('color',color);
   }
  }
- await expect(home(page).locator('[data-metric="quota-1"] .quota-warning')).toBeEmpty();
+ if(style==='segments'){
+  const fills=await home(page).locator('[data-metric="quota-5"] .home-segment-track > span > span').evaluateAll(es=>es.map(e=>new DOMMatrix(getComputedStyle(e).transform).a));
+  // 37.6% = seven whole cells and 52% of the eighth, not eight whole cells.
+  expect(fills.slice(0,remaining?12:7)).toEqual(Array(remaining?12:7).fill(1));
+  expect(fills[remaining?12:7]).toBeCloseTo(remaining?0.48:0.52,5);
+  expect(fills.slice(remaining?13:8)).toEqual(Array(remaining?7:12).fill(0));
+ }
+ await expect(home(page).locator('[data-metric="quota-1"]')).not.toContainText('Near quota limit');
  await expect(home(page).locator('[data-metric="quota-2"] .quota-warning')).toHaveText('Near quota limit');
  await expect(home(page).locator('[data-metric="quota-3"] .quota-warning')).toHaveText('Quota exhausted');
  await expect(home(page).locator('[data-metric="quota-4"] .quota-warning')).toHaveText('Quota exceeded');
  for(const id of ['missing','null']){
   const tile=home(page).locator(`[data-metric="${id}"]`);await expect(tile).toHaveAttribute('data-tone','normal');
-  await expect(tile.getByRole('meter').or(tile.getByRole('img'))).toHaveCount(0);await expect(tile.locator('.quota-missing')).toContainText(messages('en').missing);
+  await expect(tile.getByRole('meter').or(tile.getByRole('img'))).toHaveCount(0);await expect(tile).toContainText(messages('en').missing);
  }
  await expect(home(page).locator('[data-metric="unstarted"] .reset')).toHaveText(textFor('en').notStarted);
  await expect(home(page).locator('[data-metric="unstarted"]')).toContainText(remaining?'83%':'17%');
@@ -113,19 +130,44 @@ for(const style of ['gauges','cells'] as const)for(const remaining of [false,tru
  await expect(home(page).locator('[data-metric="quota-0"]')).toContainText('7%');
 });
 
+test('concentric rings keep independent readings and never pair unrelated quotas',async({page})=>{
+ const data=largeDesktop(),base=data.accounts[0];
+ data.accounts=Array.from({length:7},(_,i)=>({...structuredClone(base),id:`claude:pair-${i}`,email:`pair-${i}@example.com`}));
+ data.accounts[0].metrics[0].percent=37;data.accounts[0].metrics[1].percent=82;
+ data.accounts[1].metrics=data.accounts[1].metrics.slice(0,1);
+ data.accounts[2].metrics[1].periodSeconds=data.accounts[2].metrics[0].periodSeconds;
+ data.accounts[3].metrics[1].periodSeconds=null;
+ data.accounts[4].metrics.splice(1,0,{...base.metrics[0],id:'balance',label:'Balance',percent:null,periodSeconds:null,unit:'dollars',amount:7.25});
+ data.accounts[5].metrics.push({...base.metrics[0],id:'extra',periodSeconds:86400});
+ data.accounts[6].metrics[0].hasData=false;
+ await page.addInitScript(()=>localStorage.setItem('tokenplan.homeUsageStyle','concentric'));
+ await mockDesktop(page,'en',false,data);await page.goto('/');
+ const accounts=home(page).locator('.account-block');
+ await expect(accounts.nth(0).locator('.home-concentric')).toHaveCount(1);
+ await expect(accounts.nth(0).getByRole('meter',{name:'5h · Used',exact:true})).toHaveAttribute('aria-valuetext','37%');
+ await expect(accounts.nth(0).getByRole('meter',{name:'1w · Used',exact:true})).toHaveAttribute('aria-valuetext','82% · Near quota limit');
+ await expect(accounts.nth(0)).toContainText('Outer Ring');await expect(accounts.nth(0)).toContainText('Inner Ring');
+ for(let i=1;i<=5;i++)await expect(accounts.nth(i).locator('.home-concentric')).toHaveCount(0);
+ await expect(accounts.nth(4).locator('.home-metrics > *').nth(1)).toContainText('$7.25');
+ await expect(accounts.nth(6).getByRole('meter')).toHaveCount(1);
+ await expect(accounts.nth(6)).toContainText(messages('en').missing);
+});
+
 for(const language of ['en','zh-Hans','zh-Hant','ja','ko'])test(`Home styles fit with localized labels: ${language}`,async({page})=>{
  const data=largeDesktop();data.accounts[0].metrics[0].label='Claude Sonnet Extra Long Model Allowance';
+ // Keep the narrow-panel regression: the grid must yield space to its numeric reading.
+ if(language==='en')await page.setViewportSize({width:360,height:680});
  await mockDesktop(page,language,false,data);await page.goto('/');
  for(const theme of ['light','dark'] as const){
   await page.emulateMedia({colorScheme:theme});
-  for(const style of ['Gauges','Percentage Grid']){
+  for(const style of ['Gauges','Percentage Grid',...Object.values(extraStyles)]){
    await settings(page,language);await choose(page,providerText(style,language),language);await back(page,language);
-   const tiles=home(page).locator('.home-quota');await expect(tiles.first()).toContainText(providerText('Used',language));
+   const tiles=home(page).locator('.home-quota,.home-reading');await expect(tiles.first()).toContainText(providerText('Used',language));
    await expect(tiles.nth(1)).toContainText(providerText('Near quota limit',language));
    expect(await visible(page).evaluate(e=>e.scrollWidth<=e.clientWidth+1)).toBe(true);
    expect(await tiles.evaluateAll(elements=>elements.every(e=>e.scrollWidth<=e.clientWidth+1))).toBe(true);
    const bodies=await home(page).locator('.quota-body').evaluateAll(elements=>elements.slice(0,2).map(e=>e.getBoundingClientRect().y));
-   expect(Math.abs(bodies[0]-bodies[1])).toBeLessThan(1);
+   if(bodies.length)expect(Math.abs(bodies[0]-bodies[1])).toBeLessThan(1);
   }
  }
 });

@@ -4,6 +4,9 @@
 .track,.arc { fill:none;stroke-width:9;stroke-linecap:round; }
 .track { stroke:var(--border-strong); }
 .arc { stroke:var(--gauge-color); }
+.paths { --gauge-color:var(--provider-color,var(--accent)); }
+.paths[data-tone="danger"] { --gauge-color:var(--danger); }
+.paths[data-missing="true"] .track { stroke-dasharray:3 6;stroke-linecap:butt; }
 .readout { position:absolute;top:0;left:0;display:grid;width:100%;aspect-ratio:1;place-content:center;pointer-events:none; }
 .number { display:inline-flex;align-items:baseline;color:var(--foreground);font-family:var(--font-display);font-size:var(--text-2xl);font-weight:500;letter-spacing:var(--tracking-display);line-height:1;font-variant-numeric:tabular-nums; }
 .unit { margin-left:1px;color:var(--text-secondary);font-family:var(--font-body);font-size:.5em;letter-spacing:0; }

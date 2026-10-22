@@ -179,9 +179,11 @@
 "Comfortable" = "宽松";
 "Command Line" = "命令行";
 "Compact" = "紧凑";
+"Compact Rings" = "紧凑环形";
 "Complete the official login in the terminal, then detect accounts again." = "请在终端中完成官方登录，然后重新检测账号。";
 "Complete the update in the installer." = "请在安装程序中完成更新。";
 "Completions" = "补全";
+"Concentric Rings" = "独立同心环";
 "Configuration Directory" = "配置目录";
 "Confirm" = "确认";
 "Connect Account" = "连接账号";
@@ -203,6 +205,7 @@
 "Copy Login Command" = "复制登录命令";
 "Cost" = "费用";
 "Cost Estimates" = "费用估算";
+"Cost Unknown" = "费用未知";
 "Cost/MTok" = "每百万 token 费用";
 "Could not apply this change. Refresh and try again." = "无法应用此更改，请刷新后重试。";
 "Could not check for updates. Try again later." = "无法检查更新，请稍后重试。";
@@ -309,6 +312,7 @@
 "Estimated from model token rates, not your subscription bill." = "按模型 token 价格估算，不代表订阅账单。";
 "Estimated locally, so it may be off" = "在本地估算，可能有偏差";
 "Everything found on this Mac is already added." = "这台 Mac 上发现的账号都已添加。";
+"Exact Readings" = "精确数值";
 "Example Data" = "示例数据";
 "Existing accounts are in Account Management, including accounts hidden from Home." = "已添加的账号都在“账号管理”中，包括未在首页显示的账号。";
 "Expanded" = "已展开";
@@ -456,11 +460,14 @@
 "Middle Ring" = "中环";
 "Minutes" = "分钟";
 "Model Breakdown" = "模型明细";
+"Model token counts are invalid. Showing the original model list." = "模型 token 数值无效，改为显示原始模型列表。";
+"Model tokens exceed the recorded total. Showing the original model list." = "模型 token 之和超过记录总数，改为显示原始模型列表。";
 "Monitor Your AI Subscriptions with TokenPlan" = "用 TokenPlan 监控你的 AI 订阅";
 "Monthly" = "每月";
 "More" = "更多";
 "More Metrics" = "更多指标";
 "More Usage Details" = "更多用量详情";
+"More than six nonzero parts. Showing the original model list." = "非零部分超过六项，改用列表以便清楚比较。";
 "Move Down" = "下移";
 "Move Up" = "上移";
 "Move down" = "下移";
@@ -494,6 +501,8 @@
 "No login or usage confirmed." = "尚未确认登录或用量。";
 "No matching account was identified. Check the directory and access permissions." = "未识别到匹配账号，请检查目录和访问权限。";
 "No metrics to show" = "没有可显示的指标";
+"No positive model tokens to compare. Showing the original model list." = "没有大于零的模型 token 可比较，显示原始模型列表。";
+"No positive recorded tokens to compare. Showing the original model list." = "没有大于零的 token 记录可比较，显示原始模型列表。";
 "No providers are enabled." = "尚未启用提供方。";
 "No quota data is available." = "暂无可用额度数据。";
 "No readings in this range. Successful refreshes will appear here." = "此时间范围内暂无记录，成功刷新后会显示在这里。";
@@ -528,6 +537,7 @@
 "Notifications could not be delivered. Check system notification settings." = "无法发送通知，请检查系统通知设置。";
 "Notifications, appearance and more" = "通知、外观等";
 "Notify When Usage Reaches" = "用量达到以下比例时提醒";
+"Numbers" = "醒目数字";
 "On Demand" = "按需展开";
 "One ring per selected account: Claude 5h, Codex Pro 1w, Plus 5h. Other plans use the quota with least remaining." = "每个所选账号显示一个环：Claude 5h、Codex Pro 1w、Plus 5h。其他计划显示剩余额度最少的一项限制。";
 "Only includes %@." = "仅包含 %@。";
@@ -588,6 +598,7 @@
 "Quit TokenPlan" = "退出 TokenPlan";
 "Quota History" = "额度记录";
 "Quota Readings" = "配额记录";
+"Quota Ruler" = "额度刻度尺";
 "Quota Style" = "图形样式";
 "Quota exceeded" = "已超出额度";
 "Quota exhausted" = "额度已用尽";
@@ -605,6 +616,8 @@
 "Recalculating Estimates…" = "正在重新计算估算…";
 "Receive pre-release builds before they ship to everyone" = "在正式发布前抢先收到预发布版本";
 "Record Shortcut" = "录制快捷键";
+"Recorded Tokens" = "已记录 token";
+"Recorded token counts are invalid. Showing the original model list." = "记录的 token 总数无效，改为显示原始模型列表。";
 "Reduce Animations" = "减少动画";
 "Refresh" = "刷新";
 "Refresh %@" = "刷新 %@";
@@ -661,6 +674,7 @@
 "Resets %@" = "重置于 %@";
 "Resets expire in:" = "重置到期时间：";
 "Resets expire:" = "重置到期：";
+"Resets in" = "距重置";
 "Resets in %@" = "%@ 后重置";
 "Resets soon" = "即将重置";
 "Resetting" = "即将重置";
@@ -693,6 +707,7 @@
 "Saving…" = "正在保存…";
 "Search" = "搜索";
 "Search Services" = "搜索服务";
+"Segmented Bar" = "分段额度条";
 "Selected accounts appear as live system tray indicators. Each value uses its own icon in percentage mode. Your desktop controls icon spacing, order and overflow." = "选中的账号会在系统托盘中实时显示用量。百分比模式下，每项数值单独显示。图标间距、排列和折叠由桌面系统控制。";
 "Service Configuration" = "服务配置";
 "Services & Subscriptions" = "服务与订阅";
@@ -705,6 +720,8 @@
 "Set Up" = "设置";
 "Settings" = "设置";
 "Settings…" = "设置…";
+"Share of Recorded Tokens" = "已记录 token 构成";
+"Shares use %@ recorded tokens from this day and source, not a plan limit or a full bill." = "占比以当天该来源记录的 %@ token 为总数，不代表套餐额度或完整账单。";
 "Show" = "显示";
 "Show First Usage Metric" = "显示首项用量";
 "Show Log Folder" = "打开日志文件夹";
@@ -785,6 +802,7 @@
 "The update could not be installed. Your current version is unchanged." = "更新安装失败，当前版本未变更。";
 "Theme" = "主题";
 "These three readings share one allowance. More expensive models use it up faster. They are not each model's own remaining amount." = "这三条是同一份额度。贵的模型会更快用完，不是每个模型各自的剩余量。";
+"These variants are included in the model above, not added again." = "这些细分已计入上方模型，不重复累加。";
 "This Mac" = "这台 Mac";
 "This Month" = "本月";
 "This Week" = "本周";
@@ -815,6 +833,7 @@
 "TokenPlan reads credentials on this device to retrieve your usage. No analytics or crash reporting is collected." = "TokenPlan 使用本机凭据获取用量，不收集分析数据或崩溃报告。";
 "TokenPlan sends no analytics or crash reports. Credentials stay on this computer." = "TokenPlan 不发送任何统计或崩溃报告，凭据只保留在这台电脑上。";
 "Tokens" = "Token";
+"Tokens without a model stay in the total as unclassified records." = "未注明模型的 token 保留在总数中，显示为未归类记录。";
 "Top Up" = "充值";
 "Topped Up" = "已充值";
 "Total Spend Metric" = "总花费指标";
@@ -835,6 +854,7 @@
 "Unattributed" = "未归属";
 "Unavailable" = "不可用";
 "Unavailable Model" = "不可用的模型";
+"Unclassified Records" = "未归类记录";
 "Under 10% usage remaining for this window." = "本周期剩余额度不足 10%。";
 "Uninstall" = "卸载";
 "Unknown" = "未知";

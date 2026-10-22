@@ -10,6 +10,7 @@ import type {Account,DesktopState,Metric,Send} from '../desktop';
 import type {Copy} from '../copy';
 import {HistorySummary,isHistoryMetric} from './HistoryPage';
 import {AccountConfiguration,type AccountDraft} from './AccountConfiguration';
+import {BenefitMetrics} from './BenefitMetrics';
 
 export function AccountDetail({account,tab,onTab,history,send,t,busy,language,now,remaining,missing,traySettings,badge,draft,onDraftChange}:{draft:AccountDraft;onDraftChange:(patch:AccountDraft)=>void;badge?:number|null;traySettings:DesktopState['settings'];account:Account;tab:string;onTab:(tab:string)=>void;history:(range:string)=>void;send:Send;t:Copy;busy:boolean;language:string;now:number;remaining:boolean;missing:string}) {
  const tr=(s:string)=>providerText(s,language),[range,setRange]=useState('30');
@@ -26,7 +27,7 @@ export function AccountDetail({account,tab,onTab,history,send,t,busy,language,no
   <div hidden={tab!=='usage'}>
    {account.error&&<p role="status" className="inline-error">{tr(account.error)}</p>}{!account.error&&account.warning&&<p role="status" className="group-description">{tr(account.warning)}</p>}
    {quota.length>0&&<section className="detail-group"><h2>{tr('Current Quota')}</h2>{quota.map(row)}</section>}
-   {other.length>0&&<section className="detail-group"><h2>{tr('Balance and Benefits')}</h2>{other.map(row)}</section>}
+   {other.length>0&&<section className="detail-group"><h2>{tr('Balance and Benefits')}</h2><BenefitMetrics metrics={other} now={now} missing={missing} language={language} remaining={remaining}/></section>}
    <section className="detail-group history-overview"><div className="section-heading"><h2>{t.history}</h2><Button variant="ghost" size="sm" onClick={()=>history(range)}>{tr('View History')}<ChevronRight size={15}/></Button></div><HistorySummary accounts={[account]} t={t} language={language} range={range} onRange={setRange}/></section>
    {account.note&&<section className="detail-group"><h2>{t.note}</h2><p>{account.note}</p></section>}
    {account.fetchedAt&&<p className="last-updated">{tr('Last Updated')} {new Date(account.fetchedAt).toLocaleTimeString(language,{hour:'2-digit',minute:'2-digit'})}</p>}

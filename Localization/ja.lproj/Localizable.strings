@@ -179,9 +179,11 @@
 "Comfortable" = "ゆったり";
 "Command Line" = "コマンドライン";
 "Compact" = "コンパクト";
+"Compact Rings" = "コンパクトリング";
 "Complete the official login in the terminal, then detect accounts again." = "ターミナルで公式のログインを完了し、再検出してください。";
 "Complete the update in the installer." = "インストーラーで更新を完了してください。";
 "Completions" = "補完";
+"Concentric Rings" = "独立した同心リング";
 "Configuration Directory" = "設定フォルダ";
 "Confirm" = "確認";
 "Connect Account" = "アカウントを接続";
@@ -203,6 +205,7 @@
 "Copy Login Command" = "ログインコマンドをコピー";
 "Cost" = "コスト";
 "Cost Estimates" = "コスト見積もり";
+"Cost Unknown" = "費用不明";
 "Cost/MTok" = "百万トークンあたりコスト";
 "Could not apply this change. Refresh and try again." = "変更できません。更新して再試行してください。";
 "Could not check for updates. Try again later." = "更新を確認できません。後で再試行してください。";
@@ -309,6 +312,7 @@
 "Estimated from model token rates, not your subscription bill." = "モデルのトークン料金による推定で、契約の請求額ではありません。";
 "Estimated locally, so it may be off" = "ローカルで推定しているため、誤差がある場合があります";
 "Everything found on this Mac is already added." = "この Mac で見つかったアカウントはすべて追加済みです。";
+"Exact Readings" = "正確な数値";
 "Example Data" = "サンプルデータ";
 "Existing accounts are in Account Management, including accounts hidden from Home." = "追加済みのアカウントは、ホームで非表示のものも「アカウント管理」にあります。";
 "Expanded" = "展開済み";
@@ -456,11 +460,14 @@
 "Middle Ring" = "中央";
 "Minutes" = "分";
 "Model Breakdown" = "モデル別内訳";
+"Model token counts are invalid. Showing the original model list." = "モデルのトークン数が無効なため、元のモデル一覧を表示します。";
+"Model tokens exceed the recorded total. Showing the original model list." = "モデルのトークン合計が記録総数を超えるため、元のモデル一覧を表示します。";
 "Monitor Your AI Subscriptions with TokenPlan" = "TokenPlan で AI サブスクリプションを監視";
 "Monthly" = "月間";
 "More" = "その他";
 "More Metrics" = "その他の指標";
 "More Usage Details" = "使用量の詳細";
+"More than six nonzero parts. Showing the original model list." = "0以外の項目が6つを超えるため、比較しやすい一覧で表示します。";
 "Move Down" = "下へ";
 "Move Up" = "上へ";
 "Move down" = "下へ";
@@ -494,6 +501,8 @@
 "No login or usage confirmed." = "ログインまたは使用量をまだ確認できません。";
 "No matching account was identified. Check the directory and access permissions." = "一致するアカウントが見つかりません。ディレクトリとアクセス権を確認してください。";
 "No metrics to show" = "表示する指標がありません";
+"No positive model tokens to compare. Showing the original model list." = "比較できる正のモデルトークン数がないため、元のモデル一覧を表示します。";
+"No positive recorded tokens to compare. Showing the original model list." = "比較できる正のトークン記録がないため、元のモデル一覧を表示します。";
 "No providers are enabled." = "有効なプロバイダーがありません。";
 "No quota data is available." = "利用可能な割り当てデータがありません。";
 "No readings in this range. Successful refreshes will appear here." = "この期間の履歴はありません。正常に更新されると、ここに表示されます。";
@@ -528,6 +537,7 @@
 "Notifications could not be delivered. Check system notification settings." = "通知を送信できません。システムの通知設定を確認してください。";
 "Notifications, appearance and more" = "通知、外観など";
 "Notify When Usage Reaches" = "通知する使用率";
+"Numbers" = "数値";
 "On Demand" = "必要時に表示";
 "One ring per selected account: Claude 5h, Codex Pro 1w, Plus 5h. Other plans use the quota with least remaining." = "選択した各アカウントに1つのリング：Claude 5h、Codex Pro 1w、Plus 5h。その他のプランは残り枠が最も少ない制限を表示します。";
 "Only includes %@." = "%@ のみ含まれます。";
@@ -588,6 +598,7 @@
 "Quit TokenPlan" = "TokenPlan を終了";
 "Quota History" = "使用枠の履歴";
 "Quota Readings" = "クォータ記録";
+"Quota Ruler" = "使用枠の目盛り";
 "Quota Style" = "使用量グラフ";
 "Quota exceeded" = "上限を超過";
 "Quota exhausted" = "使用枠を使い切りました";
@@ -605,6 +616,8 @@
 "Recalculating Estimates…" = "見積もりを再計算中…";
 "Receive pre-release builds before they ship to everyone" = "一般公開前のプレリリース版を受け取ります";
 "Record Shortcut" = "ショートカットを記録";
+"Recorded Tokens" = "記録済みトークン";
+"Recorded token counts are invalid. Showing the original model list." = "記録されたトークン合計が無効なため、元のモデル一覧を表示します。";
 "Reduce Animations" = "アニメーションを減らす";
 "Refresh" = "更新";
 "Refresh %@" = "%@ を更新";
@@ -661,6 +674,7 @@
 "Resets %@" = "%@ にリセット";
 "Resets expire in:" = "リセットの有効期限：";
 "Resets expire:" = "リセットの有効期限：";
+"Resets in" = "リセットまで";
 "Resets in %@" = "%@ 後にリセット";
 "Resets soon" = "まもなくリセット";
 "Resetting" = "リセット中";
@@ -693,6 +707,7 @@
 "Saving…" = "保存中…";
 "Search" = "検索";
 "Search Services" = "サービスを検索";
+"Segmented Bar" = "分割バー";
 "Selected accounts appear as live system tray indicators. Each value uses its own icon in percentage mode. Your desktop controls icon spacing, order and overflow." = "選択したアカウントの使用量をシステムトレイに表示します。割合モードでは各値を別のアイコンに表示します。間隔・並び順・折りたたみはデスクトップが制御します。";
 "Service Configuration" = "サービス設定";
 "Services & Subscriptions" = "サービスと契約";
@@ -705,6 +720,8 @@
 "Set Up" = "設定";
 "Settings" = "設定";
 "Settings…" = "設定…";
+"Share of Recorded Tokens" = "記録済みトークンの構成";
+"Shares use %@ recorded tokens from this day and source, not a plan limit or a full bill." = "割合はこの日のこの記録元の %@ トークンを基準とし、プランの上限や請求全体を示すものではありません。";
 "Show" = "表示";
 "Show First Usage Metric" = "最初の使用量を表示";
 "Show Log Folder" = "ログフォルダーを開く";
@@ -785,6 +802,7 @@
 "The update could not be installed. Your current version is unchanged." = "更新をインストールできませんでした。現在のバージョンは変更されていません。";
 "Theme" = "テーマ";
 "These three readings share one allowance. More expensive models use it up faster. They are not each model's own remaining amount." = "この3つは同じ利用枠です。高いモデルほど早く消費され、モデルごとの残りではありません。";
+"These variants are included in the model above, not added again." = "この内訳は上のモデルに含まれており、再加算しません。";
 "This Mac" = "この Mac";
 "This Month" = "今月";
 "This Week" = "今週";
@@ -815,6 +833,7 @@
 "TokenPlan reads credentials on this device to retrieve your usage. No analytics or crash reporting is collected." = "TokenPlan はこのデバイスの資格情報を使用して使用量を取得します。分析データやクラッシュレポートは収集しません。";
 "TokenPlan sends no analytics or crash reports. Credentials stay on this computer." = "TokenPlan は分析データやクラッシュレポートを送信しません。認証情報はこのコンピュータにのみ保存されます。";
 "Tokens" = "トークン";
+"Tokens without a model stay in the total as unclassified records." = "モデル不明のトークンも合計に含め、未分類の記録として表示します。";
 "Top Up" = "チャージ";
 "Topped Up" = "チャージ済み";
 "Total Spend Metric" = "合計支出の指標";
@@ -835,6 +854,7 @@
 "Unattributed" = "未分類";
 "Unavailable" = "利用不可";
 "Unavailable Model" = "利用できないモデル";
+"Unclassified Records" = "未分類の記録";
 "Under 10% usage remaining for this window." = "この期間の残りが 10% 未満です。";
 "Uninstall" = "アンインストール";
 "Unknown" = "不明";

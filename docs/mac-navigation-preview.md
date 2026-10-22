@@ -8,16 +8,21 @@ tray integration remain platform-specific. This change does not publish a releas
 
 - Home offers Compact (default) and Comfortable spacing. The preference stays on
   this device; the previous macOS preview preference is preserved on upgrade.
-- General Settings also offers Home Usage Style: Bars (default), Gauges and
-  Percentage Grid. The choice stays on this device, independently of spacing,
+- General Settings offers eight Home Usage Styles: Bars (default), Gauges,
+  Percentage Grid, Compact Rings, Quota Ruler, Concentric Rings, Numbers and
+  Segmented Bar. The choice stays on this device, independently of spacing,
   used/remaining mode and tray style. It changes Home only, not account details
   or history. Each account and quota keeps its own reading; nothing is averaged
   or combined. Balances and existing history charts keep their original form and order.
-- Gauges and grids show the same percentages and reset times as bars, including
+- All styles show the same percentages and reset times as bars, including
   missing readings and windows that have not started. A grid has 100 whole cells,
   each representing one percentage point; fractions round to the nearest cell.
   Over-limit numbers are never clipped: a gauge stops at its endpoint but keeps
   the real percentage; a grid outside 0–100% shows the number without a grid.
+  A segmented bar has 20 pieces with a partially filled last piece, so small
+  changes are not rounded to a whole piece. Concentric rings pair only two adjacent
+  quotas with different known periods in one account; other arrangements use
+  independent compact rings. Each ring has its own name, number and reset time.
   Reopening Home and refreshing do not replay fill animations or celebrate exhaustion.
 - These are independent quota displays, not combined goal rings, quota composition
   charts or forecasts without real data.
@@ -29,6 +34,16 @@ tray integration remain platform-specific. This change does not publish a releas
   hidden. Percentages follow the used/remaining preference, including their screen
   reader names. Home and quota details keep the values and reset countdowns without
   a separate explanatory legend.
+  Benefits with expiry details expand on demand; their title and value remain visible
+  when closed. Benefits without expiry details remain plain rows. Currency, credits
+  and counts remain separate values, and unavailable amounts never become zero.
+  Model details within a daily source record use a composition ring for recorded
+  tokens, not quota or spending. The denominator is that source's total for that day;
+  missing model assignments remain an unclassified portion, rather than enlarging
+  known shares. Exact token and cost values and nested variants remain available.
+  Zero, invalid or contradictory totals, or more than six nonzero portions, keep a
+  list with an explanation instead. Unknown cost remains unknown. History summaries,
+  daily record lists, account information and current quota details stay unchanged.
 - Quota bar rows show the provider's actual period (such as 5h, 1w or 30d) separately
   from the model or allowance name. Names do not add extra rows. Long names are
   shortened with an ellipsis; their full text remains in account settings and
@@ -39,7 +54,7 @@ tray integration remain platform-specific. This change does not publish a releas
   Amp's non-periodic Orb allowance uses the short label Orb rather than a missing
   period and separate caption.
 - Quota displays retain the service color until at least 80% is used (20% or less
-  remaining), then both the graphic and percentage turn red. Gauges and grids also
+  remaining), then both the graphic and percentage turn red. Alternative styles also
   name the near-limit, exhausted or exceeded state. The threshold uses the unrounded
   reading, not the displayed number or the filled cell count, and is the same
   in Used and Remaining modes. Missing readings never signal a low quota.

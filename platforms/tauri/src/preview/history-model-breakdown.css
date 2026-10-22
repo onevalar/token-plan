@@ -1,0 +1,25 @@
+.history-model-breakdown { min-width:0;padding:12px 0;overflow-wrap:anywhere; }
+.history-model-breakdown h3 { font-size:var(--text-sm);font-weight:500;margin:0 0 8px; }
+.history-model-caption,.history-model-denominator,.history-model-notice { font-size:var(--text-xs);line-height:1.7;color:var(--text-secondary);margin:0 0 12px; }
+.history-model-denominator { color:var(--foreground); }
+.history-model-notice { padding:12px;border:1px solid var(--border-strong);border-radius:var(--radius-control); }
+.history-model-donut { position:relative;width:208px;max-width:100%;aspect-ratio:1;margin:12px auto 16px; }
+.history-model-donut svg { display:block;width:100%;height:100%; }
+.history-model-donut-center { position:absolute;inset:15%;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:4px;text-align:center;pointer-events:none; }
+.history-model-donut-center span { font-size:var(--text-xs);color:var(--text-secondary); }
+.history-model-donut-center strong { max-width:100%;font-size:var(--text-xl);font-family:var(--font-geist);font-weight:500;font-variant-numeric:tabular-nums; }
+.history-model-legend { list-style:none;padding:0;margin:0; }
+.history-model-legend > li { padding:12px 0;border-bottom:1px solid var(--border); }
+.history-model-legend-head { display:grid;grid-template-columns:8px minmax(0,1fr) auto;align-items:baseline;gap:8px;font-size:var(--text-sm); }
+.history-model-legend-head strong { font-size:var(--text-xs);font-weight:500;font-variant-numeric:tabular-nums; }
+.history-model-swatch { width:8px;height:8px;border-radius:2px; }
+.history-model-legend-values { display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 12px;margin:4px 0 0 16px;font-size:var(--text-xs);color:var(--text-secondary);font-variant-numeric:tabular-nums; }
+.history-model-legend .history-model-variants { margin-left:16px; }
+.history-model-variants,.history-model-exact { font-size:var(--text-xs);color:var(--text-secondary); }
+.history-model-variants summary,.history-model-exact summary { min-height:44px;align-content:center;cursor:pointer; }
+.history-model-variants p { margin:0 0 8px;line-height:1.6; }
+.history-model-variants > div { display:grid;gap:4px;margin-bottom:12px;font-variant-numeric:tabular-nums; }
+.history-model-variants > div > span:first-child { color:var(--foreground); }
+.history-model-exact { border-top:1px solid var(--border);margin-top:12px; }
+.history-model-exact-row { padding:12px 0;border-bottom:1px solid var(--border);display:grid;gap:4px;color:var(--foreground); }
+.history-model-exact-row > span+span { font-variant-numeric:tabular-nums;color:var(--text-secondary); }

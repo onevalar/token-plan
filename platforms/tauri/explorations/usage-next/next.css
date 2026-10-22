@@ -1,0 +1,30 @@
+/* The previous round's shell and prescribed picker remain unchanged. */
+.round-links { margin-top:12px;font-size:var(--text-sm); }
+.round-links a { color:var(--foreground);text-underline-offset:3px; }
+.number-quotas { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px 24px; }
+.number-amount { grid-column:1/-1; }
+.number-quota { min-width:0;font-variant-numeric:tabular-nums; }
+.number-label { display:flex;align-items:baseline;gap:8px;min-height:20px;font-size:var(--text-sm); }
+.number-label > span { min-width:0;overflow-wrap:anywhere; }
+.number-label small { flex:none;font-size:var(--text-xs);color:var(--text-secondary); }
+.number-value { display:flex;align-items:baseline;gap:2px;margin:8px 0 6px;font-family:var(--font-display);letter-spacing:var(--tracking-display);line-height:var(--leading-display); }
+.number-value strong { font-size:var(--text-3xl);font-weight:500; }
+.number-value > span { font-size:var(--text-xl);font-weight:400; }
+.number-reset { min-height:18px; }
+.next-reset { display:inline-flex;align-items:baseline;gap:6px;font-size:var(--text-xs);color:var(--text-secondary); }
+.number-quota[data-tone="critical"] .number-value,.segmented-quota[data-tone="critical"] .segmented-value,.next-warning { color:var(--danger); }
+.next-warning { font-size:var(--text-xs);line-height:var(--leading-body);margin:4px 0 0;overflow-wrap:anywhere; }
+.segmented-quotas { display:grid;gap:16px; }
+.segmented-quota { min-width:0;--fill-color:var(--provider-color);font-variant-numeric:tabular-nums; }
+.segmented-quota[data-tone="critical"] { --fill-color:var(--danger); }
+.segmented-label { display:flex;justify-content:space-between;align-items:baseline;gap:12px;font-size:var(--text-sm); }
+.segmented-label > span { min-width:0;overflow-wrap:anywhere; }
+.segmented-label .next-reset { flex:none; }
+.segmented-reading { display:grid;grid-template-columns:minmax(0,1fr) 52px;align-items:center;gap:12px;margin-top:6px;min-height:20px; }
+.segmented-meter { min-width:0; }
+.segmented-track { display:grid;grid-template-columns:repeat(20,minmax(0,1fr));gap:3px;height:16px; }
+.segmented-cell { display:block;position:relative;overflow:hidden;background:var(--border-strong);border-radius:2px; }
+.segmented-fill { position:absolute;inset:0;background:var(--fill-color);transform-origin:0; }
+.segmented-value { font-size:var(--text-sm);font-weight:500;text-align:right; }
+.segmented-unknown { border-top:1px dashed var(--border-strong); }
+@media(max-width:359px) { .number-quotas { column-gap:16px; } }

@@ -39,3 +39,22 @@ do not mount a grid. Both omit interactive legends, tooltips, initial animation,
 and per-cell motion. No animation state, resize observers or untranslated interaction
 copy are needed for a read-only quota. Labels come from TokenPlan's five-language tables.
 The existing MIT license applies. No new package dependencies or Pro source were added.
+
+The additional Home styles reuse that same Gauge geometry for compact and independent
+concentric meters. Quota Ruler and Segmented Bar adapt the free Usage Meter's track,
+scaleX fill and limit marker (https://uiarc.dev/r/usage-meter.json); the segmented
+version partially fills its last piece. Numbers adopts the free Metric Card's static
+label/value/context structure (https://uiarc.dev/r/metric-card.json). These are local,
+read-only quota presentations, not claims that upstream exposes these variant props.
+They omit animated counters, category toggles and fake goal-completion states.
+
+ExpandableCard was retrieved from the free registry on 2026-10-22:
+https://uiarc.dev/r/expandable-card.json. It retains native disclosure buttons, inert
+closed panels, Escape focus return and reduced-motion support; local imports use the
+existing Lucide icons and motion tokens. Benefits without expiry dates stay plain rows.
+
+StaticDonut adapts the free Donut Chart's cumulative-angle sector geometry:
+https://uiarc.dev/r/donut-chart.json. It keeps a fixed recorded-token denominator and
+omits hidden-category renormalization, hover resizing, tooltips and animation. Exact
+readings and zero-token models remain in the accompanying legend; invalid or overly
+fragmented data retains the original list. Both use the existing MIT license.

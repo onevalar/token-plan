@@ -38,9 +38,13 @@ export function MetricReset({metric:m,now,missing,language}:Omit<MetricRowProps,
 export function MetricExpiries({metric:m,language}:Pick<MetricRowProps,'metric'|'language'>) {
  return m.expiries.length>0?<div className="expiries"><span>{textFor(language).expires}</span><ul>{m.expiries.map((date,i)=><li key={i}>{new Date(date).toLocaleString(language)}</li>)}</ul></div>:null;
 }
+export function metricAmount(m:Metric,language:string,missing:string) {
+ if(!m.hasData)return missing;
+ const format=(v:number,unit:string)=>unit==='dollars'?`$${v.toFixed(2)}`:unit==='yuan'?`¥${v.toFixed(2)}`:new Intl.NumberFormat(language,{notation:'compact',maximumFractionDigits:1}).format(v);
+ return m.values.length?m.values.map(v=>`${format(v.amount,v.unit)}${v.label?` ${providerText(v.label,language)}`:''}`).join(' · '):m.amount==null?missing:format(m.amount,m.unit);
+}
 export function MetricRow({metric:m,now,missing,language,remaining=false}:MetricRowProps) {
  const name=metricName(m,language);
- const format=(v:number,unit:string)=>unit==='dollars'?`$${v.toFixed(2)}`:unit==='yuan'?`¥${v.toFixed(2)}`:new Intl.NumberFormat(language,{notation:'compact',maximumFractionDigits:1}).format(v);
  if(m.chart.length){
   const max=Math.max(1,...m.chart.map(p=>p.value));
   const points=m.chart.map((p,i)=>`${i*180/Math.max(1,m.chart.length-1)},${26-p.value/max*22}`).join(' ');
@@ -52,7 +56,7 @@ export function MetricRow({metric:m,now,missing,language,remaining=false}:Metric
  const scope=bounded&&!orb?providerText(metricScope(m),language):'';
  return <div className="metric-block"><div className={`metric ${bounded?'':'text-metric'}`} data-tone={!m.hasData||m.percent==null?'normal':usageTone(m.percent,remaining)}>
   <span className="metric-name" title={windowDescription(m.periodSeconds,language)}>{orb?'Orb':bounded?period(m.periodSeconds)||'—':name}</span>
-  {bounded?<><div className="metric-meter">{scope&&<span className="metric-scope">{scope}</span>}<progress aria-label={`${name} · ${providerText(remaining?'Remaining':'Used',language)}`} aria-valuetext={!m.hasData||m.percent==null?missing:undefined} max={100} value={m.hasData?Math.max(0,Math.min(100,m.percent??0)):0}/></div><span className="value">{m.hasData&&m.percent!=null?`${Math.round(m.percent)}%`:'—'}</span></>:<span className="amount">{!m.hasData?missing:m.values.length?m.values.map(v=>`${format(v.amount,v.unit)}${v.label?` ${providerText(v.label,language)}`:''}`).join(' · '):m.amount==null?missing:format(m.amount,m.unit)}</span>}
+  {bounded?<><div className="metric-meter">{scope&&<span className="metric-scope">{scope}</span>}<progress aria-label={`${name} · ${providerText(remaining?'Remaining':'Used',language)}`} aria-valuetext={!m.hasData||m.percent==null?missing:undefined} max={100} value={m.hasData?Math.max(0,Math.min(100,m.percent??0)):0}/></div><span className="value">{m.hasData&&m.percent!=null?`${Math.round(m.percent)}%`:'—'}</span></>:<span className="amount">{metricAmount(m,language,missing)}</span>}
   {bounded&&<MetricReset metric={m} now={now} missing={missing} language={language}/>}
  </div><MetricExpiries metric={m} language={language}/></div>;
 }

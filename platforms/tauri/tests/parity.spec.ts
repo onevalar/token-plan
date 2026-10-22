@@ -14,7 +14,7 @@ test('daily history expands real model amounts',async({page})=>{
  await page.getByRole('button',{name:'更多',exact:true}).click();await page.getByRole('menuitem',{name:'用量历史'}).click();
  await page.locator('.day-trigger').first().click();
  await page.locator('.entry-trigger').first().click();
- await expect(page.locator('.model-record')).toContainText('claude-test');await expect(page.locator('.model-record')).toContainText('$1.20');
+ const model=page.getByRole('listitem').filter({hasText:'claude-test'});await expect(model).toContainText('1,200 token');await expect(model).toContainText('$1.20');
 });
 
 test('retired cloud state cannot expose synchronization controls',async({page})=>{

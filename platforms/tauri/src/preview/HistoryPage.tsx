@@ -5,6 +5,7 @@ import {Select} from '../components/arc/select/select';
 import {providerText} from '../providerText';
 import {historyRange,historyBounds,summarizeHistory,dateKey} from '../historyModel';
 import {MetricRow} from '../Metrics';
+import {HistoryModelBreakdown} from './HistoryModelBreakdown';
 import type {Account} from '../desktop';
 import type {Copy} from '../copy';
 
@@ -62,7 +63,7 @@ export function HistoryPage({accounts,t,language,initialRange='30'}:HistoryProps
       <Button variant="ghost" size="sm" className="row-button entry-trigger" disabled={!r.models.length} aria-expanded={modelRow===r.owner} onClick={()=>setModelRow(modelRow===r.owner?null:r.owner)}>
        <span className="record-label">{r.provider}{r.account&&<small>{r.account}</small>}</span><span className="record-value">{money(r.cost,language)}<small>{number(r.tokens,language)} token</small></span>{r.models.length>0&&(modelRow===r.owner?<ChevronDown size={14}/>:<ChevronRight size={14}/>)}
       </Button>
-      {modelRow===r.owner&&r.models.map(m=><div className="model-record" key={m.model}><span>{tr(m.model)}</span><span>{money(m.cost,language)}<small>{number(m.tokens,language)} token</small></span>{m.variants.length>0&&<details><summary>{tr('Model Breakdown')}</summary>{m.variants.map(v=><p key={v.model}>{v.model} · {number(v.tokens,language)} token · {money(v.cost,language)}</p>)}</details>}</div>)}
+      {modelRow===r.owner&&<HistoryModelBreakdown row={r} language={language}/>}
      </div>)}</div>}
     </div>;
    })}

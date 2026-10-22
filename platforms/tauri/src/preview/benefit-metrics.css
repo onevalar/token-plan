@@ -1,0 +1,6 @@
+.benefit-expandables { display:grid;gap:12px;overflow-wrap:anywhere;--focus-outline-offset:-3px; }
+.benefit-expandables [data-benefit] { min-width:0; }
+.benefit-dates { font-size:var(--text-xs);line-height:1.7;color:var(--text-secondary); }
+.benefit-dates p { margin:0 0 8px; }
+.benefit-dates ul { list-style:none;padding:0;margin:0;font-variant-numeric:tabular-nums; }
+.benefit-dates li { overflow-wrap:anywhere; }

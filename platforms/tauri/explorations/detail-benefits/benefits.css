@@ -1,0 +1,28 @@
+.detail-rounds { display:flex;flex-wrap:wrap;gap:16px;font-size:var(--text-sm); }
+.detail-rounds a { text-decoration:underline;text-underline-offset:3px; }
+.detail-sample { padding-top:16px; }
+.benefit-region { min-width:0; }
+.benefit-note { color:var(--text-secondary);font-size:var(--text-xs);line-height:1.7; }
+.benefit-summaries { display:grid;gap:12px; }
+/* Local static Metric Card adaptation: no counter, change chip or forced clipping. */
+.benefit-summary { min-width:0;border:1px solid var(--border);border-radius:var(--radius-surface);padding:var(--space-4);background:var(--surface);box-shadow:var(--shadow-resting); }
+.benefit-summary h3 { font-size:var(--text-sm);font-weight:400;color:var(--text-secondary);line-height:1.6;overflow-wrap:anywhere; }
+.benefit-values { display:flex;flex-wrap:wrap;gap:12px 24px;margin-top:12px; }
+.benefit-values p { min-width:0;max-width:100%;display:flex;flex-direction:column;align-items:flex-start;gap:2px; }
+.benefit-values strong { font-family:var(--font-geist);font-size:var(--text-2xl);font-weight:500;line-height:1.25;font-variant-numeric:tabular-nums;overflow-wrap:anywhere; }
+.benefit-values span { font-size:var(--text-xs);color:var(--text-secondary); }
+.benefit-values .benefit-missing { font-size:var(--text-sm);color:var(--text-secondary); }
+.benefit-dates { font-size:var(--text-xs);line-height:1.7;color:var(--text-secondary); }
+.benefit-dates p { margin:0 0 8px; }
+.benefit-dates ul { list-style:none;padding:0;margin:0;font-variant-numeric:tabular-nums; }
+.benefit-dates li { overflow-wrap:anywhere; }
+.benefit-summary .benefit-dates { margin-top:16px;padding-top:12px;border-top:1px solid var(--border); }
+.benefit-expandables { display:grid;gap:12px;overflow-wrap:anywhere;--focus-outline-offset:-3px; }
+.benefit-expandables [data-benefit] { min-width:0; }
+/* Wrap the comparison columns when text/page zoom leaves insufficient actual room. */
+@media(min-width:781px) {
+ .lab-layout { display:flex;flex-wrap:wrap; }
+ .lab-controls { flex:1 1 300px;max-width:340px; }
+ .preview-figure { flex:0 1 var(--panel-width); }
+}
+@media(max-width:359px) { .detail-rounds { gap:8px 16px; } }

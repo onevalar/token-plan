@@ -179,9 +179,11 @@
 "Comfortable" = "넓게";
 "Command Line" = "명령줄";
 "Compact" = "간결";
+"Compact Rings" = "작은 링";
 "Complete the official login in the terminal, then detect accounts again." = "터미널에서 공식 로그인을 완료한 후 계정을 다시 검색하세요.";
 "Complete the update in the installer." = "설치 프로그램에서 업데이트를 완료하세요.";
 "Completions" = "완성";
+"Concentric Rings" = "독립 동심원";
 "Configuration Directory" = "설정 폴더";
 "Confirm" = "확인";
 "Connect Account" = "계정 연결";
@@ -203,6 +205,7 @@
 "Copy Login Command" = "로그인 명령 복사";
 "Cost" = "비용";
 "Cost Estimates" = "비용 추정";
+"Cost Unknown" = "비용 미상";
 "Cost/MTok" = "백만 토큰당 비용";
 "Could not apply this change. Refresh and try again." = "변경하지 못했습니다. 새로 고침 후 다시 시도하세요.";
 "Could not check for updates. Try again later." = "업데이트를 확인할 수 없습니다. 나중에 다시 시도하세요.";
@@ -309,6 +312,7 @@
 "Estimated from model token rates, not your subscription bill." = "모델 토큰 요금으로 계산한 추정치이며 구독 청구 금액이 아닙니다.";
 "Estimated locally, so it may be off" = "로컬에서 추정한 값이라 오차가 있을 수 있습니다";
 "Everything found on this Mac is already added." = "이 Mac에서 찾은 계정은 모두 추가되었습니다.";
+"Exact Readings" = "정확한 수치";
 "Example Data" = "예시 데이터";
 "Existing accounts are in Account Management, including accounts hidden from Home." = "홈에서 숨긴 계정을 포함하여 추가한 계정은 모두 계정 관리에 있습니다.";
 "Expanded" = "펼침";
@@ -456,11 +460,14 @@
 "Middle Ring" = "가운데 링";
 "Minutes" = "분";
 "Model Breakdown" = "모델별 내역";
+"Model token counts are invalid. Showing the original model list." = "모델 토큰 수가 유효하지 않아 원래 모델 목록을 표시합니다.";
+"Model tokens exceed the recorded total. Showing the original model list." = "모델 토큰 합계가 기록된 총량보다 커서 원래 모델 목록을 표시합니다.";
 "Monitor Your AI Subscriptions with TokenPlan" = "TokenPlan으로 AI 구독을 모니터링하세요";
 "Monthly" = "월간";
 "More" = "더 보기";
 "More Metrics" = "추가 지표";
 "More Usage Details" = "사용량 상세 정보";
+"More than six nonzero parts. Showing the original model list." = "0이 아닌 항목이 6개를 넘어 비교하기 쉬운 목록으로 표시합니다.";
 "Move Down" = "아래로 이동";
 "Move Up" = "위로 이동";
 "Move down" = "아래로";
@@ -494,6 +501,8 @@
 "No login or usage confirmed." = "로그인 또는 사용량을 아직 확인하지 못했습니다.";
 "No matching account was identified. Check the directory and access permissions." = "일치하는 계정을 찾지 못했습니다. 디렉터리와 접근 권한을 확인하세요.";
 "No metrics to show" = "표시할 지표가 없습니다";
+"No positive model tokens to compare. Showing the original model list." = "비교할 양수 모델 토큰 수가 없어 원래 모델 목록을 표시합니다.";
+"No positive recorded tokens to compare. Showing the original model list." = "비교할 양수 토큰 기록이 없어 원래 모델 목록을 표시합니다.";
 "No providers are enabled." = "사용 중인 제공업체가 없습니다.";
 "No quota data is available." = "사용 가능한 할당량 데이터가 없습니다.";
 "No readings in this range. Successful refreshes will appear here." = "이 기간의 기록이 없습니다. 새로고침에 성공하면 여기에 표시됩니다.";
@@ -528,6 +537,7 @@
 "Notifications could not be delivered. Check system notification settings." = "알림을 보낼 수 없습니다. 시스템 알림 설정을 확인하세요.";
 "Notifications, appearance and more" = "알림, 모양 등";
 "Notify When Usage Reaches" = "알림 사용량 기준";
+"Numbers" = "숫자";
 "On Demand" = "필요할 때 표시";
 "One ring per selected account: Claude 5h, Codex Pro 1w, Plus 5h. Other plans use the quota with least remaining." = "선택한 계정마다 링 하나: Claude 5h, Codex Pro 1w, Plus 5h. 다른 요금제는 남은 할당량이 가장 적은 한도를 표시합니다.";
 "Only includes %@." = "%@만 포함됩니다.";
@@ -588,6 +598,7 @@
 "Quit TokenPlan" = "TokenPlan 종료";
 "Quota History" = "할당량 기록";
 "Quota Readings" = "할당량 기록";
+"Quota Ruler" = "할당량 눈금";
 "Quota Style" = "사용량 그래프";
 "Quota exceeded" = "할당량 초과";
 "Quota exhausted" = "할당량 소진";
@@ -605,6 +616,8 @@
 "Recalculating Estimates…" = "추정치 다시 계산 중…";
 "Receive pre-release builds before they ship to everyone" = "정식 배포 전에 사전 출시 빌드를 받습니다";
 "Record Shortcut" = "단축키 기록";
+"Recorded Tokens" = "기록된 토큰";
+"Recorded token counts are invalid. Showing the original model list." = "기록된 토큰 합계가 유효하지 않아 원래 모델 목록을 표시합니다.";
 "Reduce Animations" = "애니메이션 줄이기";
 "Refresh" = "새로고침";
 "Refresh %@" = "%@ 새로고침";
@@ -661,6 +674,7 @@
 "Resets %@" = "%@ 초기화";
 "Resets expire in:" = "초기화 만료 시각:";
 "Resets expire:" = "초기화 만료:";
+"Resets in" = "초기화까지";
 "Resets in %@" = "%@ 후 초기화";
 "Resets soon" = "곧 초기화";
 "Resetting" = "초기화 중";
@@ -693,6 +707,7 @@
 "Saving…" = "저장 중…";
 "Search" = "검색";
 "Search Services" = "서비스 검색";
+"Segmented Bar" = "분할 막대";
 "Selected accounts appear as live system tray indicators. Each value uses its own icon in percentage mode. Your desktop controls icon spacing, order and overflow." = "선택한 계정의 사용량이 시스템 트레이에 실시간으로 표시됩니다. 백분율 모드에서는 각 값이 별도 아이콘으로 표시됩니다. 간격, 순서 및 숨김은 데스크톱에서 제어합니다.";
 "Service Configuration" = "서비스 설정";
 "Services & Subscriptions" = "서비스 및 구독";
@@ -705,6 +720,8 @@
 "Set Up" = "설정";
 "Settings" = "설정";
 "Settings…" = "설정…";
+"Share of Recorded Tokens" = "기록된 토큰 구성";
+"Shares use %@ recorded tokens from this day and source, not a plan limit or a full bill." = "비율은 해당 날짜와 출처에 기록된 %@ 토큰을 기준으로 하며, 요금제 한도나 전체 청구 내역이 아닙니다.";
 "Show" = "표시";
 "Show First Usage Metric" = "첫 사용량 항목 표시";
 "Show Log Folder" = "로그 폴더 열기";
@@ -785,6 +802,7 @@
 "The update could not be installed. Your current version is unchanged." = "업데이트를 설치하지 못했습니다. 현재 버전은 변경되지 않았습니다.";
 "Theme" = "테마";
 "These three readings share one allowance. More expensive models use it up faster. They are not each model's own remaining amount." = "이 세 항목은 같은 한도입니다. 비싼 모델일수록 더 빨리 소진되며, 모델별 잔여량이 아닙니다.";
+"These variants are included in the model above, not added again." = "이 세부 항목은 위 모델에 이미 포함되어 있으며 다시 더하지 않습니다.";
 "This Mac" = "이 Mac";
 "This Month" = "이번 달";
 "This Week" = "이번 주";
@@ -815,6 +833,7 @@
 "TokenPlan reads credentials on this device to retrieve your usage. No analytics or crash reporting is collected." = "TokenPlan은 이 기기의 자격 증명으로 사용량을 조회합니다. 분석 데이터나 충돌 보고서는 수집하지 않습니다.";
 "TokenPlan sends no analytics or crash reports. Credentials stay on this computer." = "TokenPlan은 분석 데이터나 충돌 보고서를 보내지 않습니다. 자격 증명은 이 컴퓨터에만 보관됩니다.";
 "Tokens" = "토큰";
+"Tokens without a model stay in the total as unclassified records." = "모델이 없는 토큰도 합계에 포함하여 미분류 기록으로 표시합니다.";
 "Top Up" = "충전";
 "Topped Up" = "충전됨";
 "Total Spend Metric" = "총 지출 지표";
@@ -835,6 +854,7 @@
 "Unattributed" = "미분류";
 "Unavailable" = "사용 불가";
 "Unavailable Model" = "사용할 수 없는 모델";
+"Unclassified Records" = "미분류 기록";
 "Under 10% usage remaining for this window." = "이 기간의 남은 사용량이 10% 미만입니다.";
 "Uninstall" = "제거";
 "Unknown" = "알 수 없음";

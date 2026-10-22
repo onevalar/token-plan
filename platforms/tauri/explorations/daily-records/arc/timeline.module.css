@@ -1,0 +1,19 @@
+/* Free Arc Timeline marker/line/trigger layout, reduced to date-only records.
+   No event clock, sticky day heading, entry animation or fade mask. */
+.root { --marker:12px;--marker-top:20px;--line-gap:4px;position:relative;display:grid;min-width:0;color:var(--foreground); }
+.list { margin:0;padding:0;list-style:none; }
+.item { position:relative;padding-left:calc(var(--marker) + var(--space-3)); }
+.marker { position:absolute;z-index:1;top:var(--marker-top);left:0;width:var(--marker);height:var(--marker);border:1px solid var(--border-strong);border-radius:var(--radius-pill);background:var(--surface); }
+.segment { position:absolute;top:calc(var(--marker-top) + var(--marker) + var(--line-gap));bottom:calc(var(--line-gap) - var(--marker-top));left:calc(var(--marker) / 2 - .5px);width:1px;background:var(--border-strong); }
+.content { min-width:0;padding-bottom:var(--space-3); }
+.trigger { display:grid;width:100%;grid-template-columns:minmax(0,1fr) auto;align-items:start;column-gap:var(--space-3);margin:0;padding:var(--space-3);border:0;border-radius:var(--radius-control);background:transparent;color:inherit;font:inherit;text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent; }
+@media (hover:hover) and (pointer:fine) { .trigger:hover { background:var(--surface-muted); } }
+.trigger:active { background:var(--surface-muted); }
+.text { display:grid;min-width:0;gap:var(--space-1); }
+.date { display:flex;align-items:baseline;gap:var(--space-2);font-size:var(--text-sm);font-weight:500; }
+.date small { font-size:var(--text-xs);font-weight:400; }
+.summary { display:flex;flex-wrap:wrap;justify-content:space-between;gap:var(--space-2) var(--space-4);color:var(--foreground);font-size:var(--text-sm);font-variant-numeric:tabular-nums; }
+.meta { color:var(--text-secondary);font-size:var(--text-xs);line-height:var(--leading-body); }
+.chevron { color:var(--text-secondary);margin-top:var(--space-1); }
+.chevron[data-open="true"] { transform:rotate(180deg); }
+.detail { min-width:0;padding-top:var(--space-1); }
