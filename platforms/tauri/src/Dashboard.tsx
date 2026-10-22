@@ -5,7 +5,8 @@ import {Button} from './components/arc/button/button';
 import type {Account} from './desktop';
 import {accountTitle} from './usage';
 import {providerText} from './providerText';
-import {MetricRow} from './Metrics';
+import {isQuotaMetric} from './Metrics';
+import {HomeMetrics,type HomeUsageStyle} from './HomeMetrics';
 import {connectionAction} from './connection';
 
 export function ProviderLogo({family}:{family:string}) {
@@ -30,8 +31,10 @@ export function problemAction(a:Account,run:{open:(id:string)=>void;settings:(id
  if(kind==='inspect')return {label:'Check Connection',run:()=>run.open(a.id)};
  return {label:'View Details',run:()=>run.open(a.id)};
 }
-export function Dashboard({accounts,open,openSettings,retry,busy=false,now,language,missing,remaining}:{accounts:Account[];open:(id:string)=>void;openSettings:(id:string)=>void;retry:(id:string)=>void;busy?:boolean;now:number;language:string;missing:string;remaining:boolean}) {
- return <div className="dashboard">{accountGroups(accounts).map(group=><section className="provider" data-provider={group.family} style={providerTheme(group.family)} key={group.accounts[0].id}>
+export function Dashboard({accounts,open,openSettings,retry,busy=false,now,language,missing,remaining,usageStyle='bars'}:{accounts:Account[];open:(id:string)=>void;openSettings:(id:string)=>void;retry:(id:string)=>void;busy?:boolean;now:number;language:string;missing:string;remaining:boolean;usageStyle?:HomeUsageStyle}) {
+ return <div className="dashboard" data-usage-style={usageStyle}>
+  {usageStyle==='cells'&&accounts.some(a=>a.enabled&&a.metrics.some(m=>m.placement==='home'&&isQuotaMetric(m)))&&<p className="home-grid-caption">{providerText('Each cell is 1%.',language)}</p>}
+  {accountGroups(accounts).map(group=><section className="provider" data-provider={group.family} style={providerTheme(group.family)} key={group.accounts[0].id}>
   {group.accounts.length>1&&<div className="family-heading"><ProviderLogo family={group.family}/><h2>{group.accounts[0].name}</h2></div>}
   {group.accounts.map(a=><div className="account-block" key={a.id}>
    <div className="provider-heading">
@@ -45,7 +48,7 @@ export function Dashboard({accounts,open,openSettings,retry,busy=false,now,langu
     </Button>
    </div>
    {(a.error||a.warning)&&<div className="notice-block"><p role="status" className="notice">{providerText(a.error||a.warning||"",language)}</p>{(()=>{const action=problemAction(a,{open,settings:openSettings,retry});return action&&<Button size="sm" variant="secondary" className="notice-action" disabled={busy} onClick={action.run}>{providerText(action.label,language)}</Button>;})()}</div>}
-   {a.metrics.filter(m=>m.placement==='home').map(m=><MetricRow key={m.id} metric={m} now={now} missing={missing} language={language} remaining={remaining}/>)}
+   <HomeMetrics metrics={a.metrics.filter(m=>m.placement==='home')} style={usageStyle} now={now} missing={missing} language={language} remaining={remaining}/>
   </div>)}
  </section>)}</div>;
 }

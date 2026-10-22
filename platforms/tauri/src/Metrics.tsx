@@ -27,22 +27,32 @@ export function usageTone(percent:number,remaining:boolean) {
  const used=remaining?100-percent:percent;
  return used>=80?'critical':'normal';
 }
-export function MetricRow({metric:m,now,missing,language,remaining=false}:{metric:Metric;now:number;missing:string;language:string;remaining?:boolean}) {
- const name=metricName(m,language),t=textFor(language);
+export type MetricRowProps={metric:Metric;now:number;missing:string;language:string;remaining?:boolean};
+export function isQuotaMetric(m:Metric) {
+ return !m.chart.length&&(m.percent!=null||m.periodSeconds!=null||m.unit==='percent');
+}
+export function MetricReset({metric:m,now,missing,language}:Omit<MetricRowProps,'remaining'>) {
  const reset=now&&m.hasData?countdown(m.resetsAt,now):null;
+ return <span className="reset" title={reset&&!m.notStarted?providerText('Resets in %@',language).replace('%@',reset):undefined}>{reset&&!m.notStarted?<><span>{reset}</span><Hourglass size={13} aria-hidden="true"/></>:<span className="reset-status">{!m.hasData?missing:m.notStarted?textFor(language).notStarted:'—'}</span>}</span>;
+}
+export function MetricExpiries({metric:m,language}:Pick<MetricRowProps,'metric'|'language'>) {
+ return m.expiries.length>0?<div className="expiries"><span>{textFor(language).expires}</span><ul>{m.expiries.map((date,i)=><li key={i}>{new Date(date).toLocaleString(language)}</li>)}</ul></div>:null;
+}
+export function MetricRow({metric:m,now,missing,language,remaining=false}:MetricRowProps) {
+ const name=metricName(m,language);
  const format=(v:number,unit:string)=>unit==='dollars'?`$${v.toFixed(2)}`:unit==='yuan'?`¥${v.toFixed(2)}`:new Intl.NumberFormat(language,{notation:'compact',maximumFractionDigits:1}).format(v);
  if(m.chart.length){
   const max=Math.max(1,...m.chart.map(p=>p.value));
   const points=m.chart.map((p,i)=>`${i*180/Math.max(1,m.chart.length-1)},${26-p.value/max*22}`).join(' ');
   return <div className="metric-chart"><span>{name}</span><svg viewBox="0 0 180 28" role="img" aria-label={name}>{m.chart.length===1?<circle cx="90" cy={26-m.chart[0].value/max*22} r="2" fill="currentColor"/>:<polyline points={points} fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" strokeLinecap="round"/>}</svg></div>;
  }
- const bounded=m.percent!=null||m.periodSeconds!=null||m.unit==='percent';
+ const bounded=isQuotaMetric(m);
  // Amp's non-periodic Orb allowance fits the short label column on both helpers.
  const orb=m.label==='Orb Usage'&&!period(m.periodSeconds);
  const scope=bounded&&!orb?providerText(metricScope(m),language):'';
  return <div className="metric-block"><div className={`metric ${bounded?'':'text-metric'}`} data-tone={!m.hasData||m.percent==null?'normal':usageTone(m.percent,remaining)}>
   <span className="metric-name" title={windowDescription(m.periodSeconds,language)}>{orb?'Orb':bounded?period(m.periodSeconds)||'—':name}</span>
   {bounded?<><div className="metric-meter">{scope&&<span className="metric-scope">{scope}</span>}<progress aria-label={`${name} · ${providerText(remaining?'Remaining':'Used',language)}`} aria-valuetext={!m.hasData||m.percent==null?missing:undefined} max={100} value={m.hasData?Math.max(0,Math.min(100,m.percent??0)):0}/></div><span className="value">{m.hasData&&m.percent!=null?`${Math.round(m.percent)}%`:'—'}</span></>:<span className="amount">{!m.hasData?missing:m.values.length?m.values.map(v=>`${format(v.amount,v.unit)}${v.label?` ${providerText(v.label,language)}`:''}`).join(' · '):m.amount==null?missing:format(m.amount,m.unit)}</span>}
-  {bounded&&<span className="reset" title={reset&&!m.notStarted?providerText('Resets in %@',language).replace('%@',reset):undefined}>{reset&&!m.notStarted?<><span>{reset}</span><Hourglass size={13} aria-hidden="true"/></>:<span className="reset-status">{!m.hasData?missing:m.notStarted?t.notStarted:'—'}</span>}</span>}
- </div>{m.expiries.length>0&&<div className="expiries"><span>{t.expires}</span><ul>{m.expiries.map((date,i)=><li key={i}>{new Date(date).toLocaleString(language)}</li>)}</ul></div>}</div>;
+  {bounded&&<MetricReset metric={m} now={now} missing={missing} language={language}/>}
+ </div><MetricExpiries metric={m} language={language}/></div>;
 }

@@ -122,6 +122,7 @@
 "Background" = "后台运行";
 "Balance" = "余额";
 "Balance and Benefits" = "余额与权益";
+"Bars" = "横条";
 "Based on OpenUsage by Robin Ebers, released under the MIT License." = "基于 Robin Ebers 的 OpenUsage，遵循 MIT 许可证。";
 "Beta Updates" = "测试版更新";
 "Billing" = "账单";
@@ -208,6 +209,7 @@
 "Could not check or install the update. Try again later." = "无法检查或安装更新，请稍后重试。";
 "Could not complete this step. Check the directory or login and try again." = "操作未完成，请检查目录或登录状态后重试。";
 "Could not install the update. Try again later." = "无法安装更新，请稍后重试。";
+"Could not load the Home usage style. Choose a style to save it again." = "无法读取主页用量样式，请重新选择样式以保存。";
 "Could not open a terminal. Copy this command and run it in your terminal." = "无法打开终端，请复制此命令到终端运行。";
 "Could not refresh accounts. Check their status." = "账号刷新失败，请查看账号状态。";
 "Could not save. Try again." = "保存失败，请重试。";
@@ -286,6 +288,7 @@
 "Downloading Update…" = "正在下载更新…";
 "Drag metrics here" = "将指标拖到此处";
 "Drunk Mode" = "微醺模式";
+"Each cell is 1%." = "每格 1 个百分点。";
 "Edit" = "编辑";
 "Enable Claude or Codex in Providers to read local token logs." = "在提供方中启用 Claude 或 Codex，即可读取本机 Token 日志。";
 "Enable Codex in Providers to read its local token logs." = "在提供方中启用 Codex，即可读取本机 Token 日志。";
@@ -343,6 +346,7 @@
 "From your Cursor usage history." = "来自你的 Cursor 用量历史。";
 "From your Grok logs (estimated)" = "来自你的 Grok 日志（估算）";
 "From your OpenCode logs" = "来自你的 OpenCode 日志";
+"Gauges" = "独立仪表";
 "Gemini Pro" = "Gemini Pro";
 "Gemini Weekly" = "Gemini 每周";
 "General" = "通用";
@@ -372,6 +376,7 @@
 "History comes from logs on this device. It may not cover every account or device." = "历史来自本机日志，不一定涵盖所有账号和设备。";
 "Home" = "首页显示";
 "Home Layout" = "首页布局";
+"Home Usage Style" = "主页用量样式";
 "Horizontal Bar" = "横条";
 "I Have Signed In — Check Again" = "我已登录，重新检查";
 "Icon Position" = "图标位置";
@@ -461,6 +466,7 @@
 "Move down" = "下移";
 "Move up" = "上移";
 "My Accounts" = "我的账号";
+"Near quota limit" = "额度接近上限";
 "Needs Attention" = "需要处理";
 "Needs an API key" = "需要 API 密钥";
 "Needs attention" = "需要留意";
@@ -559,6 +565,7 @@
 "Party mode is on, so this stays paused." = "派对模式已开启，因此此项暂停。";
 "Pay as you go" = "按量付费";
 "Percentage" = "百分比";
+"Percentage Grid" = "百分格";
 "Personal" = "个人";
 "Pin to tray" = "固定到托盘";
 "Platform" = "运行平台";
@@ -582,6 +589,8 @@
 "Quota History" = "额度记录";
 "Quota Readings" = "配额记录";
 "Quota Style" = "图形样式";
+"Quota exceeded" = "已超出额度";
+"Quota exhausted" = "额度已用尽";
 "Quota observations" = "额度历史记录";
 "Rate Limit Resets" = "额度重置次数";
 "Rate limit resets" = "额度重置次数";

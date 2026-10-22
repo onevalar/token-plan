@@ -8,6 +8,19 @@ tray integration remain platform-specific. This change does not publish a releas
 
 - Home offers Compact (default) and Comfortable spacing. The preference stays on
   this device; the previous macOS preview preference is preserved on upgrade.
+- General Settings also offers Home Usage Style: Bars (default), Gauges and
+  Percentage Grid. The choice stays on this device, independently of spacing,
+  used/remaining mode and tray style. It changes Home only, not account details
+  or history. Each account and quota keeps its own reading; nothing is averaged
+  or combined. Balances and existing history charts keep their original form and order.
+- Gauges and grids show the same percentages and reset times as bars, including
+  missing readings and windows that have not started. A grid has 100 whole cells,
+  each representing one percentage point; fractions round to the nearest cell.
+  Over-limit numbers are never clipped: a gauge stops at its endpoint but keeps
+  the real percentage; a grid outside 0–100% shows the number without a grid.
+  Reopening Home and refreshing do not replay fill animations or celebrate exhaustion.
+- These are independent quota displays, not combined goal rings, quota composition
+  charts or forecasts without real data.
 - Home has matching icon-only Refresh/More actions. Inner pages have Back, a page
   title and only relevant actions. Back restores the prior screen, scroll, tab and
   history range, and returns keyboard focus to the entry that opened it when still
@@ -16,7 +29,7 @@ tray integration remain platform-specific. This change does not publish a releas
   hidden. Percentages follow the used/remaining preference, including their screen
   reader names. Home and quota details keep the values and reset countdowns without
   a separate explanatory legend.
-- Quota rows show the provider's actual period (such as 5h, 1w or 30d) separately
+- Quota bar rows show the provider's actual period (such as 5h, 1w or 30d) separately
   from the model or allowance name. Names do not add extra rows. Long names are
   shortened with an ellipsis; their full text remains in account settings and
   screen-reader labels. No model information is discarded from the stored reading;
@@ -25,8 +38,10 @@ tray integration remain platform-specific. This change does not publish a releas
   not started retain their status; balances and cumulative amounts remain text.
   Amp's non-periodic Orb allowance uses the short label Orb rather than a missing
   period and separate caption.
-- Quota bars retain the service color until at least 80% is used (20% or less
-  remaining), then both the bar and percentage turn red. The threshold is the same
+- Quota displays retain the service color until at least 80% is used (20% or less
+  remaining), then both the graphic and percentage turn red. Gauges and grids also
+  name the near-limit, exhausted or exceeded state. The threshold uses the unrounded
+  reading, not the displayed number or the filled cell count, and is the same
   in Used and Remaining modes. Missing readings never signal a low quota.
   This display rule does not change the user's notification thresholds.
 - Note and API-key drafts survive page navigation separately for each account, only

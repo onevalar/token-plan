@@ -23,6 +23,7 @@ import {HistoryPage} from './HistoryPage';
 import {trayAccounts} from '../desktop';
 import {TrayPanel} from './TrayPanel';
 import {useDensity} from './useDensity';
+import {useHomeUsageStyle} from './useHomeUsageStyle';
 import './preview.css';
 import {usePanelHeight} from './usePanelHeight';
 
@@ -41,6 +42,7 @@ export function DesktopApp() {
   return()=>{void stop.then(f=>f()).catch(()=>{});};
  },[]);
  const densityPreference=useDensity();
+ const usageStylePreference=useHomeUsageStyle();
  const [routes,setRoutes]=useState<Route[]>([{key:0,page:'home'}]);
  const sequence=useRef(0),heading=useRef<HTMLHeadingElement>(null);
  const previousRoute=useRef(0),lastTrigger=useRef<HTMLElement|null>(null),returnFocus=useRef(new Map<number,HTMLElement|'menu'>());
@@ -130,9 +132,9 @@ export function DesktopApp() {
   <div className="page-stack">{routes.map(route=>{
    const a=state?.accounts.find(a=>a.id===route.accountId);
    return <div className="preview-page" data-page={route.page} key={route.key} hidden={route.key!==current.key}><div className="page-content">
-    {state&&route.page==='home'&&<>{platform&&platform!=='macos'&&<TrayPanel state={state} label={t.tray} open={accountId=>push('detail',{accountId,tab:'usage'})}/>}{!state.accounts.some(a=>a.enabled)?<div className="empty-state">{state.accounts.some(a=>a.added)?<><p>{tr('All accounts are hidden from Home. You can show them again in Account Management.')}</p><Button size="sm" variant="secondary" onClick={()=>push('configure')}>{t.configure}</Button></>:<><p>{tr('No accounts yet. Add one to start tracking your usage.')}</p><div className="empty-actions"><Button size="sm" variant="secondary" onClick={addAccount}><Plus size={15}/>{tr('Add Account')}</Button></div></>}</div>:<><HomeTips state={state} send={send} language={language} addAccount={addAccount}/><Dashboard accounts={state.accounts} open={accountId=>push('detail',{accountId,tab:'usage'})} openSettings={accountId=>push('detail',{accountId,tab:'settings'})} retry={retryAccount} busy={busy||refreshing} now={now} language={language} missing={basic.missing} remaining={state.settings.showRemaining}/><Button className="add-account-row" variant="ghost" size="sm" onClick={addAccount}><Plus size={15}/>{tr('Add Account')}</Button></>}</>}
+    {state&&route.page==='home'&&<>{platform&&platform!=='macos'&&<TrayPanel state={state} label={t.tray} open={accountId=>push('detail',{accountId,tab:'usage'})}/>}{!state.accounts.some(a=>a.enabled)?<div className="empty-state">{state.accounts.some(a=>a.added)?<><p>{tr('All accounts are hidden from Home. You can show them again in Account Management.')}</p><Button size="sm" variant="secondary" onClick={()=>push('configure')}>{t.configure}</Button></>:<><p>{tr('No accounts yet. Add one to start tracking your usage.')}</p><div className="empty-actions"><Button size="sm" variant="secondary" onClick={addAccount}><Plus size={15}/>{tr('Add Account')}</Button></div></>}</div>:<><HomeTips state={state} send={send} language={language} addAccount={addAccount}/><Dashboard accounts={state.accounts} open={accountId=>push('detail',{accountId,tab:'usage'})} openSettings={accountId=>push('detail',{accountId,tab:'settings'})} retry={retryAccount} busy={busy||refreshing} now={now} language={language} missing={basic.missing} remaining={state.settings.showRemaining} usageStyle={usageStylePreference.style}/><Button className="add-account-row" variant="ghost" size="sm" onClick={addAccount}><Plus size={15}/>{tr('Add Account')}</Button></>}</>}
     {state&&a&&route.page==='detail'&&<AccountDetail draft={drafts[a.id]??{}} onDraftChange={patch=>setDrafts(d=>({...d,[a.id]:{...d[a.id],...patch}}))} badge={trayAccounts(state.accounts).find(item=>item.id===a.id)?.badge} traySettings={state.settings} account={a} tab={route.tab??'usage'} onTab={tab=>setRoutes(r=>r.map(item=>item.key===route.key?{...item,tab}:item))} history={range=>push('history',{accountId:a.id,range})} send={send} t={t} busy={busy} language={language} now={now} remaining={state.settings.showRemaining} missing={basic.missing}/>}
-    {state&&route.page==='settings'&&<GeneralSettings platform={platform} densityPreference={densityPreference} state={state} send={send} t={t} busy={busy} language={language}/>}
+    {state&&route.page==='settings'&&<GeneralSettings platform={platform} densityPreference={densityPreference} usageStylePreference={usageStylePreference} state={state} send={send} t={t} busy={busy} language={language}/>}
     {state&&route.page==='configure'&&<>{addedName&&<p role="status" className="added-note">{tr('Added to Home')}: {addedName}</p>}<ServiceConfiguration state={state} send={send} t={t} busy={busy} language={language} open={accountId=>push('detail',{accountId,tab:'settings'})}/></>}
     {state&&route.page==='add'&&<AddAccount state={state} send={send} t={t} busy={busy} language={language} complete={finishAdding} open={accountId=>{back();push('detail',{accountId,tab:'settings'});}}/>}
     {state&&route.page==='history'&&<>{a&&<div className="history-account-context">{a.name}{a.email&&<span>{a.email}</span>}</div>}<HistoryPage accounts={a?[a]:state.accounts} t={t} language={language} initialRange={route.range}/></>}

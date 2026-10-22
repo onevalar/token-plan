@@ -122,6 +122,7 @@
 "Background" = "백그라운드";
 "Balance" = "잔액";
 "Balance and Benefits" = "잔액 및 혜택";
+"Bars" = "막대";
 "Based on OpenUsage by Robin Ebers, released under the MIT License." = "Robin Ebers의 OpenUsage(MIT 라이선스)를 기반으로 합니다.";
 "Beta Updates" = "베타 업데이트";
 "Billing" = "청구";
@@ -208,6 +209,7 @@
 "Could not check or install the update. Try again later." = "업데이트를 확인하거나 설치하지 못했습니다. 나중에 다시 시도하세요.";
 "Could not complete this step. Check the directory or login and try again." = "완료하지 못했습니다. 폴더 또는 로그인 상태를 확인하고 다시 시도하세요.";
 "Could not install the update. Try again later." = "업데이트를 설치할 수 없습니다. 나중에 다시 시도하세요.";
+"Could not load the Home usage style. Choose a style to save it again." = "홈 사용량 스타일을 불러오지 못했습니다. 스타일을 다시 선택하여 저장하세요.";
 "Could not open a terminal. Copy this command and run it in your terminal." = "터미널을 열 수 없습니다. 이 명령을 복사해 터미널에서 실행하세요.";
 "Could not refresh accounts. Check their status." = "계정을 새로 고치지 못했습니다. 계정 상태를 확인하세요.";
 "Could not save. Try again." = "저장하지 못했습니다. 다시 시도하세요.";
@@ -286,6 +288,7 @@
 "Downloading Update…" = "업데이트 다운로드 중…";
 "Drag metrics here" = "여기로 지표를 끌어다 놓으세요";
 "Drunk Mode" = "취기 모드";
+"Each cell is 1%." = "한 칸은 1퍼센트포인트입니다.";
 "Edit" = "편집";
 "Enable Claude or Codex in Providers to read local token logs." = "제공업체에서 Claude 또는 Codex를 사용하면 로컬 토큰 로그를 읽을 수 있습니다.";
 "Enable Codex in Providers to read its local token logs." = "제공업체에서 Codex를 사용하면 로컬 토큰 로그를 읽을 수 있습니다.";
@@ -343,6 +346,7 @@
 "From your Cursor usage history." = "Cursor 사용 기록에서 가져왔습니다.";
 "From your Grok logs (estimated)" = "Grok 로그에서 (추정)";
 "From your OpenCode logs" = "OpenCode 로그에서";
+"Gauges" = "개별 게이지";
 "Gemini Pro" = "Gemini Pro";
 "Gemini Weekly" = "Gemini 주간";
 "General" = "일반";
@@ -372,6 +376,7 @@
 "History comes from logs on this device. It may not cover every account or device." = "이 기기의 로그 기록입니다. 모든 계정이나 기기를 포함하지 않을 수 있습니다.";
 "Home" = "홈";
 "Home Layout" = "홈 레이아웃";
+"Home Usage Style" = "홈 사용량 스타일";
 "Horizontal Bar" = "가로 막대";
 "I Have Signed In — Check Again" = "로그인했습니다. 다시 확인";
 "Icon Position" = "아이콘 위치";
@@ -461,6 +466,7 @@
 "Move down" = "아래로";
 "Move up" = "위로";
 "My Accounts" = "내 계정";
+"Near quota limit" = "할당량 한도에 근접";
 "Needs Attention" = "확인 필요";
 "Needs an API key" = "API 키 필요";
 "Needs attention" = "확인 필요";
@@ -559,6 +565,7 @@
 "Party mode is on, so this stays paused." = "파티 모드가 켜져 있어 이 설정은 일시 중지됩니다.";
 "Pay as you go" = "종량제";
 "Percentage" = "백분율";
+"Percentage Grid" = "백분율 격자";
 "Personal" = "개인";
 "Pin to tray" = "트레이에 고정";
 "Platform" = "플랫폼";
@@ -582,6 +589,8 @@
 "Quota History" = "할당량 기록";
 "Quota Readings" = "할당량 기록";
 "Quota Style" = "사용량 그래프";
+"Quota exceeded" = "할당량 초과";
+"Quota exhausted" = "할당량 소진";
 "Quota observations" = "할당량 기록";
 "Rate Limit Resets" = "한도 초기화";
 "Rate limit resets" = "한도 초기화";

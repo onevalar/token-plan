@@ -38,7 +38,13 @@ export async function mockDesktop(page:Page,language='zh-Hans',cloud=false,data:
     if(r.method==='note'&&a)a.note=r.value;
     if(r.method==='remove')state.accounts=state.accounts.filter((a:any)=>a.id!==r.accountId);
     if(r.method==='metric'&&a)Object.assign(a.metrics.find((m:any)=>m.id===r.metricId)!,r.value);
-    if(r.method==='settings'){Object.assign(state.settings,r.value);}
+    if(r.method==='settings'){
+     // Helpers return percentages in the selected display mode, not always used percentages.
+     if(typeof r.value.showRemaining==='boolean'&&r.value.showRemaining!==Boolean(state.settings.showRemaining)){
+      for(const account of state.accounts)for(const metric of account.metrics)if(metric.percent!=null)metric.percent=100-metric.percent;
+     }
+     Object.assign(state.settings,r.value);
+    }
     if(r.method==='move'&&a){const i=state.accounts.indexOf(a);[state.accounts[i],state.accounts[i+r.value]]=[state.accounts[i+r.value],a];}
     return structuredClone(state);
    }

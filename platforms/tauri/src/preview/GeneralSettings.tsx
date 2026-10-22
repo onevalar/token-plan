@@ -8,8 +8,10 @@ import type {Copy} from '../copy';
 import {providerText} from '../providerText';
 import {Group,SelectRow,ToggleRow,useChange} from './shared';
 import type {Density,useDensity} from './useDensity';
+import type {useHomeUsageStyle} from './useHomeUsageStyle';
+import type {HomeUsageStyle} from '../HomeMetrics';
 
-export function GeneralSettings({state,send,t,busy,language,densityPreference,platform}:{platform:string;densityPreference:ReturnType<typeof useDensity>;state:DesktopState;send:Send;t:Copy;busy:boolean;language:string}) {
+export function GeneralSettings({state,send,t,busy,language,densityPreference,usageStylePreference,platform}:{platform:string;densityPreference:ReturnType<typeof useDensity>;usageStylePreference:ReturnType<typeof useHomeUsageStyle>;state:DesktopState;send:Send;t:Copy;busy:boolean;language:string}) {
  const tr=(s:string)=>providerText(s,language),{pending,change,notice}=useChange(send,t),disabled=busy||pending;
  const settings=(value:unknown)=>void change({method:'settings',value});
  const shown=trayAccounts(state.accounts),[accountsOpen,setAccountsOpen]=useState(false);
@@ -18,10 +20,12 @@ export function GeneralSettings({state,send,t,busy,language,densityPreference,pl
  return <div className="general-preferences">
   {notice}
   {densityPreference.failed&&<p role="alert" className="inline-error">{t.failed}</p>}
+  {usageStylePreference.error&&<p role="alert" className="inline-error">{tr(usageStylePreference.error)}</p>}
   <Group title={tr('Appearance and Language')}>
    <SelectRow label={t.language} value={state.settings.language} disabled={disabled} options={[{value:'system',label:t.system},{value:'en',label:'English'},{value:'zh-Hans',label:'简体中文'},{value:'zh-Hant',label:'繁體中文'},{value:'ja',label:'日本語'},{value:'ko',label:'한국어'}]} onValueChange={language=>settings({language})}/>
    <SelectRow label={t.appearance} value={state.settings.appearance} disabled={disabled} options={['system','light','dark'].map(value=>({value,label:t[value as 'system']}))} onValueChange={appearance=>settings({appearance})}/>
    <SelectRow label={tr('Home Layout')} value={densityPreference.density} options={[{value:'compact',label:tr('Compact')},{value:'comfortable',label:tr('Comfortable')}]} onValueChange={value=>densityPreference.changeDensity(value as Density)}/>
+   <SelectRow label={tr('Home Usage Style')} value={usageStylePreference.style} options={[{value:'bars',label:tr('Bars')},{value:'gauges',label:tr('Gauges')},{value:'cells',label:tr('Percentage Grid')}]} onValueChange={value=>usageStylePreference.changeStyle(value as HomeUsageStyle)}/>
    <ToggleRow label={t.showRemaining} checked={state.settings.showRemaining} disabled={disabled} onCheckedChange={showRemaining=>settings({showRemaining})}/>
   </Group>
   <Group title={tr('Data Refresh')}>

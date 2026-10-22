@@ -10,7 +10,7 @@ const visible=(page:Page)=>page.locator('.preview-page:not([hidden])');
 async function menu(page:Page,item:string){await page.getByRole('button',{name:'更多',exact:true}).click();await page.getByRole('menuitem',{name:item,exact:true}).click();}
 async function openNote(page:Page){const add=page.getByRole('button',{name:'添加备注',exact:true});if(await add.count())await add.click();else await page.getByRole('button',{name:'编辑',exact:true}).click();}
 const back=(page:Page)=>page.getByRole('button',{name:'返回',exact:true}).click();
-async function setup(page:Page,data=largeDesktop()) {await mockDesktop(page,'zh-Hans',true,data);await page.goto('/');await expect(page.locator('.mac-preview')).toBeVisible();}
+async function setup(page:Page,data=largeDesktop()) {await mockDesktop(page,'zh-Hans',true,data);await page.goto('/');await expect(page.locator('.dashboard,.empty-state')).toBeVisible();}
 async function noOverflow(page:Page){expect(await visible(page).evaluate(e=>e.scrollWidth<=e.clientWidth+1)).toBe(true);}
 
 test('contextual navigation scopes refresh and restores origin, tab, range and scroll',async({page})=>{
@@ -350,6 +350,8 @@ test('quota readings retain accessible used and remaining names without explanat
 test('content height follows the active page and shrinks after returning to one service',async({page})=>{
  const data=largeDesktop();data.accounts.forEach((a,i)=>{a.enabled=i===0;});
  await setup(page,data);
+ // Wait for fonts and the ResizeObserver's frame, not the empty loading shell's first height.
+ await page.evaluate(async()=>{await document.fonts.ready;await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));});
  await expect.poll(()=>page.evaluate(()=>(window as any).__panelHeights?.at(-1))).toBeGreaterThan(100);
  const home=await page.evaluate(()=>(window as any).__panelHeights.at(-1));
  expect(home).toBeLessThan(500);

@@ -122,6 +122,7 @@
 "Background" = "バックグラウンド";
 "Balance" = "残高";
 "Balance and Benefits" = "残高と特典";
+"Bars" = "バー";
 "Based on OpenUsage by Robin Ebers, released under the MIT License." = "Robin Ebers 氏の OpenUsage（MIT ライセンス）をもとにしています。";
 "Beta Updates" = "ベータ版アップデート";
 "Billing" = "請求";
@@ -208,6 +209,7 @@
 "Could not check or install the update. Try again later." = "更新を確認またはインストールできません。後で再試行してください。";
 "Could not complete this step. Check the directory or login and try again." = "操作を完了できませんでした。フォルダやログイン状態を確認し、再試行してください。";
 "Could not install the update. Try again later." = "更新をインストールできません。後で再試行してください。";
+"Could not load the Home usage style. Choose a style to save it again." = "ホームの使用量表示を読み込めませんでした。表示形式を選び直して保存してください。";
 "Could not open a terminal. Copy this command and run it in your terminal." = "ターミナルを開けませんでした。このコマンドをコピーして実行してください。";
 "Could not refresh accounts. Check their status." = "アカウントを更新できませんでした。状態を確認してください。";
 "Could not save. Try again." = "保存できません。再試行してください。";
@@ -286,6 +288,7 @@
 "Downloading Update…" = "更新をダウンロード中…";
 "Drag metrics here" = "ここに指標をドラッグ";
 "Drunk Mode" = "ほろ酔いモード";
+"Each cell is 1%." = "1マスは1パーセントポイントです。";
 "Edit" = "編集";
 "Enable Claude or Codex in Providers to read local token logs." = "プロバイダー画面で Claude または Codex を有効にすると、ローカルのトークンログを読み取れます。";
 "Enable Codex in Providers to read its local token logs." = "プロバイダー画面で Codex を有効にすると、ローカルのトークンログを読み取れます。";
@@ -343,6 +346,7 @@
 "From your Cursor usage history." = "Cursor の使用履歴から取得しています。";
 "From your Grok logs (estimated)" = "Grok のログから（推定）";
 "From your OpenCode logs" = "OpenCode のログから";
+"Gauges" = "個別メーター";
 "Gemini Pro" = "Gemini Pro";
 "Gemini Weekly" = "Gemini 週間";
 "General" = "一般";
@@ -372,6 +376,7 @@
 "History comes from logs on this device. It may not cover every account or device." = "この端末のログによる履歴です。すべてのアカウントや端末を含むとは限りません。";
 "Home" = "ホーム";
 "Home Layout" = "ホームの表示";
+"Home Usage Style" = "ホームの使用量表示";
 "Horizontal Bar" = "横棒";
 "I Have Signed In — Check Again" = "サインインしました。もう一度確認";
 "Icon Position" = "アイコンの位置";
@@ -461,6 +466,7 @@
 "Move down" = "下へ";
 "Move up" = "上へ";
 "My Accounts" = "マイアカウント";
+"Near quota limit" = "上限に近づいています";
 "Needs Attention" = "確認が必要";
 "Needs an API key" = "API キーが必要です";
 "Needs attention" = "要確認";
@@ -559,6 +565,7 @@
 "Party mode is on, so this stays paused." = "パーティーモードがオンのため、これは一時停止されています。";
 "Pay as you go" = "従量課金";
 "Percentage" = "パーセント";
+"Percentage Grid" = "パーセントグリッド";
 "Personal" = "個人";
 "Pin to tray" = "トレイに固定";
 "Platform" = "プラットフォーム";
@@ -582,6 +589,8 @@
 "Quota History" = "使用枠の履歴";
 "Quota Readings" = "クォータ記録";
 "Quota Style" = "使用量グラフ";
+"Quota exceeded" = "上限を超過";
+"Quota exhausted" = "使用枠を使い切りました";
 "Quota observations" = "クォータの記録";
 "Rate Limit Resets" = "レート制限リセット";
 "Rate limit resets" = "レート制限リセット";
