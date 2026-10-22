@@ -73,6 +73,24 @@ try {
   Assert(state.GetProperty("accounts").EnumerateArray().Count(a=>a.GetProperty("family").GetString()=="claude")==2,"Both accounts survive a process restart");
   Assert(state.GetProperty("accounts").EnumerateArray().Where(a=>a.GetProperty("family").GetString()=="claude").All(a=>a.GetProperty("connection").GetString()=="unchecked"),"Restored headings require a check, not a premature login failure");
  }
+
+ var pinsDir=Path.Combine(root,"account-pins");Directory.CreateDirectory(pinsDir);
+ var pinsFile=Path.Combine(pinsDir,"preferences.json");
+ using(var session=new DesktopSession(pinsFile)) {
+  var remember=typeof(DesktopSession).GetMethod("RememberAccount",System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic)!;
+  ProviderResult Fixture(string identity) => new("claude","Claude",new("claude","Claude","Pro",new[]{new UsageWindow("Session",19,null),new UsageWindow("Weekly",47,null)},DateTimeOffset.UtcNow),null,AccountIdentity:identity);
+  remember.Invoke(session,[Fixture("first")]);
+  await Call(session,new{method="metric",accountId="claude",metricId="Session",value=new{pinned=false}});
+  await Call(session,new{method="metric",accountId="claude",metricId="Weekly",value=new{pinned=false}});
+  var second=(ProviderResult)remember.Invoke(session,[Fixture("second")])!;
+  await Call(session,new{method="settings",value=new{autoRefresh=false}});
+  var saved=Preferences.Load(pinsFile);
+  Assert(saved.PinnedMetrics["claude"].Length==0,"Explicit icon-only sibling stays empty");
+  Assert(saved.PinnedMetrics[second.SettingsKey].Length==2,"New account defaults persist independently");
+  remember.Invoke(session,[Fixture("first")]);
+  await Call(session,new{method="settings",value=new{autoRefresh=false}});
+  Assert(Preferences.Load(pinsFile).PinnedMetrics["claude"].Length==0,"Reconnecting does not undo icon-only choice");
+ }
  var registeredHome=Path.Combine(root,"registered");Directory.CreateDirectory(registeredHome);
  File.WriteAllText(Path.Combine(root,".tokenplan-account-directories.json"),JsonSerializer.Serialize(new Dictionary<string,string[]>{{"claude",[registeredHome]}}));
  Assert(AccountHomes.Discover("claude",root,Path.Combine(root,".claude"),_=>null).Any(a=>a.Home==registeredHome),"Registered independent directory is discoverable");

@@ -24,6 +24,9 @@ final class LayoutPersistence {
     }
     func loadSeededDefaults() -> [String]? { decode([String].self, forKey: keys.seededDefaults) }
 
+    func loadPinProviders() -> [String]? { defaults.stringArray(forKey: keys.pins + ".initializedProviders") }
+    func savePinProviders(_ value: Set<String>) { defaults.set(Array(value).sorted(), forKey: keys.pins + ".initializedProviders") }
+
     func loadPins() -> [String]? { defaults.stringArray(forKey: keys.pins) }
     func loadExpandedMetrics() -> [String]? { defaults.stringArray(forKey: keys.expandedMetrics) }
     func loadExpandOnEnable() -> [String]? { defaults.stringArray(forKey: keys.expandOnEnable) }

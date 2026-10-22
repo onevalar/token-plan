@@ -1,4 +1,5 @@
 import type {CSSProperties} from 'react';
+import {providerTheme} from './providerTheme';
 import {ChevronRight} from 'lucide-react';
 import {Button} from './components/arc/button/button';
 import type {Account} from './desktop';
@@ -7,7 +8,7 @@ import {providerText} from './providerText';
 import {MetricRow} from './Metrics';
 
 export function ProviderLogo({family}:{family:string}) {
- return <span aria-hidden="true" className="provider-logo" style={{maskImage:`url("/providers/${family}.svg")`,WebkitMaskImage:`url("/providers/${family}.svg")`} as CSSProperties}/>;
+ return <span aria-hidden="true" className="provider-logo" data-provider={family} style={{...providerTheme(family),maskImage:`url("/providers/${family}.svg")`,WebkitMaskImage:`url("/providers/${family}.svg")`} as CSSProperties}/>;
 }
 export function accountGroups(accounts:Account[]) {
  const groups:{family:string;accounts:Account[]}[]=[];
@@ -19,7 +20,7 @@ export function accountGroups(accounts:Account[]) {
  return groups;
 }
 export function Dashboard({accounts,open,now,language,missing,remaining}:{accounts:Account[];open:(id:string)=>void;now:number;language:string;missing:string;remaining:boolean}) {
- return <div className="dashboard">{accountGroups(accounts).map(group=><section className="provider" key={group.accounts[0].id}>
+ return <div className="dashboard">{accountGroups(accounts).map(group=><section className="provider" data-provider={group.family} style={providerTheme(group.family)} key={group.accounts[0].id}>
   {group.accounts.length>1&&<div className="family-heading"><ProviderLogo family={group.family}/><h2>{group.accounts[0].name}</h2></div>}
   {group.accounts.map(a=><div className="account-block" key={a.id}>
    <div className="provider-heading">

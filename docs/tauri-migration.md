@@ -245,3 +245,31 @@ suggest retry, while file/database access failures suggest checking paths and pe
 Only authorization failures suggest signing in again. The Add Service detector lists each
 account's result and original error, rather than reporting generic success. Mac discovery
 also refreshes enabled accounts using the existing cache and provider cooldowns.
+
+### Service identity and manual refresh feedback
+
+The shared desktop UI gives each service a stable light/dark accent for its logo,
+normal quota bars and compact trend. Account ordering does not change its color.
+High quota usage still uses the shared warning and danger colors. Native menu bar
+icons and their previews retain the system's monochrome contrast behavior.
+
+Manual refresh immediately shows a rotating refresh icon and a text status, prevents
+repeat requests, and reports updated data, an unchanged cached result, partial account
+errors or a failed request. Results belong to the page that initiated the refresh.
+The status has a short minimum visibility period so fast cached requests are still
+perceptible; reduced-motion mode retains the text without rotation. Saving settings
+does not start the refresh animation. The panel height includes this temporary status.
+
+### Per-account tray defaults (2.0.7)
+
+macOS now tracks accounts whose menu bar defaults have been initialized. Adding an
+account seeds its default pins independently of any sibling's saved selection. Empty
+saved selections remain empty, including after a temporary absence or reconnect. On
+migration, existing layout/order records establish which accounts were already known;
+ambiguous existing empty configurations are preserved. Windows/Linux persist per-account
+default pins when the first usable snapshot arrives and never replace an explicit empty
+array. No metrics are seeded from an unauthenticated heading.
+
+Shared account settings explain icon-only mode and offer a one-click first metric;
+the native tray summaries distinguish no selected metric from missing quota data.
+This also lets legacy accounts recover without overwriting deliberate preferences.

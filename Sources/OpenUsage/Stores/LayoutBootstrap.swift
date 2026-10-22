@@ -53,11 +53,8 @@ enum LayoutBootstrap {
             LayoutOrdering.normalizedMetricOrder($0, registry: registry)
         } ?? LayoutOrdering.defaultMetricOrder(registry: registry)
 
-        // An existing value — including an empty array from a user who unpinned everything — wins.
-        let pinnedMetricIDs = Set(
-            (persistence.loadPins() ?? defaults.pinnedMetricIDs)
-                .filter { registry.descriptor(id: $0) != nil }
-        )
+        let pinnedMetricIDs = LayoutPinBootstrap.load(registry: registry, persistence: persistence,
+            defaultPins: defaults.pinnedMetricIDs)
 
         // Expanded membership is a fresh-install default only. Existing layouts that predate the feature
         // keep every familiar metric above the caret unless the user later moves one.

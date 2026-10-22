@@ -262,3 +262,30 @@ and three usage metrics were returned. No installed application was replaced. A 
 nonfatal local-history notice is now carried as `warning`, rather than reported as a
 connection error. Synthetic fixtures cover incorrect-account rejection and reconnect UI;
 real Windows/Linux terminal OAuth completion is not claimed by browser tests.
+
+### Service colors and refresh feedback (after 2.0.6)
+
+The shared UI changes passed the production frontend build, 17 unit tests and eight
+packaging-script tests. All 87 navigation scenarios passed with macOS WebKit and the
+Windows/Linux Chromium configurations, including light/dark service colors, unchanged
+quota warning colors, delayed and cached refreshes, repeated-click/keyboard protection,
+partial failures, request failures and reduced motion. A final targeted run covers
+nonfatal provider notices, including rate-limit warnings, on all three configurations.
+These are browser interface checks, not a new native installer release. Installed apps
+were not replaced. Synthetic screenshot previews are saved locally under
+`output/service-colors-refresh/`.
+
+### 2.0.7 tray initialization
+
+Regression fixtures verify default pins for a new account independently of an explicitly
+empty sibling, preservation of ambiguous legacy empty selections, and preservation across
+absence/reconnection. Windows/Linux bridge fixtures verify persisted per-account defaults
+and empty selections after login switching. Rust checks distinguish an icon-only account
+from selected metrics with no data. Shared UI checks exercise the one-click recovery and
+explicitly clearing its selection again.
+
+Local release checks: 1,585 Swift XCTest cases (five skipped), six CLI cases and three
+Swift Testing cases passed; 523 .NET core checks and bridge integration passed; Rust
+passed 30 checks (one ignored); frontend passed 17 unit tests, eight packaging-script
+tests, the production build and all 90 cross-platform browser navigation scenarios.
+No locally installed application was replaced.

@@ -40,6 +40,9 @@ export function AccountConfiguration({account:a,send,t,busy,language,traySetting
     <TrayGlyph badge={badge} family={a.family} metrics={pinned} style={traySettings.trayStyle} position={traySettings.ringIconPosition}/>
     <ol className="ring-legend">{pinned.map((m,i)=><li key={m.id}><span>{ring?tr(i===0?'Outer Ring':pinned.length===3&&i===1?'Middle Ring':'Inner Ring'):String(i+1)}</span><strong>{metricName(m,language)}</strong></li>)}</ol>
    </div>}
+   {pinned.length===0&&a.tray&&<div className="empty-tray-selection"><p className="group-description" role="status">{tr(a.metrics.some(m=>m.pinnable)?'Only the icon is shown. No usage metric is selected.':'No usage metrics are available yet.')}</p>
+    {a.metrics.some(m=>m.pinnable)&&<Button size="sm" variant="secondary" disabled={disabled} onClick={()=>{const metric=a.metrics.find(m=>m.pinnable);if(metric)void change({method:'metric',accountId:a.id,metricId:metric.id,value:{pinned:true}});}}>{tr('Show First Usage Metric')}</Button>}
+   </div>}
    {pinned.length===3&&ring&&<p className="group-description">{tr('Three rings use the left icon layout.')}</p>}
    {pinned.length>0&&traySettings.trayStyle==='ring'&&!ring&&<p className="group-description">{tr('Metrics without a percentage are shown as values.')}</p>}
    <div className="metric-column-labels"><span>{tr('Content')}</span><span>{tr('Location')}</span><span>{tr('Menu Bar')}</span></div>

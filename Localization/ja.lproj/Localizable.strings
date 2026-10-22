@@ -120,6 +120,7 @@
 "Check for Updates" = "アップデートを確認";
 "Check for Updates…" = "アップデートを確認…";
 "Check updates automatically" = "更新を自動確認";
+"Checked. No new usage data." = "確認済みです。新しい使用量データはありません。";
 "Checking for updates…" = "更新を確認中…";
 "Checks hourly and shows a banner when an update is available." = "1 時間ごとに確認し、更新があるとバナーを表示します。";
 "Choose at most two tray metrics per account." = "アカウントごとに最大2項目です。";
@@ -184,6 +185,7 @@
 "Could not complete this step. Check the directory or login and try again." = "操作を完了できませんでした。フォルダやログイン状態を確認し、再試行してください。";
 "Could not install the update. Try again later." = "更新をインストールできません。後で再試行してください。";
 "Could not open a terminal. Copy this command and run it in your terminal." = "ターミナルを開けませんでした。このコマンドをコピーして実行してください。";
+"Could not refresh accounts. Check their status." = "アカウントを更新できませんでした。状態を確認してください。";
 "Could not save. Try again." = "保存できません。再試行してください。";
 "Couldn't %@ the terminal helper: %@" = "ターミナルヘルパーを%1$@できませんでした：%2$@";
 "Couldn't copy the log path to the clipboard." = "ログのパスをクリップボードにコピーできませんでした。";
@@ -443,6 +445,7 @@
 "No cost data for this period" = "この期間のコストデータはありません";
 "No cost-per-token data for this period" = "この期間のトークン単価データはありません";
 "No data" = "データなし";
+"No enabled accounts to refresh." = "更新する有効なアカウントがありません。";
 "No login or usage confirmed." = "ログインまたは使用量をまだ確認できません。";
 "No matching account was identified. Check the directory and access permissions." = "一致するアカウントが見つかりません。ディレクトリとアクセス権を確認してください。";
 "No metrics to show" = "表示する指標がありません";
@@ -455,6 +458,7 @@
 "No usage data" = "使用量データなし";
 "No usage history available." = "使用履歴はありません。";
 "No usage in this period" = "この期間の使用はありません";
+"No usage metrics are available yet." = "使用量の項目はまだありません。";
 "No usage yet. Refresh after signing in." = "利用状況がありません。ログインして更新してください。";
 "No valid login for this Codex account. Sign in with Codex, xswap, or pi, then refresh." = "この Codex アカウントには有効なログインがありません。Codex、xswap、または pi でサインインしてから更新してください。";
 "None" = "なし";
@@ -476,6 +480,7 @@
 "On Demand" = "必要時に表示";
 "One ring per selected account: Claude 5h, Codex Pro 1w, Plus 5h. Other plans use the quota with least remaining." = "選択した各アカウントに1つのリング：Claude 5h、Codex Pro 1w、Plus 5h。その他のプランは残り枠が最も少ない制限を表示します。";
 "Only includes %@." = "%@ のみ含まれます。";
+"Only the icon is shown. No usage metric is selected." = "アイコンのみ表示中です。使用量の項目が選択されていません。";
 "Open %@" = "%@ を開く";
 "Open Customize" = "カスタマイズを開く";
 "Open System Settings" = "システム設定を開く";
@@ -551,13 +556,16 @@
 "Refresh Interval" = "更新間隔";
 "Refresh Usage" = "使用量を更新";
 "Refresh automatically" = "自動更新";
+"Refresh completed with notices. Check account details." = "更新が完了しました。アカウントの詳細でお知らせを確認してください。";
 "Refresh failed" = "更新に失敗しました";
+"Refresh failed. Please try again." = "更新に失敗しました。もう一度お試しください。";
 "Refresh failed: %@" = "更新に失敗しました：%@";
 "Refresh interval" = "更新間隔";
 "Refresh now" = "今すぐ更新";
 "Refresh now (⌘R)" = "今すぐ更新（⌘R）";
 "Refresh timed out after %llds" = "%lld 秒後に更新がタイムアウトしました";
 "Refreshing" = "更新中";
+"Refreshing usage…" = "使用量を更新中…";
 "Refreshing…" = "更新中…";
 "Remaining" = "残り";
 "Remove" = "削除";
@@ -636,6 +644,7 @@
 "Settings" = "設定";
 "Settings…" = "設定…";
 "Show" = "表示";
+"Show First Usage Metric" = "最初の使用量を表示";
 "Show Log Folder" = "ログフォルダーを開く";
 "Show Note in Overview" = "概要にメモを表示";
 "Show TokenPlan" = "TokenPlan を表示";
@@ -656,6 +665,7 @@
 "Sign in with the Codex CLI, then refresh." = "Codex CLI でログインしてから更新してください。";
 "Sign in with the Cursor desktop app, then refresh." = "Cursor デスクトップアプリでログインしてから更新してください。";
 "Some Cursor export rows were invalid. Totals may be incomplete." = "Cursor のエクスポートに無効な行があり、集計が不完全な可能性があります。";
+"Some accounts could not be refreshed. Check their status." = "一部のアカウントを更新できませんでした。状態を確認してください。";
 "Some history could not be read. Totals may be incomplete." = "一部の履歴を取得できません。合計が不完全な場合があります。";
 "Some local token logs were skipped or could not be read. Totals may be incomplete." = "一部のローカルログを読み取れないかスキップしました。集計が不完全な可能性があります。";
 "Some models could not be priced. This estimate is incomplete." = "一部モデルの料金が不明なため、推定は不完全です。";
@@ -792,6 +802,7 @@
 "Usage request failed. Check your connection." = "使用量のリクエストに失敗しました。接続を確認してください。";
 "Usage response invalid. Try again later." = "使用量の応答が無効です。後でもう一度お試しください。";
 "Usage temporarily unavailable; retry later." = "使用量は一時的に取得できません。後で再試行してください。";
+"Usage updated." = "使用量を更新しました。";
 "Use" = "使用";
 "Use Control, Alt or Command with another key." = "Control、Alt、Commandと別のキーを組み合わせてください。";
 "Use Credit" = "クレジットを使用";

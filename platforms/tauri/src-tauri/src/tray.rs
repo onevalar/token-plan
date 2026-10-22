@@ -26,8 +26,21 @@ pub fn summaries(state: &DesktopState) -> Vec<String> {
             .map(|m| m.percent.map(|v| format!("{} {:.0}%", m.label, v)).unwrap_or_else(|| format!("{} {}", m.label, m.amount.map(|v| v.to_string()).unwrap_or_else(|| "—".into()))))
             .collect::<Vec<_>>().join(" · ");
         let name = match badge { Some(n) => format!("{} {}", account.name, n), None => account.name.clone() };
-        if readings.is_empty() { name } else { format!("{name}: {readings}") }
+        if readings.is_empty() { format!("{name}: {}", empty_reading(language(state), account.metrics.iter().any(|m| m.pinned))) } else { format!("{name}: {readings}") }
     }).collect()
+}
+
+fn empty_reading(language:&str, selected:bool) -> &'static str {
+    let lang=language.replace('_', "-");
+    if lang.starts_with("zh") {
+        if lang.contains("Hant") || lang.contains("TW") || lang.contains("HK") {
+            if selected { "暫無用量資料" } else { "僅顯示圖示，未選擇用量指標" }
+        } else if selected { "暂无用量数据" } else { "仅显示图标，未选择用量指标" }
+    } else if lang.starts_with("ja") {
+        if selected { "使用量データなし" } else { "アイコンのみ・使用量の項目未選択" }
+    } else if lang.starts_with("ko") {
+        if selected { "사용량 데이터 없음" } else { "아이콘만 표시 · 사용량 항목 미선택" }
+    } else if selected { "No usage data" } else { "Icon only; no usage metric selected" }
 }
 
 pub fn language(state: &DesktopState) -> &str {
@@ -102,6 +115,16 @@ mod tests {
             s.settings.tray_style=style.into();
             assert_eq!(visible(&s).iter().map(|(_,n)|*n).collect::<Vec<_>>(),vec![Some(1),Some(2),None]);
         }
+    }
+    #[test]
+    fn empty_selection_is_distinct_from_missing_quota() {
+        let mut s=fixture();s.settings.language="en".into();
+        for metric in &mut s.accounts[0].metrics { metric.pinned=false; }
+        assert!(summaries(&s)[0].contains("Icon only"));
+        s.accounts[0].metrics[0].pinned=true;s.accounts[0].metrics[0].has_data=false;
+        assert!(summaries(&s)[0].contains("No usage data"));
+        assert_eq!(empty_reading("zh-CN",false),"仅显示图标，未选择用量指标");
+        assert_eq!(empty_reading("zh-TW",true),"暫無用量資料");
     }
     #[test]
     fn summaries_follow_the_strip_order() {

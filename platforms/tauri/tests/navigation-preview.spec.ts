@@ -414,3 +414,82 @@ test('background history notices retain quota without a reconnect prompt',async(
  await expect(visible(page).getByRole('progressbar').first()).toBeVisible();
  await expect(visible(page).locator('.group-description').filter({hasText:'历史'}).first()).toBeVisible();
 });
+
+test('service accents adapt to light and dark while quota warnings keep priority',async({page})=>{
+ const data=largeDesktop();data.settings.appearance='system';await setup(page,data);
+ for(const mode of ['light','dark'] as const){
+  await page.emulateMedia({colorScheme:mode});
+  await expect(page.locator('html')).toHaveAttribute('data-theme',mode);
+  const claude=page.locator('.dashboard section[data-provider="claude"]').first();
+  const codex=page.locator('.dashboard section[data-provider="codex"]').first();
+  const c=await claude.locator('.provider-logo').evaluate(e=>getComputedStyle(e).color);
+  const x=await codex.locator('.provider-logo').evaluate(e=>getComputedStyle(e).color);
+  expect(c).not.toBe(x);
+  expect(c).toBe(mode==='light'?'rgb(191, 86, 57)':'rgb(237, 153, 125)');
+  const normal=await claude.locator('.metric[data-tone="normal"]').first().evaluate(e=>getComputedStyle(e).getPropertyValue('--meter-fill').trim());
+  const critical=await claude.locator('.metric[data-tone="critical"]').first().evaluate(e=>getComputedStyle(e).getPropertyValue('--meter-fill').trim());
+  expect(normal).toBe(mode==='light'?'#bf5639':'#ed997d');expect(critical).not.toBe(normal);
+  await noOverflow(page);
+  await page.screenshot({path:`test-results-navigation/service-colors-${test.info().project.name}-${mode}.png`});
+ }
+});
+
+test('manual refresh animates, prevents duplicate requests, and reports the actual result',async({page})=>{
+ await setup(page);
+ await page.emulateMedia({reducedMotion:'no-preference'});
+ await page.evaluate(()=>{(window as any).__beforeRefresh=(state:any)=>new Promise<void>(resolve=>{(window as any).__finishRefresh=()=>{state.accounts[0].fetchedAt='2030-01-01T12:00:00Z';resolve();};});});
+ const button=page.getByRole('button',{name:'刷新',exact:true});
+ await button.click();
+ await expect(button).toHaveAttribute('aria-busy','true');
+ await expect(page.locator('.refresh-feedback')).toHaveText('正在刷新用量…');
+ expect(await button.locator('svg').evaluate(e=>getComputedStyle(e).animationName)).toBe('refresh-turn');
+ const requests=await page.evaluate(()=>(window as any).__requests.length);
+ await button.dispatchEvent('click');await page.keyboard.press('Meta+r');
+ expect(await page.evaluate(()=>(window as any).__requests.length)).toBe(requests);
+ await page.screenshot({path:`test-results-navigation/refresh-pending-${test.info().project.name}.png`});
+ await page.evaluate(()=>(window as any).__finishRefresh());
+ await expect(page.locator('.refresh-feedback')).toHaveText('用量已更新。');
+ await expect(button).toHaveAttribute('aria-busy','false');
+ await page.evaluate(()=>{(window as any).__beforeRefresh=undefined;});
+ await button.click();await expect(page.locator('.refresh-feedback')).toHaveText('正在刷新用量…');
+ await expect(page.locator('.refresh-feedback')).toHaveText('已检查，暂无新的用量数据。');
+ await page.evaluate(()=>{(window as any).__beforeRefresh=(state:any)=>{state.accounts[0].warning='Usage queries are temporarily rate limited.';};});
+ await button.click();await expect(page.locator('.refresh-feedback')).toHaveText('刷新完成，部分账号有提示，请查看详情。');
+ await expect(page.locator('.refresh-feedback')).toHaveAttribute('data-tone','warning');
+ await page.evaluate(()=>{(window as any).__beforeRefresh=(state:any)=>{state.accounts[0].error='Network timeout';};});
+ await button.click();await expect(page.locator('.refresh-feedback')).toHaveAttribute('data-tone','warning');
+ await expect(page.locator('.refresh-feedback')).toHaveText('部分账号刷新失败，请查看账号状态。');
+ await page.evaluate(()=>{(window as any).__failNextRequest=true;});
+ await button.click();await expect(page.locator('.refresh-feedback')).toHaveText('刷新失败，请重试。');
+ await expect(button).toHaveAttribute('aria-busy','false');
+});
+
+test('reduced motion retains refresh text without spinning and other actions do not spin refresh',async({page})=>{
+ await setup(page);await page.emulateMedia({reducedMotion:'reduce'});
+ await page.evaluate(()=>{(window as any).__beforeRefresh=()=>new Promise<void>(resolve=>{(window as any).__finishRefresh=resolve;});});
+ const button=page.getByRole('button',{name:'刷新',exact:true});await button.click();
+ await expect(page.locator('.refresh-feedback')).toHaveText('正在刷新用量…');
+ expect(await button.locator('svg').evaluate(e=>getComputedStyle(e).animationName)).toBe('none');
+ await menu(page,'通用设置');
+ await expect(page.locator('.refresh-feedback')).toHaveCount(0);
+ await page.evaluate(()=>(window as any).__finishRefresh());
+ await page.getByRole('switch',{name:'显示剩余额度',exact:true}).click();
+ await back(page);
+ await expect(button).toHaveAttribute('aria-busy','false');
+});
+
+test('icon-only account explains empty tray selection and restores a metric without changing siblings',async({page})=>{
+ const data=largeDesktop();data.accounts[1].metrics.forEach(m=>m.pinned=false);await setup(page,data);
+ await visible(page).locator('.dashboard').getByRole('button',{name:'Claude second.with.a.long.address@example.com',exact:true}).click();
+ await page.getByRole('button',{name:'设置',exact:true}).click();
+ await expect(visible(page).getByText('仅显示图标，尚未选择用量指标。',{exact:true})).toBeVisible();
+ await visible(page).getByRole('button',{name:'显示首项用量',exact:true}).click();
+ await expect(visible(page).locator('.account-tray-preview')).toBeVisible();
+ const request=await page.evaluate(()=>(window as any).__requests.at(-1));
+ expect(request).toEqual({method:'metric',accountId:'claude:second',metricId:'session',value:{pinned:true}});
+ await visible(page).getByRole('switch',{name:/^5h ·/}).click();
+ await expect(visible(page).getByText('仅显示图标，尚未选择用量指标。',{exact:true})).toBeVisible();
+ await back(page);await visible(page).locator('.dashboard').getByRole('button',{name:'Claude second.with.a.long.address@example.com',exact:true}).click();
+ await page.getByRole('button',{name:'设置',exact:true}).click();
+ await expect(visible(page).getByText('仅显示图标，尚未选择用量指标。',{exact:true})).toBeVisible();
+});

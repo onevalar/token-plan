@@ -120,6 +120,7 @@
 "Check for Updates" = "檢查更新";
 "Check for Updates…" = "檢查更新…";
 "Check updates automatically" = "自動檢查更新";
+"Checked. No new usage data." = "已檢查，暫無新的用量資料。";
 "Checking for updates…" = "正在檢查更新…";
 "Checks hourly and shows a banner when an update is available." = "每小時檢查一次，有更新時顯示橫幅。";
 "Choose at most two tray metrics per account." = "每個帳號最多選擇兩項系統匣指標。";
@@ -184,6 +185,7 @@
 "Could not complete this step. Check the directory or login and try again." = "操作未完成，請檢查目錄或登入狀態後重試。";
 "Could not install the update. Try again later." = "無法安裝更新，請稍後重試。";
 "Could not open a terminal. Copy this command and run it in your terminal." = "無法開啟終端機，請複製此命令到終端機執行。";
+"Could not refresh accounts. Check their status." = "帳號重新整理失敗，請查看帳號狀態。";
 "Could not save. Try again." = "儲存失敗，請重試。";
 "Couldn't %@ the terminal helper: %@" = "無法%1$@終端機輔助工具：%2$@";
 "Couldn't copy the log path to the clipboard." = "無法將記錄檔路徑拷貝到剪貼簿。";
@@ -443,6 +445,7 @@
 "No cost data for this period" = "這段期間沒有費用資料";
 "No cost-per-token data for this period" = "這段期間沒有單 token 費用資料";
 "No data" = "無資料";
+"No enabled accounts to refresh." = "沒有已啟用的帳號可重新整理。";
 "No login or usage confirmed." = "尚未確認登入或用量。";
 "No matching account was identified. Check the directory and access permissions." = "未辨識到相符帳號，請檢查目錄及存取權限。";
 "No metrics to show" = "沒有可顯示的指標";
@@ -455,6 +458,7 @@
 "No usage data" = "沒有用量資料";
 "No usage history available." = "暫無用量記錄。";
 "No usage in this period" = "這段期間沒有用量";
+"No usage metrics are available yet." = "暫無可用的用量指標。";
 "No usage yet. Refresh after signing in." = "尚無用量，請登入後重新整理。";
 "No valid login for this Codex account. Sign in with Codex, xswap, or pi, then refresh." = "這個 Codex 帳號沒有有效登入。請用 Codex、xswap 或 pi 登入後再重新整理。";
 "None" = "無";
@@ -476,6 +480,7 @@
 "On Demand" = "按需展開";
 "One ring per selected account: Claude 5h, Codex Pro 1w, Plus 5h. Other plans use the quota with least remaining." = "每個所選帳號顯示一個環：Claude 5h、Codex Pro 1w、Plus 5h。其他方案顯示剩餘額度最少的一項限制。";
 "Only includes %@." = "僅包含 %@。";
+"Only the icon is shown. No usage metric is selected." = "僅顯示圖示，尚未選擇用量指標。";
 "Open %@" = "開啟 %@";
 "Open Customize" = "開啟自訂";
 "Open System Settings" = "開啟系統設定";
@@ -551,13 +556,16 @@
 "Refresh Interval" = "重新整理間隔";
 "Refresh Usage" = "重新整理用量";
 "Refresh automatically" = "自動重新整理";
+"Refresh completed with notices. Check account details." = "重新整理完成，部分帳號有提示，請查看詳情。";
 "Refresh failed" = "重新整理失敗";
+"Refresh failed. Please try again." = "重新整理失敗，請再試一次。";
 "Refresh failed: %@" = "重新整理失敗：%@";
 "Refresh interval" = "重新整理間隔";
 "Refresh now" = "立即重新整理";
 "Refresh now (⌘R)" = "立即重新整理（⌘R）";
 "Refresh timed out after %llds" = "重新整理在 %lld 秒後逾時";
 "Refreshing" = "正在重新整理";
+"Refreshing usage…" = "正在重新整理用量…";
 "Refreshing…" = "正在重新整理…";
 "Remaining" = "剩餘";
 "Remove" = "移除";
@@ -636,6 +644,7 @@
 "Settings" = "設定";
 "Settings…" = "設定…";
 "Show" = "顯示";
+"Show First Usage Metric" = "顯示首項用量";
 "Show Log Folder" = "開啟日誌資料夾";
 "Show Note in Overview" = "在總覽顯示備註";
 "Show TokenPlan" = "開啟 TokenPlan";
@@ -656,6 +665,7 @@
 "Sign in with the Codex CLI, then refresh." = "請先在 Codex CLI 中登入，再重新整理。";
 "Sign in with the Cursor desktop app, then refresh." = "請先在 Cursor 桌面應用程式中登入，再重新整理。";
 "Some Cursor export rows were invalid. Totals may be incomplete." = "部分 Cursor 匯出記錄無效，統計可能不完整。";
+"Some accounts could not be refreshed. Check their status." = "部分帳號重新整理失敗，請查看帳號狀態。";
 "Some history could not be read. Totals may be incomplete." = "部分歷史記錄無法讀取，統計可能不完整。";
 "Some local token logs were skipped or could not be read. Totals may be incomplete." = "部分本機日誌已略過或無法讀取，統計可能不完整。";
 "Some models could not be priced. This estimate is incomplete." = "部分模型無法計價，此估算不完整。";
@@ -792,6 +802,7 @@
 "Usage request failed. Check your connection." = "用量請求失敗，請檢查網路。";
 "Usage response invalid. Try again later." = "用量回應無效，請稍後再試。";
 "Usage temporarily unavailable; retry later." = "用量暫時無法讀取，請稍後重試。";
+"Usage updated." = "用量已更新。";
 "Use" = "使用";
 "Use Control, Alt or Command with another key." = "請使用 Control、Alt 或 Command 加其他按鍵。";
 "Use Credit" = "使用額度";

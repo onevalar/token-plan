@@ -1,3 +1,4 @@
+import {providerTheme} from '../providerTheme';
 import {connectionAction} from '../connection';
 import {useState} from 'react';
 import {AccountOnboarding} from './AccountOnboarding';
@@ -15,7 +16,7 @@ export function AccountDetail({account,tab,onTab,history,send,t,busy,language,no
  const metrics=account.metrics.filter(m=>m.placement!=='hidden'&&!isHistoryMetric(m.id));
  const quota=metrics.filter(m=>m.unit==='percent'||m.percent!=null||m.periodSeconds!=null),other=metrics.filter(m=>!quota.includes(m));
  const row=(m:Metric)=><div key={m.id}><MetricRow metric={{...m,expiries:[],percent:m.unit==='percent'&&!m.hasData?0:m.percent}} now={now} missing={missing} language={language} remaining={remaining}/>{m.expiries.length>0&&<details className="expiry-details"><summary>{t.expires} · {m.expiries.length}</summary><ul>{m.expiries.map((date,i)=><li key={i}>{new Date(date).toLocaleString(language,{dateStyle:'medium',timeStyle:'short'})}</li>)}</ul></details>}</div>;
- return <div className="account-detail">
+ return <div className="account-detail" data-provider={account.family} style={providerTheme(account.family)}>
   {(account.email||account.plan)&&<div className="detail-identity">{account.email&&<span>{account.email}</span>}{account.plan&&<span className="plan-tag">{account.plan}</span>}</div>}
   {['inspect','login'].includes(connectionAction(account))&&['claude','codex'].includes(account.family)&&<AccountOnboarding send={send} busy={busy} language={language} family={account.family} targetId={account.id}/>}
   <nav className="segments preview-segments detail-tabs" aria-label={account.name}>

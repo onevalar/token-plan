@@ -3,12 +3,13 @@ import {invoke} from '@tauri-apps/api/core';
 import {listen} from '@tauri-apps/api/event';
 import {Updates,useUpdater} from '../Updates';
 import {getVersion} from '@tauri-apps/api/app';
-import {ChevronLeft,RefreshCw,Plus,Ellipsis} from 'lucide-react';
+import {ChevronLeft,RefreshCw,Plus,Ellipsis,Check,TriangleAlert} from 'lucide-react';
 import {MotionConfig} from 'motion/react';
 import {Button} from '../components/arc/button/button';
 import {DropdownMenu} from '../components/arc/dropdown-menu/dropdown-menu';
 import {Dashboard,ProviderLogo} from '../Dashboard';
 import {useDesktop} from '../useDesktop';
+import {useRefreshFeedback} from '../useRefreshFeedback';
 import {messages} from '../i18n';
 import {textFor} from '../copy';
 import {providerText} from '../providerText';
@@ -27,6 +28,7 @@ type Page='home'|'detail'|'settings'|'configure'|'add'|'history'|'about'|'update
 type Route={key:number;page:Page;accountId?:string;tab?:string;range?:string};
 export function DesktopApp() {
  const {state,send,busy,error}=useDesktop();
+ const {feedback,refresh:refreshWithFeedback,refreshing}=useRefreshFeedback(send);
  const updater=useUpdater(import.meta.env.VITE_MAC_NAVIGATION_PREVIEW!=='1'&&(state?.settings.autoUpdates??false));
  const [platform,setPlatform]=useState('');
  useEffect(()=>{
@@ -44,7 +46,7 @@ export function DesktopApp() {
  const [drafts,setDrafts]=useState<Record<string,AccountDraft>>({});
  const [version,setVersion]=useState(''),[now,setNow]=useState(Date.now());
  const current=routes.at(-1)!;
- usePanelHeight(current.key,state,densityPreference.density);
+ usePanelHeight(current.key,state,densityPreference.density,feedback?.scope===current.key?feedback:null);
  const language=state?.settings.language==='system'||!state?navigator.language:state.settings.language;
  const tr=(s:string)=>providerText(s,language);
  const t={...textFor(language),pin_limit:tr('Choose up to three menu bar metrics per account.')},basic=messages(language);
@@ -56,7 +58,8 @@ export function DesktopApp() {
  };
  const back=()=>setRoutes(r=>r.length>1?r.slice(0,-1):r);
  const refreshable=current.page==='home'||current.page==='history'||current.page==='detail'&&current.tab!=='settings';
- const refresh=()=>{if(refreshable&&!busy)void send({method:'refresh',accountId:current.accountId}).catch(()=>{});};
+ const refresh=()=>{if(state&&refreshable&&!busy&&!refreshing)void refreshWithFeedback(state,current.key,current.accountId);};
+ const refreshFeedback=feedback?.scope===current.key?feedback:null;
  useEffect(()=>{
   void getVersion().then(setVersion).catch(()=>{});
   const tick=setInterval(()=>{if(!document.hidden)setNow(Date.now());},30_000);
@@ -92,14 +95,14 @@ export function DesktopApp() {
    if(e.key==='Escape'&&!document.querySelector('[role="menu"],[role="listbox"],[role="dialog"]')){e.preventDefault();void invoke('hide');}
   };
   window.addEventListener('keydown',key);return()=>window.removeEventListener('keydown',key);
- },[current,refreshable,busy,send]);
+ },[current,refreshable,busy,refreshing,state,refreshWithFeedback]);
  const title=current.page==='detail'?account?.name??'':current.page==='settings'?t.settings:current.page==='configure'?t.configure:current.page==='add'?tr('Add Service'):current.page==='history'?t.history:current.page==='about'?basic.about:current.page==='updates'?t.checkUpdates:'TokenPlan';
  return <MotionConfig reducedMotion="user"><main className="mac-preview" data-density={densityPreference.density} onClickCapture={e=>{lastTrigger.current=(e.target as Element).closest<HTMLElement>('button');}}>
   <header className={`preview-header ${current.page==='home'?'home-header':''}`}>
    {current.page!=='home'&&<Button className="icon-button back-button" size="sm" variant="ghost" aria-label={basic.back} onClick={back}><ChevronLeft size={21}/></Button>}
    <div className="page-title">{current.page==='home'?<img src="/capsule.png" alt=""/>:current.page==='detail'&&account?<ProviderLogo family={account.family}/>:null}<h1 ref={heading} tabIndex={-1}>{title}</h1></div>
    <div className="header-actions">
-    {refreshable&&<Button className="icon-button" size="sm" variant="ghost" aria-label={basic.refresh} loading={busy} onClick={refresh}><RefreshCw size={17}/></Button>}
+    {refreshable&&<Button className="icon-button refresh-button" size="sm" variant="ghost" aria-label={basic.refresh} aria-busy={refreshing} aria-disabled={busy||refreshing} data-refreshing={refreshing} onClick={refresh}><RefreshCw className="refresh-symbol" size={18}/></Button>}
     {current.page==='configure'&&<Button className="icon-button" size="sm" variant="ghost" aria-label={tr('Add Service')} onClick={()=>{push('add');void send({method:'discover'}).catch(()=>{});}}><Plus size={20}/></Button>}
     {current.page==='home'&&<DropdownMenu label={basic.more} iconOnly icon={<Ellipsis size={19}/>} items={[
      {label:t.configure,onSelect:()=>push('configure')},{label:t.history,onSelect:()=>push('history')},
@@ -108,6 +111,10 @@ export function DesktopApp() {
     ]}/>}
    </div>
   </header>
+  {refreshFeedback&&<div className="refresh-feedback" data-tone={refreshFeedback.pending?'pending':refreshFeedback.result?.tone} role="status" aria-live="polite" aria-atomic="true">
+   {refreshFeedback.pending?<RefreshCw className="refresh-symbol" size={14} aria-hidden="true"/>:refreshFeedback.result?.tone==='success'?<Check size={14} aria-hidden="true"/>:<TriangleAlert size={14} aria-hidden="true"/>}
+   <span>{tr(refreshFeedback.pending?'Refreshing usage…':refreshFeedback.result!.message)}</span>
+  </div>}
   {error&&(!state||refreshable||current.page==='add'||current.page==='updates')&&<p role="alert" className="inline-error">{t[error as keyof typeof t]??basic[error as keyof typeof basic]??t.request_failed}</p>}
   {!state&&!error&&<p role="status">{basic.loading}</p>}
   {current.page!=='updates'&&updater.status==='available'&&<Button variant="secondary" onClick={()=>push('updates')}>{t.updateAvailable} {updater.version}</Button>}

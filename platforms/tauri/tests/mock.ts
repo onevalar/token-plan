@@ -22,6 +22,7 @@ export async function mockDesktop(page:Page,language='zh-Hans',cloud=false,data:
     if(command==='plugin:resources|close')return;
     if(command!=='desktop_request')return;
     ((window as any).__requests??=[]).push(structuredClone(args.request));
+    if(args.request.method==='refresh')await (window as any).__beforeRefresh?.(state,args.request);
     if((window as any).__failNextRequest){(window as any).__failNextRequest=false;throw 'request_failed';}
     const r=args.request,a=state.accounts.find((a:any)=>a.id===r.accountId);
     if(r.method==='notificationPermission')return structuredClone(state);
