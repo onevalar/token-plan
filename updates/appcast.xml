@@ -1,7 +1,16 @@
 <?xml version='1.0' encoding='utf-8'?>
 <rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
     <channel>
-        <item><title>TokenPlan 2.1.0</title><sparkle:version>1792680284</sparkle:version><sparkle:shortVersionString>2.1.0</sparkle:shortVersionString><sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion><description>&lt;pre&gt;# TokenPlan 2.1.0
+        <item><title>TokenPlan 2.1.1</title><sparkle:version>1792684759</sparkle:version><sparkle:shortVersionString>2.1.1</sparkle:shortVersionString><sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion><description>&lt;pre&gt;# TokenPlan 2.1.1
+
+- 修复手动刷新后重置倒计时滞后的问题：点击右上角“刷新”后，显示“已刷新”的同时倒计时也会立即更新到最新时间，不再需要等待最多 30 秒。
+
+## 更新说明
+
+2.x 用户可通过“检查更新”升级；Linux 应用内自动更新使用 AppImage，DEB 用户请下载安装新版 DEB。
+
+本次更新不需要重新添加账号或调整现有设置。原生 macOS 1.x 经典版保持冻结，不包含这些改动。
+&lt;/pre&gt;</description><enclosure url="https://github.com/onevalar/token-plan/releases/download/v2.1.1/TokenPlan_2.1.1_universal.dmg" length="30520964" type="application/octet-stream" sparkle:edSignature="tJhbvNhGkDyF/tUhcltPSCO/FNAeR0LJXcjmhB+nl/hJMDLxXZXMmG8zHJpZKx8jgwpFXATnlhQQjucTvJ6LCw==" /></item><item><title>TokenPlan 2.1.0</title><sparkle:version>1792680284</sparkle:version><sparkle:shortVersionString>2.1.0</sparkle:shortVersionString><sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion><description>&lt;pre&gt;# TokenPlan 2.1.0
 
 - 主页现在提供八种可选用量样式：横条、独立仪表、百分格、紧凑环形、额度刻度尺、独立同心环、醒目数字和分段额度条。在“通用设置 → 主页用量样式”中切换，默认仍为横条，选择保存在本机。
 - 各种样式保留独立的账号与额度读数、已用或剩余模式、重置时间和额度告警。缺失数据不会变成零，超额读数不会被截成 100%；切换样式不改变用量数据、首页隐藏规则或菜单栏设置。
