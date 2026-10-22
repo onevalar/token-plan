@@ -1,12 +1,60 @@
 import {test,expect} from '@playwright/test';
 import {mockDesktop} from './mock';
+import {largeDesktop} from './fixtures/largeDesktop';
+for(const remaining of [false,true])test(`quota emphasis follows real usage, remaining=${remaining}`,async({page},info)=>{
+ const data=largeDesktop(),base=data.accounts[0].metrics[0];
+ data.settings.showRemaining=remaining;
+ data.accounts[0].metrics=[79,80,100,90].map((used,i)=>({...base,id:`threshold-${i}`,label:i===2?'Sonnet':'Weekly',periodSeconds:604800,
+  percent:remaining?100-used:used,hasData:i!==3}));
+ data.accounts[1].metrics=[{...base,percent:remaining?54:46}];
+ data.accounts[2].metrics=[{...base,percent:remaining?20:80}];
+ data.accounts[2].email='personal@example.com';
+ data.accounts=data.accounts.slice(0,3);
+ await mockDesktop(page,'zh-Hans',false,data);await page.goto('/');
+ await page.setViewportSize({width:390,height:720});
+ const rows=page.locator('.dashboard .metric'),values=rows.locator('.value');
+ await expect(values).toHaveText(remaining?['21%','20%','0%','—','54%','20%']:['79%','80%','100%','—','46%','80%']);
+ for(const colorScheme of ['light','dark'] as const){
+  await page.emulateMedia({colorScheme,reducedMotion:'reduce'});
+  await expect(page.locator('html')).toHaveAttribute('data-theme',colorScheme);
+  const colors=await rows.evaluateAll(es=>es.map(e=>({
+   fill:getComputedStyle(e.querySelector('progress')!).accentColor,
+   value:getComputedStyle(e.querySelector('.value')!).color,
+  })));
+  expect(colors[0].fill).toBe(await page.locator('.dashboard .provider-logo').first().evaluate(e=>getComputedStyle(e).color));
+  expect(colors[0].fill).not.toBe(colors[1].fill);
+  expect(colors[1].fill).toBe(colors[2].fill);expect(colors[1].fill).toBe(colors[5].fill);
+  expect(colors[0].value).not.toBe(colors[1].value);
+  expect(colors[1].value).toBe(colors[2].value);expect(colors[1].value).toBe(colors[5].value);
+  expect(colors[3].value).toBe(colors[0].value);
+  await expect(rows.first().locator('.metric-name')).toHaveCSS('text-align','left');
+  expect(await rows.first().locator('.metric-name').evaluate(e=>getComputedStyle(e).color)).toBe(await page.locator('.mac-preview').evaluate(e=>getComputedStyle(e).color));
+  await expect(page.locator('.dashboard .identity-line h2').first()).toHaveCSS('font-weight','500');
+  await expect(page.locator('.dashboard .email')).toHaveCSS('font-weight','400');
+  const contrasts=await page.evaluate(()=>{
+   const ctx=document.createElement('canvas').getContext('2d')!;
+   const luminance=(color:string)=>{ctx.clearRect(0,0,1,1);ctx.fillStyle=color;ctx.fillRect(0,0,1,1);
+    const rgb=Array.from(ctx.getImageData(0,0,1,1).data).slice(0,3).map(v=>{const s=v/255;return s<=.04045?s/12.92:((s+.055)/1.055)**2.4;});
+    return rgb[0]*.2126+rgb[1]*.7152+rgb[2]*.0722;};
+   const bg=luminance(getComputedStyle(document.querySelector('.mac-preview')!).backgroundColor);
+   const ratio=(color:string)=>{const l=luminance(color);return (Math.max(l,bg)+.05)/(Math.min(l,bg)+.05);};
+   const text=Array.from(document.querySelectorAll('.dashboard .value,.dashboard .reset,.dashboard .metric-name,.dashboard .metric-scope,.dashboard .identity-line h2,.dashboard .plan,.dashboard .email')).map(e=>ratio(getComputedStyle(e).color));
+   const critical=document.querySelectorAll('.dashboard .metric')[1];
+   return {minimum:Math.min(...text),value:ratio(getComputedStyle(critical.querySelector('.value')!).color),bar:ratio(getComputedStyle(critical.querySelector('progress')!).accentColor)};
+  });
+  expect(contrasts.minimum).toBeGreaterThanOrEqual(4.5);
+  expect(contrasts.value).toBeLessThan(contrasts.bar);
+  console.log(`${colorScheme}, remaining=${remaining}: minimum text ${contrasts.minimum.toFixed(2)}:1, alert text ${contrasts.value.toFixed(2)}:1, bar ${contrasts.bar.toFixed(2)}:1`);
+  await page.screenshot({path:info.outputPath(`hierarchy-${colorScheme}.png`),animations:'disabled'});
+ }
+});
 for(const colorScheme of ['light','dark'] as const)for(const width of [390,768,1024,1440]){
  test(`${colorScheme} ${width}px accounts and columns`,async({page},info)=>{
   await page.setViewportSize({width,height:850});await page.emulateMedia({colorScheme,reducedMotion:'reduce'});
   await mockDesktop(page);await page.goto('/');
   await expect(page.getByText('first@example.com',{exact:true})).toBeVisible();
   await expect(page.getByText('second.with.a.long.address@example.com',{exact:true})).toBeVisible();
-  await expect(page.getByText('Argon · 1w',{exact:true})).toHaveCount(3);
+  await expect(page.getByText('Argon',{exact:true})).toHaveCount(3);
   await expect(page.getByText('无数据',{exact:true})).toHaveCount(3);
   await expect(page.getByText('0%',{exact:true})).toHaveCount(0);
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
@@ -16,6 +64,62 @@ for(const colorScheme of ['light','dark'] as const)for(const width of [390,768,1
   await page.keyboard.press('Escape');await expect(page.getByRole('button',{name:'更多',exact:true})).toBeFocused();
  });
 }
+for(const language of ['en','zh-Hans','zh-Hant','ja','ko'])test(`quota labels and countdown alignment ${language}`,async({page},info)=>{
+ const now=new Date(),data=largeDesktop(now),account=data.accounts[0],base=account.metrics[0];
+ const labels=['Session','Weekly','Sonnet 1w','Sonnet 4.5 · Extended Context Weekly','Web Searches','Fable Weekly','Monthly'];
+ account.metrics=labels.map((label,i)=>({...base,id:`quota-${i}`,label,
+  periodSeconds:[18000,604800,604800,604800,2592000,null,2592000][i],
+  percent:[46,92,29,65,24,null,0][i],hasData:i!==5,notStarted:i===6,
+  resetsAt:new Date(now.getTime()+[59*60,3600,6*86400+13*3600,29*86400+23*3600,2*86400,0,0][i]*1000).toISOString(),
+ }));
+ data.accounts=[account,data.accounts.find(a=>a.family==='deepseek')!];
+ await mockDesktop(page,language,false,data);await page.goto('/');
+ const rows=page.locator('.dashboard .metric').filter({has:page.getByRole('progressbar')});
+ await expect(rows).toHaveCount(7);
+ await expect(rows.locator('.metric-name')).toHaveText(['5h','1w','1w','1w','30d','—','30d']);
+ await expect(rows.nth(0).locator('.metric-scope')).toHaveCount(0);
+ await expect(rows.nth(2).locator('.metric-scope')).toHaveText('Sonnet');
+ await expect(rows.nth(3).locator('.metric-scope')).toHaveText('Sonnet 4.5 · Extended Context');
+ await expect(rows.nth(5).getByRole('progressbar')).toHaveAccessibleName(/Fable Weekly/);
+ await expect(rows.nth(5).locator('.value')).toHaveText('—');
+ await expect(rows.nth(6).locator('.value')).toHaveText('0%');
+ await expect(rows.nth(6).locator('.reset svg')).toHaveCount(0);
+ await expect(page.locator('.dashboard .text-metric .amount')).toHaveText('¥126.85');
+ for(const colorScheme of ['light','dark'] as const)for(const width of [390,350]){
+  await page.emulateMedia({colorScheme,reducedMotion:'reduce'});await page.setViewportSize({width,height:850});
+  const boxes=await rows.evaluateAll(elements=>elements.map(e=>{
+   const box=(selector:string)=>{const r=e.querySelector(selector)!.getBoundingClientRect();return {x:r.x,right:r.right,y:r.y,height:r.height};};
+   return {height:e.getBoundingClientRect().height,name:box('.metric-name'),bar:box('progress'),value:box('.value'),time:box('.reset > span'),
+    icon:e.querySelector('.reset svg')?box('.reset svg'):null,scope:e.querySelector('.metric-scope')?box('.metric-scope'):null};
+  }));
+  for(const b of boxes){
+   expect(b.height).toBe(28);
+   expect(b.bar.x).toBeCloseTo(boxes[0].bar.x,1);
+   expect(b.bar.right).toBeCloseTo(boxes[0].bar.right,1);
+   expect(b.time.right).toBeCloseTo(boxes[0].time.right,1);
+   expect(b.bar.y+b.bar.height/2).toBeCloseTo(b.name.y+b.name.height/2,1);
+   expect(b.bar.y+b.bar.height/2).toBeCloseTo(b.value.y+b.value.height/2,1);
+   if(b.icon){expect(b.icon.x-b.time.right).toBeCloseTo(4,1);expect(b.icon.right).toBeCloseTo(boxes[0].icon!.right,1);}
+   if(b.scope){expect(b.scope.x).toBeCloseTo(b.bar.x,1);expect(b.bar.y-b.scope.y-b.scope.height).toBeCloseTo(2,1);}
+  }
+  expect(boxes[3].scope!.height).toBe(boxes[2].scope!.height);
+  expect(await rows.nth(3).locator('.metric-scope').evaluate(e=>e.scrollWidth>e.clientWidth)).toBe(true);
+  await expect(rows.nth(3).getByRole('progressbar')).toHaveAccessibleName(/Sonnet 4.5 · Extended Context/);
+  expect(await page.locator('.dashboard').evaluate(e=>e.scrollWidth<=e.clientWidth+1)).toBe(true);
+  if(language==='zh-Hans')await page.screenshot({path:info.outputPath(`quota-${colorScheme}-${width}.png`),animations:'disabled'});
+ }
+ if(language==='zh-Hans'){
+  await page.emulateMedia({colorScheme:'light'});await page.setViewportSize({width:390,height:850});
+  await page.getByRole('button',{name:'更多',exact:true}).click();await page.getByRole('menuitem',{name:'通用设置',exact:true}).click();
+  await page.getByRole('combobox',{name:'首页布局',exact:true}).click();await page.getByRole('option',{name:'宽松',exact:true}).click();
+  await page.getByRole('button',{name:'返回',exact:true}).click();
+  await expect(rows.nth(3).locator('.metric-scope')).toHaveText('Sonnet 4.5 · Extended Context');
+  await page.screenshot({path:info.outputPath('quota-comfortable.png'),animations:'disabled'});
+  await page.getByRole('button',{name:'Claude first@example.com',exact:true}).click();
+  await page.getByRole('button',{name:'设置',exact:true}).click();
+  await expect(page.locator('.placement-row > span').filter({hasText:'Sonnet 4.5 · Extended Context · 1w'})).toBeVisible();
+ }
+});
 test('account settings allow zero home metrics and preserve another account',async({page},info)=>{
  await page.setViewportSize({width:390,height:850});
  await mockDesktop(page);await page.goto('/');

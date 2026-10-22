@@ -16,6 +16,17 @@ tray integration remain platform-specific. This change does not publish a releas
   hidden. Percentages follow the used/remaining preference, including their screen
   reader names. Home and quota details keep the values and reset countdowns without
   a separate explanatory legend.
+- Quota rows show the provider's actual period (such as 5h, 1w or 30d) separately
+  from the model or allowance name. Names do not add extra rows. Long names are
+  shortened with an ellipsis; their full text remains in account settings and
+  screen-reader labels. No model information is discarded from the stored reading;
+  an unknown period stays unknown rather than being guessed from the name.
+  Countdown text precedes the hourglass. Missing readings and windows that have
+  not started retain their status; balances and cumulative amounts remain text.
+- Quota bars retain the service color until at least 80% is used (20% or less
+  remaining), then both the bar and percentage turn red. The threshold is the same
+  in Used and Remaining modes. Missing readings never signal a low quota.
+  This display rule does not change the user's notification thresholds.
 - Note and API-key drafts survive page navigation separately for each account, only
   in the running app's memory. They are not saved until Save is pressed and are lost
   when the app quits. Successful saves clear the draft; removing an account clears

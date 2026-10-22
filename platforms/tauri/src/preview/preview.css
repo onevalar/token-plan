@@ -22,6 +22,8 @@
 .mac-preview .preview-page[data-page="home"] { padding-top:0; }
 .mac-preview .provider:last-child { border-bottom:0; }
 .mac-preview .provider { padding-block:14px; }
+.mac-preview .dashboard .identity-line h2 { color:var(--foreground); }
+.mac-preview .dashboard .email,.mac-preview .dashboard .plan { font-size:var(--text-xs);font-weight:400;color:var(--text-muted); }
 .mac-preview .detail-group > p,.mac-preview .dashboard .notice { overflow-wrap:anywhere; }
 .mac-preview .inline-error { margin:10px 12px;padding:10px 12px;font-size:12px;border:1px solid var(--border);border-radius:var(--radius-control);color:var(--danger);overflow-wrap:anywhere; }
 .mac-preview .empty-state { color:var(--text-secondary);font-size:13px;padding:22px 8px;text-align:center; }
@@ -35,7 +37,7 @@
 .mac-preview .detail-group .section-heading { margin-bottom:8px; }
 .mac-preview .detail-group .section-heading h2,.mac-preview .section-heading h2 { margin:0; }
 .mac-preview .detail-group .section-heading button { font-size:12px;min-height:28px;padding-inline:4px; }
-.mac-preview .metric { grid-template-columns:65px minmax(36px,1fr) 39px 72px;gap:8px;min-height:36px; }
+.mac-preview .metric { grid-template-columns:32px minmax(36px,1fr) 39px 84px;column-gap:8px;min-height:36px; }
 .mac-preview .text-metric { grid-template-columns:minmax(80px,1fr) minmax(0,auto);gap:10px; }
 .mac-preview .metric-name { font-size:13px; }
 .mac-preview .amount { font-size:13px; }

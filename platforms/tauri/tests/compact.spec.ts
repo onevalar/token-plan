@@ -17,7 +17,7 @@ for(const colorScheme of ['light','dark'] as const)for(const width of [390,480])
   await expect(page.locator('.account-block')).toHaveCount(7);
   await expect(page.locator('.family-heading')).toHaveCount(1);
   await expect(page.locator('.metric[data-tone="critical"]')).toHaveCount(1);
-  await expect(page.locator('.metric[data-tone="warning"]')).toHaveCount(1);
+  await expect(page.locator('[data-provider="amp"] .metric').filter({hasText:'76%'})).toHaveAttribute('data-tone','normal');
   await expect(page.getByText('Fable',{exact:true})).toHaveCount(0);
   await expect(page.locator('.metric-chart svg circle')).toBeVisible();
   // Previously the charts alone occupied 60px, independent of row height.
