@@ -81,7 +81,7 @@ test('confirmed account removal leaves contiguous tray numbering',async({page})=
 
 test('service order is reflected in the homepage',async({page})=>{
  await mockDesktop(page);await page.goto('/');
- await page.getByRole('button',{name:'更多',exact:true}).click();await page.getByRole('menuitem',{name:'服务配置'}).click();
+ await page.getByRole('button',{name:'更多',exact:true}).click();await page.getByRole('menuitem',{name:'账号',exact:true}).click();
  await page.getByRole('button',{name:'排序',exact:true}).click();
  await page.locator('.configured-account').nth(1).getByRole('button',{name:/上移/}).click();
  await page.getByRole('button',{name:'返回',exact:true}).click();
@@ -107,7 +107,7 @@ test('confirmation timeout pauses for keyboard focus, including internal focus m
  await page.getByRole('button',{name:'设置',exact:true}).click();
  await page.mouse.move(0,0);
  await page.getByRole('button',{name:'移除账号',exact:true}).focus();await page.keyboard.press('Enter');
- const control=page.locator('.remove-account [data-mode]');
+ const control=page.locator('.danger-zone [data-mode]');
  await expect(control.getByRole('group').getByRole('button',{name:'移除账号',exact:true})).toBeFocused();
  await page.waitForTimeout(6200);
  await expect(control).toHaveAttribute('data-state','confirming');
@@ -136,7 +136,7 @@ test('reduced motion stops the pending spinner without hiding its status',async(
  await page.getByRole('button',{name:'移除账号',exact:true}).click();
  await page.waitForTimeout(300);
  await page.getByRole('group').getByRole('button',{name:'移除账号',exact:true}).click();
- const control=page.locator('.remove-account [data-mode]'),spinner=control.locator('svg');
+ const control=page.locator('.danger-zone [data-mode]'),spinner=control.locator('svg');
  await expect(control).toHaveAttribute('data-state','pending');
  await expect(control).toHaveAttribute('aria-busy','true');
  await expect(control.locator('[data-face="pending"]')).toHaveText('正在移除…');

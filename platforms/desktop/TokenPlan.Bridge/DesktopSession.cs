@@ -18,14 +18,20 @@ public sealed partial class DesktopSession : IDisposable
     bool[] notifications = [false, false, false];
     string shortcut = "";
     List<string> accountOrder = [];
-    public DesktopSession(string? preferencesPath = null)
+    /// How long after fetching a provider a repeat, non-forced refresh is answered from what we already have. The shell's
+    /// timer decides when to refresh, so this only coalesces requests that arrive almost together. (It used to be the whole
+    /// refresh interval and was saved to disk: a timer tick landing a moment early, any tick after a manual refresh, or the
+    /// first refresh after a relaunch was silently skipped, so numbers were refreshed only every second interval or
+    /// not at all until the old interval ran out.)
+    internal static readonly TimeSpan CoalescingWindow = TimeSpan.FromSeconds(20);
+    public DesktopSession(string? preferencesPath = null, ProviderService? providerService = null)
     {
         file = preferencesPath ?? Preferences.DefaultPath;
         preferences = Preferences.Load(file, preserveRefreshSetting: true);
         var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
         var codex = Environment.GetEnvironmentVariable("CODEX_HOME") ?? Path.Combine(home, ".codex");
         var claude = Environment.GetEnvironmentVariable("CLAUDE_CONFIG_DIR") ?? Path.Combine(home, ".claude");
-        service = new(codex, claude);
+        service = providerService ?? new(codex, claude);
         service.IsAccountRemoved = a => preferences.IsAccountRemoved(a);
         var claudeHomes = Environment.GetEnvironmentVariable("CLAUDE_CONFIG_DIR") is { Length: > 0 } configured
             ? configured.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
@@ -49,9 +55,8 @@ public sealed partial class DesktopSession : IDisposable
             trayStyle = doc.RootElement.GetProperty("trayStyle").GetString() is "percentage" ? "percentage" : "ring";
             if (doc.RootElement.TryGetProperty("cooldowns", out var cooldowns)) service.RestoreCooldowns(cooldowns.Deserialize<Dictionary<string, DateTimeOffset>>() ?? []);
             if (doc.RootElement.TryGetProperty("accountOrder", out var order)) accountOrder = order.Deserialize<List<string>>() ?? [];
-            if (doc.RootElement.TryGetProperty("nextRefresh", out var dates))
-                foreach (var entry in dates.EnumerateObject())
-                    if (DateTimeOffset.TryParse(entry.Value.GetString(), out var date) && date <= DateTimeOffset.UtcNow.AddHours(24)) nextRefresh[entry.Name] = date;
+            // A saved "next refresh" time is deliberately not restored: after a relaunch the first refresh must fetch. Rate limits
+            // are protected by the separately saved provider cooldowns above.
         }
     }
     public async Task<object> Execute(JsonElement request)
@@ -67,7 +72,7 @@ public sealed partial class DesktopSession : IDisposable
             case "state": break;
             case "refresh":
             case "discover":
-                await RefreshAccounts(method == "discover", id == "" ? null : family);
+                await RefreshAccounts(method == "discover", id == "" ? null : family, request.TryGetProperty("force", out var forced) && forced.ValueKind == JsonValueKind.True);
 
                 break;
             case "enabled":

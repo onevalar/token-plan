@@ -3,7 +3,7 @@ import {invoke} from '@tauri-apps/api/core';
 import {listen} from '@tauri-apps/api/event';
 import {Updates,useUpdater} from '../Updates';
 import {getVersion} from '@tauri-apps/api/app';
-import {ChevronLeft,RefreshCw,Plus,Ellipsis,Check,TriangleAlert} from 'lucide-react';
+import {ChevronLeft,RefreshCw,Plus,Ellipsis,Check,TriangleAlert,ExternalLink} from 'lucide-react';
 import {MotionConfig} from 'motion/react';
 import {Button} from '../components/arc/button/button';
 import {DropdownMenu} from '../components/arc/dropdown-menu/dropdown-menu';
@@ -17,6 +17,8 @@ import {AccountDetail} from './AccountDetail';
 import type {AccountDraft} from './AccountConfiguration';
 import {GeneralSettings} from './GeneralSettings';
 import {ServiceConfiguration} from './ServiceConfiguration';
+import {AddAccount} from './AddAccount';
+import {HomeTips} from './HomeTips';
 import {HistoryPage} from './HistoryPage';
 import {trayAccounts} from '../desktop';
 import {TrayPanel} from './TrayPanel';
@@ -46,7 +48,7 @@ export function DesktopApp() {
  const [drafts,setDrafts]=useState<Record<string,AccountDraft>>({});
  const [version,setVersion]=useState(''),[now,setNow]=useState(Date.now());
  const current=routes.at(-1)!;
- usePanelHeight(current.key,state,densityPreference.density,feedback?.scope===current.key?feedback:null);
+ usePanelHeight(current.key,state,densityPreference.density);
  const language=state?.settings.language==='system'||!state?navigator.language:state.settings.language;
  const tr=(s:string)=>providerText(s,language);
  const t={...textFor(language),pin_limit:tr('Choose up to three menu bar metrics per account.')},basic=messages(language);
@@ -57,9 +59,13 @@ export function DesktopApp() {
   setRoutes(r=>[...r,{key:++sequence.current,page,...details}]);
  };
  const back=()=>setRoutes(r=>r.length>1?r.slice(0,-1):r);
+ const addAccount=()=>{push('add');void send({method:'discover'}).catch(()=>{});};
+ const retryAccount=(accountId:string)=>{if(state&&!busy&&!refreshing)void refreshWithFeedback(state,current.key,accountId);};
  const refreshable=current.page==='home'||current.page==='history'||current.page==='detail'&&current.tab!=='settings';
  const refresh=()=>{if(state&&refreshable&&!busy&&!refreshing)void refreshWithFeedback(state,current.key,current.accountId);};
  const refreshFeedback=feedback?.scope===current.key?feedback:null;
+ // The finished result is shown on the button itself (icon + a short label beside it); the full sentence is only announced.
+ const refreshOutcome=refreshFeedback&&!refreshFeedback.pending?refreshFeedback.result??null:null;
  useEffect(()=>{
   void getVersion().then(setVersion).catch(()=>{});
   const tick=setInterval(()=>{if(!document.hidden)setNow(Date.now());},30_000);
@@ -96,38 +102,44 @@ export function DesktopApp() {
   };
   window.addEventListener('keydown',key);return()=>window.removeEventListener('keydown',key);
  },[current,refreshable,busy,refreshing,state,refreshWithFeedback]);
- const title=current.page==='detail'?account?.name??'':current.page==='settings'?t.settings:current.page==='configure'?t.configure:current.page==='add'?tr('Add Service'):current.page==='history'?t.history:current.page==='about'?basic.about:current.page==='updates'?t.checkUpdates:'TokenPlan';
+ const title=current.page==='detail'?account?.name??'':current.page==='settings'?t.settings:current.page==='configure'?t.configure:current.page==='add'?tr('Add Account'):current.page==='history'?t.history:current.page==='about'?basic.about:current.page==='updates'?t.checkUpdates:'TokenPlan';
  return <MotionConfig reducedMotion="user"><main className="mac-preview" data-density={densityPreference.density} onClickCapture={e=>{lastTrigger.current=(e.target as Element).closest<HTMLElement>('button');}}>
   <header className={`preview-header ${current.page==='home'?'home-header':''}`}>
    {current.page!=='home'&&<Button className="icon-button back-button" size="sm" variant="ghost" aria-label={basic.back} onClick={back}><ChevronLeft size={21}/></Button>}
    <div className="page-title">{current.page==='home'?<img src="/capsule.png" alt=""/>:current.page==='detail'&&account?<ProviderLogo family={account.family}/>:null}<h1 ref={heading} tabIndex={-1}>{title}</h1></div>
    <div className="header-actions">
-    {refreshable&&<Button className="icon-button refresh-button" size="sm" variant="ghost" aria-label={basic.refresh} aria-busy={refreshing} aria-disabled={busy||refreshing} data-refreshing={refreshing} onClick={refresh}><RefreshCw className="refresh-symbol" size={18}/></Button>}
-    {current.page==='configure'&&<Button className="icon-button" size="sm" variant="ghost" aria-label={tr('Add Service')} onClick={()=>{push('add');void send({method:'discover'}).catch(()=>{});}}><Plus size={20}/></Button>}
+    {refreshable&&<>
+     {refreshOutcome&&<span className="refresh-status" data-tone={refreshOutcome.tone} aria-hidden="true">{tr(refreshOutcome.short)}</span>}
+     <Button className="icon-button refresh-button" size="sm" variant="ghost" aria-label={basic.refresh} aria-busy={refreshing} aria-disabled={busy||refreshing} data-refreshing={refreshing} data-result={refreshOutcome?.tone} onClick={refresh}>
+      {refreshOutcome?.tone==='success'?<Check size={18}/>:refreshOutcome?<TriangleAlert size={18}/>:<RefreshCw className="refresh-symbol" size={18}/>}
+     </Button></>}
+    {current.page==='configure'&&<Button className="icon-button" size="sm" variant="ghost" aria-label={tr('Add Account')} onClick={addAccount}><Plus size={20}/></Button>}
     {current.page==='home'&&<DropdownMenu label={basic.more} iconOnly icon={<Ellipsis size={19}/>} items={[
-     {label:t.configure,onSelect:()=>push('configure')},{label:t.history,onSelect:()=>push('history')},
+     {label:tr('Add Account'),onSelect:addAccount},{label:t.configure,onSelect:()=>push('configure')},{label:t.history,onSelect:()=>push('history')},
      {label:t.settings,onSelect:()=>push('settings')},...(import.meta.env.VITE_MAC_NAVIGATION_PREVIEW==='1'?[]:[{label:t.checkUpdates,onSelect:()=>push('updates')}]),{label:basic.about,onSelect:()=>push('about')},
      {label:basic.quit,separatorBefore:true,onSelect:()=>{void invoke('quit');}},
     ]}/>}
    </div>
   </header>
-  {refreshFeedback&&<div className="refresh-feedback" data-tone={refreshFeedback.pending?'pending':refreshFeedback.result?.tone} role="status" aria-live="polite" aria-atomic="true">
-   {refreshFeedback.pending?<RefreshCw className="refresh-symbol" size={14} aria-hidden="true"/>:refreshFeedback.result?.tone==='success'?<Check size={14} aria-hidden="true"/>:<TriangleAlert size={14} aria-hidden="true"/>}
-   <span>{tr(refreshFeedback.pending?'Refreshing usage…':refreshFeedback.result!.message)}</span>
-  </div>}
+  <p className="sr-only refresh-announcement" aria-live="polite" aria-atomic="true">{refreshFeedback?tr(refreshFeedback.pending?'Refreshing usage…':refreshFeedback.result!.message):''}</p>
   {error&&(!state||refreshable||current.page==='add'||current.page==='updates')&&<p role="alert" className="inline-error">{t[error as keyof typeof t]??basic[error as keyof typeof basic]??t.request_failed}</p>}
   {!state&&!error&&<p role="status">{basic.loading}</p>}
   {current.page!=='updates'&&updater.status==='available'&&<Button variant="secondary" onClick={()=>push('updates')}>{t.updateAvailable} {updater.version}</Button>}
   <div className="page-stack">{routes.map(route=>{
    const a=state?.accounts.find(a=>a.id===route.accountId);
    return <div className="preview-page" data-page={route.page} key={route.key} hidden={route.key!==current.key}><div className="page-content">
-    {state&&route.page==='home'&&<>{platform&&platform!=='macos'&&<TrayPanel state={state} label={t.tray} open={accountId=>push('detail',{accountId,tab:'usage'})}/>}{!state.accounts.some(a=>a.enabled)?<div className="empty-state"><p>{basic.empty}</p><Button size="sm" variant="secondary" onClick={()=>push('configure')}>{t.configure}</Button></div>:<Dashboard accounts={state.accounts} open={accountId=>push('detail',{accountId,tab:'usage'})} now={now} language={language} missing={basic.missing} remaining={state.settings.showRemaining}/>}</>}
+    {state&&route.page==='home'&&<>{platform&&platform!=='macos'&&<TrayPanel state={state} label={t.tray} open={accountId=>push('detail',{accountId,tab:'usage'})}/>}{!state.accounts.some(a=>a.enabled)?<div className="empty-state"><p>{tr('No accounts yet. Add one to start tracking your usage.')}</p><div className="empty-actions"><Button size="sm" variant="secondary" onClick={addAccount}><Plus size={15}/>{tr('Add Account')}</Button></div></div>:<><HomeTips state={state} send={send} language={language} addAccount={addAccount}/><Dashboard accounts={state.accounts} open={accountId=>push('detail',{accountId,tab:'usage'})} openSettings={accountId=>push('detail',{accountId,tab:'settings'})} retry={retryAccount} busy={busy||refreshing} now={now} language={language} missing={basic.missing} remaining={state.settings.showRemaining}/><Button className="add-account-row" variant="ghost" size="sm" onClick={addAccount}><Plus size={15}/>{tr('Add Account')}</Button></>}</>}
     {state&&a&&route.page==='detail'&&<AccountDetail draft={drafts[a.id]??{}} onDraftChange={patch=>setDrafts(d=>({...d,[a.id]:{...d[a.id],...patch}}))} badge={trayAccounts(state.accounts).find(item=>item.id===a.id)?.badge} traySettings={state.settings} account={a} tab={route.tab??'usage'} onTab={tab=>setRoutes(r=>r.map(item=>item.key===route.key?{...item,tab}:item))} history={range=>push('history',{accountId:a.id,range})} send={send} t={t} busy={busy} language={language} now={now} remaining={state.settings.showRemaining} missing={basic.missing}/>}
     {state&&route.page==='settings'&&<GeneralSettings platform={platform} densityPreference={densityPreference} state={state} send={send} t={t} busy={busy} language={language}/>}
-    {state&&(route.page==='configure'||route.page==='add')&&<ServiceConfiguration state={state} send={send} t={t} busy={busy} language={language} adding={route.page==='add'} open={accountId=>push('detail',{accountId,tab:'settings'})}/>}
+    {state&&route.page==='configure'&&<ServiceConfiguration state={state} send={send} t={t} busy={busy} language={language} add={addAccount} open={accountId=>push('detail',{accountId,tab:'settings'})}/>}
+    {state&&route.page==='add'&&<AddAccount state={state} send={send} t={t} busy={busy} language={language} open={accountId=>push('detail',{accountId,tab:'settings'})}/>}
     {state&&route.page==='history'&&<>{a&&<div className="history-account-context">{a.name}{a.email&&<span>{a.email}</span>}</div>}<HistoryPage accounts={a?[a]:state.accounts} t={t} language={language} initialRange={route.range}/></>}
     {route.page==='updates'&&<Updates showHeading={false} t={t} updater={updater} automatic={state?.settings.autoUpdates??true} onAutomatic={autoUpdates=>{void send({method:'settings',value:{autoUpdates}}).catch(()=>{});}}/>}
-    {route.page==='about'&&<section className="about"><img src="/capsule.png" alt=""/><h2>TokenPlan</h2><p>{version}</p>{import.meta.env.VITE_MAC_NAVIGATION_PREVIEW==='1'&&<p className="muted">{tr('Design Preview')}</p>}</section>}
+    {route.page==='about'&&<section className="about"><img src="/capsule.png" alt=""/><h2>TokenPlan</h2><p>{version}</p>{import.meta.env.VITE_MAC_NAVIGATION_PREVIEW==='1'&&<p className="muted">{tr('Design Preview')}</p>}
+     <p className="about-tagline">{tr('Track your AI subscriptions and API balances from your menu bar or system tray.')}</p>
+     <div className="about-links">{([['Project Home','https://github.com/onevalar/token-plan'],['Release Notes','https://github.com/onevalar/token-plan/releases'],['Report a Problem','https://github.com/onevalar/token-plan/issues/new'],['License','https://github.com/onevalar/token-plan/blob/main/LICENSE']] as const).map(([label,url])=><Button key={url} size="sm" variant="ghost" onClick={()=>{void invoke('open_link',{url}).catch(e=>console.error('Link could not be opened',e));}}><span>{tr(label)}</span><ExternalLink size={14} aria-hidden="true"/></Button>)}</div>
+     <p className="about-credit">{tr('Based on OpenUsage by Robin Ebers, released under the MIT License.')}</p>
+     <p className="about-credit">{tr('TokenPlan sends no analytics or crash reports. Credentials stay on this computer.')}</p></section>}
    </div></div>;
   })}</div>
  </main></MotionConfig>;

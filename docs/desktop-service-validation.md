@@ -76,3 +76,23 @@ Windows、Linux 的独立 CLI 凭据支持到期前续期，以及 401 后续期
 403 不再解释为登录过期。超时、DNS、TLS/证书、代理认证、限流和续期凭据被撤销分别提示。网络诊断记录目标域名、状态、耗时和代理是否启用，不记录账号、令牌、代理地址、请求头或接口响应。通用设置的高级选项可打开日志目录。
 
 回归覆盖使用模拟凭据和 HTTP 响应；不等于已在用户的 Ubuntu 网络环境成功连接。实际账号、代理与系统凭据权限仍需安装后验证。
+
+## 国内服务实测（2026-10-22）
+
+用一个明显无效的密钥向各家官方额度接口发起请求（不涉及任何真实账号），确认接口存在、域名可达，并观察服务如何表示“密钥无效”：
+
+| 服务 | 接口 | 无效密钥时的真实响应 |
+| --- | --- | --- |
+| DeepSeek | `api.deepseek.com/user/balance` | HTTP 401，`authentication_error` |
+| Kimi / Moonshot | `api.moonshot.cn` 与 `api.moonshot.ai` 的 `/v1/users/me/balance` | HTTP 401，`invalid_authentication_error` |
+| 硅基流动 | `api.siliconflow.cn/v1/user/info`（`.com` 同样可达） | HTTP 401，`code 30014 Token is invalid` |
+| MiniMax | `www.minimaxi.com` / `api.minimaxi.com` / `www.minimax.io` 的 `/v1/token_plan/remains` | **HTTP 200**，`base_resp.status_code 1004`（“请在 Authorization 中携带 API 密钥”） |
+| 智谱 Z.ai | `api.z.ai` 与 `open.bigmodel.cn` 的 `/api/monitor/usage/quota/limit` | **HTTP 200**，`{"code":401,"success":false}` |
+| OpenRouter | `openrouter.ai/api/v1/credits` | HTTP 401 |
+
+结论与修复：
+
+- 所有接口均存在且响应迅速（约 0.1–1.3 秒）。DeepSeek、Kimi、硅基流动、OpenRouter 用标准的 HTTP 401 表示密钥无效，原有处理正确。
+- **MiniMax 与智谱把“密钥无效”放在 HTTP 200 的响应体里**。此前 Windows/Linux 会把它显示成“用量或登录数据无法读取”，Mac 助手的智谱则不会尝试国内站（因为只看状态码）。现已统一改为：识别响应体中的拒绝信号，提示“API 密钥被拒绝，请检查服务设置中的密钥”，并继续尝试另一端点（国际/国内）。两端各增加了回归检查（.NET 4 项、Swift 1 项）。
+- MiniMax 的国内站请使用 `/v1/token_plan/remains`；`/v1/api/openplatform/coding_plan/remains` 要求网页登录 Cookie，不能用 API 密钥。
+- **仍未验证**：成功响应的字段映射只与官方文档和既有解析器核对过，没有用真实付费账号取过数。MiniMax 的字段形状最可能与实际有出入。Kimi 的会员/Kimi Code 额度（`api.kimi.com/coding/v1/usages`）接口可达，但响应结构没有公开文档，尚未支持，目前只显示开放平台的 API 余额。硅基流动国际站（`.com`）尚未作为备用端点，账户币种也未确认。

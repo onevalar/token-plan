@@ -33,6 +33,8 @@ public sealed partial class ProviderService
             }
             catch (ProviderFailure error) when (error.Message == "Your session has expired. Sign in with the CLI again.")
             { failure = new ProviderFailure("The API key was rejected. Check the key in service settings."); }
+            catch (KeyRejectedException)
+            { failure = new ProviderFailure("The API key was rejected. Check the key in service settings."); }
             catch (InvalidDataException error) { failure = error; }
             catch (ProviderFailure error) when (id == "openrouter" && error.Message != "Usage queries are temporarily rate limited. Data may be out of date. Retrying automatically later.") { failure = error; }
         }

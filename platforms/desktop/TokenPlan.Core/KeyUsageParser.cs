@@ -3,6 +3,10 @@ using System.Text.Json;
 
 namespace TokenPlan.Core;
 
+/// A provider answered HTTP 200 but said in the body that the API key is wrong. Z.ai (`code` 401) and MiniMax
+/// (`base_resp.status_code` 1004) do this, so the status code alone cannot reveal a rejected key.
+public sealed class KeyRejectedException : Exception;
+
 /// Mirrors the native provider mappers. Missing fields never become a fabricated zero balance.
 public static class KeyUsageParser
 {
@@ -48,7 +52,7 @@ public static class KeyUsageParser
                 Money(data, "chargeBalance", "Topped Up", "CNY"); Money(data, "balance", "Granted", "CNY");
                 break;
             case "minimax":
-                if (Number(Field(root, "base_resp"), "status_code") is { } status && status != 0) throw new InvalidDataException();
+                if (Number(Field(root, "base_resp"), "status_code") is { } status && status != 0) throw status == 1004 ? new KeyRejectedException() : new InvalidDataException();
                 var models = Field(root, "model_remains");
                 if (models.ValueKind != JsonValueKind.Array) throw new InvalidDataException();
                 var model = models.EnumerateArray().FirstOrDefault(m => UsageParser.String(m, "model_name")?.StartsWith("minimax-m", StringComparison.OrdinalIgnoreCase) == true);
@@ -76,7 +80,7 @@ public static class KeyUsageParser
                     Percent("Key Limit", Math.Max(0, keyLimit - keyRemaining) / keyLimit * 100);
                 break;
             case "zai":
-                if (Field(root, "success").ValueKind == JsonValueKind.False) throw new InvalidDataException();
+                if (Field(root, "success").ValueKind == JsonValueKind.False) throw Number(root, "code") == 401 ? new KeyRejectedException() : new InvalidDataException();
                 var limits = Field(data.ValueKind == JsonValueKind.Object ? data : root, "limits");
                 if (limits.ValueKind != JsonValueKind.Array) throw new InvalidDataException();
                 foreach (var entry in limits.EnumerateArray())

@@ -2,7 +2,7 @@ using TokenPlan.Core;
 namespace TokenPlan.Bridge;
 public sealed partial class DesktopSession
 {
-    async Task RefreshAccounts(bool discover, string? family)
+    async Task RefreshAccounts(bool discover, string? family, bool force = false)
     {
         using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(110));
         var ids = preferences.OrderedProviders.Where(p => preferences.IsEnabled(p) || (discover && p is ("claude" or "codex"))).Where(p => family == null || p == family).ToArray();
@@ -10,8 +10,10 @@ public sealed partial class DesktopSession
         {
             await Parallel.ForEachAsync(ids, new ParallelOptions { MaxDegreeOfParallelism = 2, CancellationToken = timeout.Token }, async (provider, cancellation) =>
             {
-                if (!discover && nextRefresh.GetValueOrDefault(provider) > DateTimeOffset.UtcNow) return;
-                nextRefresh[provider] = DateTimeOffset.UtcNow.AddMinutes(preferences.RefreshMinutes); Persist();
+                // A pressed Refresh (force) and account discovery always fetch; only a repeat request that arrives within moments of the
+                // last fetch is coalesced.
+                if (!discover && !force && nextRefresh.GetValueOrDefault(provider) > DateTimeOffset.UtcNow) return;
+                nextRefresh[provider] = DateTimeOffset.UtcNow + CoalescingWindow;
                 try
                 {
                     var fresh = await service.Refresh(provider, cancellation);

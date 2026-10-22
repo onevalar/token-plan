@@ -17,7 +17,8 @@ export const desktopSchema = z.object({schema:z.literal('tokenplan.desktop.v1'),
 export type DesktopState=z.infer<typeof desktopSchema>;
 export type Account=z.infer<typeof accountSchema>;
 export type Metric=z.infer<typeof metricSchema>;
-export type Request={method:string;accountId?:string;metricId?:string;value?:unknown};
+/** `force` marks a refresh the person asked for: it must fetch from the provider, never reuse a snapshot taken moments ago. */
+export type Request={method:string;accountId?:string;metricId?:string;value?:unknown;force?:boolean};
 export type Send=(request:Request)=>Promise<DesktopState|void>;
 export function trayAccounts(accounts:Account[]) {
  const shown=accounts.filter(a=>a.enabled&&a.tray);

@@ -31,6 +31,21 @@ static class ServiceContractChecks
                 check(result.Snapshot == null && result.ErrorKey != null && !result.ErrorKey.Contains("private"), id + " sanitizes auth/rate-limit/server/schema failures: " + status);
             }
         }
+        // Z.ai and MiniMax reject a bad key inside an HTTP 200 body; that must read as a rejected key, not as unreadable data,
+        // and the second (mainland / global) endpoint must still be tried.
+        foreach (var (id, rejection, good, firstHost) in new[] {
+            ("zai", """{"code":401,"msg":"token expired or incorrect","success":false}""", fixtures["zai"].Body, "api.z.ai"),
+            ("minimax", """{"base_resp":{"status_code":1004,"status_msg":"login fail"}}""", fixtures["minimax"].Body, "www.minimaxi.com") })
+        {
+            keys.Save(id, "fixture-" + id);
+            using (var service = new ProviderService(root, root, new Handler(_ => new(HttpStatusCode.OK) { Content = new StringContent(rejection) }), (_, _) => {}, keys: keys))
+            {
+                var result = await service.Refresh(id, default);
+                check(result.Snapshot == null && result.ErrorKey == "The API key was rejected. Check the key in service settings.", id + " reports a key rejected inside HTTP 200");
+            }
+            using (var service = new ProviderService(root, root, new Handler(request => new(HttpStatusCode.OK) { Content = new StringContent(request.RequestUri!.Host == firstHost ? rejection : good) }), (_, _) => {}, keys: keys))
+                check((await service.Refresh(id, default)).Snapshot?.Windows.Count > 0, id + " falls back to its other endpoint after a body-level rejection");
+        }
         var home = Path.Combine(root, "service-contract-home"); var config = Path.Combine(home, ".config"); var data = Path.Combine(home, ".local", "share");
         Directory.CreateDirectory(Path.Combine(config, "github-copilot")); Directory.CreateDirectory(Path.Combine(data, "devin")); Directory.CreateDirectory(Path.Combine(data, "opencode")); Directory.CreateDirectory(Path.Combine(home, ".grok"));
         File.WriteAllText(Path.Combine(config, "github-copilot", "apps.json"), """{"github.com":{"oauth_token":"fixture-copilot"}}""");

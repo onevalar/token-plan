@@ -1,0 +1,32 @@
+# Order: zh-Hans, zh-Hant, ja, ko. Problem actions, first-run tips, window tooltips, About page.
+T = {
+ 'Set API Key': ('设置 API 密钥', '設定 API 金鑰', 'API キーを設定', 'API 키 설정'),
+ 'Try Again': ('重试', '重試', '再試行', '다시 시도'),
+ 'Sign In Again': ('重新登录', '重新登入', '再度サインイン', '다시 로그인'),
+ 'Check Connection': ('检查连接', '檢查連線', '接続を確認', '연결 확인'),
+ 'View Details': ('查看详情', '查看詳情', '詳細を見る', '자세히 보기'),
+ 'Account Settings': ('账号设置', '帳號設定', 'アカウント設定', '계정 설정'),
+ 'Got It': ('知道了', '知道了', 'わかりました', '확인'),
+ 'Not Now': ('以后再说', '稍後再說', '今はしない', '나중에'),
+ 'Turn On Alerts': ('开启提醒', '開啟提醒', '通知をオンにする', '알림 켜기'),
+ 'Search': ('搜索', '搜尋', '検索', '검색'),
+ 'Project Home': ('项目主页', '專案首頁', 'プロジェクトのホーム', '프로젝트 홈'),
+ 'Release Notes': ('更新说明', '更新說明', 'リリースノート', '릴리스 노트'),
+ 'Report a Problem': ('反馈问题', '回報問題', '問題を報告', '문제 신고'),
+ '%@-minute window': ('%@ 分钟窗口', '%@ 分鐘視窗', '%@ 分の期間', '%@분 구간'),
+ '%@-hour window': ('%@ 小时窗口', '%@ 小時視窗', '%@ 時間の期間', '%@시간 구간'),
+ '%@-day window': ('%@ 天窗口', '%@ 天視窗', '%@ 日の期間', '%@일 구간'),
+ '%@-week window': ('%@ 周窗口', '%@ 週視窗', '%@ 週間の期間', '%@주 구간'),
+ 'Accounts already signed in on this Mac appear here automatically.': ('这台 Mac 上已登录的账号会自动显示在这里。', '這台 Mac 上已登入的帳號會自動顯示在這裡。', 'この Mac でサインイン済みのアカウントは、自動的にここに表示されます。', '이 Mac에 로그인된 계정은 자동으로 여기에 표시됩니다.'),
+ '“5h” and “1w” are usage windows of 5 hours and 1 week. The hourglass shows when each one resets.': ('“5h”“1w”是 5 小时、1 周的用量周期，沙漏旁边是该周期的重置倒计时。', '「5h」「1w」是 5 小時、1 週的用量週期，沙漏旁邊是該週期的重置倒數。', '「5h」「1w」は 5 時間・1 週間の使用量の期間で、砂時計は各期間がリセットされるまでの時間を表します。', '"5h", "1w"는 5시간·1주 사용량 구간이며, 모래시계는 각 구간이 초기화되기까지 남은 시간입니다.'),
+ 'Click an account for details, or use More → Add Account to track another login.': ('点击账号查看详情；要追踪另一个登录，请用“更多”→“添加账号”。', '點擊帳號查看詳情；要追蹤另一個登入，請用「更多」→「新增帳號」。', 'アカウントをクリックすると詳細が開きます。別のログインを追加するには「その他」→「アカウントを追加」を使います。', '계정을 누르면 자세히 볼 수 있습니다. 다른 로그인을 추가하려면 "더 보기" → "계정 추가"를 사용하세요.'),
+ 'Get a heads-up before you run out.': ('在用完之前提前收到提醒。', '在用完之前提前收到提醒。', '使い切る前にお知らせします。', '소진되기 전에 미리 알려 드립니다.'),
+ 'TokenPlan can notify you when a limit is almost used up, or on track to run out before it resets.': ('额度快用完，或预计会在重置前用完时，TokenPlan 可以通知你。', '額度快用完，或預計會在重置前用完時，TokenPlan 可以通知你。', '上限をほぼ使い切ったとき、またはリセット前に使い切りそうなときに、TokenPlan が通知できます。', '한도를 거의 다 썼거나 초기화 전에 소진될 것 같을 때 TokenPlan이 알려 드릴 수 있습니다.'),
+ 'Track your AI subscriptions and API balances from your menu bar or system tray.': ('在菜单栏或系统托盘中追踪你的 AI 订阅额度和 API 余额。', '在選單列或系統匣中追蹤你的 AI 訂閱額度與 API 餘額。', 'AI サブスクリプションと API 残高を、メニューバーやシステムトレイから確認できます。', '메뉴 막대나 시스템 트레이에서 AI 구독 한도와 API 잔액을 확인하세요.'),
+ 'Based on OpenUsage by Robin Ebers, released under the MIT License.': ('基于 Robin Ebers 的 OpenUsage，遵循 MIT 许可证。', '基於 Robin Ebers 的 OpenUsage，遵循 MIT 授權。', 'Robin Ebers 氏の OpenUsage（MIT ライセンス）をもとにしています。', 'Robin Ebers의 OpenUsage(MIT 라이선스)를 기반으로 합니다.'),
+ 'TokenPlan sends no analytics or crash reports. Credentials stay on this computer.': ('TokenPlan 不发送任何统计或崩溃报告，凭据只保留在这台电脑上。', 'TokenPlan 不傳送任何統計或當機報告，憑證只保留在這台電腦上。', 'TokenPlan は分析データやクラッシュレポートを送信しません。認証情報はこのコンピュータにのみ保存されます。', 'TokenPlan은 분석 데이터나 충돌 보고서를 보내지 않습니다. 자격 증명은 이 컴퓨터에만 보관됩니다.'),
+}
+T.update({
+ 'Not refreshed': ('未刷新', '未重新整理', '更新されていません', '새로고침 안 됨'),
+ 'Nothing new was fetched. Try again in a moment.': ('没有获取到新数据，请稍后再试。', '沒有取得新資料，請稍後再試。', '新しいデータを取得できませんでした。しばらくしてからお試しください。', '새 데이터를 가져오지 못했습니다. 잠시 후 다시 시도하세요.'),
+})

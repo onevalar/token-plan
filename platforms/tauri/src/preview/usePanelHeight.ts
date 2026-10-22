@@ -2,7 +2,7 @@ import {useLayoutEffect} from 'react';
 import {invoke} from '@tauri-apps/api/core';
 
 // Measure an intrinsically sized child, never the scroll viewport: that allows shrinking.
-export function usePanelHeight(route:number,state:unknown,density:string,feedback?:unknown) {
+export function usePanelHeight(route:number,state:unknown,density:string) {
  useLayoutEffect(()=>{
   const page=document.querySelector<HTMLElement>('.preview-page:not([hidden])');
   const content=page?.querySelector<HTMLElement>('.page-content');
@@ -21,5 +21,5 @@ export function usePanelHeight(route:number,state:unknown,density:string,feedbac
   };
   const observer=new ResizeObserver(measure);observer.observe(content);measure();
   return()=>{cancelAnimationFrame(frame);observer.disconnect();};
- },[route,state,density,feedback]);
+ },[route,state,density]);
 }

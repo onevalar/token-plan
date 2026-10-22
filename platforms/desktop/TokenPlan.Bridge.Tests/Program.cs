@@ -91,8 +91,37 @@ try {
   await Call(session,new{method="settings",value=new{autoRefresh=false}});
   Assert(Preferences.Load(pinsFile).PinnedMetrics["claude"].Length==0,"Reconnecting does not undo icon-only choice");
  }
+ // Regression: a pressed Refresh answered "refreshed" without fetching, and numbers only caught up later. A pressed Refresh
+ // must always fetch; the first refresh after a relaunch must fetch; only near-simultaneous repeats are coalesced.
+ var gateDir=Path.Combine(root,"refresh-gate");Directory.CreateDirectory(gateDir);
+ var gateFile=Path.Combine(gateDir,"preferences.json");
+ new Preferences().WithEnabled("claude",false).WithEnabled("codex",false).WithEnabled("cursor",false).WithEnabled("deepseek",true).Save(gateFile);
+ var gateKeys=new APIKeyStore(Path.Combine(gateDir,"keys"),_=>null);gateKeys.Save("deepseek","fixture-key");
+ var gateCalls=0;
+ DesktopSession GateSession()=>new(gateFile,new ProviderService(gateDir,gateDir,new CountingHandler(()=>{gateCalls++;return """{"balance_infos":[{"currency":"CNY","total_balance":"10"}]}""";}),(_,_)=>{},keys:gateKeys));
+ using(var session=GateSession()){
+  var state=await Call(session,new{method="refresh"});
+  Assert(gateCalls==1,"The first refresh fetches");
+  Assert(state.GetProperty("accounts").EnumerateArray().Single(a=>a.GetProperty("id").GetString()=="deepseek").GetProperty("fetchedAt").GetString()!="","The fetch is reported in state");
+  await Call(session,new{method="refresh"});
+  Assert(gateCalls==1,"A repeat that arrives moments later is coalesced");
+  await Call(session,new{method="refresh",force=true});
+  Assert(gateCalls==2,"A pressed Refresh always fetches");
+  await Call(session,new{method="refresh",accountId="deepseek",force=true});
+  Assert(gateCalls==3,"A pressed per-account Refresh always fetches");
+ }
+ using(var session=GateSession()){
+  await Call(session,new{method="refresh"});
+  Assert(gateCalls==4,"The first refresh after a relaunch fetches instead of waiting out an old saved interval");
+ }
  var registeredHome=Path.Combine(root,"registered");Directory.CreateDirectory(registeredHome);
  File.WriteAllText(Path.Combine(root,".tokenplan-account-directories.json"),JsonSerializer.Serialize(new Dictionary<string,string[]>{{"claude",[registeredHome]}}));
  Assert(AccountHomes.Discover("claude",root,Path.Combine(root,".claude"),_=>null).Any(a=>a.Home==registeredHome),"Registered independent directory is discoverable");
  Console.WriteLine("Bridge integration checks passed (isolated preferences; no network or real credentials).");
 }finally{Directory.Delete(root,true);}
+
+sealed class CountingHandler(Func<string> body) : HttpMessageHandler
+{
+    protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken token)
+        => Task.FromResult(new HttpResponseMessage(System.Net.HttpStatusCode.OK) { Content = new StringContent(body()) });
+}

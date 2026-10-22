@@ -254,8 +254,12 @@ High quota usage still uses the shared warning and danger colors. Native menu ba
 icons and their previews retain the system's monochrome contrast behavior.
 
 Manual refresh immediately shows a rotating refresh icon and a text status, prevents
-repeat requests, and reports updated data, an unchanged cached result, partial account
-errors or a failed request. Results belong to the page that initiated the refresh.
+repeat requests, and reports updated data, a "Not refreshed" result when nothing was
+fetched, partial account errors or a failed request. Success is claimed only when an
+account's fetch time actually advanced. Pressing Refresh (the button, ⌘R, or a card's
+Try Again) always asks the helper to fetch from the provider, bypassing the helper's
+short reuse window; the launch refresh and the background timer do not, so a tick and a
+press that land together do not fetch twice. Results belong to the page that initiated the refresh.
 The status has a short minimum visibility period so fast cached requests are still
 perceptible; reduced-motion mode retains the text without rotation. Saving settings
 does not start the refresh animation. The panel height includes this temporary status.

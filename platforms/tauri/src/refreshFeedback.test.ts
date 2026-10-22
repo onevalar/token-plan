@@ -3,17 +3,23 @@ import {largeDesktop} from '../tests/fixtures/largeDesktop';
 import {refreshResult} from './refreshFeedback';
 
 describe('manual refresh feedback',()=>{
- it('distinguishes updated data from a cached response',()=>{
+ it('only claims success when something was actually fetched',()=>{
   const before=largeDesktop(),after=structuredClone(before);
-  expect(refreshResult(before,after).message).toBe('Checked. No new usage data.');
+  // Nothing fetched (no fetch time advanced): never "refreshed" or "up to date".
+  expect(refreshResult(before,after).tone).toBe('warning');
+  expect(refreshResult(before,after).short).toBe('Not refreshed');
+  expect(refreshResult(before,after).message).toBe('Nothing new was fetched. Try again in a moment.');
   after.accounts[0].fetchedAt='2030-01-01T12:00:00Z';
   expect(refreshResult(before,after).message).toBe('Usage updated.');
+  expect(refreshResult(before,after).short).toBe('Refreshed');
  });
  it('does not announce success when some or all target accounts fail',()=>{
   const before=largeDesktop(),after=structuredClone(before);
   after.accounts[0].error='Too many requests';
   expect(refreshResult(before,after).tone).toBe('warning');
+  expect(refreshResult(before,after).short).toBe('Some failed');
   expect(refreshResult(before,after,after.accounts[0].id).tone).toBe('error');
+  expect(refreshResult(before,after,after.accounts[0].id).short).toBe('Refresh failed');
   after.accounts[0].error='';after.accounts[0].connection='unverified';
   expect(refreshResult(before,after,after.accounts[0].id).tone).toBe('error');
  });

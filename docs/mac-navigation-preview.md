@@ -23,8 +23,33 @@ tray integration remain platform-specific. This change does not publish a releas
 - Removing an account requires confirmation and keeps the existing terminal login
   and history behavior. Confirmation timers pause while keyboard focus is inside,
   just as they do on hover. Reduced motion keeps loading feedback without rotation.
-- Settings group appearance, refresh, tray, notifications and shortcuts. Service
-  configuration separates enabled accounts, adding accounts and reordering.
+- Manual refresh is shown on the refresh button itself: it spins while working, then
+  shows a check or warning mark for a few seconds with a one-or-two-word label beside it
+  (Refreshed, Not refreshed, Needs attention, Some failed, Refresh failed). "Refreshed" appears only when
+  at least one account actually fetched new data; if nothing was fetched it says Not refreshed. There is no banner
+  and nothing moves; the full sentence is only announced to screen readers.
+- The Accounts page (previously Service Configuration) lists enabled accounts with
+  switches, reordering and an Add Account row. Home also ends with Add Account, the More
+  menu starts with it, and an empty Home offers it as the one action. Add Account has two
+  tabs: Available to Add (accounts and services TokenPlan knows about, detected ones first,
+  one press to add; services that need an API key open their settings next) and Another
+  Account (a numbered guide to sign in to a second or third Claude or Codex login in its own
+  folder, with the existing-folder option under Advanced).
+- An account's note is hidden behind Add Note (or shown as text with Edit) until wanted;
+  an unsaved draft keeps the editor open. Removing an account sits in its own section at
+  the bottom of the account settings, apart from notes and the API key.
+- Problem cards carry one button for the next step: Try Again (temporary failures, refreshes just that account), Sign In Again
+  (a CLI login that needs authorizing), Check Connection, Set API Key (opens the key field) or View Details. Each Home account also
+  has a settings shortcut that appears on hover or keyboard focus. Window labels (5h, 1w) and reset countdowns have plain-language
+  tooltips ("5-hour window", "Resets in 3h").
+- First use shows a short welcome once (what appears automatically, what 5h/1w and the hourglass mean, where to add another login).
+  Later, when an account is at 70% or more and every alert is off, one card offers to turn alerts on (asking for notification
+  permission first). Both can be dismissed; the choice is kept per device in the webview's own storage and never in preferences.
+- About shows the version, a one-line description, links to the project, release notes, issue reporting and license (opened by a native
+  command that only accepts https links inside this project's repository), the OpenUsage credit and the no-analytics statement.
+- Settings group appearance, refresh, tray, notifications and shortcuts. The menu-bar account list is collapsed behind a row that shows
+  how many are selected. The three alerts
+  share one card, and the tray account list is labelled as such.
   History provides filtering, seven-day pagination and expandable model records.
 - The production updater and About page remain available from More. Automatic
   updates keep the existing signed updater flow. iCloud sync remains removed.

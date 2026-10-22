@@ -5,7 +5,7 @@ import {largeDesktop} from './fixtures/largeDesktop';
 const noOverflow=async(page:Page)=>expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
 async function configure(page:Page) {
  await page.getByRole('button',{name:'更多',exact:true}).click();
- await page.getByRole('menuitem',{name:'服务配置',exact:true}).click();
+ await page.getByRole('menuitem',{name:'账号',exact:true}).click();
  await expect(page.getByRole('menu',{includeHidden:true})).toHaveCount(0);
 }
 for(const colorScheme of ['light','dark'] as const)for(const width of [390,480]){
@@ -50,11 +50,11 @@ for(const colorScheme of ['light','dark'] as const)for(const width of [390,480])
   await page.screenshot({path:info.outputPath('history.png'),fullPage:true,animations:'disabled'});
   await page.getByRole('button',{name:'返回',exact:true}).click();
   await configure(page);
-  await page.getByRole('button',{name:'添加服务',exact:true}).click();
+  await page.getByRole('button',{name:'添加账号',exact:true}).first().click();
   await expect(page.locator('.preview-page:not([hidden]) .configured-account')).toHaveCount(8);
   await page.getByRole('textbox',{name:'搜索服务',exact:true}).fill('Cursor');
   await expect(page.locator('.preview-page:not([hidden]) .configured-account')).toHaveCount(1);
-  await page.locator('.preview-page:not([hidden])').getByRole('switch').click();
+  await page.getByRole('button',{name:'添加 Cursor',exact:true}).click();
   await page.getByRole('button',{name:'返回',exact:true}).click();
   await expect(page.locator('.preview-page:not([hidden]) .configured-account')).toHaveCount(8);
  });

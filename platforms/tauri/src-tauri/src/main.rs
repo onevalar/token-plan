@@ -2,6 +2,7 @@
 
 mod bridge;
 mod account_setup;
+mod links;
 mod shortcuts;
 mod notifications;
 mod model;
@@ -55,7 +56,7 @@ fn main() {
         .manage(tray::Trays::default())
         .manage(panel::Panel::default())
         .manage(account_setup::AccountSetup::default())
-        .invoke_handler(tauri::generate_handler![bridge::desktop_request, shortcuts::shortcut_capture, panel::panel_frame, panel::panel_content_height, account_setup::account_login, account_setup::account_directory, quit, hide])
+        .invoke_handler(tauri::generate_handler![bridge::desktop_request, shortcuts::shortcut_capture, panel::panel_frame, panel::panel_content_height, account_setup::account_login, account_setup::account_directory, links::open_link, quit, hide])
         .setup(|app| {
             #[cfg(target_os="windows")]
             {

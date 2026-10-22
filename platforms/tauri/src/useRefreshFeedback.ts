@@ -14,15 +14,17 @@ export function useRefreshFeedback(send:Send) {
   const visibleUntil=Date.now()+600;
   let result:RefreshResult;
   try {
-   const after=await send({method:'refresh',accountId});
+   // A press of Refresh (button, shortcut or a card's Try Again) is a manual refresh: always fetch.
+   const after=await send({method:'refresh',accountId,force:true});
    if(!after)throw new Error('invalid_response');
    result=refreshResult(before,after,accountId);
-  }catch {result={tone:'error',message:'Refresh failed. Please try again.'};}
+  }catch {result={tone:'error',message:'Refresh failed. Please try again.',short:'Refresh failed'};}
   await new Promise(resolve=>setTimeout(resolve,Math.max(0,visibleUntil-Date.now())));
   active.current=false;
   if(!alive.current)return;
   setFeedback({scope,pending:false,result});
-  clear.current=setTimeout(()=>setFeedback(null),6000);
+  // A plain success fades quickly; anything that needs a decision stays long enough to read.
+  clear.current=setTimeout(()=>setFeedback(null),result.tone==='success'?3500:7000);
  },[send]);
  return {feedback,refresh,refreshing:feedback?.pending??false};
 }

@@ -32,6 +32,16 @@ enum ZAIUsageMapper {
     /// clear `.notAvailable` error (a header warning) instead of three blank "No data" meters that don't
     /// say why. Matched on the structured `success:false` plus the "coding plan" phrase the message
     /// carries (ASCII even in the localized string), so an unrelated business failure doesn't trip it.
+    /// Z.ai answers a rejected key with HTTP **200** and `{"code":401,"msg":"token expired or incorrect",
+    /// "success":false}` (verified against both api.z.ai and open.bigmodel.cn), so the status code alone
+    /// can't tell a wrong key from a good one. This is what lets the mainland fallback and the "key
+    /// invalid" message work.
+    static func isAuthRejection(_ body: Data) -> Bool {
+        guard let root = ProviderParse.jsonObject(body),
+              (root["success"] as? Bool) == false else { return false }
+        return ProviderParse.number(root["code"]) == 401
+    }
+
     static func isNoCodingPlan(_ body: Data) -> Bool {
         guard let root = ProviderParse.jsonObject(body),
               (root["success"] as? Bool) == false else { return false }

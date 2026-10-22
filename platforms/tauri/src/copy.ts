@@ -1,6 +1,6 @@
 export const copy = {
   "en": {
-    "configure": "Service Configuration",
+    "configure": "Accounts",
     "settings": "General Settings",
     "history": "Usage History",
     "usage": "Usage",
@@ -59,7 +59,7 @@ export const copy = {
     "expires": "Expires"
   },
   "zh-Hans": {
-    "configure": "服务配置",
+    "configure": "账号",
     "settings": "通用设置",
     "history": "用量历史",
     "usage": "用量",
@@ -118,7 +118,7 @@ export const copy = {
     "expires": "到期时间"
   },
   "zh-Hant": {
-    "configure": "服務設定",
+    "configure": "帳號",
     "settings": "一般設定",
     "history": "用量記錄",
     "usage": "用量",
@@ -177,7 +177,7 @@ export const copy = {
     "expires": "到期時間"
   },
   "ja": {
-    "configure": "サービス設定",
+    "configure": "アカウント",
     "settings": "一般設定",
     "history": "使用履歴",
     "usage": "使用量",
@@ -236,7 +236,7 @@ export const copy = {
     "expires": "有効期限"
   },
   "ko": {
-    "configure": "서비스 설정",
+    "configure": "계정",
     "settings": "일반 설정",
     "history": "사용 기록",
     "usage": "사용량",

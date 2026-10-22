@@ -46,9 +46,29 @@ public final class DesktopBridge {
         self.accounts = accounts; self.enablement = enablement; self.layout = layout
         self.notes = SubscriptionNotesStore(defaults: defaults)
         self.store = WidgetDataStore(registry: registry, providers: runtimes,
-            cache: ProviderSnapshotCache(userDefaults: defaults, allowsPersistedFreshness: true),
+            cache: Self.makeSnapshotCache(defaults: defaults),
             defaults: defaults, isProviderEnabled: { enablement.isEnabled($0) && !accounts.isRemoved($0) },
             providerIdentityKeys: assembly.identityKeysByCard)
+    }
+
+    /// The snapshot cache for this long-lived helper. The shell's own timer decides *when* to refresh (every
+    /// refresh interval), so the cache here only coalesces requests that arrive almost together. Two earlier
+    /// settings made refreshes silently do nothing, which showed "refreshed" while the numbers stayed old:
+    /// - a freshness window as long as the refresh interval meant a timer tick landing a moment early, or any
+    ///   tick after a manual refresh, found a "fresh" snapshot and skipped the fetch (so data was refreshed
+    ///   only every *second* interval);
+    /// - treating a snapshot persisted by the previous session as fresh meant that after a relaunch nothing was
+    ///   fetched until the old interval ran out. (That mode exists for the one-shot command-line tool.)
+    static let coalescingWindow: TimeInterval = 20
+
+    static func makeSnapshotCache(defaults: UserDefaults, now: @escaping () -> Date = Date.init) -> ProviderSnapshotCache {
+        ProviderSnapshotCache(userDefaults: defaults, ttl: coalescingWindow, allowsPersistedFreshness: false, now: now)
+    }
+
+    /// A press of Refresh sends `force: true` and must fetch from every provider; the shell's timer and the
+    /// launch refresh omit it and are allowed to reuse a snapshot fetched moments ago.
+    static func isForcedRefresh(_ request: [String: Any]) -> Bool {
+        request["force"] as? Bool ?? false
     }
 
     public func execute(_ input: Data) async -> Data {
@@ -77,12 +97,13 @@ public final class DesktopBridge {
                 AppNotifications.shared.registerAsDelegate()
                 guard await AppNotifications.shared.post(idPrefix: "desktop", title: title, subtitle: "", body: body) else { throw Failure.notification }
             case "refresh":
-                if id.isEmpty { await store.refreshAll(force: false) }
+                let force = Self.isForcedRefresh(request)
+                if id.isEmpty { await store.refreshAll(force: force) }
                 else {
                     guard enablement.isEnabled(id), !accounts.isRemoved(id) else { throw Failure.invalid }
                     if accounts.records.contains(where: { $0.id == id && observedIdentities[id] != $0.identityKey }) { break }
                     guard registry.provider(id: id) != nil else { throw Failure.invalid }
-                    _ = await store.refresh(providerID: id, force: false)
+                    _ = await store.refresh(providerID: id, force: force)
                 }
                 await PersistentJSONLScanCaches.flushPendingWrites()
             case "enabled":

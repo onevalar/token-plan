@@ -34,7 +34,7 @@ TokenPlan 将多个 AI 服务的用量集中到一个轻量面板：查看还剩
 
 [下载经典版 DMG](https://github.com/onevalar/token-plan/releases/download/v1.0.12/TokenPlan-1.0.12.dmg) · [校验文件](https://github.com/onevalar/token-plan/releases/download/v1.0.12/SHA256SUMS.txt) · [1.0.12 发布说明](https://github.com/onevalar/token-plan/releases/tag/v1.0.12)
 
-经典版保留当时的原始安装包；后续主要更新 2.x，经典版是否继续维护另行决定。两个版本使用同一个应用名称和账号配置，请退出当前版本后替换安装，不要同时运行。若希望停留在经典版，可关闭自动检查更新；经典版的“检查更新”仍可能提供 2.x 升级，请按自己的意愿选择。
+经典版保留当时的原始安装包，**不再更新，仅保留下载**；今后的新功能和修复只在 2.x 版本提供。两个版本使用同一个应用名称和账号配置，请退出当前版本后替换安装，不要同时运行。若希望停留在经典版，可关闭自动检查更新；经典版的“检查更新”仍可能提供 2.x 升级，请按自己的意愿选择。
 
 macOS 正式安装包已完成 Developer ID 签名和 Apple 公证。Windows 安装包目前未进行代码签名。Windows/Linux 自带数据助手运行时，无需安装 .NET SDK。
 

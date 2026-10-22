@@ -4,6 +4,15 @@ import {countdown,period} from './usage';
 import {providerText} from './providerText';
 import {textFor} from './copy';
 
+/** "5h" → "5-hour window": the plain-language meaning of the short window label, shown as a tooltip. */
+export function windowDescription(seconds:number|null|undefined,language:string) {
+ if(!seconds||seconds<=0)return undefined;
+ const [n,unit]=seconds%604800===0?[seconds/604800,'week']:seconds%86400===0?[seconds/86400,'day']:seconds%3600===0?[seconds/3600,'hour']:[Math.ceil(seconds/60),'minute'];
+ // Look the template up by its exact key and fill in the number ourselves; matching an already-filled sentence against
+ // every table entry can pick the wrong one ("3h" also fits the "%lldh" duration pattern).
+ return providerText(`%@-${unit} window`,language).replace('%@',String(n));
+}
+
 export function metricName(m:Metric,language:string) {
  const duration=period(m.periodSeconds);
  const scope=m.label.match(/\b(argon|sonnet|claude|spark|fable)\b/i)?.[0];
@@ -24,8 +33,8 @@ export function MetricRow({metric:m,now,missing,language,remaining=false}:{metri
  }
  const bounded=m.percent!=null||m.periodSeconds!=null;
  return <div className="metric-block"><div className={`metric ${bounded?'':'text-metric'}`} data-tone={m.percent==null?'normal':usageTone(m.percent,remaining)}>
-  <span className="metric-name">{name}</span>
+  <span className="metric-name" title={windowDescription(m.periodSeconds,language)}>{name}</span>
   {bounded?<><progress aria-label={`${name} · ${providerText(remaining?'Remaining':'Used',language)}`} aria-valuetext={!m.hasData||m.percent==null?missing:undefined} max={100} value={m.hasData?Math.max(0,Math.min(100,m.percent??0)):0}/><span className="value">{m.hasData&&m.percent!=null?`${Math.round(m.percent)}%`:'—'}</span></>:<span className="amount">{!m.hasData?missing:m.values.length?m.values.map(v=>`${format(v.amount,v.unit)}${v.label?` ${providerText(v.label,language)}`:''}`).join(' · '):m.amount==null?missing:format(m.amount,m.unit)}</span>}
-  {bounded&&<span className="reset">{reset&&!m.notStarted?<><Hourglass size={13} aria-hidden="true"/><span>{reset}</span></>:<span className="reset-label">{!m.hasData?missing:m.notStarted?t.notStarted:'—'}</span>}</span>}
+  {bounded&&<span className="reset" title={reset&&!m.notStarted?providerText('Resets in %@',language).replace('%@',reset):undefined}>{reset&&!m.notStarted?<><Hourglass size={13} aria-hidden="true"/><span>{reset}</span></>:<span className="reset-label">{!m.hasData?missing:m.notStarted?t.notStarted:'—'}</span>}</span>}
  </div>{m.expiries.length>0&&<div className="expiries"><span>{t.expires}</span><ul>{m.expiries.map((date,i)=><li key={i}>{new Date(date).toLocaleString(language)}</li>)}</ul></div>}</div>;
 }

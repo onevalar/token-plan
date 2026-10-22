@@ -8,6 +8,15 @@
 - The one-shot `tokenplan` command reuses this same persisted cache for one refresh interval, refreshes missing or stale entries without starting the app, and exits. `tokenplan --force` runs the same forced provider refresh as ⌘R regardless of cache age.
 - While a provider is fetching, a small spinner appears next to its name (and one shows in the footer beside the countdown), so you can tell a refresh is in flight rather than wondering if the numbers are stale.
 
+## Desktop app (Tauri) refresh behavior
+
+The Windows, Linux and Mac desktop interface talks to a helper that fetches the numbers. Its rules are simpler than the classic app's, so the Refresh button can be trusted:
+
+- **Pressing Refresh always fetches.** The button, ⌘R and a card's Try Again ask the helper to bypass every reuse rule, so the numbers you see afterwards come from the provider, not from a snapshot. A provider that is in a rate-limit cooldown is still left alone.
+- **The first refresh after launch always fetches**, even if the previous session fetched seconds earlier. Nothing fetched by an earlier launch counts as fresh.
+- **The background timer and the launch refresh reuse a snapshot fetched in the last 20 seconds**, so two requests that land together do not hit the provider twice. This window is fixed and does not depend on the refresh interval, so a timer tick is never skipped because of an earlier manual refresh.
+- The refresh button says **Refreshed** only when at least one account actually fetched new data. If nothing was fetched it says **Not refreshed**.
+
 ## Caching
 
 Snapshots are cached on disk and load instantly at launch, so you see your last-known values immediately instead of placeholders — even before the first fetch finishes.

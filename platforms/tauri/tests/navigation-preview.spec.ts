@@ -8,14 +8,15 @@ test.beforeEach(async({page},info)=>{await page.addInitScript(platform=>{(window
 
 const visible=(page:Page)=>page.locator('.preview-page:not([hidden])');
 async function menu(page:Page,item:string){await page.getByRole('button',{name:'更多',exact:true}).click();await page.getByRole('menuitem',{name:item,exact:true}).click();}
+async function openNote(page:Page){const add=page.getByRole('button',{name:'添加备注',exact:true});if(await add.count())await add.click();else await page.getByRole('button',{name:'编辑',exact:true}).click();}
 const back=(page:Page)=>page.getByRole('button',{name:'返回',exact:true}).click();
 async function setup(page:Page,data=largeDesktop()) {await mockDesktop(page,'zh-Hans',true,data);await page.goto('/');await expect(page.locator('.mac-preview')).toBeVisible();}
 async function noOverflow(page:Page){expect(await visible(page).evaluate(e=>e.scrollWidth<=e.clientWidth+1)).toBe(true);}
 
 test('contextual navigation scopes refresh and restores origin, tab, range and scroll',async({page})=>{
  await setup(page);
- await menu(page,'服务配置');
- await expect(page.getByRole('heading',{level:1})).toHaveText('服务配置');
+ await menu(page,'账号');
+ await expect(page.getByRole('heading',{level:1})).toHaveText('账号');
  await expect(page.getByRole('button',{name:'刷新',exact:true})).toHaveCount(0);
  await expect(visible(page).locator('.usage-summary')).toHaveCount(0);
  await page.getByRole('button',{name:'排序',exact:true}).click();
@@ -23,7 +24,7 @@ test('contextual navigation scopes refresh and restores origin, tab, range and s
  await expect(page.getByRole('button',{name:'设置',exact:true})).toHaveAttribute('aria-pressed','true');
  await page.getByRole('button',{name:'用量',exact:true}).click();
  await page.getByRole('button',{name:'刷新',exact:true}).click();
- expect(await page.evaluate(()=>(window as any).__requests.at(-1))).toEqual({method:'refresh',accountId:'claude:second'});
+ expect(await page.evaluate(()=>(window as any).__requests.at(-1))).toEqual({method:'refresh',accountId:'claude:second',force:true});
  await page.getByRole('button',{name:'昨天',exact:true}).click();
  await page.getByRole('button',{name:'查看历史',exact:true}).click();
  await expect(page.getByRole('heading',{level:1})).toHaveText('用量历史');
@@ -31,11 +32,12 @@ test('contextual navigation scopes refresh and restores origin, tab, range and s
  await back(page);
  await expect(page.getByRole('button',{name:'昨天',exact:true})).toHaveAttribute('aria-pressed','true');
  await page.getByRole('button',{name:'设置',exact:true}).click();
+ await openNote(page);
  await page.getByRole('textbox',{name:'备注',exact:true}).focus();
  await page.getByRole('textbox',{name:'备注',exact:true}).fill('Draft note');
  expect((await page.locator('.preview-header').boundingBox())!.y).toBeGreaterThanOrEqual(0);
  await back(page);
- await expect(page.getByRole('heading',{level:1})).toHaveText('服务配置');
+ await expect(page.getByRole('heading',{level:1})).toHaveText('账号');
  await expect(page.getByRole('button',{name:'完成',exact:true})).toBeVisible();
  await back(page);
  await visible(page).evaluate(e=>e.scrollTop=180);
@@ -65,17 +67,17 @@ test('settings have compact labels, conditional interval, immediate saves and lo
 
 test('service switches preserve accounts; add, reorder and remove return to configuration',async({page})=>{
  const data=largeDesktop();data.accounts.splice(1,0,data.accounts.pop()!);
- await setup(page,data);await menu(page,'服务配置');
+ await setup(page,data);await menu(page,'账号');
  await page.getByRole('button',{name:'排序',exact:true}).click();
  await page.getByRole('button',{name:'上移 Claude second.with.a.long.address@example.com',exact:true}).click();
  await expect(visible(page).locator('.configured-account').first()).toContainText('second.with.a.long.address@example.com');
  await page.getByRole('button',{name:'完成',exact:true}).click();
  await page.getByRole('switch',{name:'显示账号 Claude first@example.com',exact:true}).click();
  await expect(visible(page).locator('.configured-account')).toHaveCount(6);
- await page.getByRole('button',{name:'添加服务',exact:true}).click();
+ await page.getByRole('button',{name:'添加账号',exact:true}).first().click();
  await page.getByRole('textbox',{name:'搜索服务',exact:true}).fill('first@example.com');
  await expect(visible(page).locator('.configured-account')).toHaveCount(1);
- await page.getByRole('switch',{name:'显示账号 Claude first@example.com',exact:true}).click();
+ await page.getByRole('button',{name:'添加 Claude · first@example.com',exact:true}).click();
  await back(page);
  await expect(visible(page).locator('.configured-account')).toHaveCount(7);
  await visible(page).getByRole('button',{name:'Claude first@example.com',exact:true}).click();
@@ -84,7 +86,7 @@ test('service switches preserve accounts; add, reorder and remove return to conf
  // Arc ignores presses within 280ms of opening, preventing the original click from confirming.
  await page.waitForTimeout(300);
  await page.getByRole('group').getByRole('button',{name:'移除账号',exact:true}).click();
- await expect(page.getByRole('heading',{level:1})).toHaveText('服务配置');
+ await expect(page.getByRole('heading',{level:1})).toHaveText('账号');
  await expect(visible(page).locator('.configured-account')).toHaveCount(6);
 });
 
@@ -130,7 +132,7 @@ for(const theme of ['light','dark'] as const)test(`390px visual review ${theme}`
  for(const screen of ['home','detail','account-settings','configure','settings','history']){
   if(screen==='detail')await page.locator('.dashboard').getByRole('button',{name:'Codex',exact:true}).click();
   if(screen==='account-settings')await page.getByRole('button',{name:'设置',exact:true}).click();
-  if(screen==='configure'){await back(page);await menu(page,'服务配置');}
+  if(screen==='configure'){await back(page);await menu(page,'账号');}
   if(screen==='settings'){await back(page);await menu(page,'通用设置');}
   if(screen==='history'){await back(page);await menu(page,'用量历史');}
   await noOverflow(page);
@@ -190,20 +192,20 @@ test('home density persists, reduces space without dropping metrics, and toolbar
  await noOverflow(page);
 });
 
-test('account note saves inline and removal shares its right alignment',async({page})=>{
+test('account note stays collapsed until wanted, saves inline and removal sits in its own section',async({page})=>{
  await setup(page);await page.locator('.dashboard').getByRole('button',{name:'Claude first@example.com',exact:true}).click();
  await page.getByRole('button',{name:'设置',exact:true}).click();
+ await expect(page.getByRole('textbox',{name:'备注',exact:true})).toHaveCount(0);
+ await openNote(page);
  const note=page.getByRole('textbox',{name:'备注',exact:true});
  await note.fill('Local note');
  const save=page.getByRole('button',{name:'保存',exact:true});
  await save.click();
  expect(await page.evaluate(()=>(window as any).__requests.at(-1))).toEqual({method:'note',accountId:'claude',value:'Local note'});
- await expect(save).toBeDisabled();
- const inputBox=(await note.boundingBox())!,saveBox=(await save.boundingBox())!;
- expect(Math.abs(inputBox.y-saveBox.y)).toBeLessThan(1);
- await page.getByRole('button',{name:'移除账号',exact:true}).scrollIntoViewIfNeeded();
- const removeBox=(await page.getByRole('button',{name:'移除账号',exact:true}).boundingBox())!;
- expect(Math.abs(removeBox.x+removeBox.width-saveBox.x-saveBox.width)).toBeLessThan(1);
+ await expect(visible(page).locator('.note-row')).toContainText('Local note');
+ await expect(page.getByRole('textbox',{name:'备注',exact:true})).toHaveCount(0);
+ await expect(visible(page).locator('.danger-zone').getByRole('button',{name:'移除账号',exact:true})).toBeVisible();
+ await expect(visible(page).locator('.preference-group').getByRole('button',{name:'移除账号',exact:true})).toHaveCount(0);
  await noOverflow(page);
 });
 
@@ -290,12 +292,13 @@ test('account drafts survive navigation without being saved and return restores 
  const first=page.locator('.dashboard').getByRole('button',{name:'Claude first@example.com',exact:true});
  await first.focus();await page.keyboard.press('Enter');
  await page.getByRole('button',{name:'设置',exact:true}).click();
+ await openNote(page);
  await page.getByRole('textbox',{name:'备注',exact:true}).fill('Unsaved first account');
  await page.getByRole('textbox',{name:'API 密钥',exact:true}).fill('synthetic-test-key');
  await back(page);await expect(first).toBeFocused();
  await page.locator('.dashboard').getByRole('button',{name:'Claude second.with.a.long.address@example.com',exact:true}).click();
  await page.getByRole('button',{name:'设置',exact:true}).click();
- await expect(page.getByRole('textbox',{name:'备注',exact:true})).not.toHaveValue('Unsaved first account');
+ await expect(page.getByRole('textbox',{name:'备注',exact:true})).toHaveCount(0);
  await back(page);await first.click();await page.getByRole('button',{name:'设置',exact:true}).click();
  await expect(page.getByRole('textbox',{name:'备注',exact:true})).toHaveValue('Unsaved first account');
  const key=page.getByRole('textbox',{name:'API 密钥',exact:true});
@@ -314,16 +317,17 @@ test('account drafts survive navigation without being saved and return restores 
 test('note saves report pending, failure and success nearby and long content stays within the panel',async({page})=>{
  await setup(page);await page.locator('.dashboard').getByRole('button',{name:'Claude first@example.com',exact:true}).click();
  await page.getByRole('button',{name:'设置',exact:true}).click();
+ await openNote(page);
  const note=page.getByRole('textbox',{name:'备注',exact:true}),form=visible(page).locator('form').filter({has:note});
  const value='audit_identifier_'.repeat(14);
  await note.fill(value);
  await page.evaluate(()=>{const api=(window as any).__TAURI_INTERNALS__,invoke=api.invoke;api.invoke=async(command:string,args:any)=>{if(args?.request?.method==='note')await new Promise(r=>setTimeout(r,700));return invoke(command,args);};(window as any).__failNextRequest=true;});
  await form.getByRole('button',{name:'保存',exact:true}).click();
- await expect(form.getByRole('button')).toHaveAttribute('aria-busy','true');
+ await expect(form.getByRole('button',{name:'保存',exact:true})).toHaveAttribute('aria-busy','true');
  await expect(form.getByRole('alert')).toContainText('保存失败');
  await expect(note).toHaveValue(value);
  await form.getByRole('button',{name:'保存',exact:true}).click();
- await expect(form.getByRole('status')).toHaveText('已保存');
+ await expect(visible(page).getByRole('status').filter({hasText:'已保存'})).toBeVisible();
  await page.getByRole('button',{name:'用量',exact:true}).click();
  await expect(visible(page)).toContainText(value);await noOverflow(page);
 });
@@ -353,21 +357,23 @@ test('content height follows the active page and shrinks after returning to one 
 });
 
 test('account setup guides isolated login and detection without restarting',async({page},info)=>{
- await setup(page);await menu(page,'服务配置');await page.getByRole('button',{name:'添加服务',exact:true}).click();
- const scan=page.getByRole('button',{name:'重新检测账号',exact:true});
+ await setup(page);await menu(page,'账号');await page.getByRole('button',{name:'添加账号',exact:true}).first().click();
+ await page.getByRole('button',{name:'其他账号',exact:true}).click();
+ const scan=page.getByRole('button',{name:'检查已有登录',exact:true});
  await expect(scan).toBeEnabled();
  await page.evaluate(()=>(window as any).__failNextRequest=true);
  await scan.click();
  await expect(visible(page).getByRole('alert').filter({hasText:'操作未完成'})).toBeVisible();
  await scan.click();
  await expect(visible(page).getByRole('status')).toContainText('检测完成');
- await page.getByRole('button',{name:'登录新账号',exact:true}).click();
+ await page.getByRole('button',{name:'打开终端登录',exact:true}).click();
  await expect(page.locator('.login-command')).toContainText('CLAUDE_CONFIG_DIR=/isolated');
+ await expect(visible(page).locator('.login-steps li')).toHaveCount(2);
  expect(await page.evaluate(()=>(window as any).__loginProviders)).toEqual(['claude']);
  await page.screenshot({path:info.outputPath('account-login-guide.png')});
- await page.getByRole('button',{name:'已完成登录，重新检测',exact:true}).click();
+ await page.getByRole('button',{name:'我已登录，重新检查',exact:true}).click();
  expect(await page.evaluate(()=>(window as any).__requests.at(-1).method)).toBe('discover');
- await page.getByRole('button',{name:'连接已有配置目录',exact:true}).click();
+ await page.getByRole('button',{name:'高级：使用已有文件夹',exact:true}).click();
  await page.getByRole('textbox',{name:'配置目录',exact:true}).fill('invalid');
  await page.getByRole('button',{name:'连接并检测',exact:true}).click();
  await expect(visible(page).getByRole('alert').filter({hasText:'目录不存在或无法访问'})).toBeVisible();
@@ -382,10 +388,10 @@ test('unavailable saved account remains configurable and offers reconnect guidan
  const data=largeDesktop();const account=data.accounts[0];account.error='Account saved. Reconnect its login, then detect accounts again.';account.metrics=[];
  await setup(page,data);
  await visible(page).locator('.dashboard').getByRole('button',{name:`${account.name} ${account.email}`,exact:true}).click();
- await expect(page.getByRole('button',{name:'登录新账号',exact:true})).toBeVisible();
+ await expect(page.getByRole('button',{name:'打开终端登录',exact:true})).toBeVisible();
  await expect(visible(page).getByText('账号已保留。请重新连接登录后，再检测账号。',{exact:true})).toBeVisible();
  await page.getByRole('button',{name:'设置',exact:true}).click();
- await expect(page.getByRole('textbox',{name:'备注',exact:true})).toBeVisible();
+ await expect(page.getByRole('button',{name:'添加备注',exact:true})).toBeVisible();
  await noOverflow(page);
 });
 
@@ -396,9 +402,10 @@ test('detection reports per-account outcomes and network failures do not request
  data.accounts[1].connection='different_account';
  await setup(page,data);
  await visible(page).locator('.dashboard').getByRole('button',{name:`Claude ${data.accounts[0].email}`,exact:true}).click();
- await expect(visible(page).getByRole('button',{name:'登录新账号',exact:true})).toHaveCount(0);
- await back(page);await menu(page,'服务配置');await page.getByRole('button',{name:'添加服务',exact:true}).click();
- await page.getByRole('button',{name:'重新检测账号',exact:true}).click();
+ await expect(visible(page).getByRole('button',{name:'打开终端登录',exact:true})).toHaveCount(0);
+ await back(page);await menu(page,'账号');await page.getByRole('button',{name:'添加账号',exact:true}).first().click();
+ await page.getByRole('button',{name:'其他账号',exact:true}).click();
+ await page.getByRole('button',{name:'检查已有登录',exact:true}).click();
  const results=visible(page).getByRole('list',{name:'检测结果'});
  await expect(results).toContainText(data.accounts[0].email);
  await expect(results).toContainText('用量暂时无法读取，请稍后重试。');
@@ -410,7 +417,7 @@ test('background history notices retain quota without a reconnect prompt',async(
  const data=largeDesktop();const a=data.accounts[0];a.error='';a.warning='Local token history is still updating.';
  await setup(page,data);
  await visible(page).locator('.dashboard').getByRole('button',{name:`Claude ${a.email}`,exact:true}).click();
- await expect(visible(page).getByRole('button',{name:'登录新账号',exact:true})).toHaveCount(0);
+ await expect(visible(page).getByRole('button',{name:'打开终端登录',exact:true})).toHaveCount(0);
  await expect(visible(page).getByRole('progressbar').first()).toBeVisible();
  await expect(visible(page).locator('.group-description').filter({hasText:'历史'}).first()).toBeVisible();
 });
@@ -434,62 +441,146 @@ test('service accents adapt to light and dark while quota warnings keep priority
  }
 });
 
-test('manual refresh animates, prevents duplicate requests, and reports the actual result',async({page})=>{
+test('manual refresh spins the button, prevents duplicate requests, and reports the result beside it',async({page})=>{
  await setup(page);
  await page.emulateMedia({reducedMotion:'no-preference'});
  await page.evaluate(()=>{(window as any).__beforeRefresh=(state:any)=>new Promise<void>(resolve=>{(window as any).__finishRefresh=()=>{state.accounts[0].fetchedAt='2030-01-01T12:00:00Z';resolve();};});});
- const button=page.getByRole('button',{name:'刷新',exact:true});
+ const button=page.getByRole('button',{name:'刷新',exact:true}),status=page.locator('.refresh-status'),announce=page.locator('.refresh-announcement');
  await button.click();
  await expect(button).toHaveAttribute('aria-busy','true');
- await expect(page.locator('.refresh-feedback')).toHaveText('正在刷新用量…');
+ // No banner and no text while working: the button itself spins.
+ await expect(announce).toHaveText('正在刷新用量…');
+ await expect(status).toHaveCount(0);
+ await expect(page.locator('.refresh-feedback')).toHaveCount(0);
  expect(await button.locator('svg').evaluate(e=>getComputedStyle(e).animationName)).toBe('refresh-turn');
  const requests=await page.evaluate(()=>(window as any).__requests.length);
  await button.dispatchEvent('click');await page.keyboard.press('Meta+r');
  expect(await page.evaluate(()=>(window as any).__requests.length)).toBe(requests);
  await page.screenshot({path:`test-results-navigation/refresh-pending-${test.info().project.name}.png`});
  await page.evaluate(()=>(window as any).__finishRefresh());
- await expect(page.locator('.refresh-feedback')).toHaveText('用量已更新。');
+ await expect(status).toHaveText('已刷新');
+ await expect(button).toHaveAttribute('data-result','success');
+ await expect(announce).toHaveText('用量已更新。');
  await expect(button).toHaveAttribute('aria-busy','false');
+ // The label sits next to the button without resizing the header or pushing the page down.
+ const header=(await page.locator('.preview-header').boundingBox())!,list=(await visible(page).boundingBox())!;
+ expect(header.height).toBeLessThan(60);expect(list.y).toBeLessThan(70);
+ await page.screenshot({path:`test-results-navigation/refresh-done-${test.info().project.name}.png`});
  await page.evaluate(()=>{(window as any).__beforeRefresh=undefined;});
- await button.click();await expect(page.locator('.refresh-feedback')).toHaveText('正在刷新用量…');
- await expect(page.locator('.refresh-feedback')).toHaveText('已检查，暂无新的用量数据。');
+ await button.click();await expect(announce).toHaveText('正在刷新用量…');
+ await expect(status).toHaveText('已刷新');await expect(announce).toHaveText('用量已更新。');
+ // If the helper reports back without having fetched anything, the app must not claim success.
+ await page.evaluate(()=>{(window as any).__skipFetch=true;});
+ await button.click();
+ await expect(status).toHaveText('未刷新');await expect(status).toHaveAttribute('data-tone','warning');await expect(announce).toHaveText('没有获取到新数据，请稍后再试。');
+ await page.evaluate(()=>{(window as any).__skipFetch=false;});
  await page.evaluate(()=>{(window as any).__beforeRefresh=(state:any)=>{state.accounts[0].warning='Usage queries are temporarily rate limited.';};});
- await button.click();await expect(page.locator('.refresh-feedback')).toHaveText('刷新完成，部分账号有提示，请查看详情。');
- await expect(page.locator('.refresh-feedback')).toHaveAttribute('data-tone','warning');
+ await button.click();await expect(announce).toHaveText('刷新完成，部分账号有提示，请查看详情。');
+ await expect(status).toHaveText('需要留意');await expect(status).toHaveAttribute('data-tone','warning');
  await page.evaluate(()=>{(window as any).__beforeRefresh=(state:any)=>{state.accounts[0].error='Network timeout';};});
- await button.click();await expect(page.locator('.refresh-feedback')).toHaveAttribute('data-tone','warning');
- await expect(page.locator('.refresh-feedback')).toHaveText('部分账号刷新失败，请查看账号状态。');
+ await button.click();await expect(status).toHaveAttribute('data-tone','warning');
+ await expect(status).toHaveText('部分失败');await expect(announce).toHaveText('部分账号刷新失败，请查看账号状态。');
  await page.evaluate(()=>{(window as any).__failNextRequest=true;});
- await button.click();await expect(page.locator('.refresh-feedback')).toHaveText('刷新失败，请重试。');
+ await button.click();await expect(status).toHaveText('刷新失败');await expect(announce).toHaveText('刷新失败，请重试。');
+ await expect(button).toHaveAttribute('data-result','error');
  await expect(button).toHaveAttribute('aria-busy','false');
 });
 
-test('reduced motion retains refresh text without spinning and other actions do not spin refresh',async({page})=>{
+test('reduced motion keeps the busy state without spinning and other actions do not spin refresh',async({page})=>{
  await setup(page);await page.emulateMedia({reducedMotion:'reduce'});
  await page.evaluate(()=>{(window as any).__beforeRefresh=()=>new Promise<void>(resolve=>{(window as any).__finishRefresh=resolve;});});
  const button=page.getByRole('button',{name:'刷新',exact:true});await button.click();
- await expect(page.locator('.refresh-feedback')).toHaveText('正在刷新用量…');
+ await expect(page.locator('.refresh-announcement')).toHaveText('正在刷新用量…');
+ await expect(button).toHaveAttribute('aria-busy','true');
  expect(await button.locator('svg').evaluate(e=>getComputedStyle(e).animationName)).toBe('none');
  await menu(page,'通用设置');
- await expect(page.locator('.refresh-feedback')).toHaveCount(0);
+ await expect(page.locator('.refresh-announcement')).toHaveText('');
+ await expect(page.locator('.refresh-status')).toHaveCount(0);
  await page.evaluate(()=>(window as any).__finishRefresh());
  await page.getByRole('switch',{name:'显示剩余额度',exact:true}).click();
  await back(page);
  await expect(button).toHaveAttribute('aria-busy','false');
 });
 
-test('icon-only account explains empty tray selection and restores a metric without changing siblings',async({page})=>{
- const data=largeDesktop();data.accounts[1].metrics.forEach(m=>m.pinned=false);await setup(page,data);
- await visible(page).locator('.dashboard').getByRole('button',{name:'Claude second.with.a.long.address@example.com',exact:true}).click();
- await page.getByRole('button',{name:'设置',exact:true}).click();
- await expect(visible(page).getByText('仅显示图标，尚未选择用量指标。',{exact:true})).toBeVisible();
- await visible(page).getByRole('button',{name:'显示首项用量',exact:true}).click();
- await expect(visible(page).locator('.account-tray-preview')).toBeVisible();
- const request=await page.evaluate(()=>(window as any).__requests.at(-1));
- expect(request).toEqual({method:'metric',accountId:'claude:second',metricId:'session',value:{pinned:true}});
- await visible(page).getByRole('switch',{name:/^5h ·/}).click();
- await expect(visible(page).getByText('仅显示图标，尚未选择用量指标。',{exact:true})).toBeVisible();
- await back(page);await visible(page).locator('.dashboard').getByRole('button',{name:'Claude second.with.a.long.address@example.com',exact:true}).click();
- await page.getByRole('button',{name:'设置',exact:true}).click();
- await expect(visible(page).getByText('仅显示图标，尚未选择用量指标。',{exact:true})).toBeVisible();
+test('a problem card offers the one next step instead of only describing it',async({page})=>{
+ const data=largeDesktop();
+ data.accounts[0].error='Usage queries are temporarily rate limited. Data may be out of date. Retrying automatically later.';
+ data.accounts[2].error='Not logged in. Run `codex` to authenticate.';
+ const deepseek=data.accounts.find(a=>a.family==='deepseek')!;deepseek.apiKey=true;deepseek.error='No DeepSeek API key. Set DEEPSEEK_API_KEY or add it to ~/.config/tokenplan/deepseek.json.';
+ await setup(page,data);
+ const home=visible(page).locator('.dashboard');
+ // Temporary failure: retry just that account.
+ await home.locator('.account-block').first().getByRole('button',{name:'重试',exact:true}).click();
+ expect(await page.evaluate(()=>(window as any).__requests.at(-1))).toEqual({method:'refresh',accountId:'claude',force:true});
+ // Sign-in problem on a CLI login: go to the account, where the sign-in steps are.
+ await home.locator('.account-block').filter({hasText:'Codex'}).getByRole('button',{name:'重新登录',exact:true}).click();
+ await expect(page.getByRole('heading',{level:1})).toHaveText('Codex');
+ await expect(page.getByRole('button',{name:'打开终端登录',exact:true})).toBeVisible();
+ await back(page);
+ // Missing key: straight to the key field.
+ await home.locator('.account-block').filter({hasText:'DeepSeek'}).getByRole('button',{name:'设置 API 密钥',exact:true}).click();
+ await expect(page.getByRole('button',{name:'设置',exact:true})).toHaveAttribute('aria-pressed','true');
+ await expect(page.getByRole('textbox',{name:'API 密钥',exact:true})).toBeVisible();
+ await noOverflow(page);
+});
+
+test('each home account has a quick shortcut to its settings and metrics explain themselves',async({page})=>{
+ await setup(page);
+ const first=visible(page).locator('.account-block').first();
+ await first.hover();
+ await first.getByRole('button',{name:/^账号设置 Claude/}).click();
+ await expect(page.getByRole('button',{name:'设置',exact:true})).toHaveAttribute('aria-pressed','true');
+ await back(page);
+ const names=visible(page).locator('.metric-name');
+ await expect(names.first()).toHaveAttribute('title','5 小时窗口');
+ await expect(visible(page).locator('.reset').first()).toHaveAttribute('title',/后重置/);
+});
+
+test('first-run welcome explains the basics once, and an alerts nudge appears near a limit',async({page})=>{
+ await page.addInitScript(()=>{(window as any).__tips=true;});
+ await setup(page);
+ const welcome=page.getByRole('region',{name:'欢迎使用 TokenPlan'});
+ await expect(welcome).toContainText('“5h”“1w”');
+ await expect(page.getByRole('region',{name:'在用完之前提前收到提醒。'})).toHaveCount(0);
+ await welcome.getByRole('button',{name:'知道了',exact:true}).click();
+ await expect(welcome).toHaveCount(0);
+ // Claude is at 92%, notifications are off: one nudge, which turns every alert on.
+ const nudge=page.getByRole('region',{name:'在用完之前提前收到提醒。'});
+ await expect(nudge).toBeVisible();
+ await nudge.getByRole('button',{name:'开启提醒',exact:true}).click();
+ await expect(nudge).toHaveCount(0);
+ const requests=await page.evaluate(()=>(window as any).__requests.map((r:any)=>r.method));
+ expect(requests).toContain('notificationPermission');
+ expect(await page.evaluate(()=>(window as any).__requests.at(-1))).toEqual({method:'settings',value:{notifications:[true,true,true]}});
+ await page.reload();await expect(page.locator('.mac-preview')).toBeVisible();
+ await expect(page.getByRole('region',{name:'欢迎使用 TokenPlan'})).toHaveCount(0);
+ await expect(page.getByRole('region',{name:'在用完之前提前收到提醒。'})).toHaveCount(0);
+});
+
+test('the welcome can jump straight to adding an account',async({page})=>{
+ await page.addInitScript(()=>{(window as any).__tips=true;});
+ await setup(page);
+ await page.getByRole('region',{name:'欢迎使用 TokenPlan'}).getByRole('button',{name:'添加账号',exact:true}).click();
+ await expect(page.getByRole('heading',{level:1})).toHaveText('添加账号');
+});
+
+test('about offers project links and credits the original project',async({page})=>{
+ await setup(page);await menu(page,'关于');
+ await expect(visible(page)).toContainText('Robin Ebers');
+ await expect(visible(page)).toContainText('不发送任何统计或崩溃报告');
+ await visible(page).getByRole('button',{name:'更新说明'}).click();
+ await visible(page).getByRole('button',{name:'反馈问题'}).click();
+ expect(await page.evaluate(()=>(window as any).__openedLinks)).toEqual(['https://github.com/onevalar/token-plan/releases','https://github.com/onevalar/token-plan/issues/new']);
+ await noOverflow(page);
+});
+
+test('the menu bar account list is collapsed until opened',async({page})=>{
+ await setup(page);await menu(page,'通用设置');
+ const row=visible(page).getByRole('button',{name:/显示在菜单栏的账号/});
+ await expect(row).toHaveAttribute('aria-expanded','false');
+ await expect(row).toContainText('7 / 7');
+ await expect(visible(page).getByRole('switch',{name:/Claude · first@example.com/})).toHaveCount(0);
+ await row.click();
+ await expect(visible(page).getByRole('switch',{name:/Claude · first@example.com/})).toBeVisible();
+ await noOverflow(page);
 });

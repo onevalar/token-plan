@@ -97,6 +97,7 @@ final class ZAIProvider: ProviderRuntime {
             guard (200..<300).contains(response.statusCode) else {
                 return .failed(.requestFailed(response.statusCode))
             }
+            if ZAIUsageMapper.isAuthRejection(response.body) { return .authFailure }
             return .success(response.body)
         } catch {
             return .failed(.connectionFailed)

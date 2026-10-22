@@ -21,7 +21,7 @@ Pushing an approved stable `vX.Y.Z` tag on `main` runs `.github/workflows/releas
 
 ## Architecture
 
-- The owner selected a shared Tauri + React interface on 2026-10-20. `platforms/tauri` is the migration preview; see `docs/tauri-migration.md` for parity requirements. Use Arc for its web UI. Do not switch stable packaging/update feeds to this preview until platform integration and feature parity are verified.
+- **The Tauri + React interface (`platforms/tauri`) is the only maintained product interface** (owner decision, 2026-10-22). Use Arc for its web UI. The original native macOS app (SwiftUI/AppKit, 1.0.12 "classic") is **frozen**: it stays available as a download but gets no new features, fixes or updates, and its UI code under `Sources/OpenUsage/Views`, `App` and `Stores` is not to be changed. The Swift provider/engine code (`Sources/OpenUsage/Providers`, `Services`, `Models`, `Pricing`) is *not* frozen — the Mac build of the Tauri app runs it as its bundled data helper, so provider fixes go there (macOS) and in `platforms/desktop/TokenPlan.Core` (Windows/Linux). Change both whenever a provider's behavior changes, and see `docs/tauri-migration.md` and `docs/mac-navigation-preview.md` for UI behavior.
 - SwiftPM executable target; SwiftUI content hosted in an AppKit-owned `NSStatusItem` + custom key-capable `NSPanel`.
 - Swift 6 with strict concurrency.
 - Providers implement the small `ProviderRuntime` protocol: an auth store reads credentials already on the user's machine, a usage client calls the provider's API, and a mapper normalizes the response into `MetricLine` values. The UI renders those normalized values.
@@ -45,6 +45,9 @@ Conventions for the per-provider modules under `Sources/OpenUsage/Providers/<Nam
 All user-visible text ships in five languages (English, 简体中文, 繁體中文, 日本語, 한국어). Write the English text in code (`Text("…")`, `tr("…")`, `trf("…%@…", x)`, or `String(localized:)` for placeholders), add the four translations to `script/l10n/part*.py`, run `script/generate_localizations.py`, and see `docs/localization.md`. `swift test` verifies the tables.
 
 ## Running / Testing Changes
+
+- Shared interface: from `platforms/tauri` run `npm test` (unit), `npx playwright test --config playwright.preview.config.ts` (macOS/Windows/Linux shell contracts) and `npx playwright test` (regression). Set `TOKENPLAN_TEST_BROWSER` to a Chromium executable if Playwright's own browser is missing. UI strings need translations (`script/l10n/part*.py`, then `script/generate_localizations.py` and `node platforms/tauri/scripts/sync-localizations.mjs`).
+- Before tagging a release run `script/preflight_release.py X.Y.Z` (see `docs/releasing.md`).
 
 - There is no hot reload. The app is a long-lived menu-bar process, so **every code change requires a full rebuild and restart of the running app** to take effect — kill the running instance, rebuild, and relaunch before testing.
 

@@ -339,6 +339,42 @@ final class ZAIProviderTests: XCTestCase {
         XCTAssertNil(snapshot.errorCategory)
     }
 
+    /// Z.ai answers a rejected key with HTTP 200 and `{"code":401,...,"success":false}` (observed live on both
+    /// hosts), so the fallback and the "key invalid" message must key off the body, not the status code.
+    func testRejectedKeyInsideHTTP200FallsBackToMainlandAndFinallyReportsInvalidKey() async throws {
+        let rejected = #"{"code":401,"msg":"token expired or incorrect","success":false}"#
+        XCTAssertTrue(ZAIUsageMapper.isAuthRejection(Data(rejected.utf8)))
+        XCTAssertFalse(ZAIUsageMapper.isAuthRejection(Data(#"{"code":500,"msg":"internal error","success":false}"#.utf8)))
+
+        final class HostLog: @unchecked Sendable {
+            private let lock = NSLock()
+            private var storage: [String] = []
+            func add(_ host: String) { lock.lock(); storage.append(host); lock.unlock() }
+            var hosts: [String] { lock.lock(); defer { lock.unlock() }; return storage }
+        }
+        let log = HostLog()
+        let mainlandKey = ZAIProvider(
+            authStore: makeAuthStore(key: "zai-test"),
+            usageClient: ZAIUsageClient(http: RoutingHTTPClient { request in
+                if request.url.path.hasSuffix("/quota/limit") {
+                    log.add(request.url.host ?? "")
+                    return jsonResponse(request.url.host == "api.z.ai" ? rejected : quotaBothLimitsJSON)
+                }
+                return jsonResponse(subscriptionJSON)
+            })
+        )
+        let ok = await mainlandKey.refresh()
+        XCTAssertEqual(log.hosts, ["api.z.ai", "open.bigmodel.cn"])
+        XCTAssertNil(ok.errorCategory)
+
+        let wrongEverywhere = ZAIProvider(
+            authStore: makeAuthStore(key: "zai-test"),
+            usageClient: ZAIUsageClient(http: RoutingHTTPClient { _ in jsonResponse(rejected) })
+        )
+        let rejectedEverywhere = await wrongEverywhere.refresh()
+        XCTAssertEqual(rejectedEverywhere.errorCategory, .authInvalid)
+    }
+
     func testRefreshOnTransportErrorReportsNetwork() async {
         let provider = ZAIProvider(
             authStore: makeAuthStore(key: "zai-test"),
