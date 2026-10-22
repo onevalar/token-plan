@@ -9,13 +9,12 @@ import type {Account,Send} from '../desktop';
 
 type Guide={command:string;directory:string;opened:boolean};
 /**
- * Connects another Claude or Codex login. `family` is set when it is shown inside an existing account (the service is then fixed);
- * without it the person picks the service here. Signing in always happens in the official CLI, in a separate configuration folder
+ * Connects the selected Claude or Codex service. Signing in happens in the official CLI, in a separate configuration folder
  * so the current login is never replaced.
  */
-export function AccountOnboarding({send,busy,language,family,targetId}:{send:Send;busy:boolean;language:string;family?:string;targetId?:string}) {
+export function AccountOnboarding({send,busy,language,family,targetId,onConnected}:{send:Send;busy:boolean;language:string;family:string;targetId?:string;onConnected?:(accounts:Account[])=>void}) {
  const tr=(s:string)=>providerText(s,language);
- const [provider,setProvider]=useState(family==='codex'?'codex':'claude');
+ const provider=family;
  const [pending,setPending]=useState(false),[status,setStatus]=useState(''),[error,setError]=useState('');
  const [guide,setGuide]=useState<Guide|null>(null),[advanced,setAdvanced]=useState(false),[directory,setDirectory]=useState('');
  const [results,setResults]=useState<Account[]|null>(null),[copied,setCopied]=useState(false);
@@ -29,14 +28,11 @@ export function AccountOnboarding({send,busy,language,family,targetId}:{send:Sen
   if(!state)throw new Error('missing_detection_result');
   const rows=state.accounts.filter(a=>a.family===provider&&(a.email||a.removable||a.error||a.fetchedAt));
   setResults(rows);setStatus(tr(rows.length?'Detection complete.':'No matching account was identified. Check the directory and access permissions.'));
+  onConnected?.(rows);
  };
  const detect=()=>run(scan);
- const pick=(value:string)=>{setProvider(value);setGuide(null);setError('');setStatus('');setResults(null);};
  return <section className="account-onboarding" aria-label={tr('Connect Account')}>
-  <p className="group-description">{tr(family?'Saved accounts stay here. Detect existing logins first; only sign in again when authorization is required.':'Use this to track a second or third Claude or Codex account. TokenPlan opens a terminal with its own login folder, so the account you are already using stays signed in.')}</p>
-  {!family&&<div className="segments service-picker" role="group" aria-label={tr('Login Service')}>
-   {[['claude','Claude'],['codex','Codex']].map(([value,label])=><Button key={value} size="sm" variant={provider===value?'secondary':'ghost'} aria-pressed={provider===value} disabled={disabled} onClick={()=>pick(value)}>{label}</Button>)}
-  </div>}
+  <p className="group-description">{tr(targetId?'Saved accounts stay here. Detect existing logins first; only sign in again when authorization is required.':'Use this to track a second or third Claude or Codex account. TokenPlan opens a terminal with its own login folder, so the account you are already using stays signed in.')}</p>
   {!guide&&<div className="onboarding-actions">
    <Button size="sm" variant="secondary" disabled={disabled} onClick={()=>void run(async()=>{setCopied(false);setGuide(await invoke<Guide>('account_login',{provider}));})}>{tr('Open Terminal to Sign In')}</Button>
    <Button size="sm" variant="ghost" disabled={disabled} onClick={()=>void detect()}>{pending?tr('Working…'):tr('Check for Existing Logins')}</Button>

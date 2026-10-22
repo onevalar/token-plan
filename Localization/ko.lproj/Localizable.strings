@@ -86,6 +86,7 @@
 "Alert when a limit is projected to finish before it resets." = "한도가 초기화되기 전에 소진될 것으로 예상되면 알립니다.";
 "Alert when a limit is projected to finish with little left." = "한도가 거의 남지 않을 것으로 예상되면 알립니다.";
 "All Providers" = "모든 제공업체";
+"All accounts are hidden from Home. You can show them again in Account Management." = "모든 계정이 홈에서 숨겨져 있습니다. 계정 관리에서 다시 표시할 수 있습니다.";
 "All services" = "모든 서비스";
 "Allow Notifications" = "알림 허용";
 "Allow TokenPlan notifications in system settings, then try again." = "시스템 설정에서 TokenPlan 알림을 허용한 후 다시 시도하세요.";
@@ -131,6 +132,7 @@
 "Cannot reach the provider. Check the desktop app's network, proxy, or VPN connection." = "서비스에 연결할 수 없습니다. 데스크톱 앱의 네트워크, 프록시 또는 VPN 연결을 확인하세요.";
 "Cannot reach the provider. Check your connection." = "서비스에 연결할 수 없습니다. 네트워크를 확인하세요.";
 "Cash" = "현금";
+"Change Service" = "서비스 변경";
 "Chat" = "채팅";
 "Check Automatically" = "자동으로 확인";
 "Check Connection" = "연결 확인";
@@ -141,6 +143,7 @@
 "Checked. No new usage data." = "확인했습니다. 새로운 사용량 데이터가 없습니다.";
 "Checking for updates…" = "업데이트 확인 중…";
 "Checks hourly and shows a banner when an update is available." = "1시간마다 확인하고 업데이트가 있으면 배너를 표시합니다.";
+"Choose a service to see how to connect an account." = "서비스를 선택한 다음 계정을 연결하세요.";
 "Choose at most two tray metrics per account." = "계정당 트레이 지표를 최대 2개 선택하세요.";
 "Choose services and accounts to show. Hiding them keeps stars, overview and refresh unchanged." = "표시할 서비스와 계정을 선택하세요. 숨겨도 별표, 개요 및 새로고침은 바뀌지 않습니다.";
 "Choose the service's local folder, such as .claude or .codex, to read its login and usage history." = "로그인 및 사용 기록을 읽으려면 .claude 또는 .codex 같은 서비스 폴더를 선택하세요。";
@@ -150,6 +153,7 @@
 "Choose where each item appears. Menu Bar shows up to two values beside the app icon; uncheck one before choosing a replacement." = "각 항목의 표시 위치를 선택하세요. 메뉴 막대에는 앱 아이콘 옆에 최대 두 값을 표시할 수 있습니다. 바꾸려면 먼저 하나를 해제하세요.";
 "Choose where each item appears. System Tray shows up to two values; uncheck one before choosing a replacement." = "각 항목의 표시 위치를 선택하세요. 시스템 트레이에는 최대 두 값을 표시할 수 있습니다. 바꾸려면 먼저 하나를 해제하세요.";
 "Choose which accounts appear in your overview and refresh automatically." = "개요에 표시하고 자동으로 새로고침할 계정을 선택하세요.";
+"Choose which accounts appear on Home. Hidden accounts stay in this list." = "홈에 표시할 계정을 선택하세요. 숨긴 계정도 이 목록에 남습니다.";
 "Claude Code logs on this device. Includes logs from different sign-ins, not the current account's complete usage." = "이 기기의 Claude Code 로그를 집계합니다. 다른 로그인 때의 기록도 포함되며 현재 계정의 전체 사용량은 아닙니다.";
 "Claude Desktop login couldn't be read. Open Claude Desktop, then try again." = "Claude Desktop 로그인 정보를 읽을 수 없습니다. Claude Desktop을 연 뒤 다시 시도하세요.";
 "Claude Desktop login found. Refresh once and choose Always Allow to connect it." = "Claude Desktop 로그인을 찾았습니다. 한 번 새로고침하고 '항상 허용'을 선택하면 연결됩니다.";
@@ -259,6 +263,7 @@
 "Details Only" = "상세만";
 "Details only" = "상세만";
 "Detect Accounts" = "계정 다시 검색";
+"Detected Account" = "감지된 계정";
 "Detection Results" = "검색 결과";
 "Detection complete." = "검색이 완료되었습니다.";
 "Detection complete. Choose an account below or return to its details." = "검색이 완료되었습니다. 아래에서 계정을 선택하거나 계정 상세로 돌아가세요.";
@@ -302,6 +307,7 @@
 "Estimated locally, so it may be off" = "로컬에서 추정한 값이라 오차가 있을 수 있습니다";
 "Everything found on this Mac is already added." = "이 Mac에서 찾은 계정은 모두 추가되었습니다.";
 "Example Data" = "예시 데이터";
+"Existing accounts are in Account Management, including accounts hidden from Home." = "홈에서 숨긴 계정을 포함하여 추가한 계정은 모두 계정 관리에 있습니다.";
 "Expanded" = "펼침";
 "Expired" = "만료됨";
 "Expires" = "만료";
@@ -454,6 +460,7 @@
 "Move Up" = "위로 이동";
 "Move down" = "아래로";
 "Move up" = "위로";
+"My Accounts" = "내 계정";
 "Needs Attention" = "확인 필요";
 "Needs an API key" = "API 키 필요";
 "Needs attention" = "확인 필요";

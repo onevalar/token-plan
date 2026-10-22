@@ -47,6 +47,16 @@ T.update({
 
 T['Metrics without a percentage are shown as values.'] = ('包含非百分比指标时以数值显示。','包含非百分比指標時以數值顯示。','割合のない項目を含む場合は数値で表示します。','백분율이 없는 지표가 포함되면 숫자로 표시합니다.')
 
+T.update({
+ 'My Accounts': ('我的账号','我的帳號','マイアカウント','내 계정'),
+ 'Choose which accounts appear on Home. Hidden accounts stay in this list.': ('选择在首页显示的账号。关闭显示后，账号仍保留在这里。','選擇在首頁顯示的帳號。關閉顯示後，帳號仍保留在這裡。','ホームに表示するアカウントを選びます。非表示にしても、この一覧に残ります。','홈에 표시할 계정을 선택하세요. 숨긴 계정도 이 목록에 남습니다.'),
+ 'Choose a service to see how to connect an account.': ('先选择服务，再连接账号。','先選擇服務，再連接帳號。','サービスを選んで、アカウントを接続します。','서비스를 선택한 다음 계정을 연결하세요.'),
+ 'Change Service': ('更换服务','更換服務','サービスを変更','서비스 변경'),
+ 'Detected Account': ('已检测到账号','已偵測到帳號','検出されたアカウント','감지된 계정'),
+ 'Existing accounts are in Account Management, including accounts hidden from Home.': ('已添加的账号都在“账号管理”中，包括未在首页显示的账号。','已新增的帳號都在「帳號管理」中，包括未在首頁顯示的帳號。','追加済みのアカウントは、ホームで非表示のものも「アカウント管理」にあります。','홈에서 숨긴 계정을 포함하여 추가한 계정은 모두 계정 관리에 있습니다.'),
+ 'All accounts are hidden from Home. You can show them again in Account Management.': ('所有账号都已在首页隐藏，可在“账号管理”中重新显示。','所有帳號都已在首頁隱藏，可在「帳號管理」中重新顯示。','すべてのアカウントが非表示です。「アカウント管理」で再表示できます。','모든 계정이 홈에서 숨겨져 있습니다. 계정 관리에서 다시 표시할 수 있습니다.'),
+})
+
 T['Windows and Linux show these indicators in the tray panel. The system tray keeps the TokenPlan icon.'] = ('Windows 和 Linux 在托盘面板中显示这些指标，系统托盘保留 TokenPlan 图标。','Windows 和 Linux 在系統匣面板中顯示這些指標，系統匣保留 TokenPlan 圖示。','Windows と Linux ではトレイパネルにこれらの項目を表示し、システムトレイには TokenPlan アイコンを表示します。','Windows와 Linux에서는 트레이 패널에 지표를 표시하고 시스템 트레이에는 TokenPlan 아이콘을 유지합니다.')
 T['Selected accounts appear as live system tray indicators. Each value uses its own icon in percentage mode. Your desktop controls icon spacing, order and overflow.'] = ('选中的账号会在系统托盘中实时显示用量。百分比模式下，每项数值单独显示。图标间距、排列和折叠由桌面系统控制。','選取的帳號會在系統匣中即時顯示用量。百分比模式下，每項數值分開顯示。圖示間距、排列和收合由桌面系統控制。','選択したアカウントの使用量をシステムトレイに表示します。割合モードでは各値を別のアイコンに表示します。間隔・並び順・折りたたみはデスクトップが制御します。','선택한 계정의 사용량이 시스템 트레이에 실시간으로 표시됩니다. 백분율 모드에서는 각 값이 별도 아이콘으로 표시됩니다. 간격, 순서 및 숨김은 데스크톱에서 제어합니다.')
 T['If an indicator is hidden, move it from the taskbar overflow area into the system tray.'] = ('如果图标被隐藏，可从任务栏的折叠区域拖到系统托盘中。','如果圖示被隱藏，可從工作列的收合區域拖到系統匣中。','アイコンが隠れている場合は、タスクバーのオーバーフロー領域からシステムトレイに移動してください。','아이콘이 숨겨져 있다면 작업 표시줄의 숨겨진 아이콘 영역에서 시스템 트레이로 옮기세요.')

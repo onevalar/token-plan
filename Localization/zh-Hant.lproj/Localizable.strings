@@ -86,6 +86,7 @@
 "Alert when a limit is projected to finish before it resets." = "預計額度會在重置前用完時提醒。";
 "Alert when a limit is projected to finish with little left." = "預計額度所剩無幾時提醒。";
 "All Providers" = "全部提供方";
+"All accounts are hidden from Home. You can show them again in Account Management." = "所有帳號都已在首頁隱藏，可在「帳號管理」中重新顯示。";
 "All services" = "全部服務";
 "Allow Notifications" = "允許通知";
 "Allow TokenPlan notifications in system settings, then try again." = "請在系統設定中允許 TokenPlan 通知，然後重試。";
@@ -131,6 +132,7 @@
 "Cannot reach the provider. Check the desktop app's network, proxy, or VPN connection." = "無法連接服務商，請檢查桌面應用程式的網路、代理或 VPN 連線。";
 "Cannot reach the provider. Check your connection." = "無法連接服務，請檢查網路連線。";
 "Cash" = "現金";
+"Change Service" = "更換服務";
 "Chat" = "聊天";
 "Check Automatically" = "自動檢查";
 "Check Connection" = "檢查連線";
@@ -141,6 +143,7 @@
 "Checked. No new usage data." = "已檢查，暫無新的用量資料。";
 "Checking for updates…" = "正在檢查更新…";
 "Checks hourly and shows a banner when an update is available." = "每小時檢查一次，有更新時顯示橫幅。";
+"Choose a service to see how to connect an account." = "先選擇服務，再連接帳號。";
 "Choose at most two tray metrics per account." = "每個帳號最多選擇兩項系統匣指標。";
 "Choose services and accounts to show. Hiding them keeps stars, overview and refresh unchanged." = "選擇顯示的服務和帳號。隱藏不會改變星號、總覽或重新整理。";
 "Choose the service's local folder, such as .claude or .codex, to read its login and usage history." = "選擇服務的本機資料夾（如 .claude 或 .codex），以讀取登入和用量記錄。";
@@ -150,6 +153,7 @@
 "Choose where each item appears. Menu Bar shows up to two values beside the app icon; uncheck one before choosing a replacement." = "顯示設定決定內容出現在首頁、詳細資訊或隱藏。勾選「選單列」可在 App 圖示旁顯示數值，最多兩項；更換時先取消一項。";
 "Choose where each item appears. System Tray shows up to two values; uncheck one before choosing a replacement." = "顯示設定決定內容出現在首頁、詳細資訊或隱藏。勾選「系統匣」可在系統匣選單顯示數值，最多兩項；更換時先取消一項。";
 "Choose which accounts appear in your overview and refresh automatically." = "選擇在概覽中顯示並自動重新整理的帳號。";
+"Choose which accounts appear on Home. Hidden accounts stay in this list." = "選擇在首頁顯示的帳號。關閉顯示後，帳號仍保留在這裡。";
 "Claude Code logs on this device. Includes logs from different sign-ins, not the current account's complete usage." = "統計本機 Claude Code 日誌，包含不同登入留下的記錄，並非目前帳號的全部用量。";
 "Claude Desktop login couldn't be read. Open Claude Desktop, then try again." = "無法讀取 Claude Desktop 的登入資訊。請開啟 Claude Desktop 後再試。";
 "Claude Desktop login found. Refresh once and choose Always Allow to connect it." = "發現 Claude Desktop 登入資訊。重新整理一次並選擇「永遠允許」即可連接。";
@@ -259,6 +263,7 @@
 "Details Only" = "僅詳情";
 "Details only" = "僅詳細資料";
 "Detect Accounts" = "重新偵測帳號";
+"Detected Account" = "已偵測到帳號";
 "Detection Results" = "偵測結果";
 "Detection complete." = "偵測完成。";
 "Detection complete. Choose an account below or return to its details." = "偵測完成。可在下方選取帳號，或返回帳號詳情。";
@@ -302,6 +307,7 @@
 "Estimated locally, so it may be off" = "在本機估算，可能有偏差";
 "Everything found on this Mac is already added." = "這台 Mac 上發現的帳號都已加入。";
 "Example Data" = "範例資料";
+"Existing accounts are in Account Management, including accounts hidden from Home." = "已新增的帳號都在「帳號管理」中，包括未在首頁顯示的帳號。";
 "Expanded" = "已展開";
 "Expired" = "已到期";
 "Expires" = "到期時間";
@@ -454,6 +460,7 @@
 "Move Up" = "上移";
 "Move down" = "下移";
 "Move up" = "上移";
+"My Accounts" = "我的帳號";
 "Needs Attention" = "需要處理";
 "Needs an API key" = "需要 API 金鑰";
 "Needs attention" = "需要留意";

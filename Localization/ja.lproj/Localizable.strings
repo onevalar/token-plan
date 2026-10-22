@@ -86,6 +86,7 @@
 "Alert when a limit is projected to finish before it resets." = "リセット前に上限を使い切る見込みのときに通知します。";
 "Alert when a limit is projected to finish with little left." = "上限の残りがわずかになる見込みのときに通知します。";
 "All Providers" = "すべてのプロバイダー";
+"All accounts are hidden from Home. You can show them again in Account Management." = "すべてのアカウントが非表示です。「アカウント管理」で再表示できます。";
 "All services" = "すべてのサービス";
 "Allow Notifications" = "通知を許可";
 "Allow TokenPlan notifications in system settings, then try again." = "システム設定でTokenPlanの通知を許可して再試行してください。";
@@ -131,6 +132,7 @@
 "Cannot reach the provider. Check the desktop app's network, proxy, or VPN connection." = "サービスに接続できません。デスクトップアプリのネットワーク、プロキシ、VPN 接続を確認してください。";
 "Cannot reach the provider. Check your connection." = "サービスに接続できません。ネットワークを確認してください。";
 "Cash" = "現金";
+"Change Service" = "サービスを変更";
 "Chat" = "チャット";
 "Check Automatically" = "自動的に確認";
 "Check Connection" = "接続を確認";
@@ -141,6 +143,7 @@
 "Checked. No new usage data." = "確認済みです。新しい使用量データはありません。";
 "Checking for updates…" = "更新を確認中…";
 "Checks hourly and shows a banner when an update is available." = "1 時間ごとに確認し、更新があるとバナーを表示します。";
+"Choose a service to see how to connect an account." = "サービスを選んで、アカウントを接続します。";
 "Choose at most two tray metrics per account." = "アカウントごとに最大2項目です。";
 "Choose services and accounts to show. Hiding them keeps stars, overview and refresh unchanged." = "表示するサービスとアカウントを選択します。非表示にしてもスター、概要、更新は変わりません。";
 "Choose the service's local folder, such as .claude or .codex, to read its login and usage history." = "ログインと使用履歴を読むため、.claude や .codex などのサービスフォルダを選択してください。";
@@ -150,6 +153,7 @@
 "Choose where each item appears. Menu Bar shows up to two values beside the app icon; uncheck one before choosing a replacement." = "各項目の表示場所を選びます。メニューバーにはアイコンの横に最大2つの値を表示できます。変更するには先に1つ選択を解除してください。";
 "Choose where each item appears. System Tray shows up to two values; uncheck one before choosing a replacement." = "各項目の表示場所を選びます。システムトレイには最大2つの値を表示できます。変更するには先に1つ選択を解除してください。";
 "Choose which accounts appear in your overview and refresh automatically." = "概要に表示し、自動更新するアカウントを選びます。";
+"Choose which accounts appear on Home. Hidden accounts stay in this list." = "ホームに表示するアカウントを選びます。非表示にしても、この一覧に残ります。";
 "Claude Code logs on this device. Includes logs from different sign-ins, not the current account's complete usage." = "この端末の Claude Code ログを集計します。別のログイン時の記録も含み、現在のアカウント全体の使用量ではありません。";
 "Claude Desktop login couldn't be read. Open Claude Desktop, then try again." = "Claude Desktop のログイン情報を読み取れません。Claude Desktop を開いてからもう一度お試しください。";
 "Claude Desktop login found. Refresh once and choose Always Allow to connect it." = "Claude Desktop のログインが見つかりました。一度更新して「常に許可」を選ぶと接続できます。";
@@ -259,6 +263,7 @@
 "Details Only" = "詳細のみ";
 "Details only" = "詳細のみ";
 "Detect Accounts" = "アカウントを再検出";
+"Detected Account" = "検出されたアカウント";
 "Detection Results" = "検出結果";
 "Detection complete." = "検出が完了しました。";
 "Detection complete. Choose an account below or return to its details." = "検出が完了しました。下から選択するか、アカウント詳細に戻ってください。";
@@ -302,6 +307,7 @@
 "Estimated locally, so it may be off" = "ローカルで推定しているため、誤差がある場合があります";
 "Everything found on this Mac is already added." = "この Mac で見つかったアカウントはすべて追加済みです。";
 "Example Data" = "サンプルデータ";
+"Existing accounts are in Account Management, including accounts hidden from Home." = "追加済みのアカウントは、ホームで非表示のものも「アカウント管理」にあります。";
 "Expanded" = "展開済み";
 "Expired" = "期限切れ";
 "Expires" = "有効期限";
@@ -454,6 +460,7 @@
 "Move Up" = "上へ";
 "Move down" = "下へ";
 "Move up" = "上へ";
+"My Accounts" = "マイアカウント";
 "Needs Attention" = "確認が必要";
 "Needs an API key" = "API キーが必要です";
 "Needs attention" = "要確認";

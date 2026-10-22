@@ -8,6 +8,7 @@
 .mac-preview .page-title .provider-logo { width:18px;height:18px; }
 .mac-preview .page-title img { width:16px;height:23px;object-fit:contain; }
 .mac-preview .home-header { grid-template-columns:minmax(0,1fr) auto; }
+.mac-preview .configure-header { grid-template-columns:36px minmax(0,1fr) auto; }
 .mac-preview .home-header .page-title { justify-content:flex-start;gap:8px; }
 .mac-preview .home-header h1 { font-size:17px; }
 .mac-preview .header-actions { display:flex;align-items:center;justify-content:flex-end;gap:4px;min-width:36px;--control-height-md:var(--control-height-sm); }
@@ -198,14 +199,10 @@
 .mac-preview .add-account-row { width:100%;justify-content:center;gap:6px;margin-top:10px;color:var(--text-secondary);font-size:13px; }
 .mac-preview .empty-state .empty-actions { display:flex;justify-content:center;gap:8px;margin-top:12px; }
 .mac-preview .add-intro { color:var(--text-secondary);font-size:12px;line-height:1.6;margin:0 2px 18px; }
-.mac-preview .add-section { margin-bottom:24px; }
-.mac-preview .add-section > .section-heading { margin:0 0 8px; }
 .mac-preview .added-note { display:flex;align-items:center;gap:6px;margin:0 0 8px;color:var(--success);font-size:12px;overflow-wrap:anywhere; }
 .mac-preview .add-account .account-entry { display:flex;align-items:center;gap:10px;flex:1;min-width:0; }
 .mac-preview .add-account .account-entry .provider-logo { width:20px;height:20px;flex:none; }
 .mac-preview .add-account .record-label { flex:1;min-width:0;font-size:13px;overflow-wrap:anywhere; }
-.mac-preview .service-picker { margin:0 0 12px;padding:3px;gap:3px; }
-.mac-preview .service-picker button { flex:1;font-size:13px; }
 .mac-preview .login-steps { margin:10px 0 6px;padding-left:20px;display:grid;gap:14px;font-size:12px;line-height:1.6; }
 .mac-preview .login-steps li { padding-left:4px; }
 .mac-preview .login-steps li > span { display:block; }
@@ -221,8 +218,6 @@
 .mac-preview .danger-zone .group-description { margin:8px 2px 0; }
 .mac-preview .group-subheading { font-size:12px;font-weight:500;color:var(--text-secondary);margin:12px 0 2px; }
 .mac-preview .danger-zone [data-face="idle"] button:not(:disabled) { color:var(--danger); }
-.mac-preview .add-tabs { margin:0 0 14px;padding:3px;gap:3px; }
-.mac-preview .add-tabs button { flex:1;font-size:13px; }
 .mac-preview .note-editor { display:grid;gap:8px;padding:12px 0;border-bottom:1px solid var(--border); }
 .mac-preview .note-editor input { width:100%;min-height:36px;height:36px;font-size:13px; }
 .mac-preview .note-editor label { font-size:13px; }
@@ -240,10 +235,10 @@
 .mac-preview .notice-block { display:flex;align-items:center;justify-content:space-between;gap:10px;margin:2px 0 6px; }
 .mac-preview .notice-block .notice { margin:0;flex:1;min-width:0; }
 .mac-preview .notice-action { flex:none; }
-.mac-preview .heading-actions { display:flex;align-items:center;flex:none; }
-.mac-preview .settings-button { width:28px;min-height:28px;padding:0;opacity:0;transition:opacity .12s ease; }
-.mac-preview .provider-heading:hover .settings-button,.mac-preview .settings-button:focus-visible { opacity:1; }
-@media(hover:none) { .mac-preview .settings-button { opacity:.7; } }
+.mac-preview .account-detail-entry { width:100%;height:auto;min-height:44px;padding:4px 0;text-align:left; }
+.mac-preview .account-detail-entry > span,.mac-preview .account-detail-entry > span > span,.mac-preview .account-detail-entry > span > span > span { display:flex;align-items:center;min-width:0;width:100% !important;gap:10px; }
+.mac-preview .account-detail-entry .identity-text { flex:1;min-width:0; }
+.mac-preview .account-chevron { flex:none;color:var(--text-secondary); }
 .mac-preview .disclosure-row { width:100%;justify-content:flex-start;gap:8px;padding:10px 0;border-top:1px solid var(--border);font-size:13px; }
 .mac-preview .disclosure-row .disclosure-count { margin-left:auto;color:var(--text-secondary);font-variant-numeric:tabular-nums; }
 .mac-preview .disclosure-row svg { transition:transform .15s ease; }

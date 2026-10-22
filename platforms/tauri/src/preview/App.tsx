@@ -46,6 +46,7 @@ export function DesktopApp() {
  const previousRoute=useRef(0),lastTrigger=useRef<HTMLElement|null>(null),returnFocus=useRef(new Map<number,HTMLElement|'menu'>());
  // Drafts live only for this running app. They are never stored in browser storage.
  const [drafts,setDrafts]=useState<Record<string,AccountDraft>>({});
+ const [addedName,setAddedName]=useState('');
  const [version,setVersion]=useState(''),[now,setNow]=useState(Date.now());
  const current=routes.at(-1)!;
  usePanelHeight(current.key,state,densityPreference.density);
@@ -59,7 +60,8 @@ export function DesktopApp() {
   setRoutes(r=>[...r,{key:++sequence.current,page,...details}]);
  };
  const back=()=>setRoutes(r=>r.length>1?r.slice(0,-1):r);
- const addAccount=()=>{push('add');void send({method:'discover'}).catch(()=>{});};
+ const addAccount=()=>{setAddedName('');if(current.page!=='configure')push('configure');push('add');void send({method:'discover'}).catch(()=>{});};
+ const finishAdding=(name:string)=>{setAddedName(name);back();};
  const retryAccount=(accountId:string)=>{if(state&&!busy&&!refreshing)void refreshWithFeedback(state,current.key,accountId);};
  const refreshable=current.page==='home'||current.page==='history'||current.page==='detail'&&current.tab!=='settings';
  const refresh=()=>{if(state&&refreshable&&!busy&&!refreshing)void refreshWithFeedback(state,current.key,current.accountId);};
@@ -104,7 +106,7 @@ export function DesktopApp() {
  },[current,refreshable,busy,refreshing,state,refreshWithFeedback]);
  const title=current.page==='detail'?account?.name??'':current.page==='settings'?t.settings:current.page==='configure'?t.configure:current.page==='add'?tr('Add Account'):current.page==='history'?t.history:current.page==='about'?basic.about:current.page==='updates'?t.checkUpdates:'TokenPlan';
  return <MotionConfig reducedMotion="user"><main className="mac-preview" data-density={densityPreference.density} onClickCapture={e=>{lastTrigger.current=(e.target as Element).closest<HTMLElement>('button');}}>
-  <header className={`preview-header ${current.page==='home'?'home-header':''}`}>
+  <header className={`preview-header ${current.page==='home'?'home-header':current.page==='configure'?'configure-header':''}`}>
    {current.page!=='home'&&<Button className="icon-button back-button" size="sm" variant="ghost" aria-label={basic.back} onClick={back}><ChevronLeft size={21}/></Button>}
    <div className="page-title">{current.page==='home'?<img src="/capsule.png" alt=""/>:current.page==='detail'&&account?<ProviderLogo family={account.family}/>:null}<h1 ref={heading} tabIndex={-1}>{title}</h1></div>
    <div className="header-actions">
@@ -113,10 +115,10 @@ export function DesktopApp() {
      <Button className="icon-button refresh-button" size="sm" variant="ghost" aria-label={basic.refresh} aria-busy={refreshing} aria-disabled={busy||refreshing} data-refreshing={refreshing} data-result={refreshOutcome?.tone} onClick={refresh}>
       {refreshOutcome?.tone==='success'?<Check size={18}/>:refreshOutcome?<TriangleAlert size={18}/>:<RefreshCw className="refresh-symbol" size={18}/>}
      </Button></>}
-    {current.page==='configure'&&<Button className="icon-button" size="sm" variant="ghost" aria-label={tr('Add Account')} onClick={addAccount}><Plus size={20}/></Button>}
+    {current.page==='configure'&&<Button size="sm" variant="ghost" onClick={addAccount}><Plus size={16}/>{tr('Add Account')}</Button>}
     {current.page==='home'&&<DropdownMenu label={basic.more} iconOnly icon={<Ellipsis size={19}/>} items={[
-     {label:tr('Add Account'),onSelect:addAccount},{label:t.configure,onSelect:()=>push('configure')},{label:t.history,onSelect:()=>push('history')},
-     {label:t.settings,onSelect:()=>push('settings')},...(import.meta.env.VITE_MAC_NAVIGATION_PREVIEW==='1'?[]:[{label:t.checkUpdates,onSelect:()=>push('updates')}]),{label:basic.about,onSelect:()=>push('about')},
+     {label:t.configure,onSelect:()=>push('configure')},{label:t.history,onSelect:()=>push('history')},
+     {label:t.settings,onSelect:()=>push('settings')},...(import.meta.env.VITE_MAC_NAVIGATION_PREVIEW==='1'?[]:[{label:t.checkUpdates,separatorBefore:true,onSelect:()=>push('updates')}]),{label:basic.about,separatorBefore:import.meta.env.VITE_MAC_NAVIGATION_PREVIEW==='1',onSelect:()=>push('about')},
      {label:basic.quit,separatorBefore:true,onSelect:()=>{void invoke('quit');}},
     ]}/>}
    </div>
@@ -128,11 +130,11 @@ export function DesktopApp() {
   <div className="page-stack">{routes.map(route=>{
    const a=state?.accounts.find(a=>a.id===route.accountId);
    return <div className="preview-page" data-page={route.page} key={route.key} hidden={route.key!==current.key}><div className="page-content">
-    {state&&route.page==='home'&&<>{platform&&platform!=='macos'&&<TrayPanel state={state} label={t.tray} open={accountId=>push('detail',{accountId,tab:'usage'})}/>}{!state.accounts.some(a=>a.enabled)?<div className="empty-state"><p>{tr('No accounts yet. Add one to start tracking your usage.')}</p><div className="empty-actions"><Button size="sm" variant="secondary" onClick={addAccount}><Plus size={15}/>{tr('Add Account')}</Button></div></div>:<><HomeTips state={state} send={send} language={language} addAccount={addAccount}/><Dashboard accounts={state.accounts} open={accountId=>push('detail',{accountId,tab:'usage'})} openSettings={accountId=>push('detail',{accountId,tab:'settings'})} retry={retryAccount} busy={busy||refreshing} now={now} language={language} missing={basic.missing} remaining={state.settings.showRemaining}/><Button className="add-account-row" variant="ghost" size="sm" onClick={addAccount}><Plus size={15}/>{tr('Add Account')}</Button></>}</>}
+    {state&&route.page==='home'&&<>{platform&&platform!=='macos'&&<TrayPanel state={state} label={t.tray} open={accountId=>push('detail',{accountId,tab:'usage'})}/>}{!state.accounts.some(a=>a.enabled)?<div className="empty-state">{state.accounts.some(a=>a.added)?<><p>{tr('All accounts are hidden from Home. You can show them again in Account Management.')}</p><Button size="sm" variant="secondary" onClick={()=>push('configure')}>{t.configure}</Button></>:<><p>{tr('No accounts yet. Add one to start tracking your usage.')}</p><div className="empty-actions"><Button size="sm" variant="secondary" onClick={addAccount}><Plus size={15}/>{tr('Add Account')}</Button></div></>}</div>:<><HomeTips state={state} send={send} language={language} addAccount={addAccount}/><Dashboard accounts={state.accounts} open={accountId=>push('detail',{accountId,tab:'usage'})} openSettings={accountId=>push('detail',{accountId,tab:'settings'})} retry={retryAccount} busy={busy||refreshing} now={now} language={language} missing={basic.missing} remaining={state.settings.showRemaining}/><Button className="add-account-row" variant="ghost" size="sm" onClick={addAccount}><Plus size={15}/>{tr('Add Account')}</Button></>}</>}
     {state&&a&&route.page==='detail'&&<AccountDetail draft={drafts[a.id]??{}} onDraftChange={patch=>setDrafts(d=>({...d,[a.id]:{...d[a.id],...patch}}))} badge={trayAccounts(state.accounts).find(item=>item.id===a.id)?.badge} traySettings={state.settings} account={a} tab={route.tab??'usage'} onTab={tab=>setRoutes(r=>r.map(item=>item.key===route.key?{...item,tab}:item))} history={range=>push('history',{accountId:a.id,range})} send={send} t={t} busy={busy} language={language} now={now} remaining={state.settings.showRemaining} missing={basic.missing}/>}
     {state&&route.page==='settings'&&<GeneralSettings platform={platform} densityPreference={densityPreference} state={state} send={send} t={t} busy={busy} language={language}/>}
-    {state&&route.page==='configure'&&<ServiceConfiguration state={state} send={send} t={t} busy={busy} language={language} add={addAccount} open={accountId=>push('detail',{accountId,tab:'settings'})}/>}
-    {state&&route.page==='add'&&<AddAccount state={state} send={send} t={t} busy={busy} language={language} open={accountId=>push('detail',{accountId,tab:'settings'})}/>}
+    {state&&route.page==='configure'&&<>{addedName&&<p role="status" className="added-note">{tr('Added to Home')}: {addedName}</p>}<ServiceConfiguration state={state} send={send} t={t} busy={busy} language={language} open={accountId=>push('detail',{accountId,tab:'settings'})}/></>}
+    {state&&route.page==='add'&&<AddAccount state={state} send={send} t={t} busy={busy} language={language} complete={finishAdding} open={accountId=>{back();push('detail',{accountId,tab:'settings'});}}/>}
     {state&&route.page==='history'&&<>{a&&<div className="history-account-context">{a.name}{a.email&&<span>{a.email}</span>}</div>}<HistoryPage accounts={a?[a]:state.accounts} t={t} language={language} initialRange={route.range}/></>}
     {route.page==='updates'&&<Updates showHeading={false} t={t} updater={updater} automatic={state?.settings.autoUpdates??true} onAutomatic={autoUpdates=>{void send({method:'settings',value:{autoUpdates}}).catch(()=>{});}}/>}
     {route.page==='about'&&<section className="about"><img src="/capsule.png" alt=""/><h2>TokenPlan</h2><p>{version}</p>{import.meta.env.VITE_MAC_NAVIGATION_PREVIEW==='1'&&<p className="muted">{tr('Design Preview')}</p>}

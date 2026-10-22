@@ -37,7 +37,6 @@ p { margin:8px 0; }
 .email { display:block;font-size:var(--text-xs);overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
 .provider-logo { display:block;width:22px;height:22px;flex:none;background:currentColor;color:var(--provider-color);mask-size:contain;mask-repeat:no-repeat;mask-position:center;-webkit-mask-size:contain;-webkit-mask-repeat:no-repeat;-webkit-mask-position:center; }
 .family-heading + .account-block .identity-line h2,.family-heading ~ .account-block .identity-line h2 { font-size:var(--text-sm); }
-.detail-button { flex:none;min-width:28px !important;padding:4px !important; }
 .metric { display:grid;grid-template-columns:76px minmax(40px,1fr) 42px 82px;align-items:center;gap:10px;min-height:32px;font-variant-numeric:tabular-nums;--meter-fill:var(--provider-color,var(--usage-normal)); }
 .metric[data-tone="warning"] { --meter-fill:var(--warning); }
 .metric[data-tone="critical"] { --meter-fill:var(--danger); }

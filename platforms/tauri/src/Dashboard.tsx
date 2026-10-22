@@ -1,6 +1,6 @@
 import type {CSSProperties} from 'react';
 import {providerTheme} from './providerTheme';
-import {ChevronRight,SlidersHorizontal} from 'lucide-react';
+import {ChevronRight} from 'lucide-react';
 import {Button} from './components/arc/button/button';
 import type {Account} from './desktop';
 import {accountTitle} from './usage';
@@ -35,17 +35,14 @@ export function Dashboard({accounts,open,openSettings,retry,busy=false,now,langu
   {group.accounts.length>1&&<div className="family-heading"><ProviderLogo family={group.family}/><h2>{group.accounts[0].name}</h2></div>}
   {group.accounts.map(a=><div className="account-block" key={a.id}>
    <div className="provider-heading">
-    <div className="account-identity">
+    <Button variant="ghost" className="account-identity account-detail-entry" aria-label={`${a.name} ${a.email}`.trim()} onClick={()=>open(a.id)}>
      {group.accounts.length===1&&<ProviderLogo family={a.family}/>}
      <div className="identity-text">
       <div className="identity-line"><h2>{group.accounts.length>1?accountTitle(a.email)||a.name:a.name}</h2><span className="plan">{a.plan}</span></div>
       {group.accounts.length===1&&a.email&&<span className="email">{accountTitle(a.email)}</span>}
      </div>
-    </div>
-    <div className="heading-actions">
-     <Button size="sm" className="settings-button" variant="ghost" aria-label={`${providerText('Account Settings',language)} ${a.name} ${a.email}`.trim()} title={providerText('Account Settings',language)} onClick={()=>openSettings(a.id)}><SlidersHorizontal size={15}/></Button>
-     <Button size="sm" className="detail-button" variant="ghost" aria-label={`${a.name} ${a.email}`} onClick={()=>open(a.id)}><ChevronRight size={18}/></Button>
-    </div>
+     <ChevronRight className="account-chevron" size={18} aria-hidden="true"/>
+    </Button>
    </div>
    {(a.error||a.warning)&&<div className="notice-block"><p role="status" className="notice">{providerText(a.error||a.warning||"",language)}</p>{(()=>{const action=problemAction(a,{open,settings:openSettings,retry});return action&&<Button size="sm" variant="secondary" className="notice-action" disabled={busy} onClick={action.run}>{providerText(action.label,language)}</Button>;})()}</div>}
    {a.metrics.filter(m=>m.placement==='home').map(m=><MetricRow key={m.id} metric={m} now={now} missing={missing} language={language} remaining={remaining}/>)}

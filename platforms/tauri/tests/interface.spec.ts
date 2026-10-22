@@ -81,7 +81,7 @@ test('confirmed account removal leaves contiguous tray numbering',async({page})=
 
 test('service order is reflected in the homepage',async({page})=>{
  await mockDesktop(page);await page.goto('/');
- await page.getByRole('button',{name:'更多',exact:true}).click();await page.getByRole('menuitem',{name:'账号',exact:true}).click();
+ await page.getByRole('button',{name:'更多',exact:true}).click();await page.getByRole('menuitem',{name:'账号管理',exact:true}).click();
  await page.getByRole('button',{name:'排序',exact:true}).click();
  await page.locator('.configured-account').nth(1).getByRole('button',{name:/上移/}).click();
  await page.getByRole('button',{name:'返回',exact:true}).click();

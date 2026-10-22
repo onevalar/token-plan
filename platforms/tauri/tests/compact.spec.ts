@@ -5,7 +5,7 @@ import {largeDesktop} from './fixtures/largeDesktop';
 const noOverflow=async(page:Page)=>expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
 async function configure(page:Page) {
  await page.getByRole('button',{name:'更多',exact:true}).click();
- await page.getByRole('menuitem',{name:'账号',exact:true}).click();
+ await page.getByRole('menuitem',{name:'账号管理',exact:true}).click();
  await expect(page.getByRole('menu',{includeHidden:true})).toHaveCount(0);
 }
 for(const colorScheme of ['light','dark'] as const)for(const width of [390,480]){
@@ -22,7 +22,7 @@ for(const colorScheme of ['light','dark'] as const)for(const width of [390,480])
   await expect(page.locator('.metric-chart svg circle')).toBeVisible();
   // Previously the charts alone occupied 60px, independent of row height.
   for(const chart of await page.locator('.metric-chart svg').all())expect((await chart.boundingBox())!.height).toBeLessThanOrEqual(28);
-  const arrows=await page.locator('.detail-button').evaluateAll(nodes=>nodes.map(n=>n.getBoundingClientRect().right));
+  const arrows=await page.locator('.account-chevron').evaluateAll(nodes=>nodes.map(n=>n.getBoundingClientRect().right));
   expect(Math.max(...arrows)-Math.min(...arrows)).toBeLessThan(1);
   await noOverflow(page);
   await page.screenshot({path:info.outputPath('dashboard.png'),fullPage:true,animations:'disabled'});
@@ -51,11 +51,13 @@ for(const colorScheme of ['light','dark'] as const)for(const width of [390,480])
   await page.getByRole('button',{name:'返回',exact:true}).click();
   await configure(page);
   await page.getByRole('button',{name:'添加账号',exact:true}).first().click();
-  await expect(page.locator('.preview-page:not([hidden]) .configured-account')).toHaveCount(8);
+  await expect(page.locator('.preview-page:not([hidden]) .account-entry')).toHaveCount(14);
   await page.getByRole('textbox',{name:'搜索服务',exact:true}).fill('Cursor');
+  await page.getByRole('button',{name:'Cursor',exact:true}).click();
   await expect(page.locator('.preview-page:not([hidden]) .configured-account')).toHaveCount(1);
   await page.getByRole('button',{name:'添加 Cursor',exact:true}).click();
-  await page.getByRole('button',{name:'返回',exact:true}).click();
+  await expect(page.getByRole('heading',{level:1})).toHaveText('账号管理');
+  await expect(page.getByRole('status')).toContainText('Cursor');
   await expect(page.locator('.preview-page:not([hidden]) .configured-account')).toHaveCount(8);
  });
 }

@@ -18,6 +18,7 @@ public sealed partial class DesktopSession
             connection = a.ErrorKey == "Saved account. Refresh to check its current connection." ? "unchecked" : a.ErrorKey?.StartsWith("Another account is currently connected.") == true ? "different_account" : a.ErrorKey?.StartsWith("Account kept.") == true ? "unverified" : a.AccountIdentity != null ? "available" : "unchecked",
             email = a.AccountEmail ?? "", plan = a.Snapshot?.Plan ?? "",
             enabled = preferences.IsEnabled(a.Id) && preferences.AccountVisibility.GetValueOrDefault(a.SettingsKey, true),
+            added = addedAccounts.Contains(a.SettingsKey) || preferences.IsEnabled(a.Id) && preferences.AccountVisibility.GetValueOrDefault(a.SettingsKey, true),
             tray = preferences.TrayServices.GetValueOrDefault(a.Id, true) && preferences.TrayAccounts.GetValueOrDefault(a.SettingsKey, true),
             removable = Preferences.AccountRemovalKey(a) != null, apiKey = ProviderCatalog.Get(a.Id).EnvironmentKey != null,
             note = preferences.ProviderNotes.GetValueOrDefault(a.SettingsKey, ""), error = a.ErrorKey ?? "",

@@ -108,6 +108,9 @@ public final class DesktopBridge {
                 await PersistentJSONLScanCaches.flushPendingWrites()
             case "enabled":
                 guard let enabled = value as? Bool else { throw Failure.invalid }
+                var added = Set(defaults.stringArray(forKey: "tokenplan.desktop.addedAccounts") ?? [])
+                if enabled || enablement.isEnabled(id) { added.insert(id) }
+                defaults.set(Array(added), forKey: "tokenplan.desktop.addedAccounts")
                 enablement.setEnabled(enabled, for: id)
             case "remove":
                 guard accounts.records.contains(where: { $0.id == id }) else { throw Failure.invalid }
@@ -239,7 +242,13 @@ public final class DesktopBridge {
                 "fetchedAt": snapshot.map { OpenUsageISO8601.string(from: $0.refreshedAt) } ?? ""
             ]
         }
-        return ["schema": "tokenplan.desktop.v1", "accounts": entries, "settings": [
+        let added = Set(defaults.stringArray(forKey: "tokenplan.desktop.addedAccounts") ?? [])
+        let managedEntries = entries.map { entry in
+            var entry = entry
+            entry["added"] = (entry["enabled"] as? Bool == true) || added.contains(entry["id"] as? String ?? "")
+            return entry
+        }
+        return ["schema": "tokenplan.desktop.v1", "accounts": managedEntries, "settings": [
             "showRemaining": store.meterStyle == .remaining,
             "notifications": ["underTenPercent", "healthyToClose", "closeToRunningOut"].map { defaults.bool(forKey: "tokenplan.notifications.\($0)") },
             "shortcut": DesktopShortcutMigration.read(defaults: defaults),

@@ -33,7 +33,7 @@ export async function mockDesktop(page:Page,language='zh-Hans',cloud=false,data:
     if((window as any).__failNextRequest){(window as any).__failNextRequest=false;throw 'request_failed';}
     const r=args.request,a=state.accounts.find((a:any)=>a.id===r.accountId);
     if(r.method==='notificationPermission')return structuredClone(state);
-    if(r.method==='enabled'&&a)a.enabled=r.value;
+    if(r.method==='enabled'&&a){a.added=a.added||a.enabled||r.value;a.enabled=r.value;}
     if(r.method==='tray'&&a)a.tray=r.value;
     if(r.method==='note'&&a)a.note=r.value;
     if(r.method==='remove')state.accounts=state.accounts.filter((a:any)=>a.id!==r.accountId);

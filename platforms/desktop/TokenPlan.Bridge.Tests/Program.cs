@@ -18,6 +18,8 @@ try {
   state=await Call(session,new{method="enabled",accountId="claude",value=false});
   var accounts=state.GetProperty("accounts").EnumerateArray().ToArray();
   Assert(!accounts.Single(a=>a.GetProperty("id").GetString()=="claude").GetProperty("enabled").GetBoolean(),"Primary disabled");
+  Assert(accounts.Single(a=>a.GetProperty("id").GetString()=="claude").GetProperty("added").GetBoolean(),"Hidden account stays added");
+  Assert(!accounts.Single(a=>a.GetProperty("id").GetString()=="deepseek").GetProperty("added").GetBoolean(),"Unconfigured service is not an added account");
   Assert(accounts.Single(a=>a.GetProperty("id").GetString()=="claude:second").GetProperty("enabled").GetBoolean(),"Secondary must remain enabled");
   await Call(session,new{method="settings",value=new{trayStyle="percentage",ringIconPosition="left",autoUpdates=false,autoRefresh=false,language="zh-Hans"}});
   try { await Call(session,new{method="settings",value=new{ringIconPosition="invalid"}}); throw new Exception("Invalid position accepted"); } catch(InvalidDataException) { }
@@ -43,6 +45,8 @@ try {
   Assert(state.GetProperty("settings").GetProperty("ringIconPosition").GetString()=="left","Persisted ring position");
   Assert(!state.GetProperty("settings").GetProperty("autoRefresh").GetBoolean(),"Refresh preference survives restart");
   Assert(!state.GetProperty("settings").GetProperty("autoUpdates").GetBoolean(),"Persisted updater preference");
+  var hidden = state.GetProperty("accounts").EnumerateArray().Single(a=>a.GetProperty("id").GetString()=="claude");
+  Assert(hidden.GetProperty("added").GetBoolean() && !hidden.GetProperty("enabled").GetBoolean(),"Hidden membership survives restart");
   Assert(!state.GetProperty("accounts").EnumerateArray().Any(a=>a.GetProperty("id").GetString()=="claude:second"),"Tombstone survives relaunch");
   Assert(!state.ToString().Contains("CredentialFingerprint"),"No authentication fields exported");
  }

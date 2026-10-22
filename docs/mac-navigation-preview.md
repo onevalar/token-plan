@@ -28,19 +28,25 @@ tray integration remain platform-specific. This change does not publish a releas
   (Refreshed, Not refreshed, Needs attention, Some failed, Refresh failed). "Refreshed" appears only when
   at least one account actually fetched new data; if nothing was fetched it says Not refreshed. There is no banner
   and nothing moves; the full sentence is only announced to screen readers.
-- The Accounts page (previously Service Configuration) lists enabled accounts with
-  switches, reordering and an Add Account row. Home also ends with Add Account, the More
-  menu starts with it, and an empty Home offers it as the one action. Add Account has two
-  tabs: Available to Add (accounts and services TokenPlan knows about, detected ones first,
-  one press to add; services that need an API key open their settings next) and Another
-  Account (a numbered guide to sign in to a second or third Claude or Codex login in its own
-  folder, with the existing-folder option under Advanced).
+- Account Management lists added accounts, including those hidden from Home. Turning a
+  switch off keeps the row here, including after restarting; it does not send the account
+  back to Add Account. Never-added service placeholders stay out of this list. Older
+  versions did not record this distinction: previously hidden accounts can be added once
+  from Add Account, after which hiding them preserves their membership.
+- Add Account is an action inside Account Management, with a shortcut at the end of Home.
+  Choose a service first, then use its available account or connection options. Claude
+  and Codex offer an isolated terminal login and an existing-folder option. Adding returns
+  to Account Management with confirmation; API-key services open settings first, with Back
+  returning to Account Management. When all added accounts are hidden, Home offers Account
+  Management rather than claiming there are no accounts.
+- More groups Account Management, Usage History and General Settings together; Check for
+  Updates and About form the second group, and Quit remains separate.
 - An account's note is hidden behind Add Note (or shown as text with Edit) until wanted;
   an unsaved draft keeps the editor open. Removing an account sits in its own section at
   the bottom of the account settings, apart from notes and the API key.
 - Problem cards carry one button for the next step: Try Again (temporary failures, refreshes just that account), Sign In Again
-  (a CLI login that needs authorizing), Check Connection, Set API Key (opens the key field) or View Details. Each Home account also
-  has a settings shortcut that appears on hover or keyboard focus. Window labels (5h, 1w) and reset countdowns have plain-language
+  (a CLI login that needs authorizing), Check Connection, Set API Key (opens the key field) or View Details. Each Home account has
+  one heading/arrow entry into Usage; settings live in the detail page's Settings tab, not a neighboring hover shortcut. Window labels (5h, 1w) and reset countdowns have plain-language
   tooltips ("5-hour window", "Resets in 3h").
 - First use shows a short welcome once (what appears automatically, what 5h/1w and the hourglass mean, where to add another login).
   Later, when an account is at 70% or more and every alert is off, one card offers to turn alerts on (asking for notification

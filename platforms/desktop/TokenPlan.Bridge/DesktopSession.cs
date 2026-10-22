@@ -18,6 +18,7 @@ public sealed partial class DesktopSession : IDisposable
     bool[] notifications = [false, false, false];
     string shortcut = "";
     List<string> accountOrder = [];
+    HashSet<string> addedAccounts = [];
     /// How long after fetching a provider a repeat, non-forced refresh is answered from what we already have. The shell's
     /// timer decides when to refresh, so this only coalesces requests that arrive almost together. (It used to be the whole
     /// refresh interval and was saved to disk: a timer tick landing a moment early, any tick after a manual refresh, or the
@@ -55,6 +56,7 @@ public sealed partial class DesktopSession : IDisposable
             trayStyle = doc.RootElement.GetProperty("trayStyle").GetString() is "percentage" ? "percentage" : "ring";
             if (doc.RootElement.TryGetProperty("cooldowns", out var cooldowns)) service.RestoreCooldowns(cooldowns.Deserialize<Dictionary<string, DateTimeOffset>>() ?? []);
             if (doc.RootElement.TryGetProperty("accountOrder", out var order)) accountOrder = order.Deserialize<List<string>>() ?? [];
+            if (doc.RootElement.TryGetProperty("addedAccounts", out var added)) addedAccounts = added.Deserialize<HashSet<string>>() ?? [];
             // A saved "next refresh" time is deliberately not restored: after a relaunch the first refresh must fetch. Rate limits
             // are protected by the separately saved provider cooldowns above.
         }
@@ -76,6 +78,7 @@ public sealed partial class DesktopSession : IDisposable
 
                 break;
             case "enabled":
+                if (value.GetBoolean() || preferences.IsEnabled(family) && preferences.AccountVisibility.GetValueOrDefault(id, true)) addedAccounts.Add(id);
                 if (value.GetBoolean() && !preferences.IsEnabled(family))
                 {
                     var visibility = new Dictionary<string, bool>(preferences.AccountVisibility);
@@ -161,7 +164,7 @@ public sealed partial class DesktopSession : IDisposable
         lock (persistenceLock) {
         Directory.CreateDirectory(Path.GetDirectoryName(stateFile)!);
         var temp = stateFile + ".tmp";
-        File.WriteAllText(temp, JsonSerializer.Serialize(new { trayStyle, ringIconPosition, autoUpdates, notifications, shortcut, nextRefresh, accountOrder, cooldowns = service.ExportCooldowns(), accounts = results.Values.Select(a => new ProviderResult(a.Id, a.Name, null, null, AccountKey: a.AccountKey, AccountEmail: a.AccountEmail, AccountIdentity: a.AccountIdentity)).ToArray() }));
+        File.WriteAllText(temp, JsonSerializer.Serialize(new { trayStyle, ringIconPosition, autoUpdates, notifications, shortcut, nextRefresh, accountOrder, addedAccounts, cooldowns = service.ExportCooldowns(), accounts = results.Values.Select(a => new ProviderResult(a.Id, a.Name, null, null, AccountKey: a.AccountKey, AccountEmail: a.AccountEmail, AccountIdentity: a.AccountIdentity)).ToArray() }));
         File.Move(temp, stateFile, true);
         }
     }
