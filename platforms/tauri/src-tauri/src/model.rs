@@ -19,7 +19,7 @@ pub struct ModelVariant { pub model: String, pub tokens: i64, pub cost: Option<f
 pub struct Observation { pub date: String, pub label: String, pub value: Option<f64>, pub unit: Option<String> }
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
-pub struct Account { #[serde(default)] pub connection: String, #[serde(default)] pub warning: String, pub id: String, pub family: String, pub name: String, pub email: String, pub plan: String, pub enabled: bool, pub tray: bool, pub removable: bool, pub api_key: bool, pub note: String, pub error: String, pub fetched_at: String, pub metrics: Vec<Metric>, #[serde(default)] pub observations: Vec<Observation>, pub history_scope: String, pub history_partial: bool, pub history: Vec<Day> }
+pub struct Account { #[serde(default)] pub added: bool, #[serde(default)] pub login_directories: Vec<String>, #[serde(default)] pub connection: String, #[serde(default)] pub warning: String, pub id: String, pub family: String, pub name: String, pub email: String, pub plan: String, pub enabled: bool, pub tray: bool, pub removable: bool, pub api_key: bool, pub note: String, pub error: String, pub fetched_at: String, pub metrics: Vec<Metric>, #[serde(default)] pub observations: Vec<Observation>, pub history_scope: String, pub history_partial: bool, pub history: Vec<Day> }
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct DesktopState { pub schema: String, pub accounts: Vec<Account>, pub settings: Settings }
 impl DesktopState {
@@ -32,3 +32,18 @@ impl DesktopState {
 fn default_ring_position()->String{"inside".into()}
 
 fn default_true()->bool{true}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn account_membership_and_directory_bindings_survive_the_shell_protocol() {
+        let mut value:serde_json::Value=serde_json::from_str(include_str!("../../tests/fixtures/desktop.json")).unwrap();
+        value["accounts"][0]["added"]=serde_json::json!(true);
+        value["accounts"][0]["enabled"]=serde_json::json!(false);
+        value["accounts"][0]["loginDirectories"]=serde_json::json!(["/private/account2"]);
+        let state:super::DesktopState=serde_json::from_value(value).unwrap();
+        let wire=serde_json::to_value(state).unwrap();
+        assert_eq!(wire["accounts"][0]["added"],true);
+        assert_eq!(wire["accounts"][0]["loginDirectories"][0],"/private/account2");
+    }
+}

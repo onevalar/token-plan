@@ -1,0 +1,22 @@
+# Shared account setup and Home style settings: zh-Hans, zh-Hant, ja, ko.
+T = {
+ 'Unified Style': ('全局统一','全域統一','すべて共通','전체 통일'),
+ 'Customize by Account': ('按账号自定义','依帳號自訂','アカウント別','계정별 설정'),
+ 'Open an account, then choose Edit Home Display to set its usage style.': ('进入账号详情，点击“编辑首页显示”设置该账号的用量样式。','進入帳號詳情，點擊「編輯首頁顯示」設定該帳號的用量樣式。','アカウントの詳細で「ホームの表示を編集」を選ぶと、使用量の表示を設定できます。','계정 상세에서 "홈 표시 편집"을 선택하여 사용량 스타일을 설정하세요.'),
+ 'Subscription Management': ('订阅管理','訂閱管理','サブスクリプション管理','구독 관리'),
+ 'Usage Statistics': ('用量统计','用量統計','使用量の統計','사용량 통계'),
+ 'Same order as Subscription Management': ('顺序与“订阅管理”相同','順序與「訂閱管理」相同','並び順は「サブスクリプション管理」と同じです','순서는 "구독 관리"와 같습니다'),
+ 'Existing accounts are in Subscription Management, including accounts hidden from Home.': ('已添加的账号都在订阅管理中，包括在首页隐藏的账号。','已新增的帳號都在訂閱管理中，包括在首頁隱藏的帳號。','追加済みのアカウントは、ホームで非表示のものもサブスクリプション管理にあります。','홈에서 숨긴 계정을 포함하여 추가된 계정은 구독 관리에 있습니다.'),
+ 'All accounts are hidden from Home. You can show them again in Subscription Management.': ('所有账号都已在首页隐藏，可在订阅管理中重新显示。','所有帳號都已在首頁隱藏，可在訂閱管理中重新顯示。','すべてのアカウントがホームで非表示です。サブスクリプション管理で再表示できます。','모든 계정이 홈에서 숨겨져 있습니다. 구독 관리에서 다시 표시할 수 있습니다.'),
+ 'Account Actions': ('账号操作','帳號操作','アカウント操作','계정 작업'),
+ 'Pending Connections': ('待连接账号','待連線帳號','接続待ちのアカウント','연결 대기 중인 계정'),
+ 'Not signed in yet': ('尚未完成登录','尚未完成登入','ログイン未完了','로그인 미완료'),
+ 'Continue Setup': ('继续连接','繼續連線','接続を続ける','연결 계속'),
+ 'Could not load pending accounts. Try again.': ('无法读取待连接账号，请重试。','無法讀取待連線帳號，請重試。','接続待ちのアカウントを読み込めません。再試行してください。','연결 대기 계정을 읽지 못했습니다. 다시 시도하세요.'),
+ 'Create a separate login folder for this account. Your existing terminal login stays unchanged.': ('为这个账号创建独立登录目录，不影响终端当前登录的账号。','為這個帳號建立獨立登入目錄，不影響終端機目前登入的帳號。','このアカウント専用のログインフォルダーを作成します。ターミナルの現在のログインには影響しません。','이 계정 전용 로그인 폴더를 만듭니다. 터미널의 기존 로그인은 유지됩니다.'),
+ 'Account Note (Optional)': ('账号备注（可选）','帳號備註（選填）','アカウントのメモ（任意）','계정 메모 (선택)'),
+ 'Create Account and Sign In': ('创建独立账号并登录','建立獨立帳號並登入','専用アカウントを追加してログイン','별도 계정 추가 및 로그인'),
+ 'Account connected.': ('账号已连接。','帳號已連線。','アカウントを接続しました。','계정이 연결되었습니다.'),
+ 'No signed-in account was found in this folder yet. Finish signing in, then check again.': ('这个目录中还没有检测到已登录的账号，请完成登录后再次检测。','這個目錄中還沒有偵測到已登入的帳號，請完成登入後再次偵測。','このフォルダーにログイン済みのアカウントはまだ見つかりません。ログインを完了して再確認してください。','이 폴더에서 로그인된 계정을 찾지 못했습니다. 로그인을 완료한 뒤 다시 확인하세요.'),
+ 'Reopen Terminal': ('重新打开终端','重新開啟終端機','ターミナルを再度開く','터미널 다시 열기'),
+}

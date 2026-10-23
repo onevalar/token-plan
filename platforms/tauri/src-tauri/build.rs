@@ -1,4 +1,5 @@
 fn main() {
+    println!("cargo:rerun-if-env-changed=VITE_MAC_NAVIGATION_PREVIEW");
     tauri_build::build();
     // The development helper uses SwiftPM's executable-relative resource lookup.
     // Release packaging remains disabled until signing/updater migration is complete.

@@ -5,7 +5,7 @@ import {largeDesktop} from './fixtures/largeDesktop';
 const visible=(page:Page)=>page.locator('.preview-page:not([hidden])');
 async function history(page:Page){
  await page.getByRole('button',{name:'更多',exact:true}).click();
- await page.getByRole('menuitem',{name:'用量历史',exact:true}).click();
+ await page.getByRole('menuitem',{name:'用量统计',exact:true}).click();
 }
 for(const theme of ['light','dark'] as const){
  test(`daily records keep currency precision and inset content in ${theme}`,async({page},info)=>{
@@ -53,7 +53,6 @@ for(const theme of ['light','dark'] as const){
   await page.emulateMedia({colorScheme:theme,reducedMotion:'reduce'});
   await mockDesktop(page,'zh-Hans',false,largeDesktop());await page.goto('/');
   await page.getByRole('button',{name:'Claude first@example.com',exact:true}).click();
-  await page.getByRole('button',{name:'账号设置',exact:true}).click();
   const zone=visible(page).locator('.danger-zone'),control=zone.locator('[data-mode]');
   const remove=zone.getByRole('button',{name:'移除账号',exact:true});
   await remove.scrollIntoViewIfNeeded();

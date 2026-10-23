@@ -108,18 +108,21 @@ pub fn application_icon()->tauri::Result<tauri::image::Image<'static>> {
     Ok(tauri::image::Image::new_owned(rgba,32,32))
 }
 
-/// Delay a Windows primary-click menu until the double-click interval expires.
-#[cfg(any(target_os="windows",test))]
-#[derive(Default)]
-pub struct Clicks {revision:u64,ignore_until:u64}
-#[cfg(any(target_os="windows",test))]
-impl Clicks {
-    pub fn primary(&mut self,now:u64)->Option<u64> {
-        if now<self.ignore_until{return None;}
-        self.revision+=1;Some(self.revision)
+#[cfg(not(target_os="linux"))]
+pub fn rect_anchor(rect:tauri::Rect)->Option<(i32,i32,i32)> {
+    let position=rect.position.to_physical::<f64>(1.0);
+    let size=rect.size.to_physical::<f64>(1.0);
+    if size.width<=0. || size.height<=0. {return None;}
+    Some(((position.x+size.width/2.) as i32,position.y as i32,(position.y+size.height) as i32))
+}
+
+#[cfg(not(target_os="linux"))]
+pub fn primary_anchor(event:&tauri::tray::TrayIconEvent)->Option<(i32,i32,i32)> {
+    use tauri::tray::{TrayIconEvent,MouseButton,MouseButtonState};
+    match event {
+        TrayIconEvent::Click{button:MouseButton::Left,button_state:MouseButtonState::Up,rect,..}=>rect_anchor(*rect),
+        _=>None,
     }
-    pub fn double(&mut self,now:u64,interval:u64) {self.revision+=1;self.ignore_until=now.saturating_add(interval);}
-    pub fn current(&self,revision:u64)->bool {self.revision==revision}
 }
 
 pub fn open_label(language:&str)->&'static str {
@@ -140,12 +143,21 @@ pub fn quit_label(language:&str) -> &'static str {
 mod tests {
     use super::*;
     fn fixture() -> DesktopState { serde_json::from_str(include_str!("../../tests/fixtures/desktop.json")).unwrap() }
+    #[cfg(not(target_os="linux"))]
     #[test]
-    fn a_double_click_cancels_the_single_click_menu_and_its_trailing_release() {
-        let mut clicks=Clicks::default();let pending=clicks.primary(100).unwrap();
-        assert!(clicks.current(pending));clicks.double(200,500);
-        assert!(!clicks.current(pending));assert!(clicks.primary(210).is_none());
-        assert!(clicks.primary(800).is_some());
+    fn only_primary_release_opens_home_and_preserves_physical_coordinates() {
+        use tauri::tray::{TrayIconEvent,MouseButton,MouseButtonState};
+        let rect=tauri::Rect {position:tauri::PhysicalPosition::new(-120.,1040.).into(),size:tauri::PhysicalSize::new(32.,32.).into()};
+        assert_eq!(rect_anchor(tauri::Rect{size:tauri::PhysicalSize::new(0.,0.).into(),..rect}),None);
+        let click=|button,button_state|TrayIconEvent::Click{id:"root".into(),position:tauri::PhysicalPosition::new(-104.,1056.),rect,button,button_state};
+        assert_eq!(primary_anchor(&click(MouseButton::Left,MouseButtonState::Up)),Some((-104,1040,1072)));
+        assert_eq!(primary_anchor(&click(MouseButton::Left,MouseButtonState::Down)),None);
+        assert_eq!(primary_anchor(&click(MouseButton::Right,MouseButtonState::Up)),None);
+        assert_eq!(primary_anchor(&click(MouseButton::Middle,MouseButtonState::Up)),None);
+        let double=TrayIconEvent::DoubleClick{id:"root".into(),position:tauri::PhysicalPosition::new(-104.,1056.),rect,button:MouseButton::Left};
+        assert_eq!(primary_anchor(&double),None);
+        // The trailing release still shows Home instead of toggling it shut.
+        assert_eq!(primary_anchor(&click(MouseButton::Left,MouseButtonState::Up)),Some((-104,1040,1072)));
     }
     #[test]
     fn application_tray_icon_has_no_plate_or_border() {

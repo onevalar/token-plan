@@ -14,6 +14,7 @@ final class ClaudeHomeDiscoveryTests: XCTestCase {
         let second = root.path + "/.claude-account2"
         let duplicate = root.path + "/.claude-copy"
         let files = FakeFiles([
+            root.path + "/.tokenplan-account-directories.json": "{\"claude\":[\"\(duplicate)\"]}",
             root.path + "/.claude.json": #"{"oauthAccount":{"accountUuid":"first","organizationUuid":"org1"}}"#,
             second + "/.claude.json": #"{"oauthAccount":{"accountUuid":"second","organizationUuid":"org2","emailAddress":"second@example.com"}}"#,
             duplicate + "/.claude.json": #"{"oauthAccount":{"accountUuid":"first","organizationUuid":"org1"}}"#
@@ -28,8 +29,10 @@ final class ClaudeHomeDiscoveryTests: XCTestCase {
             listClaudeHomeDirectories: { _ in [second, duplicate, root.path + "/.claude-empty"] }
         )
         XCTAssertEqual(assembly.claudeCards.count, 2)
+        XCTAssertEqual(assembly.claudeCards.first { $0.identityKey == "first|org1" }?.configDirectory, duplicate)
         XCTAssertEqual(assembly.claudeCards.first { $0.identityKey == "second|org2" }?.configDirectory, second)
         XCTAssertEqual(assembly.claudeCards.first { $0.identityKey == "second|org2" }?.accountLabel, "second@example.com")
+        XCTAssertTrue(assembly.claudeCards.first { $0.identityKey == "first|org1" }?.additionalLogDirectories.contains(root.path + "/.claude") == true)
         XCTAssertFalse(assembly.claudeCards.contains { $0.allowsUnattributedPiUsage })
     }
 

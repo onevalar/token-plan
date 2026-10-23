@@ -13,7 +13,13 @@ export async function mockDesktop(page:Page,language='zh-Hans',cloud=false,data:
    unregisterCallback:(id:number)=>callbacks.delete(id),
    invoke:async(command:string,args:any)=>{
     if(command==='panel_content_height'){((window as any).__panelHeights??=[]).push(args.height);return;}
-    if(command==='account_login'){((window as any).__loginProviders??=[]).push(args.provider);return {command:'env CLAUDE_CONFIG_DIR=/isolated claude auth login',directory:'/isolated',opened:true};}
+    if(command==='account_setups')return JSON.parse(localStorage.getItem('fixture.setups')??'[]');
+    if(command==='account_setup_create'){
+     const rows=JSON.parse(localStorage.getItem('fixture.setups')??'[]');const index=Number(localStorage.getItem('fixture.setupIndex')??0)+1;localStorage.setItem('fixture.setupIndex',String(index));
+     const setup={id:`.${args.provider}-account${index}`,provider:args.provider,label:args.label,directory:`/isolated/${args.provider}-account${index}`};rows.push(setup);localStorage.setItem('fixture.setups',JSON.stringify(rows));return setup;
+    }
+    if(command==='account_setup_remove'){const rows=JSON.parse(localStorage.getItem('fixture.setups')??'[]');localStorage.setItem('fixture.setups',JSON.stringify(rows.filter((r:any)=>r.id!==args.id)));return;}
+    if(command==='account_login'){((window as any).__loginProviders??=[]).push(args.provider);((window as any).__loginDirectories??=[]).push(args.directory);return {command:`env ${args.provider==='claude'?'CLAUDE_CONFIG_DIR':'CODEX_HOME'}=${args.directory} ${args.provider} ${args.provider==='claude'?'auth ':''}login`,directory:args.directory,opened:true};}
     if(command==='account_directory'){((window as any).__directories??=[]).push(args);if(args.directory==='invalid')throw 'invalid_directory';return;}
     if(command==='open_link'){((window as any).__openedLinks??=[]).push(args.url);return;}
     if(command==='hide'){(window as any).__panelHides=((window as any).__panelHides??0)+1;return;}
@@ -28,6 +34,7 @@ export async function mockDesktop(page:Page,language='zh-Hans',cloud=false,data:
     if(command==='plugin:resources|close')return;
     if(command!=='desktop_request')return;
     ((window as any).__requests??=[]).push(structuredClone(args.request));
+    if(args.request.method==='discover')await (window as any).__discover?.(state);
     if(args.request.method==='refresh'){
      await (window as any).__beforeRefresh?.(state,args.request);
      // A real helper fetches on every refresh, so each target account's fetch time advances; __skipFetch simulates a helper that silently skipped.
@@ -40,6 +47,7 @@ export async function mockDesktop(page:Page,language='zh-Hans',cloud=false,data:
     if(r.method==='tray'&&a)a.tray=r.value;
     if(r.method==='note'&&a)a.note=r.value;
     if(r.method==='remove')state.accounts=state.accounts.filter((a:any)=>a.id!==r.accountId);
+    if(r.method==='metricLayout'&&a)a.metrics=r.value.map((row:any)=>({...a.metrics.find((m:any)=>m.id===row.id),placement:row.placement}));
     if(r.method==='metric'&&a)Object.assign(a.metrics.find((m:any)=>m.id===r.metricId)!,r.value);
     if(r.method==='settings'){
      // Helpers return percentages in the selected display mode, not always used percentages.

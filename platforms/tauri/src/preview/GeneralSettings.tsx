@@ -21,8 +21,11 @@ export function GeneralSettings({state,send,t,busy,language,densityPreference,us
    <SelectRow label={t.appearance} value={state.settings.appearance} disabled={disabled} options={['system','light','dark'].map(value=>({value,label:t[value as 'system']}))} onValueChange={appearance=>settings({appearance})}/>
    <SelectRow label={t.language} value={state.settings.language} disabled={disabled} options={[{value:'system',label:t.system},{value:'en',label:'English'},{value:'zh-Hans',label:'简体中文'},{value:'zh-Hant',label:'繁體中文'},{value:'ja',label:'日本語'},{value:'ko',label:'한국어'}]} onValueChange={language=>settings({language})}/>
   </Group>
+  <Group title={tr('Usage Style')}>
+   <SelectRow label={tr('Apply Style')} value={usageStylePreference.mode} options={[{value:'uniform',label:tr('Unified Style')},{value:'custom',label:tr('Customize by Account')}]} onValueChange={value=>usageStylePreference.changeMode(value as 'uniform'|'custom')}/>
+   {usageStylePreference.mode==='uniform'?<UsageStylePicker value={usageStylePreference.style} onChange={usageStylePreference.changeStyle} tr={tr}/>:<p className="group-description">{tr('Open an account, then choose Edit Home Display to set its usage style.')}</p>}
+  </Group>
   <Group title={tr('Home Page')}>
-   <UsageStylePicker value={usageStylePreference.style} onChange={usageStylePreference.changeStyle} tr={tr}/>
    <SelectRow label={tr('Density')} value={densityPreference.density} options={[{value:'compact',label:tr('Compact')},{value:'comfortable',label:tr('Comfortable')}]} onValueChange={value=>densityPreference.changeDensity(value as Density)}/>
    <ToggleRow label={t.showRemaining} checked={state.settings.showRemaining} disabled={disabled} onCheckedChange={showRemaining=>settings({showRemaining})}/>
   </Group>

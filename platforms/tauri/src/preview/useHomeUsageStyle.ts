@@ -1,22 +1,38 @@
-import {useState} from 'react';
+import {useRef,useState} from 'react';
 import {isHomeUsageStyle,type HomeUsageStyle} from '../homeUsage';
 
-const key='tokenplan.homeUsageStyle';
-type Preference={style:HomeUsageStyle;error:string};
+export const homeStyleKey='tokenplan.homeUsagePreferences';
+export type HomeStyleMode='uniform'|'custom';
+export type HomeStylePreferences={mode:HomeStyleMode;style:HomeUsageStyle;customDefault:HomeUsageStyle;accounts:Record<string,HomeUsageStyle>;initialized:boolean};
+export function readHomeStyles(storage:Pick<Storage,'getItem'>):HomeStylePreferences {
+ const raw=storage.getItem(homeStyleKey);
+ if(raw){
+  const p=JSON.parse(raw);
+  if(!p||!['uniform','custom'].includes(p.mode)||!isHomeUsageStyle(p.style)||!isHomeUsageStyle(p.customDefault)||typeof p.initialized!=='boolean'||!p.accounts||typeof p.accounts!=='object'||Array.isArray(p.accounts)||Object.values(p.accounts).some(v=>typeof v!=='string'||!isHomeUsageStyle(v)))throw new Error('Invalid Home styles');
+  return p;
+ }
+ const legacy=storage.getItem('tokenplan.homeUsageStyle')??'bars';
+ if(!isHomeUsageStyle(legacy))throw new Error('Invalid Home style');
+ return {mode:'uniform',style:legacy,customDefault:legacy,accounts:{},initialized:false};
+}
+export function homeStyleFor(p:HomeStylePreferences,id:string):HomeUsageStyle {return p.mode==='uniform'?p.style:p.accounts[id]??p.customDefault;}
+export function homeStyleMode(p:HomeStylePreferences,mode:HomeStyleMode):HomeStylePreferences {
+ return {...p,mode,...mode==='custom'&&!p.initialized?{initialized:true,customDefault:p.style}:{}};
+}
 export function useHomeUsageStyle() {
- const [preference,setPreference]=useState<Preference>(()=>{
-  try {
-   const value=localStorage.getItem(key);
-   if(value!==null&&!isHomeUsageStyle(value))throw new Error('Unknown Home usage style');
-   return {style:value??'bars',error:''};
-  }catch(error){
-   console.error('Home usage style could not be read',error);
-   return {style:'bars',error:'Could not load the Home usage style. Choose a style to save it again.'};
-  }
+ const [error,setError]=useState('');
+ const [preference,setPreference]=useState<HomeStylePreferences>(()=>{
+  try{return readHomeStyles(localStorage);}catch(e){console.error('Home styles could not be read',e);setError('Could not load the Home usage style. Choose a style to save it again.');return {mode:'uniform',style:'bars',customDefault:'bars',accounts:{},initialized:false};}
  });
- const changeStyle=(style:HomeUsageStyle)=>{
-  try {localStorage.setItem(key,style);setPreference({style,error:''});}
-  catch(error){console.error('Home usage style could not be saved',error);setPreference(previous=>({...previous,error:'Could not save. Try again.'}));}
+ const current=useRef(preference);current.current=preference;
+ const persist=(next:HomeStylePreferences)=>{localStorage.setItem(homeStyleKey,JSON.stringify(next));current.current=next;setPreference(next);setError('');};
+ const change=(next:HomeStylePreferences)=>{try{persist(next);}catch(e){console.error('Home styles could not be saved',e);setError('Could not save. Try again.');}};
+ // Check storage before saving metrics; a rejected helper request restores the previous style record.
+ const saveAccount=async(id:string,style:HomeUsageStyle,saveMetrics:()=>Promise<unknown>)=>{
+  const previous=localStorage.getItem(homeStyleKey),next={...current.current,accounts:{...current.current.accounts,[id]:style}};
+  localStorage.setItem(homeStyleKey,JSON.stringify(next));
+  try{await saveMetrics();current.current=next;setPreference(next);setError('');}
+  catch(e){try{if(previous===null)localStorage.removeItem(homeStyleKey);else localStorage.setItem(homeStyleKey,previous);}catch(rollback){console.error('Home style rollback failed',rollback);setError('Could not save. Try again.');}throw e;}
  };
- return {...preference,changeStyle};
+ return {...preference,error,styleFor:(id:string)=>homeStyleFor(preference,id),changeStyle:(style:HomeUsageStyle)=>change({...current.current,style}),changeMode:(mode:HomeStyleMode)=>change(homeStyleMode(current.current,mode)),saveAccount};
 }

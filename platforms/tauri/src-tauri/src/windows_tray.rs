@@ -1,33 +1,9 @@
 use crate::{model::DesktopState,tray};
-use tauri::{Manager,Emitter,menu::{Menu,MenuItem}};
-use std::{sync::Mutex,time::{Instant,Duration}};
+use tauri::{Manager,menu::{Menu,MenuItem}};
 
-pub struct WindowsTray {clicks:Mutex<tray::Clicks>,clock:Instant}
-impl Default for WindowsTray {fn default()->Self{Self{clicks:Mutex::new(Default::default()),clock:Instant::now()}}}
-#[link(name="user32")]
-extern "system" {fn GetDoubleClickTime()->u32;}
-fn interval()->u64 {unsafe{GetDoubleClickTime().max(1) as u64}}
-pub fn primary(app:&tauri::AppHandle) {
-    let state=app.state::<WindowsTray>();
-    let Some(revision)=state.clicks.lock().unwrap().primary(state.clock.elapsed().as_millis() as u64) else{return};
-    let handle=app.clone();
-    tauri::async_runtime::spawn(async move {
-        tokio::time::sleep(Duration::from_millis(interval())).await;
-        let state=handle.state::<WindowsTray>();
-        if !state.clicks.lock().unwrap().current(revision){return;}
-        if let Some(icon)=handle.tray_by_id("root") {
-            // Use the tray's own native menu window; Home stays hidden on a single click.
-            #[allow(deprecated)]
-            if let Err(error)=icon.with_inner_tray_icon(|inner|inner.show_menu()) {
-                eprintln!("Tray menu failed: {error}");let _=handle.emit("desktop-error","tray_failed");
-            }
-        }
-    });
-}
-pub fn double(app:&tauri::AppHandle) {
-    let state=app.state::<WindowsTray>();
-    state.clicks.lock().unwrap().double(state.clock.elapsed().as_millis() as u64,interval());
-    crate::show_home(app);
+pub fn open_home(app:&tauri::AppHandle) {
+    let anchor=app.tray_by_id("root").and_then(|icon|icon.rect().ok().flatten()).and_then(tray::rect_anchor);
+    crate::show_home_at(app,anchor);
 }
 
 /// Windows has one permanent application icon; quotas belong to the main page.

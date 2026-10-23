@@ -1,8 +1,8 @@
 export const copy = {
   "en": {
-    "configure": "Account Management",
+    "configure": "Subscription Management",
     "settings": "General Settings",
-    "history": "Usage History",
+    "history": "Usage Statistics",
     "usage": "Usage",
     "discover": "Find accounts",
     "enabled": "Show account",
@@ -59,9 +59,9 @@ export const copy = {
     "expires": "Expires"
   },
   "zh-Hans": {
-    "configure": "账号管理",
+    "configure": "订阅管理",
     "settings": "通用设置",
-    "history": "用量历史",
+    "history": "用量统计",
     "usage": "用量",
     "discover": "查找账号",
     "enabled": "显示账号",
@@ -118,9 +118,9 @@ export const copy = {
     "expires": "到期时间"
   },
   "zh-Hant": {
-    "configure": "帳號管理",
+    "configure": "訂閱管理",
     "settings": "一般設定",
-    "history": "用量記錄",
+    "history": "用量統計",
     "usage": "用量",
     "discover": "尋找帳號",
     "enabled": "顯示帳號",
@@ -177,9 +177,9 @@ export const copy = {
     "expires": "到期時間"
   },
   "ja": {
-    "configure": "アカウント管理",
+    "configure": "サブスクリプション管理",
     "settings": "一般設定",
-    "history": "使用履歴",
+    "history": "使用量の統計",
     "usage": "使用量",
     "discover": "アカウントを検索",
     "enabled": "アカウントを表示",
@@ -236,9 +236,9 @@ export const copy = {
     "expires": "有効期限"
   },
   "ko": {
-    "configure": "계정 관리",
+    "configure": "구독 관리",
     "settings": "일반 설정",
-    "history": "사용 기록",
+    "history": "사용량 통계",
     "usage": "사용량",
     "discover": "계정 찾기",
     "enabled": "계정 표시",

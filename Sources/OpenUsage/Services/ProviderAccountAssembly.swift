@@ -5,7 +5,7 @@ struct ClaudeAccountCard: Equatable, Sendable {
     let identityKey: String
     let organizationID: String?
     let displayName: String
-    let usesDesktopCredentials: Bool
+    var usesDesktopCredentials: Bool
     let allowsUnattributedPiUsage: Bool
     var accountLabel: String? = nil
     var configDirectory: String? = nil
@@ -263,9 +263,18 @@ struct ProviderAccountAssembly {
             ))
             identityKeys[record.id] = account.identityKey
         }
+        let registeredHomes = Set(AccountDirectoryRegistry.paths(family: "claude", files: observer.files, home: observer.homeDirectory()))
         for home in homes {
-            guard !cards.contains(where: { $0.identityKey == home.identity }),
-                  let record = records.first(where: { $0.family == "claude" && $0.identityKey == home.identity && !$0.removedTombstone })
+            // An independently signed-in directory remains usable when the default CLI changes accounts.
+            if let index = cards.firstIndex(where: { $0.identityKey == home.identity }) {
+                if cards[index].configDirectory == nil && registeredHomes.contains(home.directory) {
+                    cards[index].configDirectory = home.directory
+                    cards[index].swapAccount = nil
+                    cards[index].usesDesktopCredentials = false
+                }
+                continue
+            }
+            guard let record = records.first(where: { $0.family == "claude" && $0.identityKey == home.identity && !$0.removedTombstone })
             else { continue }
             cards.append(ClaudeAccountCard(
                 id: record.id, identityKey: home.identity,
@@ -281,7 +290,9 @@ struct ProviderAccountAssembly {
             cards[index].accountLabel = Self.accountEmail(from: label)
                 ?? Self.accountEmail(from: records.first { $0.id == cards[index].id }?.label)
 
-            cards[index].additionalLogDirectories = swapAccounts.map(\.sessionDirectory)
+            let accountSources = observations.first { $0.family == "claude" && $0.identityKey == cards[index].identityKey }?.sources ?? []
+            let loginHomes = accountSources.filter { $0.kind == .claudeHome || $0.holdsDefaultSource }.compactMap(\.anchor)
+            cards[index].additionalLogDirectories = Array(Set(swapAccounts.map(\.sessionDirectory) + loginHomes)).sorted()
         }
         return ProviderAccountAssembly(identityKeysByCard: identityKeys, claudeCards: cards, codex: codex)
     }

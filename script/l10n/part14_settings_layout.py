@@ -14,4 +14,7 @@ T = {
  'Change in General Settings': ('在通用设置中更改', '在一般設定中變更', '一般設定で変更', '일반 설정에서 변경'),
  'Choose Which Metrics Appear on Home': ('调整首页显示哪些指标', '調整首頁顯示哪些指標', 'ホームに表示する指標を選ぶ', '홈에 표시할 지표 선택'),
  'Choose which accounts appear on Home. The same order is used in the menu bar.': ('选择要在首页显示的账号。菜单栏也按这里的顺序排列。', '選擇要在首頁顯示的帳號。選單列也依這裡的順序排列。', 'ホームに表示するアカウントを選びます。メニューバーもこの順序で並びます。', '홈에 표시할 계정을 선택하세요. 메뉴 막대도 이 순서를 따릅니다.'),
+ 'Edit Home Display': ('编辑首页显示', '編輯首頁顯示', 'ホームの表示を編集', '홈 표시 편집'),
+ 'Changes apply after you confirm. Cancel keeps your previous display.': ('点击确定后应用修改；取消将保留原来的显示配置。', '點擊確定後套用修改；取消將保留原來的顯示設定。', '確定すると変更が適用されます。キャンセルすると元の表示が維持されます。', '확인하면 변경 사항이 적용됩니다. 취소하면 기존 표시 설정이 유지됩니다.'),
+ 'Confirm Changes': ('确定', '確定', '確定', '확인'),
 }

@@ -67,7 +67,7 @@ pub async fn desktop_request(app: tauri::AppHandle, request: Value) -> Result<De
     let bridge=app.state::<Bridge>();
     let _operation=bridge.operations.lock().await;
     let method = request["method"].as_str().ok_or("request_failed")?;
-    if !["state","refresh","discover","enabled","remove","tray","metric","move","settings","key","note","notificationPermission"].contains(&method) { return Err("request_failed".into()); }
+    if !["state","refresh","discover","enabled","remove","tray","metric","metricLayout","move","settings","key","note","notificationPermission"].contains(&method) { return Err("request_failed".into()); }
     #[cfg(not(target_os="macos"))]
     if method=="notificationPermission" {return app.state::<Bridge>().call(json!({"method":"state"})).await;}
     let requested_shortcut=request["value"]["shortcut"].as_str().map(str::to_owned).filter(|_|method=="settings");

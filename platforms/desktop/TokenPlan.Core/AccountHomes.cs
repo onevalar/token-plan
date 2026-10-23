@@ -1,7 +1,7 @@
 using System.Text.Json;
 namespace TokenPlan.Core;
 
-public record AccountHome(string Home, string Label, string? AuthFile = null, bool Encoded = false, bool CanRefresh = true, string? Identity = null);
+public record AccountHome(string Home, string Label, string? AuthFile = null, bool Encoded = false, bool CanRefresh = true, string? Identity = null, bool Registered = false);
 public static class AccountHomes
 {
     public static IReadOnlyList<AccountHome> Discover(string family, string home, string defaultHome, Func<string, string?>? environment = null)
@@ -13,7 +13,7 @@ public static class AccountHomes
             if (new FileInfo(registrations).Length > 1024 * 1024) throw new InvalidDataException();
             var saved = JsonSerializer.Deserialize<Dictionary<string, string[]>>(File.ReadAllText(registrations)) ?? [];
             foreach (var path in saved.GetValueOrDefault(family, []).Take(64))
-                if (Path.IsPathFullyQualified(path)) candidates.Add(new(path, Path.GetFileName(path)));
+                if (Path.IsPathFullyQualified(path)) candidates.Add(new(path, Path.GetFileName(path), Registered: true));
         }
         if (family == "claude")
         {

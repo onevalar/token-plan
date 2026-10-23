@@ -5,7 +5,7 @@ import {largeDesktop} from './fixtures/largeDesktop';
 const noOverflow=async(page:Page)=>expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
 async function configure(page:Page) {
  await page.getByRole('button',{name:'更多',exact:true}).click();
- await page.getByRole('menuitem',{name:'账号管理',exact:true}).click();
+ await page.getByRole('menuitem',{name:'订阅管理',exact:true}).click();
  await expect(page.getByRole('menu',{includeHidden:true})).toHaveCount(0);
 }
 for(const colorScheme of ['light','dark'] as const)for(const width of [390,480]){
@@ -35,7 +35,7 @@ for(const colorScheme of ['light','dark'] as const)for(const width of [390,480])
   await page.screenshot({path:info.outputPath('configuration.png'),fullPage:true,animations:'disabled'});
   await page.getByRole('button',{name:'返回',exact:true}).click();
   await page.getByRole('button',{name:'更多',exact:true}).click();
-  await page.getByRole('menuitem',{name:'用量历史',exact:true}).click();
+  await page.getByRole('menuitem',{name:'用量统计',exact:true}).click();
   await expect(page.locator('.day-record')).toHaveCount(7);
   await expect(page.locator('.history-entry')).toHaveCount(0);
   await expect(page.locator('.pagination').first()).toContainText('1 / 5');
@@ -56,7 +56,7 @@ for(const colorScheme of ['light','dark'] as const)for(const width of [390,480])
   await page.getByRole('button',{name:'Cursor',exact:true}).click();
   await expect(page.locator('.preview-page:not([hidden]) .configured-account')).toHaveCount(1);
   await page.getByRole('button',{name:'添加 Cursor',exact:true}).click();
-  await expect(page.getByRole('heading',{level:1})).toHaveText('账号管理');
+  await expect(page.getByRole('heading',{level:1})).toHaveText('订阅管理');
   await expect(page.getByRole('status')).toContainText('Cursor');
   await expect(page.locator('.preview-page:not([hidden]) .configured-account')).toHaveCount(8);
  });
@@ -68,7 +68,7 @@ test('service movement skips saved inactive accounts',async({page})=>{
  await mockDesktop(page,'zh-Hans',false,data);
  await page.goto('/');await configure(page);
  await page.getByRole('button',{name:'排序',exact:true}).click();
- await page.locator('.configured-account').nth(1).getByRole('button',{name:/上移/}).click();
+ await page.locator('.configured-account').nth(1).getByRole('button',{name:/拖动排序/}).press('ArrowUp');
  await expect(page.locator('.configured-account').first()).toContainText('second.with.a.long.address@example.com');
  await page.getByRole('button',{name:'返回',exact:true}).click();
  await expect(page.locator('.account-block').first()).toContainText('second.with.a.long.address@example.com');

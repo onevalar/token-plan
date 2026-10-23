@@ -48,6 +48,7 @@ fn sample(m:&Metric,remaining:bool,now:i64)->Option<(f64,i8,Option<i64>)> {
     Some((used,bucket,reset))
 }
 pub async fn evaluate(app:&tauri::AppHandle,state:&DesktopState) {
+    if option_env!("VITE_MAC_NAVIGATION_PREVIEW") == Some("1") {return;}
     let alerts=app.state::<Alerts>();let mut stored=alerts.0.lock().await;
     let language=if state.settings.language=="system"{&state.settings.locale}else{&state.settings.language};
     let mut present=std::collections::HashSet::new();

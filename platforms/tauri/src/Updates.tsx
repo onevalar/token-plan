@@ -1,14 +1,16 @@
 import {useState,useEffect,useRef,useCallback} from 'react';
 import {check,type Update} from '@tauri-apps/plugin-updater';
 import {relaunch} from '@tauri-apps/plugin-process';
+import {providerText} from './providerText';
 import {Button} from './components/arc/button/button';
 import {Switch} from './components/arc/switch/switch';
 import type {Copy} from './copy';
 export function useUpdater(automatic:boolean) {
  const update=useRef<Update|null>(null),alive=useRef(true),running=useRef(false);
- const [status,setStatus]=useState<'idle'|'checking'|'available'|'latest'|'installing'|'checkError'|'installError'>('idle');
+ const [status,setStatus]=useState<'preview'|'idle'|'checking'|'available'|'latest'|'installing'|'checkError'|'installError'>('idle');
  const [version,setVersion]=useState(''),[progress,setProgress]=useState<number|null>(null);
  const checkNow=useCallback(async(background=false)=>{
+  if(import.meta.env.VITE_MAC_NAVIGATION_PREVIEW==='1'){setStatus('preview');return;}
   if(running.current)return;running.current=true;
   if(!background)setStatus('checking');
   try {
@@ -27,6 +29,7 @@ export function useUpdater(automatic:boolean) {
   return()=>{clearTimeout(start);clearInterval(timer);};
  },[automatic,checkNow]);
  const install=async()=>{
+  if(import.meta.env.VITE_MAC_NAVIGATION_PREVIEW==='1')return;
   if(!update.current||running.current)return;running.current=true;setStatus('installing');setProgress(null);
   let total:number|undefined,downloaded=0;
   try {
@@ -43,7 +46,7 @@ export function useUpdater(automatic:boolean) {
 export function Updates({t,updater:u,automatic,onAutomatic,showHeading=true}:{showHeading?:boolean;t:Copy;updater:ReturnType<typeof useUpdater>;automatic:boolean;onAutomatic:(value:boolean)=>void}) {
  return <section className="settings-list">{showHeading&&<h2>{t.checkUpdates}</h2>}
   <Switch label={t.autoUpdates} checked={automatic} onCheckedChange={onAutomatic}/>
-  <p role="status">{u.status==='available'?`${t.updateAvailable} ${u.version}`:u.status==='checking'?t.updateCheck:u.status==='latest'?t.latest:u.status==='checkError'?t.checkError:u.status==='installError'?t.installError:u.status==='installing'?t.installing:''}</p>
+  <p role="status">{u.status==='preview'?providerText('Updates are disabled in the design preview.',document.documentElement.lang||navigator.language):u.status==='available'?`${t.updateAvailable} ${u.version}`:u.status==='checking'?t.updateCheck:u.status==='latest'?t.latest:u.status==='checkError'?t.checkError:u.status==='installError'?t.installError:u.status==='installing'?t.installing:''}</p>
   {u.status==='installing'&&<progress aria-label={t.installing} max={100} value={u.progress??undefined}/>}
   <Button loading={u.status==='checking'} disabled={u.status==='installing'} onClick={()=>{void u.checkNow();}}>{t.checkUpdates}</Button>
   {(u.status==='available'||u.status==='installError')&&<Button onClick={()=>{void u.install();}}>{t.install}</Button>}

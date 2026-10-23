@@ -26,6 +26,10 @@ try {
   // Synthetic quota results exercise the actual bridge cap, not just the UI switch.
   var cache=(System.Collections.Concurrent.ConcurrentDictionary<string,ProviderResult>)typeof(DesktopSession).GetField("results",System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic)!.GetValue(session)!;
   cache["antigravity"]=new("antigravity","Antigravity",AntigravityUsage.Parse("""{"groups":[{"buckets":[{"bucketId":"gemini-5h","remainingFraction":0.8},{"bucketId":"gemini-weekly","remainingFraction":0.6},{"bucketId":"gemini-argon-wtu-weekly","remainingFraction":0.4}]}]}""",DateTimeOffset.UtcNow),null);
+  await Call(session,new{method="enabled",accountId="deepseek",value=true});
+  state=await Call(session,new{method="remove",accountId="deepseek"});
+  var detached=state.GetProperty("accounts").EnumerateArray().Single(a=>a.GetProperty("id").GetString()=="deepseek");
+  Assert(!detached.GetProperty("enabled").GetBoolean() && !detached.GetProperty("added").GetBoolean(),"Services without separate saved identities can be removed from subscriptions");
   var quotaState=await Call(session,new{method="state"});
   var agMetrics=quotaState.GetProperty("accounts").EnumerateArray().Single(a=>a.GetProperty("id").GetString()=="antigravity").GetProperty("metrics").EnumerateArray().ToArray();
   Assert(agMetrics.Select(m=>m.GetProperty("periodSeconds").GetDouble()).SequenceEqual(new[]{18000d,604800d,604800d}),"Antigravity window periods reach the shared frontend");
@@ -33,6 +37,17 @@ try {
   state=await Call(session,new{method="metric",accountId="claude",metricId="c",value=new{pinned=true}});
   Assert(state.GetProperty("accounts").EnumerateArray().Single(a=>a.GetProperty("id").GetString()=="claude").GetProperty("metrics").EnumerateArray().Count(m=>m.GetProperty("pinned").GetBoolean())==3,"Bridge accepts third pin");
   try { await Call(session,new{method="metric",accountId="claude",metricId="d",value=new{pinned=true}}); throw new Exception("Fourth pin accepted"); } catch(InvalidDataException) { }
+  var draft = new[] { new { id="d", placement="hidden" }, new { id="c", placement="details" }, new { id="b", placement="home" }, new { id="a", placement="home" } };
+  state=await Call(session,new{method="metricLayout",accountId="claude",value=draft});
+  var edited=state.GetProperty("accounts").EnumerateArray().Single(a=>a.GetProperty("id").GetString()=="claude").GetProperty("metrics").EnumerateArray().ToArray();
+  Assert(edited.Select(m=>m.GetProperty("id").GetString()).SequenceEqual(draft.Select(m=>m.id)),"Whole layout order is committed");
+  Assert(edited.Select(m=>m.GetProperty("placement").GetString()).SequenceEqual(draft.Select(m=>m.placement)),"Whole layout placements are committed");
+  var savedLayout=File.ReadAllText(file);
+  foreach(var invalid in new[]{draft.Take(3).ToArray(),new[]{draft[0],draft[0],draft[2],draft[3]},draft.Select(m=>new{id=m.id,placement=m.id=="a"?"invalid":"home"}).ToArray()}) {
+    try { await Call(session,new{method="metricLayout",accountId="claude",value=invalid});throw new Exception("Invalid metric draft accepted"); } catch(InvalidDataException) { }
+    Assert(File.ReadAllText(file)==savedLayout,"Invalid draft does not partly save");
+  }
+  Assert(Preferences.Load(file).MetricOrder["claude"].SequenceEqual(draft.Select(m=>m.id)),"Layout order persists across reload");
   var pinned = new Preferences().Pin("claude","a",true,3).Pin("claude","b",true,3).Pin("claude","c",true,3).Pin("claude","d",true,3);
   Assert(pinned.PinnedMetrics["claude"].SequenceEqual(new[]{"a","b","c"}),"Three pins, fourth rejected");
   pinned.Save(Path.Combine(root,"pins.json"));

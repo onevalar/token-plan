@@ -9,7 +9,7 @@ public record UsageWindow(string Label, double UsedPercent, DateTimeOffset? Rese
     public string FormattedAmount => (Currency == "CNY" ? "¥" : Currency == "USD" ? "$" : "") + (Currency == "COUNT" ? Amount?.ToString("N0") : Amount?.ToString("N2")) + (Limit != null ? " / " + Limit.Value.ToString("N2") : "");
 }
 public record UsageSnapshot(string Id, string Name, string? Plan, IReadOnlyList<UsageWindow> Windows, DateTimeOffset FetchedAt);
-public record ProviderResult(string Id, string Name, UsageSnapshot? Snapshot, string? ErrorKey, string? CredentialFingerprint = null, string? AccountKey = null, string? AccountEmail = null, string? AccountIdentity = null)
+public record ProviderResult(string Id, string Name, UsageSnapshot? Snapshot, string? ErrorKey, string? CredentialFingerprint = null, string? AccountKey = null, string? AccountEmail = null, string? AccountIdentity = null, string? LoginDirectory = null)
 {
     public string SettingsKey => AccountKey ?? Id;
     public ProviderResult PreserveLastSuccess(ProviderResult? previous) => Snapshot == null && ErrorKey != null && CredentialFingerprint != null && previous?.Id == Id && previous.CredentialFingerprint == CredentialFingerprint && previous.Snapshot != null ? this with { Snapshot = previous.Snapshot } : this;

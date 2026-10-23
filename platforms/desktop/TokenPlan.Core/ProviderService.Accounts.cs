@@ -11,11 +11,11 @@ public sealed partial class ProviderService
         var sources = AccountHomes.Discover(family, home, family == "claude" ? claudeHome : codexHome);
         var output = new List<ProviderResult>();
         var seen = new HashSet<string>(StringComparer.Ordinal);
-        if (family == "claude" && ClaudeAccountMetadata.Read(claudeHome, userHome) is { } primary) seen.Add(primary.Identity);
+        var primaryIdentity = family == "claude" ? ClaudeAccountMetadata.Read(claudeHome, userHome)?.Identity : null;
         foreach (var source in sources)
         {
             var metadata = family == "claude" && source.AuthFile == null ? ClaudeAccountMetadata.Read(source.Home, userHome) : null;
-            if (metadata != null && !seen.Add(metadata.Identity)) continue;
+            if (metadata != null && (metadata.Identity == primaryIdentity && !source.Registered || !seen.Add(metadata.Identity))) continue;
             var key = family + "\0" + (source.AuthFile ?? source.Home);
             if (!accountServices.TryGetValue(key, out var service))
             {
@@ -27,7 +27,7 @@ public sealed partial class ProviderService
             service.IsAccountRemoved = IsAccountRemoved;
             var result = await service.Refresh(family, cancellation);
             if (IsAccountRemoved(result)) continue;
-            output.Add(result with { Name = ProviderCatalog.Get(family).Name + " · " + source.Label, AccountKey = family + ":" + Fingerprint(result.AccountIdentity ?? key), AccountEmail = result.AccountEmail ?? (source.Encoded ? source.Label : null) });
+            output.Add(result with { Name = ProviderCatalog.Get(family).Name + " · " + source.Label, AccountKey = family + ":" + Fingerprint(result.AccountIdentity ?? key), LoginDirectory = source.AuthFile == null && result.AccountIdentity != null ? Path.GetFullPath(source.Home) : null, AccountEmail = result.AccountEmail ?? (source.Encoded ? source.Label : null) });
         }
         return output.DistinctBy(r => r.CredentialFingerprint ?? r.Name).ToArray();
     }

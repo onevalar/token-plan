@@ -121,7 +121,8 @@ for(const language of ['en','zh-Hans','zh-Hant','ja','ko'])test(`quota labels an
   await expect(rows.nth(3).locator('.metric-scope')).toHaveText('Sonnet 4.5 · Extended Context');
   await page.screenshot({path:info.outputPath('quota-comfortable.png'),animations:'disabled'});
   await page.getByRole('button',{name:'Claude first@example.com',exact:true}).click();
-  await page.getByRole('button',{name:'账号设置',exact:true}).click();
+
+  await page.getByRole('button',{name:'编辑首页显示',exact:true}).click();
   await expect(page.locator('.placement-row > span').filter({hasText:'Sonnet 4.5 · Extended Context · 1w'})).toBeVisible();
  }
 });
@@ -129,15 +130,17 @@ test('account settings allow zero home metrics and preserve another account',asy
  await page.setViewportSize({width:390,height:850});
  await mockDesktop(page);await page.goto('/');
  await page.getByRole('button',{name:'Claude first@example.com',exact:true}).click();
- await page.getByRole('button',{name:'账号设置',exact:true}).click();
+
+ await page.getByRole('button',{name:'编辑首页显示',exact:true}).click();
  for(const row of await page.locator('.placement-row').all()){
   await row.getByRole('combobox').click();await page.getByRole('option',{name:'仅详情',exact:true}).click();
  }
+ await page.getByRole('button',{name:'确定',exact:true}).click();
  await page.getByRole('button',{name:'返回',exact:true}).click();
  await expect(page.locator('.account-block').first().locator('.metric')).toHaveCount(0);
  await expect(page.locator('.account-block').nth(1).locator('.metric')).toHaveCount(2);
  // Showing or hiding an account belongs to Account Management only.
- await page.getByRole('button',{name:'更多',exact:true}).click();await page.getByRole('menuitem',{name:'账号管理',exact:true}).click();
+ await page.getByRole('button',{name:'更多',exact:true}).click();await page.getByRole('menuitem',{name:'订阅管理',exact:true}).click();
  await page.getByRole('switch',{name:'显示账号 Claude first@example.com',exact:true}).click();
  await page.getByRole('button',{name:'返回',exact:true}).click();
  await expect(page.getByText('first@example.com',{exact:true})).toHaveCount(0);
@@ -155,9 +158,10 @@ test('ring and percentage keep the same accounts and removal is confirmed',async
  await expect(page.getByRole('option',{name:'百分比',exact:true})).toHaveCount(0);
  await page.screenshot({path:info.outputPath('settings.png'),fullPage:true});
  await page.getByRole('button',{name:'返回',exact:true}).click();
- await page.getByRole('button',{name:'Claude first@example.com',exact:true}).click();await page.getByRole('button',{name:'账号设置',exact:true}).click();
+ await page.getByRole('button',{name:'Claude first@example.com',exact:true}).click();
  await page.getByRole('button',{name:'移除账号',exact:true}).click();
- await expect(page.getByText('终端登录与历史记录会保留。').first()).toBeVisible();
+ await expect(page.getByText('终端登录与历史记录会保留。')).toHaveCount(0);
+ await expect(page.getByRole('button',{name:'取消',exact:true})).toBeVisible();
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
  await page.getByRole('button',{name:'取消',exact:true}).click();
  await page.getByRole('button',{name:'返回',exact:true}).click();await expect(page.getByText('first@example.com',{exact:true})).toBeVisible();
@@ -204,7 +208,7 @@ for(const [locale,settings] of [['en','General Settings'],['zh-Hant','一般設�
 test('confirmed account removal leaves contiguous tray numbering',async({page})=>{
  await mockDesktop(page);await page.goto('/');
  await page.getByRole('button',{name:'Claude first@example.com',exact:true}).click();
- await page.getByRole('button',{name:'账号设置',exact:true}).click();
+
  await page.getByRole('button',{name:'移除账号',exact:true}).click();
  // Arc intentionally ignores a confirming press within its 280 ms accidental-double-click guard.
  await page.waitForTimeout(300);
@@ -218,9 +222,9 @@ test('confirmed account removal leaves contiguous tray numbering',async({page})=
 
 test('service order is reflected in the homepage',async({page})=>{
  await mockDesktop(page);await page.goto('/');
- await page.getByRole('button',{name:'更多',exact:true}).click();await page.getByRole('menuitem',{name:'账号管理',exact:true}).click();
+ await page.getByRole('button',{name:'更多',exact:true}).click();await page.getByRole('menuitem',{name:'订阅管理',exact:true}).click();
  await page.getByRole('button',{name:'排序',exact:true}).click();
- await page.locator('.configured-account').nth(1).getByRole('button',{name:/上移/}).click();
+ await page.locator('.configured-account').nth(1).getByRole('button',{name:/拖动排序/}).press('ArrowUp');
  await page.getByRole('button',{name:'返回',exact:true}).click();
  await expect(page.locator('.account-block').first()).toContainText('second.with.a.long.address@example.com');
 });
@@ -241,7 +245,7 @@ test('confirmation timeout pauses for keyboard focus, including internal focus m
  const previousControl=browserName==='webkit'&&process.platform==='darwin'?'Alt+Shift+Tab':'Shift+Tab';
  await mockDesktop(page);await page.goto('/');
  await page.getByRole('button',{name:'Claude first@example.com',exact:true}).click();
- await page.getByRole('button',{name:'账号设置',exact:true}).click();
+
  await page.mouse.move(0,0);
  await page.getByRole('button',{name:'移除账号',exact:true}).focus();await page.keyboard.press('Enter');
  const control=page.locator('.danger-zone [data-mode]');
@@ -269,7 +273,7 @@ test('reduced motion stops the pending spinner without hiding its status',async(
  });
  await page.goto('/');
  await page.getByRole('button',{name:'Claude first@example.com',exact:true}).click();
- await page.getByRole('button',{name:'账号设置',exact:true}).click();
+
  await page.getByRole('button',{name:'移除账号',exact:true}).click();
  await page.waitForTimeout(300);
  await page.getByRole('group').getByRole('button',{name:'移除账号',exact:true}).click();

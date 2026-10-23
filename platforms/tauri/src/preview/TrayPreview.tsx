@@ -29,7 +29,6 @@ export function TrayGlyph({family,metrics,badge,style='ring',position='inside'}:
 export function RingLayoutPicker({value,onChange,disabled,tr}:{value:string;onChange:(value:string)=>void;disabled:boolean;tr:(s:string)=>string}) {
  const metric=(percent:number):TrayMetric=>({percent,hasData:true,amount:null,unit:'percent'});
  return <div className="ring-layout-picker">
-  <h3>{tr('Icon Position')}</h3>
   <div className="ring-layout-options" role="group" aria-label={tr('Icon Position')}>
    {(['inside','left'] as const).map(position=><Button key={position} variant="secondary" className="ring-layout-option" aria-pressed={value===position} disabled={disabled} onClick={()=>onChange(position)}>
     <span className="ring-layout-card-content"><TrayGlyph family="claude" position={position} metrics={(position==='inside'?[65,35]:[65,40,20]).map(metric)}/>

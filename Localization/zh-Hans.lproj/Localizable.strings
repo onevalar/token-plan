@@ -58,9 +58,12 @@
 "About" = "关于";
 "About TokenPlan" = "关于 TokenPlan";
 "Account" = "账号";
+"Account Actions" = "账号操作";
 "Account Details" = "账号信息";
 "Account Management" = "账号管理";
+"Account Note (Optional)" = "账号备注（可选）";
 "Account Settings" = "账号设置";
+"Account connected." = "账号已连接。";
 "Account identified. Enable it and refresh to load usage." = "账号已识别，启用并刷新后可读取用量。";
 "Account kept. Its login could not be identified. Check the configuration directory and access permissions, then detect again." = "账号已保留，但暂未识别到对应登录。请检查配置目录和访问权限后重新检测。";
 "Account saved. Reconnect its login, then detect accounts again." = "账号已保留。请重新连接登录后，再检测账号。";
@@ -88,6 +91,7 @@
 "Alert when a limit is projected to finish with little left." = "预计额度所剩无几时提醒。";
 "All Providers" = "全部提供方";
 "All accounts are hidden from Home. You can show them again in Account Management." = "所有账号都已在首页隐藏，可在“账号管理”中重新显示。";
+"All accounts are hidden from Home. You can show them again in Subscription Management." = "所有账号都已在首页隐藏，可在订阅管理中重新显示。";
 "All services" = "全部服务";
 "Allow Notifications" = "允许通知";
 "Allow TokenPlan notifications in system settings, then try again." = "请在系统设置中允许 TokenPlan 通知，然后重试。";
@@ -109,6 +113,7 @@
 "Appearance" = "外观";
 "Appearance and Language" = "外观与语言";
 "Application" = "应用信息";
+"Apply Style" = "应用方式";
 "Argon Weekly" = "Argon 每周";
 "Assign tokenplan --toggle in your desktop's keyboard settings." = "可在桌面的键盘设置中为 tokenplan --toggle 分配快捷键。";
 "At least one content item must remain visible." = "至少保留一项显示内容。";
@@ -136,6 +141,7 @@
 "Cash" = "现金";
 "Change Service" = "更换服务";
 "Change in General Settings" = "在通用设置中更改";
+"Changes apply after you confirm. Cancel keeps your previous display." = "点击确定后应用修改；取消将保留原来的显示配置。";
 "Chat" = "聊天";
 "Check Automatically" = "自动检查";
 "Check Connection" = "检查连接";
@@ -190,6 +196,7 @@
 "Concentric Rings" = "独立同心环";
 "Configuration Directory" = "配置目录";
 "Confirm" = "确认";
+"Confirm Changes" = "确定";
 "Connect Account" = "连接账号";
 "Connect Amp with amp login, then refresh." = "运行 amp login 登录账号后刷新。";
 "Connect Existing Configuration Directory" = "连接已有配置目录";
@@ -201,6 +208,7 @@
 "Consumes one reset credit. Only the usage windows eligible on the server will be reset. This can't be undone." = "将消耗一份重置额度，仅重置服务端允许的用量周期。此操作无法撤销。";
 "Content" = "内容";
 "Content Item" = "内容项";
+"Continue Setup" = "继续连接";
 "Copied" = "已复制";
 "Copilot usage data is unavailable for this account." = "该账户无法获取 Copilot 用量数据。";
 "Copilot usage request failed (HTTP %lld). Try again later." = "Copilot 用量请求失败（HTTP %lld），请稍后重试。";
@@ -216,6 +224,7 @@
 "Could not check or install the update. Try again later." = "无法检查或安装更新，请稍后重试。";
 "Could not complete this step. Check the directory or login and try again." = "操作未完成，请检查目录或登录状态后重试。";
 "Could not install the update. Try again later." = "无法安装更新，请稍后重试。";
+"Could not load pending accounts. Try again." = "无法读取待连接账号，请重试。";
 "Could not load the Home usage style. Choose a style to save it again." = "无法读取主页用量样式，请重新选择样式以保存。";
 "Could not open a terminal. Copy this command and run it in your terminal." = "无法打开终端，请复制此命令到终端运行。";
 "Could not refresh accounts. Check their status." = "账号刷新失败，请查看账号状态。";
@@ -239,6 +248,8 @@
 "Couldn't save the %@ API key." = "无法保存 %@ 的 API 密钥。";
 "Couldn't save the OpenRouter API key." = "无法保存 OpenRouter 的 API 密钥。";
 "Couldn't save the Z.ai API key." = "无法保存 Z.ai 的 API 密钥。";
+"Create Account and Sign In" = "创建独立账号并登录";
+"Create a separate login folder for this account. Your existing terminal login stays unchanged." = "为这个账号创建独立登录目录，不影响终端当前登录的账号。";
 "Credits" = "额度";
 "Ctrl + Alt + U" = "Ctrl + Alt + U";
 "Current Account" = "当前账号";
@@ -252,6 +263,7 @@
 "Cursor token history needs a valid desktop session. Sign in with Cursor again." = "Cursor Token 历史需要有效的桌面登录，请在 Cursor 中重新登录。";
 "Custom Key" = "自定义密钥";
 "Customize" = "自定义";
+"Customize by Account" = "按账号自定义";
 "Customize…" = "自定义…";
 "Cutting It Close" = "接近上限";
 "Daily" = "每日";
@@ -294,11 +306,14 @@
 "Download and Install Update" = "下载并安装更新";
 "Downloading Update…" = "正在下载更新…";
 "Drag metrics here" = "将指标拖到此处";
+"Drag to Reorder" = "拖动排序";
 "Drunk Mode" = "微醺模式";
 "Each cell is 1%." = "每格 1 个百分点。";
 "Edit" = "编辑";
+"Edit Home Display" = "编辑首页显示";
 "Enable Claude or Codex in Providers to read local token logs." = "在提供方中启用 Claude 或 Codex，即可读取本机 Token 日志。";
 "Enable Codex in Providers to read its local token logs." = "在提供方中启用 Codex，即可读取本机 Token 日志。";
+"Enable Notifications" = "开启通知";
 "Enable a provider to view token history." = "启用一个提供方，即可查看 Token 历史。";
 "Enable a service with usage history to see totals here." = "启用支持用量历史的服务后，可在这里查看汇总。";
 "Enable services in Service Configuration to configure their menu-bar visibility." = "在服务配置中启用服务，即可配置其菜单栏显示。";
@@ -319,6 +334,7 @@
 "Exact Readings" = "精确数值";
 "Example Data" = "示例数据";
 "Existing accounts are in Account Management, including accounts hidden from Home." = "已添加的账号都在“账号管理”中，包括未在首页显示的账号。";
+"Existing accounts are in Subscription Management, including accounts hidden from Home." = "已添加的账号都在订阅管理中，包括在首页隐藏的账号。";
 "Expanded" = "已展开";
 "Expired" = "已到期";
 "Expires" = "到期时间";
@@ -383,6 +399,7 @@
 "History" = "历史记录";
 "History comes from logs on this device. It may not cover every account or device." = "历史来自本机日志，不一定涵盖所有账号和设备。";
 "Home" = "首页显示";
+"Home Display" = "首页显示内容";
 "Home Layout" = "首页布局";
 "Home Metrics" = "首页指标";
 "Home Page" = "首页";
@@ -516,6 +533,7 @@
 "No readings in this range. Successful refreshes will appear here." = "此时间范围内暂无记录，成功刷新后会显示在这里。";
 "No recorded token usage was found in the local logs." = "本机日志中暂无已记录的 Token 用量。";
 "No reported token usage was found in the Cursor export." = "Cursor 导出中暂无已报告的 Token 用量。";
+"No signed-in account was found in this folder yet. Finish signing in, then check again." = "这个目录中还没有检测到已登录的账号，请完成登录后再次检测。";
 "No token data for this period" = "这段时间没有 token 数据";
 "No usage data" = "没有用量数据";
 "No usage history available." = "暂无用量历史。";
@@ -532,6 +550,7 @@
 "Not logged in. Sign in via Cursor app or run `agent login`." = "未登录。请在 Cursor 应用中登录，或运行 `agent login`。";
 "Not refreshed" = "未刷新";
 "Not signed in to Ollama Cloud. Run `ollama signin` to see usage." = "未登录 Ollama Cloud。请运行 `ollama signin` 查看用量。";
+"Not signed in yet" = "尚未完成登录";
 "Not started" = "未开始";
 "Note" = "备注";
 "Note (Optional)" = "备注（选填）";
@@ -556,6 +575,7 @@
 "Open System Settings" = "打开系统设置";
 "Open Terminal to Sign In" = "打开终端登录";
 "Open TokenPlan from anywhere" = "在任何地方打开 TokenPlan";
+"Open an account, then choose Edit Home Display to set its usage style." = "进入账号详情，点击“编辑首页显示”设置该账号的用量样式。";
 "Open-Source Licenses" = "开源许可证";
 "OpenCode Go key was rejected. Log into OpenCode Go again." = "OpenCode Go 密钥被拒绝。请重新登录 OpenCode Go。";
 "OpenCode not detected. Log in with OpenCode Go or use OpenCode locally first." = "未检测到 OpenCode。请先登录 OpenCode Go 或在本地使用 OpenCode。";
@@ -583,6 +603,7 @@
 "Party Mode" = "派对模式";
 "Party mode is on, so this stays paused." = "派对模式已开启，因此此项暂停。";
 "Pay as you go" = "按量付费";
+"Pending Connections" = "待连接账号";
 "Percentage" = "百分比";
 "Percentage Grid" = "百分格";
 "Personal" = "个人";
@@ -590,6 +611,7 @@
 "Platform" = "运行平台";
 "Preferences could not be read. Changes can be saved again in Settings." = "无法读取偏好设置，可在设置中重新保存。";
 "Preferences could not be saved. Check the app data folder permissions." = "无法保存偏好设置，请检查应用数据目录的权限。";
+"Press Shortcut" = "请按下快捷键";
 "Preview" = "预览";
 "Previous Page" = "上一页";
 "Pricing" = "价格估算";
@@ -659,6 +681,7 @@
 "Remove?" = "确认移除？";
 "Removed from menu bar" = "已从菜单栏移除";
 "Removing…" = "正在移除…";
+"Reopen Terminal" = "重新打开终端";
 "Reorder" = "排序";
 "Report a Problem" = "反馈问题";
 "Report an Issue" = "反馈问题";
@@ -708,6 +731,7 @@
 "Ring" = "环形";
 "Run devin auth login or sign in to Devin and try again." = "请运行 devin auth login 或登录 Devin 后重试。";
 "Same order as Account Management" = "顺序与“账号管理”相同";
+"Same order as Subscription Management" = "顺序与“订阅管理”相同";
 "Save" = "保存";
 "Saved" = "已保存";
 "Saved account. Refresh to check its current connection." = "账号已保留，刷新后检查当前连接。";
@@ -775,6 +799,7 @@
 "Stop" = "停止";
 "Subscription" = "订阅";
 "Subscription Details" = "订阅详情";
+"Subscription Management" = "订阅管理";
 "Support & Acknowledgments" = "支持与致谢";
 "System" = "跟随系统";
 "System Default" = "跟随系统";
@@ -868,6 +893,7 @@
 "Unavailable Model" = "不可用的模型";
 "Unclassified Records" = "未归类记录";
 "Under 10% usage remaining for this window." = "本周期剩余额度不足 10%。";
+"Unified Style" = "全局统一";
 "Uninstall" = "卸载";
 "Unknown" = "未知";
 "Unknown Codex models use the selected fallback price." = "未知 Codex 模型使用所选回退模型的价格估算。";
@@ -886,6 +912,7 @@
 "Updated %@" = "更新于 %@";
 "Updated %@ ago" = "%@前更新";
 "Updates" = "更新";
+"Updates are disabled in the design preview." = "独立测试版不执行更新。";
 "Updates blocked by Anthropic. Be patient — manual refreshes will make it worse." = "Anthropic 暂时限制了更新。请耐心等待——手动刷新只会让情况更糟。";
 "Usage" = "用量";
 "Usage Display" = "用量显示";
@@ -893,6 +920,7 @@
 "Usage Needs Attention" = "请留意用量";
 "Usage Notifications" = "用量通知";
 "Usage Overview" = "用量总览";
+"Usage Statistics" = "用量统计";
 "Usage Style" = "用量样式";
 "Usage Trend" = "用量趋势";
 "Usage could not be read; see the details below." = "用量读取失败，请查看下方原因。";

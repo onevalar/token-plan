@@ -38,8 +38,75 @@
 .mac-preview .menu-bar-accounts .linked-setting,.mac-preview .service-configuration .linked-setting { border-top:1px solid var(--border);color:var(--text-secondary); }
 .mac-preview .linked-label { color:var(--text-secondary);margin-right:6px; }
 .mac-preview .linked-setting > button { min-height:28px;padding-inline:4px;font-size:12px;gap:2px;margin-left:auto; }
-.mac-preview .linked-settings { margin:-12px 2px 20px; }
 .mac-preview .scope-note { margin:0 0 14px;padding:8px 10px;font-size:12px;line-height:1.5;color:var(--text-secondary);background:var(--surface-muted);border-radius:var(--radius-control);overflow-wrap:anywhere; }
-.mac-preview .placement-link { display:flex;margin:12px auto 0;font-size:12px;min-height:28px;gap:2px; }
 .mac-preview .detail-notice { margin-bottom:14px; }
 .mac-preview .detail-notice .inline-error { flex:1;min-width:0;margin:0; }
+
+/* Account detail has one view and an explicit, reversible editing state. */
+.mac-preview .edit-home-button { width:100%;min-height:40px;margin:12px 0; }
+.mac-preview .placement-row.metric-edit-row[data-tray="false"] { grid-template-columns:minmax(0,1fr) minmax(96px,118px) auto;gap:8px; }
+.mac-preview .metric-order-actions { display:flex;justify-content:flex-end;gap:0; }
+.mac-preview .metric-order-actions button { min-width:28px;min-height:32px;padding:4px; }
+.mac-preview .metric-edit-actions { position:sticky;bottom:0;display:flex;gap:10px;padding:12px 0;background:var(--background); }
+.mac-preview .metric-edit-actions > button { flex:1;min-height:40px; }
+.mac-preview .home-metric-editor .preference-surface { padding:4px 12px; }
+.mac-preview .account-configuration { margin-top:20px; }
+
+.mac-preview .home-metric-editor { outline:none; }
+
+.mac-preview .service-configuration .account-entry,.mac-preview .pending-account .account-entry { display:flex;gap:10px;align-items:center;min-width:0;padding:10px 0; }
+.mac-preview .service-configuration .account-entry .provider-logo { flex:none; }
+.mac-preview .service-configuration .configured-account { gap:10px; }
+.mac-preview .managed-account { border-bottom:1px solid var(--border); }
+.mac-preview .managed-account .configured-account { border-bottom:0; }
+.mac-preview .subscription-remove { padding:0 0 12px; }
+.mac-preview .pending-accounts:empty { display:none; }
+.mac-preview .pending-accounts { margin-top:20px; }
+.mac-preview .pending-account { border:1px solid var(--border);border-radius:var(--radius-control);padding:4px 12px 12px;margin-top:10px; }
+.mac-preview .pending-actions { display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px; }
+.mac-preview .configuration-path { display:block;white-space:normal;overflow-wrap:anywhere;color:var(--text-secondary);font-size:11px;line-height:1.6; }
+.mac-preview .setup-directory { margin:12px 0; }
+.mac-preview .setup-directory > span { font-size:12px;color:var(--text-secondary); }
+.mac-preview .service-configuration .record-label,.mac-preview .pending-account .record-label { flex:1;min-width:0;font-size:13px; }
+.mac-preview .service-configuration .record-label small { display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+.mac-preview .add-account .section-heading h2 { display:flex;align-items:center;gap:8px; }
+
+/* Compact action stack, with identical widths and rhythm. */
+.mac-preview .account-configuration { margin-top:0;display:grid;gap:10px; }
+.mac-preview .edit-home-button { margin:16px 0 10px;min-height:42px; }
+.mac-preview .account-action-fields > .add-note { display:flex;justify-content:center;width:100%;min-height:42px;margin:0;padding:8px 12px;color:var(--foreground); }
+.mac-preview .account-configuration .danger-zone { margin:0;padding:0; }
+.mac-preview .account-action-fields:empty { display:none; }
+.mac-preview .note-editor,.mac-preview .note-row { padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius-control); }
+.mac-preview .sort-handle { cursor:grab;touch-action:none;user-select:none;min-width:30px;min-height:36px;padding:4px;color:var(--text-secondary); }
+.mac-preview .sort-handle[data-dragging="true"] { cursor:grabbing;color:var(--foreground); }
+/* A lifted row follows the pointer; its neighbours slide into the reserved space. */
+.mac-preview [data-sort-list] { position:relative;isolation:isolate; }
+.mac-preview [data-sort-id] { position:relative; }
+.mac-preview [data-sort-active="true"] { user-select:none; }
+.mac-preview [data-sort-active="true"] [data-sort-id] { will-change:transform; }
+.mac-preview [data-sort-active="true"] [data-sort-id]:not([data-sort-dragging]) { pointer-events:none; }
+.mac-preview [data-sort-dragging="true"] { z-index:3;background:var(--surface);border-radius:10px;box-shadow:0 5px 16px rgb(0 0 0 / .16),0 0 0 1px var(--border-strong);cursor:grabbing; }
+.mac-preview [data-sort-dragging="true"] .sort-handle { cursor:grabbing; }
+.mac-preview [data-sort-dragging="true"] { padding-inline:8px;margin-inline:-8px; }
+.mac-preview .home-metric-editor .preference-surface { overflow:visible; }
+
+.mac-preview .usage-style-picker:last-child { border-bottom:0; }
+.mac-preview .shortcut-setting { display:flex;flex-direction:column;align-items:center;gap:10px;padding:12px 0;font-size:13px; }
+.mac-preview .shortcut-controls { display:flex;align-items:center;justify-content:center;gap:4px;max-width:100%; }
+.mac-preview .shortcut-recorder { max-width:260px;min-height:34px;font-size:12px; }
+.mac-preview .shortcut-recorder[aria-pressed="true"] { outline:2px solid var(--foreground);outline-offset:2px; }
+.mac-preview .notification-row { padding:8px 0; }
+.mac-preview .notification-row p { font-size:12px;line-height:1.5;margin:2px 0 0; }
+.mac-preview .notification-row > button[role="switch"] { min-height:30px; }
+.mac-preview .menu-bar-accounts { margin-top:14px;padding-top:12px; }
+.mac-preview .menu-bar-accounts-heading { display:block;padding:0 0 8px; }
+.mac-preview .menu-bar-accounts-heading span { display:block;margin-top:4px; }
+.mac-preview .menu-bar-account { padding:7px 0; }
+.mac-preview .metric-chip { display:inline-flex;align-items:center;gap:4px;min-height:28px;padding:3px 8px; }
+.mac-preview .ring-layout-picker { padding:10px 0 0; }
+.mac-preview .ring-layout-option { height:48px;padding:6px;font-size:12px; }
+.mac-preview .ring-layout-card-content { flex-direction:row;gap:6px; }
+.mac-preview .menu-bar-preview { padding-block:10px; }
+.mac-preview .system-preferences .notification-row .muted { margin-top:2px; }
+.mac-preview .system-preferences .settings-list { gap:0; }

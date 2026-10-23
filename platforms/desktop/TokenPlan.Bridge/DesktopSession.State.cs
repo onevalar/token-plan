@@ -16,6 +16,7 @@ public sealed partial class DesktopSession
         accounts = Accounts().Select(a => new {
             id = a.SettingsKey, family = a.Id, name = ProviderCatalog.Get(a.Id).Name,
             connection = a.ErrorKey == "Saved account. Refresh to check its current connection." ? "unchecked" : a.ErrorKey?.StartsWith("Another account is currently connected.") == true ? "different_account" : a.ErrorKey?.StartsWith("Account kept.") == true ? "unverified" : a.AccountIdentity != null ? "available" : "unchecked",
+            loginDirectories = a.LoginDirectory == null ? Array.Empty<string>() : new[] { a.LoginDirectory },
             email = a.AccountEmail ?? "", plan = a.Snapshot?.Plan ?? "",
             enabled = preferences.IsEnabled(a.Id) && preferences.AccountVisibility.GetValueOrDefault(a.SettingsKey, true),
             added = addedAccounts.Contains(a.SettingsKey) || preferences.IsEnabled(a.Id) && preferences.AccountVisibility.GetValueOrDefault(a.SettingsKey, true),

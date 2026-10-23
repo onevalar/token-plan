@@ -16,6 +16,9 @@ for line in sys.stdin:
             state['settings'].update(value)
         elif method == 'metric' and account:
             next(m for m in account['metrics'] if m['id'] == request['metricId']).update(value)
+        elif method == 'metricLayout' and account:
+            metrics = {m['id']: m for m in account['metrics']}
+            account['metrics'] = [dict(metrics[row['id']], placement=row['placement']) for row in value]
         elif method == 'remove':
             state['accounts'] = [a for a in state['accounts'] if a['id'] != request['accountId']]
         elif method == 'move' and account:

@@ -20,14 +20,14 @@ function StyleGlyph({style}:{style:HomeUsageStyle}) {
 }
 
 /** Collapsed to one row showing the current style; expands into every style at once. */
-export function UsageStylePicker({value,onChange,tr}:{value:HomeUsageStyle;onChange:(style:HomeUsageStyle)=>void;tr:(s:string)=>string}) {
+export function UsageStylePicker({value,onChange,tr,disabled=false}:{disabled?:boolean;value:HomeUsageStyle;onChange:(style:HomeUsageStyle)=>void;tr:(s:string)=>string}) {
  const [open,setOpen]=useState(false);
  return <div className="usage-style-picker">
-  <button type="button" className="usage-style-toggle" aria-expanded={open} onClick={()=>setOpen(o=>!o)}>
+  <button type="button" className="usage-style-toggle" disabled={disabled} aria-expanded={open} onClick={()=>setOpen(o=>!o)}>
    <span>{tr('Usage Style')}</span><span className="usage-style-current">{tr(homeUsageStyles[value])}</span><ChevronDown size={15} aria-hidden="true" data-open={open}/>
   </button>
   {open&&<div className="usage-style-options" role="group" aria-label={tr('Usage Style')}>
-   {(Object.entries(homeUsageStyles) as [HomeUsageStyle,string][]).map(([style,label])=><Button key={style} variant="secondary" className="usage-style-option" aria-pressed={value===style} onClick={()=>onChange(style)}>
+   {(Object.entries(homeUsageStyles) as [HomeUsageStyle,string][]).map(([style,label])=><Button key={style} disabled={disabled} type="button" variant="secondary" className="usage-style-option" aria-pressed={value===style} onClick={()=>onChange(style)}>
     <span className="usage-style-card-content"><StyleGlyph style={style}/><span>{tr(label)}</span></span>
    </Button>)}
   </div>}

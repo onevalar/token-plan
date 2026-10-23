@@ -47,7 +47,7 @@ public sealed partial class DesktopSession : IDisposable
                 {
                     _ = ProviderCatalog.Get(account.Id);
                     // Restored headings are not authenticated quota snapshots.
-                    results[account.SettingsKey] = new(account.Id, account.Name, null, "Saved account. Refresh to check its current connection.", AccountKey: account.AccountKey, AccountEmail: account.AccountEmail, AccountIdentity: account.AccountIdentity);
+                    results[account.SettingsKey] = new(account.Id, account.Name, null, "Saved account. Refresh to check its current connection.", AccountKey: account.AccountKey, AccountEmail: account.AccountEmail, AccountIdentity: account.AccountIdentity, LoginDirectory: account.LoginDirectory);
                 }
             if (doc.RootElement.TryGetProperty("notifications", out var alerts)) { var flags = alerts.Deserialize<bool[]>(); if (flags?.Length == 3) notifications = flags; }
             if (doc.RootElement.TryGetProperty("shortcut", out var binding)) shortcut = binding.GetString() ?? "";
@@ -89,8 +89,9 @@ public sealed partial class DesktopSession : IDisposable
                 if (value.GetBoolean()) preferences = preferences.WithEnabled(family, true);
                 break;
             case "remove":
-                if (account == null || Preferences.AccountRemovalKey(account) == null) throw new InvalidDataException();
-                preferences = preferences.RemoveAccount(account); break;
+                if (account != null && Preferences.AccountRemovalKey(account) != null) preferences = preferences.RemoveAccount(account);
+                else preferences = preferences with { AccountVisibility = new(preferences.AccountVisibility) { [id] = false } };
+                addedAccounts.Remove(id); break;
             case "tray":
                 if (!preferences.TrayServices.GetValueOrDefault(family, true))
                 {
@@ -107,6 +108,24 @@ public sealed partial class DesktopSession : IDisposable
                 var offset = value.GetInt32(); if (Math.Abs(offset) != 1) throw new InvalidDataException();
                 var order = Accounts().Select(a => a.SettingsKey).ToList(); var index = order.IndexOf(id);
                 if (index >= 0 && index + offset >= 0 && index + offset < order.Count) { (order[index], order[index + offset]) = (order[index + offset], order[index]); accountOrder = order; }
+                break;
+            case "metricLayout":
+                var layoutWindows = account?.Snapshot?.Windows ?? [];
+                var layoutRows = value.EnumerateArray().Select(row => (
+                    Id: row.GetProperty("id").GetString() ?? "",
+                    Placement: row.GetProperty("placement").GetString() switch {
+                        "home" => MetricPlacement.Home, "details" => MetricPlacement.Details,
+                        "hidden" => MetricPlacement.Hidden, _ => throw new InvalidDataException()
+                    })).ToArray();
+                var validMetrics = layoutWindows.Select(w => w.Label).ToHashSet();
+                if (account == null || layoutRows.Length != validMetrics.Count ||
+                    !layoutRows.Select(row => row.Id).ToHashSet().SetEquals(validMetrics)) throw new InvalidDataException();
+                var nextPreferences = preferences;
+                foreach (var row in layoutRows) nextPreferences = nextPreferences.PlaceMetric(id, row.Id, row.Placement, layoutWindows);
+                nextPreferences = nextPreferences with { MetricOrder = new(nextPreferences.MetricOrder) { [id] = layoutRows.Select(row => row.Id).ToArray() } };
+                // Commit only after validation and persistence have succeeded.
+                nextPreferences.Save(file);
+                preferences = nextPreferences;
                 break;
             case "metric":
                 var metric = request.GetProperty("metricId").GetString()!;
@@ -130,7 +149,7 @@ public sealed partial class DesktopSession : IDisposable
             case "settings": ApplySettings(value); break;
             default: throw new InvalidDataException();
         }
-        if (method != "state") { preferences.Save(file); Persist(); }
+        if (method != "state") { if (method != "metricLayout") preferences.Save(file); Persist(); }
         return Snapshot();
     }
     void ApplySettings(JsonElement value)
@@ -164,7 +183,7 @@ public sealed partial class DesktopSession : IDisposable
         lock (persistenceLock) {
         Directory.CreateDirectory(Path.GetDirectoryName(stateFile)!);
         var temp = stateFile + ".tmp";
-        File.WriteAllText(temp, JsonSerializer.Serialize(new { trayStyle, ringIconPosition, autoUpdates, notifications, shortcut, nextRefresh, accountOrder, addedAccounts, cooldowns = service.ExportCooldowns(), accounts = results.Values.Select(a => new ProviderResult(a.Id, a.Name, null, null, AccountKey: a.AccountKey, AccountEmail: a.AccountEmail, AccountIdentity: a.AccountIdentity)).ToArray() }));
+        File.WriteAllText(temp, JsonSerializer.Serialize(new { trayStyle, ringIconPosition, autoUpdates, notifications, shortcut, nextRefresh, accountOrder, addedAccounts, cooldowns = service.ExportCooldowns(), accounts = results.Values.Select(a => new ProviderResult(a.Id, a.Name, null, null, AccountKey: a.AccountKey, AccountEmail: a.AccountEmail, AccountIdentity: a.AccountIdentity, LoginDirectory: a.LoginDirectory)).ToArray() }));
         File.Move(temp, stateFile, true);
         }
     }

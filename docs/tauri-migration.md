@@ -12,7 +12,8 @@ The installed native app and stable update feeds are not replaced by development
 ## Dashboard, service configuration and history
 
 The default desktop panel is 390 logical pixels wide, without a native title bar.
-It closes on focus loss, Escape, or another click on its tray icon. Focus-loss dismissal
+It closes on focus loss or Escape; macOS also toggles it with another tray click.
+Windows/Linux left-click explicitly shows Home, so repeated clicks do not hide it. Focus-loss dismissal
 is deferred briefly so a tray activation does not hide and immediately reopen it.
 The panel opens centered under (or, for a bottom taskbar, above) the clicked tray icon,
 inside that monitor's work area. On macOS it starts closed, so the first click opens it.
@@ -57,10 +58,12 @@ an automatic change to its saved pins.
   Windows/Linux use one transparent product icon, without a drawn background or
   border. Account quota indicators, their settings and the duplicate indicator
   strip inside Home are removed on Windows/Linux. Existing selections remain stored.
-- The Windows tray menu opens on primary-click and contains Show Home and Quit.
-  Double-click opens Home directly. Linux exposes the same native SNI menu on
-  primary-click; the protocol does not provide a distinct double-click callback.
-  Showing Home resets navigation and restores, raises and focuses the window.
+- Windows left-click shows Home near the tray icon; right-click opens Show Home / Quit.
+  Linux uses SNI Activate for Home and the host's standard context menu for right-click.
+  Hosts that force a menu on left-click retain Show Home as a fallback. There is no distinct
+  double-click action. Showing Home resets navigation and restores, raises and focuses it.
+  Without valid coordinates it centers on its current monitor (or primary), including after
+  content-height changes. Linux/Wayland placement is subject to compositor support.
   Linux still keeps an accessible window if no SNI host exists.
 - Antigravity's Windows/Linux parser now carries 5-hour and weekly periods from
   exact bucket IDs, matching the Mac mapper; unknown pools remain excluded and
@@ -68,7 +71,7 @@ an automatic change to its saved pins.
   correctly when the provider has both session and weekly quotas.
 - General settings share language, appearance, Home style and density, used/remaining display,
   menu bar configuration (including each account's menu bar metrics) and refresh interval.
-  Account settings keep only per-account choices and link to General Settings for the rest. Provider text reuses the repository's five-language translation tables.
+  Account details switch between viewing usage and editing a draft of Home metrics. Confirm saves placement and order together; Cancel discards the draft. General Settings selects uniform or per-account Home styles; custom style editing joins each account’s display draft. Menu bar settings remain in General Settings. Provider text reuses the repository's five-language translation tables.
 - Tauri's updater checks in the background or on request, verifies signatures, shows install
   progress and restarts after installation. A background check failure does not interrupt work.
   The update preference is persisted. A failed installation is shown explicitly.
@@ -223,13 +226,25 @@ missing login shows a reconnect message instead of another account's quota. Disa
 an account and explicitly removing it remain separate actions. Account identity, rather
 than the current default login directory, determines which saved account is refreshed.
 
-In **Service Configuration → Add Service**, **Detect Accounts** rescans without restarting.
-**Sign In to Another Account** opens the official Claude/Codex CLI in a separate configuration
-directory; it does not replace the current CLI login. The official CLI must be installed.
-After completing browser/terminal authentication, return and detect again. If no terminal
-can be opened, the same command is available to copy. Existing custom configuration
-directories can also be connected explicitly. Only their paths are stored in
-`~/.tokenplan-account-directories.json`; passwords and tokens are not copied into this registry.
+In **Subscription Management → Add Account**, choose Claude or Codex and optionally enter a note.
+Creating a record reserves a separate `.claude-accountN` or `.codex-accountN` directory and opens
+the official CLI there. Existing folders are skipped and the default CLI login is untouched.
+The CLI must already be installed; when a terminal cannot be opened, copy the command instead.
+After signing in, check again. The account is enabled only after its directory is matched to a
+resolved identity; another detected login cannot complete the pending record. Notes are applied
+without overwriting an existing note. An interrupted setup stays under Pending Connections and
+can resume after restarting, reusing the same directory. Removing a pending record keeps its files.
+
+Paths are registered in `~/.tokenplan-account-directories.json`. Pending record IDs, labels and
+paths are kept in `~/.tokenplan-account-setups.json`. Neither file contains credentials. Existing
+folders can still be connected explicitly. A verified, explicitly registered independent Claude
+login takes precedence when the same identity is also in the default directory, so a later CLI
+account switch does not disconnect that saved account. macOS and the .NET engines expose only
+matched directory paths to the UI, never credential contents.
+
+Home usage styles are local UI preferences. Unified mode retains the existing global style;
+Customize by Account exposes a style picker inside each account's Edit Home Display. Switching
+modes preserves per-account choices, including different styles for two accounts of one service.
 
 ### Connection diagnosis
 

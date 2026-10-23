@@ -67,10 +67,10 @@ test('unreadable preferences and failed saves stay visible and recover without c
  await mockDesktop(page,'en');await page.goto('/');await settings(page);
  await expect(visible(page).getByRole('alert')).toHaveText('Could not load the Home usage style. Choose a style to save it again.');
  await choose(page,'Gauges');await expect(visible(page).getByRole('alert')).toHaveCount(0);
- await page.evaluate(()=>{const original=Storage.prototype.setItem;(window as any).__restoreStorage=()=>{Storage.prototype.setItem=original;};Storage.prototype.setItem=function(key,value){if(key==='tokenplan.homeUsageStyle')throw new Error('fixture write denied');original.call(this,key,value);};});
+ await page.evaluate(()=>{const original=Storage.prototype.setItem;(window as any).__restoreStorage=()=>{Storage.prototype.setItem=original;};Storage.prototype.setItem=function(key,value){if(key==='tokenplan.homeUsagePreferences')throw new Error('fixture write denied');original.call(this,key,value);};});
  await choose(page,'Percentage Grid');await expect(visible(page).getByRole('alert')).toHaveText('Could not save. Try again.');
  await expect(home(page)).toHaveAttribute('data-usage-style','gauges');
- expect(await page.evaluate(()=>localStorage.getItem('tokenplan.homeUsageStyle'))).toBe('gauges');
+ expect(await page.evaluate(()=>JSON.parse(localStorage.getItem('tokenplan.homeUsagePreferences')!).style)).toBe('gauges');
  await page.evaluate(()=>(window as any).__restoreStorage());await choose(page,'Percentage Grid');
  await expect(visible(page).getByRole('alert')).toHaveCount(0);await expect(home(page)).toHaveAttribute('data-usage-style','cells');
 });

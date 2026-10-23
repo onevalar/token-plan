@@ -58,9 +58,12 @@
 "About" = "情報";
 "About TokenPlan" = "TokenPlan について";
 "Account" = "アカウント";
+"Account Actions" = "アカウント操作";
 "Account Details" = "アカウント情報";
 "Account Management" = "アカウント管理";
+"Account Note (Optional)" = "アカウントのメモ（任意）";
 "Account Settings" = "アカウント設定";
+"Account connected." = "アカウントを接続しました。";
 "Account identified. Enable it and refresh to load usage." = "アカウントを識別しました。有効にして更新すると使用量を取得できます。";
 "Account kept. Its login could not be identified. Check the configuration directory and access permissions, then detect again." = "アカウントは保持されています。対応するログインを識別できません。設定ディレクトリとアクセス権を確認して再検出してください。";
 "Account saved. Reconnect its login, then detect accounts again." = "アカウントは保存されています。再ログインしてから再検出してください。";
@@ -88,6 +91,7 @@
 "Alert when a limit is projected to finish with little left." = "上限の残りがわずかになる見込みのときに通知します。";
 "All Providers" = "すべてのプロバイダー";
 "All accounts are hidden from Home. You can show them again in Account Management." = "すべてのアカウントが非表示です。「アカウント管理」で再表示できます。";
+"All accounts are hidden from Home. You can show them again in Subscription Management." = "すべてのアカウントがホームで非表示です。サブスクリプション管理で再表示できます。";
 "All services" = "すべてのサービス";
 "Allow Notifications" = "通知を許可";
 "Allow TokenPlan notifications in system settings, then try again." = "システム設定でTokenPlanの通知を許可して再試行してください。";
@@ -109,6 +113,7 @@
 "Appearance" = "外観";
 "Appearance and Language" = "外観と言語";
 "Application" = "アプリ情報";
+"Apply Style" = "適用方法";
 "Argon Weekly" = "Argon 週間";
 "Assign tokenplan --toggle in your desktop's keyboard settings." = "デスクトップのキーボード設定で tokenplan --toggle にショートカットを割り当ててください。";
 "At least one content item must remain visible." = "少なくとも1項目を表示してください。";
@@ -136,6 +141,7 @@
 "Cash" = "現金";
 "Change Service" = "サービスを変更";
 "Change in General Settings" = "一般設定で変更";
+"Changes apply after you confirm. Cancel keeps your previous display." = "確定すると変更が適用されます。キャンセルすると元の表示が維持されます。";
 "Chat" = "チャット";
 "Check Automatically" = "自動的に確認";
 "Check Connection" = "接続を確認";
@@ -190,6 +196,7 @@
 "Concentric Rings" = "独立した同心リング";
 "Configuration Directory" = "設定フォルダ";
 "Confirm" = "確認";
+"Confirm Changes" = "確定";
 "Connect Account" = "アカウントを接続";
 "Connect Amp with amp login, then refresh." = "amp login でログインしてから更新してください。";
 "Connect Existing Configuration Directory" = "既存の設定フォルダを接続";
@@ -201,6 +208,7 @@
 "Consumes one reset credit. Only the usage windows eligible on the server will be reset. This can't be undone." = "リセットクレジットを1つ消費します。サーバーが対象とする利用枠のみリセットされます。この操作は取り消せません。";
 "Content" = "項目";
 "Content Item" = "表示項目";
+"Continue Setup" = "接続を続ける";
 "Copied" = "コピーしました";
 "Copilot usage data is unavailable for this account." = "このアカウントでは Copilot の使用量データを取得できません。";
 "Copilot usage request failed (HTTP %lld). Try again later." = "Copilot の使用量リクエストに失敗しました（HTTP %lld）。後でもう一度お試しください。";
@@ -216,6 +224,7 @@
 "Could not check or install the update. Try again later." = "更新を確認またはインストールできません。後で再試行してください。";
 "Could not complete this step. Check the directory or login and try again." = "操作を完了できませんでした。フォルダやログイン状態を確認し、再試行してください。";
 "Could not install the update. Try again later." = "更新をインストールできません。後で再試行してください。";
+"Could not load pending accounts. Try again." = "接続待ちのアカウントを読み込めません。再試行してください。";
 "Could not load the Home usage style. Choose a style to save it again." = "ホームの使用量表示を読み込めませんでした。表示形式を選び直して保存してください。";
 "Could not open a terminal. Copy this command and run it in your terminal." = "ターミナルを開けませんでした。このコマンドをコピーして実行してください。";
 "Could not refresh accounts. Check their status." = "アカウントを更新できませんでした。状態を確認してください。";
@@ -239,6 +248,8 @@
 "Couldn't save the %@ API key." = "%@ の API キーを保存できませんでした。";
 "Couldn't save the OpenRouter API key." = "OpenRouter の API キーを保存できませんでした。";
 "Couldn't save the Z.ai API key." = "Z.ai の API キーを保存できませんでした。";
+"Create Account and Sign In" = "専用アカウントを追加してログイン";
+"Create a separate login folder for this account. Your existing terminal login stays unchanged." = "このアカウント専用のログインフォルダーを作成します。ターミナルの現在のログインには影響しません。";
 "Credits" = "クレジット";
 "Ctrl + Alt + U" = "Ctrl + Alt + U";
 "Current Account" = "現在のアカウント";
@@ -252,6 +263,7 @@
 "Cursor token history needs a valid desktop session. Sign in with Cursor again." = "Cursor のトークン履歴には有効なデスクトップセッションが必要です。Cursor で再ログインしてください。";
 "Custom Key" = "カスタムキー";
 "Customize" = "カスタマイズ";
+"Customize by Account" = "アカウント別";
 "Customize…" = "カスタマイズ…";
 "Cutting It Close" = "上限間近";
 "Daily" = "日次";
@@ -294,11 +306,14 @@
 "Download and Install Update" = "更新をダウンロードしてインストール";
 "Downloading Update…" = "更新をダウンロード中…";
 "Drag metrics here" = "ここに指標をドラッグ";
+"Drag to Reorder" = "ドラッグして並べ替え";
 "Drunk Mode" = "ほろ酔いモード";
 "Each cell is 1%." = "1マスは1パーセントポイントです。";
 "Edit" = "編集";
+"Edit Home Display" = "ホームの表示を編集";
 "Enable Claude or Codex in Providers to read local token logs." = "プロバイダー画面で Claude または Codex を有効にすると、ローカルのトークンログを読み取れます。";
 "Enable Codex in Providers to read its local token logs." = "プロバイダー画面で Codex を有効にすると、ローカルのトークンログを読み取れます。";
+"Enable Notifications" = "通知を有効にする";
 "Enable a provider to view token history." = "プロバイダーを有効にすると、トークン履歴を表示できます。";
 "Enable a service with usage history to see totals here." = "使用履歴に対応したサービスを有効にすると、ここに合計を表示します。";
 "Enable services in Service Configuration to configure their menu-bar visibility." = "サービス設定でサービスを有効にして、メニューバーの表示を設定します。";
@@ -319,6 +334,7 @@
 "Exact Readings" = "正確な数値";
 "Example Data" = "サンプルデータ";
 "Existing accounts are in Account Management, including accounts hidden from Home." = "追加済みのアカウントは、ホームで非表示のものも「アカウント管理」にあります。";
+"Existing accounts are in Subscription Management, including accounts hidden from Home." = "追加済みのアカウントは、ホームで非表示のものもサブスクリプション管理にあります。";
 "Expanded" = "展開済み";
 "Expired" = "期限切れ";
 "Expires" = "有効期限";
@@ -383,6 +399,7 @@
 "History" = "履歴";
 "History comes from logs on this device. It may not cover every account or device." = "この端末のログによる履歴です。すべてのアカウントや端末を含むとは限りません。";
 "Home" = "ホーム";
+"Home Display" = "ホームの表示内容";
 "Home Layout" = "ホームの表示";
 "Home Metrics" = "ホームの指標";
 "Home Page" = "ホーム";
@@ -516,6 +533,7 @@
 "No readings in this range. Successful refreshes will appear here." = "この期間の履歴はありません。正常に更新されると、ここに表示されます。";
 "No recorded token usage was found in the local logs." = "ローカルログにトークン使用量の記録がありません。";
 "No reported token usage was found in the Cursor export." = "Cursor のエクスポートにトークン使用量の記録がありません。";
+"No signed-in account was found in this folder yet. Finish signing in, then check again." = "このフォルダーにログイン済みのアカウントはまだ見つかりません。ログインを完了して再確認してください。";
 "No token data for this period" = "この期間のトークンデータはありません";
 "No usage data" = "使用量データなし";
 "No usage history available." = "使用履歴はありません。";
@@ -532,6 +550,7 @@
 "Not logged in. Sign in via Cursor app or run `agent login`." = "ログインしていません。Cursor アプリでサインインするか、`agent login` を実行してください。";
 "Not refreshed" = "更新されていません";
 "Not signed in to Ollama Cloud. Run `ollama signin` to see usage." = "Ollama Cloud にサインインしていません。`ollama signin` を実行すると使用量を確認できます。";
+"Not signed in yet" = "ログイン未完了";
 "Not started" = "未開始";
 "Note" = "メモ";
 "Note (Optional)" = "メモ（任意）";
@@ -556,6 +575,7 @@
 "Open System Settings" = "システム設定を開く";
 "Open Terminal to Sign In" = "ターミナルを開いてサインイン";
 "Open TokenPlan from anywhere" = "どこからでも TokenPlan を開く";
+"Open an account, then choose Edit Home Display to set its usage style." = "アカウントの詳細で「ホームの表示を編集」を選ぶと、使用量の表示を設定できます。";
 "Open-Source Licenses" = "オープンソースライセンス";
 "OpenCode Go key was rejected. Log into OpenCode Go again." = "OpenCode Go のキーが拒否されました。OpenCode Go に再度ログインしてください。";
 "OpenCode not detected. Log in with OpenCode Go or use OpenCode locally first." = "OpenCode が検出されませんでした。OpenCode Go にログインするか、先にローカルで OpenCode を使用してください。";
@@ -583,6 +603,7 @@
 "Party Mode" = "パーティーモード";
 "Party mode is on, so this stays paused." = "パーティーモードがオンのため、これは一時停止されています。";
 "Pay as you go" = "従量課金";
+"Pending Connections" = "接続待ちのアカウント";
 "Percentage" = "パーセント";
 "Percentage Grid" = "パーセントグリッド";
 "Personal" = "個人";
@@ -590,6 +611,7 @@
 "Platform" = "プラットフォーム";
 "Preferences could not be read. Changes can be saved again in Settings." = "設定を読み込めませんでした。設定画面から保存し直せます。";
 "Preferences could not be saved. Check the app data folder permissions." = "設定を保存できませんでした。アプリデータフォルダーの権限を確認してください。";
+"Press Shortcut" = "キーを押してください";
 "Preview" = "プレビュー";
 "Previous Page" = "前のページ";
 "Pricing" = "料金の推定";
@@ -659,6 +681,7 @@
 "Remove?" = "削除しますか？";
 "Removed from menu bar" = "メニューバーから削除しました";
 "Removing…" = "削除中…";
+"Reopen Terminal" = "ターミナルを再度開く";
 "Reorder" = "並べ替え";
 "Report a Problem" = "問題を報告";
 "Report an Issue" = "問題を報告";
@@ -708,6 +731,7 @@
 "Ring" = "リング";
 "Run devin auth login or sign in to Devin and try again." = "devin auth login を実行するか Devin にサインインしてから、もう一度お試しください。";
 "Same order as Account Management" = "並び順は「アカウント管理」と同じです";
+"Same order as Subscription Management" = "並び順は「サブスクリプション管理」と同じです";
 "Save" = "保存";
 "Saved" = "保存しました";
 "Saved account. Refresh to check its current connection." = "アカウントは保存されています。更新して接続を確認してください。";
@@ -775,6 +799,7 @@
 "Stop" = "停止";
 "Subscription" = "契約";
 "Subscription Details" = "契約の詳細";
+"Subscription Management" = "サブスクリプション管理";
 "Support & Acknowledgments" = "サポートと謝辞";
 "System" = "システム";
 "System Default" = "システムの設定に従う";
@@ -868,6 +893,7 @@
 "Unavailable Model" = "利用できないモデル";
 "Unclassified Records" = "未分類の記録";
 "Under 10% usage remaining for this window." = "この期間の残りが 10% 未満です。";
+"Unified Style" = "すべて共通";
 "Uninstall" = "アンインストール";
 "Unknown" = "不明";
 "Unknown Codex models use the selected fallback price." = "不明な Codex モデルは選択した代替モデルの価格で推定します。";
@@ -886,6 +912,7 @@
 "Updated %@" = "%@ に更新";
 "Updated %@ ago" = "%@前に更新";
 "Updates" = "アップデート";
+"Updates are disabled in the design preview." = "デザインプレビューでは更新を実行しません。";
 "Updates blocked by Anthropic. Be patient — manual refreshes will make it worse." = "Anthropic により更新がブロックされています。しばらくお待ちください。手動更新はかえって悪化させます。";
 "Usage" = "使用量";
 "Usage Display" = "使用量の表示";
@@ -893,6 +920,7 @@
 "Usage Needs Attention" = "使用量を確認してください";
 "Usage Notifications" = "使用量の通知";
 "Usage Overview" = "使用量の概要";
+"Usage Statistics" = "使用量の統計";
 "Usage Style" = "使用量の表示";
 "Usage Trend" = "使用量の推移";
 "Usage could not be read; see the details below." = "使用量を読み取れません。以下の詳細を確認してください。";

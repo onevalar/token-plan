@@ -2,13 +2,14 @@
 
 mod bridge;
 mod account_setup;
+mod account_records;
 mod links;
 mod shortcuts;
 mod notifications;
 mod model;
 mod tray;
 mod tray_image;
-#[cfg(target_os="windows")]
+#[cfg(any(target_os="windows",test))]
 mod windows_tray;
 mod panel;
 #[cfg(target_os="linux")]
@@ -23,6 +24,11 @@ use tauri::{
 fn show_home(app:&tauri::AppHandle) {
     let _=tauri::Emitter::emit(app,"show-home",());
     panel::show(app);
+}
+
+fn show_home_at(app:&tauri::AppHandle,anchor:Option<(i32,i32,i32)>) {
+    let _=tauri::Emitter::emit(app,"show-home",());
+    panel::show_at(app,anchor);
 }
 
 fn show(app: &tauri::AppHandle) {
@@ -59,10 +65,8 @@ fn main() {
         .manage(tray::Trays::default())
         .manage(panel::Panel::default())
         .manage(account_setup::AccountSetup::default())
-        .invoke_handler(tauri::generate_handler![bridge::desktop_request, shortcuts::shortcut_capture, panel::panel_frame, panel::panel_content_height, account_setup::account_login, account_setup::account_directory, links::open_link, quit, hide])
+        .invoke_handler(tauri::generate_handler![bridge::desktop_request, shortcuts::shortcut_capture, panel::panel_frame, panel::panel_content_height, account_setup::account_login, account_setup::account_setups, account_setup::account_setup_create, account_setup::account_setup_remove, account_setup::account_directory, links::open_link, quit, hide])
         .setup(|app| {
-            #[cfg(target_os="windows")]
-            app.manage(windows_tray::WindowsTray::default());
             // A missing global-hotkey backend (e.g. a Wayland-only session) must not prevent startup.
             if app.handle().plugin(tauri_plugin_global_shortcut::Builder::new().with_handler(|app,_,event| {
                 if event.state()==tauri_plugin_global_shortcut::ShortcutState::Pressed {
@@ -97,17 +101,16 @@ fn main() {
                     .on_menu_event(|app, event| match event.id.as_ref() {
                         "open" => {
                             #[cfg(target_os="macos")] show(app);
-                            #[cfg(not(target_os="macos"))] show_home(app);
+                            #[cfg(target_os="windows")] windows_tray::open_home(app);
                         },
                         "quit" => app.exit(0),
                         _ => {}
                     })
                     .on_tray_icon_event(|tray, event| {
                         #[cfg(target_os="windows")]
-                        match event {
-                            TrayIconEvent::DoubleClick {button:MouseButton::Left,..}=>windows_tray::double(tray.app_handle()),
-                            TrayIconEvent::Click {button:MouseButton::Left,button_state:MouseButtonState::Up,..}=>windows_tray::primary(tray.app_handle()),
-                            _=>{}
+                        if let Some(anchor)=tray::primary_anchor(&event) {
+                            // Right-click keeps the native menu. Repeated left-clicks only show Home.
+                            show_home_at(tray.app_handle(),Some(anchor));
                         }
                         #[cfg(target_os="macos")]
                         if let TrayIconEvent::Click {

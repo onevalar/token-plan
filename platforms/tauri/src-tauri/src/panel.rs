@@ -6,6 +6,7 @@ pub struct Panel {
     revision: AtomicU64,
     persistent: AtomicBool,
     content_height: AtomicU32,
+    center_on_resize: AtomicBool,
     anchor: std::sync::Mutex<Option<(i32,i32,i32)>>,
 }
 impl Panel {
@@ -122,26 +123,41 @@ fn placement(anchor:(i32,i32,i32),origin:(i32,i32),area:(u32,u32),size:(u32,u32)
 pub fn toggle_near(app:&tauri::AppHandle,center:i32,top:i32,bottom:i32) {
     if let Some(window)=app.get_webview_window("main") {
         if window.is_visible().unwrap_or(false) {hide(app);return;}
-        *app.state::<Panel>().anchor.lock().unwrap()=Some((center,top,bottom));
-        // The clicked monitor may differ from the panel's previous monitor.
-        // Tray positions are physical pixels, but macOS looks up `monitor_from_point`
-        // in logical points, so match the physical monitor bounds directly.
-        let monitor=app.available_monitors().unwrap_or_default().into_iter().find(|monitor|{
+    }
+    show_at(app,Some((center,top,bottom)));
+}
+
+/// Explicit show is idempotent: a second click never hides the newly opened page.
+/// No usable tray coordinates: center on the window's current monitor (or primary).
+pub fn show_at(app:&tauri::AppHandle,requested:Option<(i32,i32,i32)>) {
+    if let Some(window)=app.get_webview_window("main") {
+        // Tray event rectangles use physical pixels. Match bounds rather than the
+        // macOS monitor_from_point API, which expects logical points there.
+        let matched=requested.and_then(|(center,top,_)|app.available_monitors().unwrap_or_default().into_iter().find(|monitor|{
             let (origin,size)=(monitor.position(),monitor.size());
             (origin.x..origin.x+size.width as i32).contains(&center) && (origin.y..origin.y+size.height as i32).contains(&top)
-        });
+        }));
+        let anchor=if matched.is_some(){requested}else{None};
+        *app.state::<Panel>().anchor.lock().unwrap()=anchor;
+        app.state::<Panel>().center_on_resize.store(anchor.is_none(),Ordering::SeqCst);
+        let monitor=matched.or_else(||window.current_monitor().ok().flatten()).or_else(||app.primary_monitor().ok().flatten());
         if let Some(monitor)=monitor {
-            let area=monitor.work_area();
-            let scale=monitor.scale_factor();
-            let width=(390.0*scale).round() as u32;
+            let area=monitor.work_area();let scale=monitor.scale_factor();
+            let width=((390.0*scale).round() as u32).min(area.size.width);
             let desired=app.state::<Panel>().content_height.load(Ordering::SeqCst);
             let height=bounded_height(if desired==0 {280.} else {desired as f64},scale,area.size.height);
             checked(app,window.set_size(tauri::PhysicalSize::new(width,height)));
-            let (x,y)=placement((center,top,bottom),(area.position.x,area.position.y),(area.size.width,area.size.height),(width,height),(6.0*scale) as i32);
+            let (x,y)=show_placement(anchor,(area.position.x,area.position.y),(area.size.width,area.size.height),(width,height),(6.0*scale) as i32);
             checked(app,window.set_position(tauri::PhysicalPosition::new(x,y)));
         }
     }
     show(app);
+}
+fn show_placement(anchor:Option<(i32,i32,i32)>,origin:(i32,i32),area:(u32,u32),size:(u32,u32),gap:i32)->(i32,i32) {
+    match anchor {
+        Some(anchor)=>placement(anchor,origin,area,size,gap),
+        None=>(origin.0+area.0.saturating_sub(size.0) as i32/2,origin.1+area.1.saturating_sub(size.1) as i32/2),
+    }
 }
 
 fn bounded_height(content:f64,scale:f64,available:u32)->u32 {
@@ -159,10 +175,11 @@ pub fn panel_content_height(app:tauri::AppHandle,height:f64)->Result<(),String> 
     let monitor=window.current_monitor().map_err(|e|e.to_string())?;
     if let Some(monitor)=monitor {
         let area=monitor.work_area();let scale=monitor.scale_factor();
-        let size=tauri::PhysicalSize::new((390.*scale).round() as u32,bounded_height(height,scale,area.size.height));
+        let size=tauri::PhysicalSize::new(((390.*scale).round() as u32).min(area.size.width),bounded_height(height,scale,area.size.height));
         window.set_size(size).map_err(|e|e.to_string())?;
-        if let Some(anchor)=*panel.anchor.lock().unwrap() {
-            let (x,y)=placement(anchor,(area.position.x,area.position.y),(area.size.width,area.size.height),(size.width,size.height),(6.*scale) as i32);
+        let anchor=*panel.anchor.lock().unwrap();
+        if anchor.is_some() || panel.center_on_resize.load(Ordering::SeqCst) {
+            let (x,y)=show_placement(anchor,(area.position.x,area.position.y),(area.size.width,area.size.height),(size.width,size.height),(6.*scale) as i32);
             window.set_position(tauri::PhysicalPosition::new(x,y)).map_err(|e|e.to_string())?;
         }
     }
@@ -220,6 +237,13 @@ mod tests {
         let blur=state.changed();
         state.persistent.store(true,Ordering::SeqCst);
         assert!(!state.can_dismiss(blur,false));
+    }
+    #[test] fn explicit_show_uses_monitor_center_without_a_tray_location() {
+        assert_eq!(show_placement(None,(-1920,24),(1920,1056),(390,280),6),(-1155,412));
+        assert_eq!(show_placement(None,(-1920,24),(1920,1056),(390,680),6),(-1155,212));
+        // 200% scaling, lower taskbar, and a secondary display to the right.
+        assert_eq!(show_placement(Some((3700,2090,2160)),(1920,0),(1920,2080),(780,1360),12),(3048,708));
+        assert_eq!(show_placement(None,(0,0),(320,200),(320,188),6),(0,6));
     }
     #[test] fn panel_centers_on_tray_icon_within_the_clicked_monitor() {
         // macOS menu bar: below the bar, centered on the icon.

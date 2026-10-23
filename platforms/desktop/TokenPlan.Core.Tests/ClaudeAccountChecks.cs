@@ -44,6 +44,11 @@ static class ClaudeAccountChecks
             var count = tokens.Count;
             accounts = await service.RefreshAdditionalAccounts("claude", CancellationToken.None);
             check(accounts[0].Snapshot == null && accounts[0].ErrorKey != null && tokens.Count == count, "Missing separate credentials cannot fall back to primary account");
+            File.WriteAllText(Path.Combine(copy, ".credentials.json"), Credentials("independent-first-token"));
+            File.WriteAllText(Path.Combine(root, ".tokenplan-account-directories.json"), JsonSerializer.Serialize(new { claude = new[] { copy } }));
+            accounts = await service.RefreshAdditionalAccounts("claude", CancellationToken.None);
+            var independent = accounts.Single(a => a.AccountIdentity == current.AccountIdentity);
+            check(independent.LoginDirectory == copy && independent.Snapshot != null && tokens.Last() == "independent-first-token", "Registered independent login remains available alongside the default identity");
         }
         finally { Directory.Delete(root, true); }
     }

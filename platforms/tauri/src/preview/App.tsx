@@ -22,12 +22,13 @@ import {HomeTips} from './HomeTips';
 import {HistoryPage} from './HistoryPage';
 import {useDensity} from './useDensity';
 import {useHomeUsageStyle} from './useHomeUsageStyle';
+import {useAccountSetups} from './useAccountSetups';
 import './preview.css';
 import './settings.css';
 import {usePanelHeight} from './usePanelHeight';
 
 type Page='home'|'detail'|'settings'|'configure'|'add'|'history'|'about'|'updates';
-type Route={key:number;page:Page;accountId?:string;tab?:string;range?:string};
+type Route={key:number;page:Page;accountId?:string;setupId?:string;editing?:boolean;focusManagement?:boolean;range?:string};
 export function DesktopApp() {
  const {state,send,busy,error}=useDesktop();
  const {feedback,refresh:refreshWithFeedback,refreshing}=useRefreshFeedback(send);
@@ -40,6 +41,7 @@ export function DesktopApp() {
   const stop=listen<Frame>('panel-frame',e=>apply(e.payload));
   return()=>{void stop.then(f=>f()).catch(()=>{});};
  },[]);
+ const setups=useAccountSetups();
  const densityPreference=useDensity();
  const usageStylePreference=useHomeUsageStyle();
  const [routes,setRoutes]=useState<Route[]>([{key:0,page:'home'}]);
@@ -57,18 +59,18 @@ export function DesktopApp() {
  usePanelHeight(current.key,state,densityPreference.density);
  const language=state?.settings.language==='system'||!state?navigator.language:state.settings.language;
  const tr=(s:string)=>providerText(s,language);
- const t={...textFor(language),pin_limit:tr('Choose up to three menu bar metrics per account.')},basic=messages(language);
+ const t={...textFor(language),configure:tr('Subscription Management'),history:tr('Usage Statistics'),pin_limit:tr('Choose up to three menu bar metrics per account.')},basic=messages(language);
  const account=state?.accounts.find(a=>a.id===current.accountId);
  const push=(page:Page,details:Omit<Route,'page'|'key'>={})=>{
   const trigger=document.querySelector('[role="menu"]')?'menu':lastTrigger.current??document.activeElement;
   if(trigger==='menu'||trigger instanceof HTMLElement)returnFocus.current.set(current.key,trigger);
   setRoutes(r=>[...r,{key:++sequence.current,page,...details}]);
  };
- const back=()=>setRoutes(r=>r.length>1?r.slice(0,-1):r);
+ const back=()=>{if(current.editing){if(!busy)setRoutes(r=>r.map(item=>item.key===current.key?{...item,editing:false}:item));}else setRoutes(r=>r.length>1?r.slice(0,-1):r);};
  const addAccount=()=>{setAddedName('');if(current.page!=='configure')push('configure');push('add');void send({method:'discover'}).catch(()=>{});};
  const finishAdding=(name:string)=>{setAddedName(name);back();};
  const retryAccount=(accountId:string)=>{if(state&&!busy&&!refreshing)void refreshWithFeedback(state,current.key,accountId);};
- const refreshable=current.page==='home'||current.page==='history'||current.page==='detail'&&current.tab!=='settings';
+ const refreshable=current.page==='home'||current.page==='history'||current.page==='detail'&&!current.editing;
  const refresh=()=>{if(state&&refreshable&&!busy&&!refreshing)void refreshWithFeedback(state,current.key,current.accountId);};
  const refreshFeedback=feedback?.scope===current.key?feedback:null;
  // The finished result is shown on the button itself (icon + a short label beside it); the full sentence is only announced.
@@ -107,14 +109,14 @@ export function DesktopApp() {
    if(e.defaultPrevented)return;
    if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='r'){e.preventDefault();refresh();}
    if((e.metaKey&&e.key==='[')||(e.altKey&&e.key==='ArrowLeft')){e.preventDefault();back();}
-   if(e.key==='Escape'&&!document.querySelector('[role="menu"],[role="listbox"],[role="dialog"]')){e.preventDefault();void invoke('hide');}
+   if(e.key==='Escape'&&!document.querySelector('[role="menu"],[role="listbox"],[role="dialog"]')){e.preventDefault();if(current.editing)back();else void invoke('hide');}
   };
   window.addEventListener('keydown',key);return()=>window.removeEventListener('keydown',key);
  },[current,refreshable,busy,refreshing,state,refreshWithFeedback]);
- const title=current.page==='detail'?account?.name??'':current.page==='settings'?t.settings:current.page==='configure'?t.configure:current.page==='add'?tr('Add Account'):current.page==='history'?t.history:current.page==='about'?basic.about:current.page==='updates'?t.checkUpdates:'TokenPlan';
+ const title=current.page==='detail'?account?.name??'':current.page==='settings'?t.settings:current.page==='configure'?tr('Subscription Management'):current.page==='add'?tr('Add Account'):current.page==='history'?tr('Usage Statistics'):current.page==='about'?basic.about:current.page==='updates'?t.checkUpdates:'TokenPlan';
  return <MotionConfig reducedMotion="user"><main className="mac-preview" data-density={densityPreference.density} onClickCapture={e=>{lastTrigger.current=(e.target as Element).closest<HTMLElement>('button');}}>
   <header className={`preview-header ${current.page==='home'?'home-header':current.page==='configure'?'configure-header':''}`}>
-   {current.page!=='home'&&<Button className="icon-button back-button" size="sm" variant="ghost" aria-label={basic.back} onClick={back}><ChevronLeft size={21}/></Button>}
+   {current.page!=='home'&&<Button className="icon-button back-button" size="sm" variant="ghost" aria-label={current.editing?t.cancel:basic.back} disabled={!!current.editing&&busy} onClick={back}><ChevronLeft size={21}/></Button>}
    <div className="page-title">{current.page==='home'?<img src="/capsule.png" alt=""/>:current.page==='detail'&&account?<ProviderLogo family={account.family}/>:null}<h1 ref={heading} tabIndex={-1}>{title}</h1></div>
    <div className="header-actions">
     {refreshable&&<>
@@ -124,8 +126,7 @@ export function DesktopApp() {
      </Button></>}
     {current.page==='configure'&&<Button size="sm" variant="ghost" onClick={addAccount}><Plus size={16}/>{tr('Add Account')}</Button>}
     {current.page==='home'&&<DropdownMenu label={basic.more} iconOnly icon={<Ellipsis size={19}/>} items={[
-     {label:t.configure,onSelect:()=>push('configure')},{label:t.history,onSelect:()=>push('history')},
-     {label:t.settings,onSelect:()=>push('settings')},...(import.meta.env.VITE_MAC_NAVIGATION_PREVIEW==='1'?[]:[{label:t.checkUpdates,separatorBefore:true,onSelect:()=>{push('updates');void updater.checkNow();}}]),{label:basic.about,separatorBefore:import.meta.env.VITE_MAC_NAVIGATION_PREVIEW==='1',onSelect:()=>push('about')},
+     {label:t.settings,onSelect:()=>push('settings')},{label:tr('Subscription Management'),onSelect:()=>push('configure')},{label:tr('Usage Statistics'),onSelect:()=>push('history')},{label:t.checkUpdates,separatorBefore:true,onSelect:()=>{push('updates');void updater.checkNow();}},{label:basic.about,separatorBefore:false,onSelect:()=>push('about')},
      {label:basic.quit,separatorBefore:true,onSelect:()=>{void invoke('quit');}},
     ]}/>}
    </div>
@@ -137,11 +138,11 @@ export function DesktopApp() {
   <div className="page-stack">{routes.map(route=>{
    const a=state?.accounts.find(a=>a.id===route.accountId);
    return <div className="preview-page" data-page={route.page} key={route.key} hidden={route.key!==current.key}><div className="page-content">
-    {state&&route.page==='home'&&<>{!state.accounts.some(a=>a.enabled)?<div className="empty-state">{state.accounts.some(a=>a.added)?<><p>{tr('All accounts are hidden from Home. You can show them again in Account Management.')}</p><Button size="sm" variant="secondary" onClick={()=>push('configure')}>{t.configure}</Button></>:<><p>{tr('No accounts yet. Add one to start tracking your usage.')}</p><div className="empty-actions"><Button size="sm" variant="secondary" onClick={addAccount}><Plus size={15}/>{tr('Add Account')}</Button></div></>}</div>:<><HomeTips state={state} send={send} language={language} addAccount={addAccount}/><Dashboard accounts={state.accounts} open={accountId=>push('detail',{accountId,tab:'usage'})} openSettings={accountId=>push('detail',{accountId,tab:'settings'})} retry={retryAccount} busy={busy||refreshing} now={now} language={language} missing={basic.missing} remaining={state.settings.showRemaining} usageStyle={usageStylePreference.style}/><Button className="add-account-row" variant="ghost" size="sm" onClick={addAccount}><Plus size={15}/>{tr('Add Account')}</Button></>}</>}
-    {state&&a&&route.page==='detail'&&<AccountDetail platform={platform} draft={drafts[a.id]??{}} onDraftChange={patch=>setDrafts(d=>({...d,[a.id]:{...d[a.id],...patch}}))} usageStyle={usageStylePreference.style} openGeneral={()=>push('settings')} retry={retryAccount} account={a} tab={route.tab??'usage'} onTab={tab=>setRoutes(r=>r.map(item=>item.key===route.key?{...item,tab}:item))} history={range=>push('history',{accountId:a.id,range})} send={send} t={t} busy={busy} language={language} now={now} remaining={state.settings.showRemaining} missing={basic.missing}/>}
+    {state&&route.page==='home'&&<>{!state.accounts.some(a=>a.enabled)?<div className="empty-state">{state.accounts.some(a=>a.added)?<><p>{tr('All accounts are hidden from Home. You can show them again in Subscription Management.')}</p><Button size="sm" variant="secondary" onClick={()=>push('configure')}>{t.configure}</Button></>:<><p>{tr('No accounts yet. Add one to start tracking your usage.')}</p><div className="empty-actions"><Button size="sm" variant="secondary" onClick={addAccount}><Plus size={15}/>{tr('Add Account')}</Button></div></>}</div>:<><HomeTips state={state} send={send} language={language} addAccount={addAccount}/><Dashboard accounts={state.accounts} open={accountId=>push('detail',{accountId})} openSettings={accountId=>push('detail',{accountId,focusManagement:true})} retry={retryAccount} busy={busy||refreshing} now={now} language={language} missing={basic.missing} remaining={state.settings.showRemaining} usageStyle={usageStylePreference.style} accountStyle={usageStylePreference.styleFor}/><Button className="add-account-row" variant="ghost" size="sm" onClick={addAccount}><Plus size={15}/>{tr('Add Account')}</Button></>}</>}
+    {state&&a&&route.page==='detail'&&<AccountDetail onSetupChange={setups.reload} usageStylePreference={usageStylePreference} focusManagement={route.focusManagement} draft={drafts[a.id]??{}} onDraftChange={patch=>setDrafts(d=>({...d,[a.id]:{...d[a.id],...patch}}))} retry={retryAccount} account={a} editing={route.editing??false} onEditing={editing=>setRoutes(r=>r.map(item=>item.key===route.key?{...item,editing}:item))} history={range=>push('history',{accountId:a.id,range})} send={send} t={t} busy={busy} language={language} now={now} remaining={state.settings.showRemaining} missing={basic.missing}/>}
     {state&&route.page==='settings'&&<GeneralSettings platform={platform} openAccounts={()=>push('configure')} densityPreference={densityPreference} usageStylePreference={usageStylePreference} state={state} send={send} t={t} busy={busy} language={language}/>}
-    {state&&route.page==='configure'&&<>{addedName&&<p role="status" className="added-note">{tr('Added to Home')}: {addedName}</p>}<ServiceConfiguration platform={platform} openGeneral={()=>push('settings')} state={state} send={send} t={t} busy={busy} language={language} open={accountId=>push('detail',{accountId,tab:'settings'})}/></>}
-    {state&&route.page==='add'&&<AddAccount state={state} send={send} t={t} busy={busy} language={language} complete={finishAdding} open={accountId=>{back();push('detail',{accountId,tab:'settings'});}}/>}
+    {state&&route.page==='configure'&&<>{addedName&&<p role="status" className="added-note">{tr('Added to Home')}: {addedName}</p>}<ServiceConfiguration setups={setups} resume={setupId=>push('add',{setupId})} platform={platform} state={state} send={send} t={t} busy={busy} language={language}/></>}
+    {state&&route.page==='add'&&<AddAccount setup={setups.records.find(r=>r.id===route.setupId)} onSetupChange={setups.reload} state={state} send={send} t={t} busy={busy} language={language} complete={finishAdding} open={accountId=>{back();push('detail',{accountId});}}/>}
     {state&&route.page==='history'&&<>{a&&<div className="history-account-context">{a.name}{a.email&&<span>{a.email}</span>}</div>}<HistoryPage accounts={a?[a]:state.accounts} t={t} language={language} initialRange={route.range}/></>}
     {route.page==='updates'&&<Updates showHeading={false} t={t} updater={updater} automatic={state?.settings.autoUpdates??true} onAutomatic={autoUpdates=>{void send({method:'settings',value:{autoUpdates}}).catch(()=>{});}}/>}
     {route.page==='about'&&<section className="about"><img src="/capsule.png" alt=""/><h2>TokenPlan</h2><p>{version}</p>{import.meta.env.VITE_MAC_NAVIGATION_PREVIEW==='1'&&<p className="muted">{tr('Design Preview')}</p>}

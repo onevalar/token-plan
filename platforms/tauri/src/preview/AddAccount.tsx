@@ -8,10 +8,11 @@ import type {Account,DesktopState,Send} from '../desktop';
 import type {Copy} from '../copy';
 import {useChange} from './shared';
 import {AccountOnboarding} from './AccountOnboarding';
+import type {AccountSetup} from './useAccountSetups';
 
 /** Pick a service first, then use only the connection options that service supports. */
-export function AddAccount({state,send,t,busy,language,open,complete}:{state:DesktopState;send:Send;t:Copy;busy:boolean;language:string;open:(id:string)=>void;complete:(name:string)=>void}) {
- const tr=(s:string)=>providerText(s,language),[search,setSearch]=useState(''),[family,setFamily]=useState<string|null>(null);
+export function AddAccount({state,send,t,busy,language,open,complete,setup,onSetupChange}:{setup?:AccountSetup;onSetupChange:()=>Promise<void>;state:DesktopState;send:Send;t:Copy;busy:boolean;language:string;open:(id:string)=>void;complete:(name:string)=>void}) {
+ const tr=(s:string)=>providerText(s,language),[search,setSearch]=useState(''),[family,setFamily]=useState<string|null>(setup?.provider??null);
  const {pending,change,notice}=useChange(send,t),disabled=busy||pending;
  const services=state.accounts.filter((a,i,all)=>all.findIndex(b=>b.family===a.family)===i);
  const selected=services.find(a=>a.family===family);
@@ -35,10 +36,9 @@ export function AddAccount({state,send,t,busy,language,open,complete}:{state:Des
     <span className="account-entry"><ProviderLogo family={a.family}/><span className="record-label">{a.name}<small>{hint(a)}</small></span></span>
     <Button size="sm" variant="secondary" disabled={disabled} aria-label={`${tr(a.apiKey?'Set Up':'Add')} ${label(a)}`} onClick={()=>void add(a)}>{tr(a.apiKey?'Set Up':'Add')}</Button>
    </div>)}</div>
-   {!found.length&&<p className="group-description">{tr('Existing accounts are in Account Management, including accounts hidden from Home.')}</p>}
-   {['claude','codex'].includes(selected.family)&&<AccountOnboarding key={selected.family} family={selected.family} send={send} busy={disabled} language={language} onConnected={accounts=>{
-    const added=accounts.find(a=>a.enabled&&!state.accounts.some(old=>old.id===a.id&&(old.enabled||old.added)));
-    if(added)complete(label(added));
+   {!found.length&&<p className="group-description">{tr('Existing accounts are in Subscription Management, including accounts hidden from Home.')}</p>}
+   {['claude','codex'].includes(selected.family)&&<AccountOnboarding key={selected.family} setup={setup?.provider===selected.family?setup:undefined} onSetupChange={onSetupChange} family={selected.family} send={send} busy={disabled} language={language} onConnected={accounts=>{
+    const added=accounts[0];if(added)complete(label(added));
    }}/>}
   </>}
  </div>;

@@ -12,6 +12,7 @@ public final class DesktopBridge {
     private let layout: LayoutStore
     private let store: WidgetDataStore
     private let observedIdentities: [String: String]
+    private let loginDirectories: [String: [String]]
     private let notes: SubscriptionNotesStore
 
     public init(defaults: UserDefaults) async {
@@ -41,6 +42,10 @@ public final class DesktopBridge {
             defaultExpandedMetricIDs: expand(DefaultLayout.expandedMetricIDs),
             isProviderEnabled: { enablement.isEnabled($0) && !accounts.isRemoved($0) })
         layout.isProviderRemoved = { accounts.isRemoved($0) }
+        var directories = Dictionary(uniqueKeysWithValues: assembly.claudeCards.map { ($0.id, $0.configDirectory.map { [$0] } ?? []) })
+        for card in assembly.codexCards { directories[card.id] = card.authHomes }
+        if assembly.codexCards.isEmpty { directories["codex"] = assembly.codex.plainAuthHomes }
+        self.loginDirectories = directories
         self.observedIdentities = assembly.identityKeysByCard
         self.runtimes = runtimes; self.registry = registry
         self.accounts = accounts; self.enablement = enablement; self.layout = layout
@@ -113,8 +118,9 @@ public final class DesktopBridge {
                 defaults.set(Array(added), forKey: "tokenplan.desktop.addedAccounts")
                 enablement.setEnabled(enabled, for: id)
             case "remove":
-                guard accounts.records.contains(where: { $0.id == id }) else { throw Failure.invalid }
-                accounts.remove(id); enablement.setEnabled(false, for: id)
+                if accounts.records.contains(where: { $0.id == id }) { accounts.remove(id) }
+                enablement.setEnabled(false, for: id)
+                defaults.set((defaults.stringArray(forKey: "tokenplan.desktop.addedAccounts") ?? []).filter { $0 != id }, forKey: "tokenplan.desktop.addedAccounts")
             case "tray":
                 guard let enabled = value as? Bool else { throw Failure.invalid }
                 layout.setMenuBarEntrySelected(enabled, for: id)
@@ -126,6 +132,8 @@ public final class DesktopBridge {
                 var order = accountIDs()
                 guard let index = order.firstIndex(of: id), order.indices.contains(index + offset) else { break }
                 order.swapAt(index, index + offset); layout.providerOrder = order; layout.persistProviderOrder()
+            case "metricLayout":
+                try DesktopMetricLayout.apply(value, accountID: id, registry: registry, layout: layout)
             case "metric":
                 guard let metricID = request["metricId"] as? String,
                       registry.descriptor(id: metricID)?.providerID == id,
@@ -235,6 +243,7 @@ public final class DesktopBridge {
                 "plan": snapshot?.plan ?? "", "enabled": enablement.isEnabled(id),
                 "tray": layout.isMenuBarAccountVisible(id) && layout.isMenuBarServiceVisible(id),
                 "removable": accounts.records.contains { $0.id == id }, "apiKey": runtimes.first { $0.provider.id == id } is any APIKeyManaging,
+                "loginDirectories": loginDirectories[id] ?? [],
                 "connection": observedIdentities[id] == nil ? "unchecked" : "available",
                 "note": notes.note(for: id), "metrics": metrics, "history": history,
                 "historyScope": "account", "historyPartial": !(snapshot?.usageHistory?.unknownModelsByDay.isEmpty ?? true),

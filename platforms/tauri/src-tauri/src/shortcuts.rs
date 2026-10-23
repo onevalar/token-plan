@@ -21,6 +21,7 @@ pub fn apply(app:&tauri::AppHandle,value:&str)->Result<(),String> {
     let binding=app.state::<Binding>();let mut old=binding.0.lock().map_err(|_|"shortcut_failed")?;
     if old.value==value {return Ok(())}
     if !available(app) {if value.is_empty(){old.value.clear();return Ok(())}return Err("shortcut_failed".into());}
+    if option_env!("VITE_MAC_NAVIGATION_PREVIEW") == Some("1") {old.value=value.into();return Ok(())}
     // Register first: conflicts leave the previous working shortcut intact.
     if !value.is_empty() { app.global_shortcut().register(parse(value)?).map_err(|_|"shortcut_failed")?; }
     if !old.paused && !old.value.is_empty() {
@@ -45,6 +46,7 @@ pub fn shortcut_capture(app:tauri::AppHandle,paused:bool)->Result<(),String> {
     let binding=app.state::<Binding>();let mut state=binding.0.lock().map_err(|_|"shortcut_failed")?;
     if state.paused==paused {return Ok(())}
     if !available(&app) {return Err("shortcut_failed".into());}
+    if option_env!("VITE_MAC_NAVIGATION_PREVIEW") == Some("1") {state.paused=paused;return Ok(())}
     if !state.value.is_empty() {
         let shortcut=parse(&state.value)?;
         if paused {app.global_shortcut().unregister(shortcut)} else {app.global_shortcut().register(shortcut)}.map_err(|_|"shortcut_failed")?;

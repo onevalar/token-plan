@@ -58,9 +58,12 @@
 "About" = "關於";
 "About TokenPlan" = "關於 TokenPlan";
 "Account" = "帳號";
+"Account Actions" = "帳號操作";
 "Account Details" = "帳號資訊";
 "Account Management" = "帳號管理";
+"Account Note (Optional)" = "帳號備註（選填）";
 "Account Settings" = "帳號設定";
+"Account connected." = "帳號已連線。";
 "Account identified. Enable it and refresh to load usage." = "帳號已辨識，啟用並重新整理後可讀取用量。";
 "Account kept. Its login could not be identified. Check the configuration directory and access permissions, then detect again." = "帳號已保留，但尚未辨識對應登入。請檢查設定目錄及存取權限後重新偵測。";
 "Account saved. Reconnect its login, then detect accounts again." = "帳號已保留。請重新連接登入後，再偵測帳號。";
@@ -88,6 +91,7 @@
 "Alert when a limit is projected to finish with little left." = "預計額度所剩無幾時提醒。";
 "All Providers" = "全部提供方";
 "All accounts are hidden from Home. You can show them again in Account Management." = "所有帳號都已在首頁隱藏，可在「帳號管理」中重新顯示。";
+"All accounts are hidden from Home. You can show them again in Subscription Management." = "所有帳號都已在首頁隱藏，可在訂閱管理中重新顯示。";
 "All services" = "全部服務";
 "Allow Notifications" = "允許通知";
 "Allow TokenPlan notifications in system settings, then try again." = "請在系統設定中允許 TokenPlan 通知，然後重試。";
@@ -109,6 +113,7 @@
 "Appearance" = "外觀";
 "Appearance and Language" = "外觀與語言";
 "Application" = "應用程式資訊";
+"Apply Style" = "套用方式";
 "Argon Weekly" = "Argon 每週";
 "Assign tokenplan --toggle in your desktop's keyboard settings." = "可在桌面的鍵盤設定中為 tokenplan --toggle 指派快速鍵。";
 "At least one content item must remain visible." = "至少保留一項顯示內容。";
@@ -136,6 +141,7 @@
 "Cash" = "現金";
 "Change Service" = "更換服務";
 "Change in General Settings" = "在一般設定中變更";
+"Changes apply after you confirm. Cancel keeps your previous display." = "點擊確定後套用修改；取消將保留原來的顯示設定。";
 "Chat" = "聊天";
 "Check Automatically" = "自動檢查";
 "Check Connection" = "檢查連線";
@@ -190,6 +196,7 @@
 "Concentric Rings" = "獨立同心環";
 "Configuration Directory" = "設定目錄";
 "Confirm" = "確認";
+"Confirm Changes" = "確定";
 "Connect Account" = "連接帳號";
 "Connect Amp with amp login, then refresh." = "執行 amp login 登入帳號後重新整理。";
 "Connect Existing Configuration Directory" = "連接現有設定目錄";
@@ -201,6 +208,7 @@
 "Consumes one reset credit. Only the usage windows eligible on the server will be reset. This can't be undone." = "將消耗一份重置額度，僅重置伺服器允許的用量週期。此操作無法復原。";
 "Content" = "內容";
 "Content Item" = "內容項";
+"Continue Setup" = "繼續連線";
 "Copied" = "已複製";
 "Copilot usage data is unavailable for this account." = "此帳號無法取得 Copilot 用量資料。";
 "Copilot usage request failed (HTTP %lld). Try again later." = "Copilot 用量請求失敗（HTTP %lld），請稍後再試。";
@@ -216,6 +224,7 @@
 "Could not check or install the update. Try again later." = "無法檢查或安裝更新，請稍後重試。";
 "Could not complete this step. Check the directory or login and try again." = "操作未完成，請檢查目錄或登入狀態後重試。";
 "Could not install the update. Try again later." = "無法安裝更新，請稍後重試。";
+"Could not load pending accounts. Try again." = "無法讀取待連線帳號，請重試。";
 "Could not load the Home usage style. Choose a style to save it again." = "無法讀取首頁用量樣式，請重新選擇樣式以儲存。";
 "Could not open a terminal. Copy this command and run it in your terminal." = "無法開啟終端機，請複製此命令到終端機執行。";
 "Could not refresh accounts. Check their status." = "帳號重新整理失敗，請查看帳號狀態。";
@@ -239,6 +248,8 @@
 "Couldn't save the %@ API key." = "無法儲存 %@ 的 API 金鑰。";
 "Couldn't save the OpenRouter API key." = "無法儲存 OpenRouter 的 API 金鑰。";
 "Couldn't save the Z.ai API key." = "無法儲存 Z.ai 的 API 金鑰。";
+"Create Account and Sign In" = "建立獨立帳號並登入";
+"Create a separate login folder for this account. Your existing terminal login stays unchanged." = "為這個帳號建立獨立登入目錄，不影響終端機目前登入的帳號。";
 "Credits" = "額度";
 "Ctrl + Alt + U" = "Ctrl + Alt + U";
 "Current Account" = "目前帳號";
@@ -252,6 +263,7 @@
 "Cursor token history needs a valid desktop session. Sign in with Cursor again." = "Cursor Token 歷史需要有效的桌面登入，請在 Cursor 中重新登入。";
 "Custom Key" = "自訂金鑰";
 "Customize" = "自訂";
+"Customize by Account" = "依帳號自訂";
 "Customize…" = "自訂…";
 "Cutting It Close" = "接近上限";
 "Daily" = "每日";
@@ -294,11 +306,14 @@
 "Download and Install Update" = "下載並安裝更新";
 "Downloading Update…" = "正在下載更新…";
 "Drag metrics here" = "將指標拖曳到此處";
+"Drag to Reorder" = "拖曳排序";
 "Drunk Mode" = "微醺模式";
 "Each cell is 1%." = "每格 1 個百分點。";
 "Edit" = "編輯";
+"Edit Home Display" = "編輯首頁顯示";
 "Enable Claude or Codex in Providers to read local token logs." = "在提供方中啟用 Claude 或 Codex，即可讀取本機 Token 日誌。";
 "Enable Codex in Providers to read its local token logs." = "在提供方中啟用 Codex，即可讀取本機 Token 日誌。";
+"Enable Notifications" = "開啟通知";
 "Enable a provider to view token history." = "啟用一個提供方，即可查看 Token 歷史。";
 "Enable a service with usage history to see totals here." = "啟用支援用量記錄的服務後，可在此查看彙總。";
 "Enable services in Service Configuration to configure their menu-bar visibility." = "在服務設定中啟用服務，即可設定其選單列顯示。";
@@ -319,6 +334,7 @@
 "Exact Readings" = "精確數值";
 "Example Data" = "範例資料";
 "Existing accounts are in Account Management, including accounts hidden from Home." = "已新增的帳號都在「帳號管理」中，包括未在首頁顯示的帳號。";
+"Existing accounts are in Subscription Management, including accounts hidden from Home." = "已新增的帳號都在訂閱管理中，包括在首頁隱藏的帳號。";
 "Expanded" = "已展開";
 "Expired" = "已到期";
 "Expires" = "到期時間";
@@ -383,6 +399,7 @@
 "History" = "歷史記錄";
 "History comes from logs on this device. It may not cover every account or device." = "歷史來自本機記錄，不一定涵蓋所有帳號與裝置。";
 "Home" = "首頁顯示";
+"Home Display" = "首頁顯示內容";
 "Home Layout" = "首頁配置";
 "Home Metrics" = "首頁指標";
 "Home Page" = "首頁";
@@ -516,6 +533,7 @@
 "No readings in this range. Successful refreshes will appear here." = "此時間範圍內暫無記錄，成功重新整理後會顯示在此。";
 "No recorded token usage was found in the local logs." = "本機日誌中暫無已記錄的 Token 用量。";
 "No reported token usage was found in the Cursor export." = "Cursor 匯出中暫無已回報的 Token 用量。";
+"No signed-in account was found in this folder yet. Finish signing in, then check again." = "這個目錄中還沒有偵測到已登入的帳號，請完成登入後再次偵測。";
 "No token data for this period" = "這段期間沒有 token 資料";
 "No usage data" = "沒有用量資料";
 "No usage history available." = "暫無用量記錄。";
@@ -532,6 +550,7 @@
 "Not logged in. Sign in via Cursor app or run `agent login`." = "尚未登入。請在 Cursor App 中登入，或執行 `agent login`。";
 "Not refreshed" = "未重新整理";
 "Not signed in to Ollama Cloud. Run `ollama signin` to see usage." = "尚未登入 Ollama Cloud。請執行 `ollama signin` 查看用量。";
+"Not signed in yet" = "尚未完成登入";
 "Not started" = "未開始";
 "Note" = "備註";
 "Note (Optional)" = "備註（選填）";
@@ -556,6 +575,7 @@
 "Open System Settings" = "開啟系統設定";
 "Open Terminal to Sign In" = "開啟終端機登入";
 "Open TokenPlan from anywhere" = "在任何地方開啟 TokenPlan";
+"Open an account, then choose Edit Home Display to set its usage style." = "進入帳號詳情，點擊「編輯首頁顯示」設定該帳號的用量樣式。";
 "Open-Source Licenses" = "開源授權條款";
 "OpenCode Go key was rejected. Log into OpenCode Go again." = "OpenCode Go 金鑰被拒絕。請重新登入 OpenCode Go。";
 "OpenCode not detected. Log in with OpenCode Go or use OpenCode locally first." = "未偵測到 OpenCode。請先登入 OpenCode Go 或在本機使用 OpenCode。";
@@ -583,6 +603,7 @@
 "Party Mode" = "派對模式";
 "Party mode is on, so this stays paused." = "派對模式已開啟，因此此項暫停。";
 "Pay as you go" = "按量付費";
+"Pending Connections" = "待連線帳號";
 "Percentage" = "百分比";
 "Percentage Grid" = "百分格";
 "Personal" = "個人";
@@ -590,6 +611,7 @@
 "Platform" = "執行平台";
 "Preferences could not be read. Changes can be saved again in Settings." = "無法讀取偏好設定，可在設定中重新儲存。";
 "Preferences could not be saved. Check the app data folder permissions." = "無法儲存偏好設定，請檢查應用程式資料目錄的權限。";
+"Press Shortcut" = "請按下快速鍵";
 "Preview" = "預覽";
 "Previous Page" = "上一頁";
 "Pricing" = "價格估算";
@@ -659,6 +681,7 @@
 "Remove?" = "確認移除？";
 "Removed from menu bar" = "已從選單列移除";
 "Removing…" = "正在移除…";
+"Reopen Terminal" = "重新開啟終端機";
 "Reorder" = "排序";
 "Report a Problem" = "回報問題";
 "Report an Issue" = "回報問題";
@@ -708,6 +731,7 @@
 "Ring" = "環形";
 "Run devin auth login or sign in to Devin and try again." = "請執行 devin auth login 或登入 Devin 後再試。";
 "Same order as Account Management" = "順序與「帳號管理」相同";
+"Same order as Subscription Management" = "順序與「訂閱管理」相同";
 "Save" = "儲存";
 "Saved" = "已儲存";
 "Saved account. Refresh to check its current connection." = "帳號已保留，重新整理後檢查目前連線。";
@@ -775,6 +799,7 @@
 "Stop" = "停止";
 "Subscription" = "訂閱";
 "Subscription Details" = "訂閱詳情";
+"Subscription Management" = "訂閱管理";
 "Support & Acknowledgments" = "支援與致謝";
 "System" = "跟隨系統";
 "System Default" = "跟隨系統";
@@ -868,6 +893,7 @@
 "Unavailable Model" = "無法使用的模型";
 "Unclassified Records" = "未分類記錄";
 "Under 10% usage remaining for this window." = "本週期剩餘額度不足 10%。";
+"Unified Style" = "全域統一";
 "Uninstall" = "解除安裝";
 "Unknown" = "未知";
 "Unknown Codex models use the selected fallback price." = "未知 Codex 模型使用所選備援模型的價格估算。";
@@ -886,6 +912,7 @@
 "Updated %@" = "更新於 %@";
 "Updated %@ ago" = "%@前更新";
 "Updates" = "更新";
+"Updates are disabled in the design preview." = "獨立測試版不執行更新。";
 "Updates blocked by Anthropic. Be patient — manual refreshes will make it worse." = "Anthropic 暫時限制了更新。請耐心等待——手動重新整理只會讓情況更糟。";
 "Usage" = "用量";
 "Usage Display" = "用量顯示";
@@ -893,6 +920,7 @@
 "Usage Needs Attention" = "請留意用量";
 "Usage Notifications" = "用量通知";
 "Usage Overview" = "用量總覽";
+"Usage Statistics" = "用量統計";
 "Usage Style" = "用量樣式";
 "Usage Trend" = "用量趨勢";
 "Usage could not be read; see the details below." = "用量讀取失敗，請查看下方原因。";

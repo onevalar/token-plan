@@ -18,15 +18,17 @@ test('platform settings expose live tray quotas only on macOS',async({page},info
  await expect(page.getByRole('button',{name:/^用量样式/})).toBeVisible();
  await page.getByRole('button',{name:'返回',exact:true}).click();
  await page.getByRole('button',{name:'Claude first@example.com',exact:true}).click();
- await page.getByRole('button',{name:'账号设置',exact:true}).click();
- // Menu bar choices live in General Settings; here they are only summarized with a link there.
+ await page.getByRole('button',{name:'编辑首页显示',exact:true}).click();
+ // Global styles have no duplicate account-level entry.
  await expect(visible(page).getByRole('switch')).toHaveCount(0);
- await expect(visible(page).locator('.linked-setting').filter({hasText:'菜单栏'})).toHaveCount(mac?1:0);
- await expect(visible(page).locator('.linked-setting').filter({hasText:'首页用量样式'})).toHaveCount(1);
+ await expect(visible(page).locator('.linked-setting').filter({hasText:'菜单栏'})).toHaveCount(0);
+ await expect(visible(page).locator('.linked-setting').filter({hasText:'首页用量样式'})).toHaveCount(0);
  const rows=visible(page).locator('.placement-row');
  await expect(rows.first().getByRole('combobox')).toBeVisible();
  await rows.first().getByRole('combobox').click();await page.getByRole('option',{name:'仅详情',exact:true}).click();
- expect(await page.evaluate(()=>(window as any).__requests.at(-1))).toMatchObject({method:'metric',value:{placement:'details'}});
+ expect(await page.evaluate(()=>(window as any).__requests.filter((r:any)=>r.method==='metricLayout'))).toHaveLength(0);
+ await page.getByRole('button',{name:'确定',exact:true}).click();
+ expect(await page.evaluate(()=>(window as any).__requests.at(-1))).toMatchObject({method:'metricLayout',value:expect.arrayContaining([expect.objectContaining({placement:'details'})])});
  expect(await visible(page).evaluate(e=>e.scrollWidth<=e.clientWidth)).toBe(true);
  await page.screenshot({path:info.outputPath('account-settings.png'),animations:'disabled'});
 });

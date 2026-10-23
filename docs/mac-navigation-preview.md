@@ -8,7 +8,7 @@ tray integration remain platform-specific. This change does not publish a releas
 
 - Home offers Compact (default) and Comfortable spacing. The preference stays on
   this device; the previous macOS preview preference is preserved on upgrade.
-- General Settings › Home offers eight Home Usage Styles, shown as one collapsed row with the
+- In Unified mode, General Settings › Usage Style offers eight Home Usage Styles, shown as one collapsed row with the
   current style; opening it shows a small drawing of every style at once: Bars (default), Gauges,
   Percentage Grid, Compact Rings, Quota Ruler, Concentric Rings, Numbers and
   Segmented Bar. The choice stays on this device, independently of spacing,
@@ -28,7 +28,7 @@ tray integration remain platform-specific. This change does not publish a releas
 - These are independent quota displays, not combined goal rings, quota composition
   charts or forecasts without real data.
 - Home has matching icon-only Refresh/More actions. Inner pages have Back, a page
-  title and only relevant actions. Back restores the prior screen, scroll, tab and
+  title and only relevant actions. Back restores the prior screen, scroll and
   history range, and returns keyboard focus to the entry that opened it when still
   available. Escape closes a dropdown before dismissing the panel.
 - Account details group quotas, benefits and history. All home metrics can be
@@ -75,25 +75,29 @@ tray integration remain platform-specific. This change does not publish a releas
   (Refreshed, Not refreshed, Needs attention, Some failed, Refresh failed). "Refreshed" appears only when
   at least one account actually fetched new data; if nothing was fetched it says Not refreshed. There is no banner
   and nothing moves; the full sentence is only announced to screen readers.
-- Account Management lists added accounts, including those hidden from Home. Turning a
+- Subscription Management lists added accounts, including those hidden from Home. Turning a
   switch off keeps the row here, including after restarting; it does not send the account
   back to Add Account. Never-added service placeholders stay out of this list. Older
   versions did not record this distinction: previously hidden accounts can be added once
   from Add Account, after which hiding them preserves their membership.
-- Add Account is an action inside Account Management, with a shortcut at the end of Home.
+- Add Account is an action inside Subscription Management, with a shortcut at the end of Home.
   Choose a service first, then use its available account or connection options. Claude
-  and Codex offer an isolated terminal login and an existing-folder option. Adding returns
-  to Account Management with confirmation; API-key services open settings first, with Back
-  returning to Account Management. When all added accounts are hidden, Home offers Account
+  and Codex create a local pending record with an optional note and a private `.claude-accountN` or
+  `.codex-accountN` directory, skipping existing folders. Login opens the official CLI in that folder;
+  the default login is unchanged. Pending records survive navigation/restart and can resume in the same
+  directory or be removed without deleting login files. Detection only completes that record when the
+  engine identifies an account in its directory. An existing-folder option remains available. Adding returns
+  to Subscription Management with confirmation; API-key services open settings first, with Back
+  returning to Subscription Management. When all added accounts are hidden, Home offers Subscription
   Management rather than claiming there are no accounts.
-- More groups Account Management, Usage History and General Settings together; Check for
+- More groups General Settings, Subscription Management and Usage Statistics in that order; Check for
   Updates and About form the second group, and Quit remains separate.
 - An account's note is hidden behind Add Note (or shown as text with Edit) until wanted;
-  an unsaved draft keeps the editor open. Removing an account sits in its own section at
-  the bottom of the account settings, apart from notes and the API key.
+  an unsaved draft keeps the editor open. Edit Home Display, Add Note and Remove Account
+  form three full-width actions below the account details; removal asks for confirmation.
 - Problem cards carry one button for the next step: Try Again (temporary failures, refreshes just that account), Sign In Again
   (a CLI login that needs authorizing), Check Connection, Set API Key (opens the key field) or View Details. Each Home account has
-  one heading/arrow entry into Usage; settings live in the detail page's Account Settings tab, not a neighboring hover shortcut.
+  one heading/arrow entry into Usage; account management is below the usage details; Home display changes use an explicit editor.
   The detail page offers the same Try Again and Set API Key buttons beside an error (sign-in help is already on the page). Window labels (5h, 1w) and reset countdowns have plain-language
   tooltips ("5-hour window", "Resets in 3h").
 - First use shows a short welcome once (what appears automatically, what 5h/1w and the hourglass mean, where to add another login).
@@ -101,18 +105,24 @@ tray integration remain platform-specific. This change does not publish a releas
   permission first). Both can be dismissed; the choice is kept per device in the webview's own storage and never in preferences.
 - About shows the version, a one-line description, links to the project, release notes, issue reporting and license (opened by a native
   command that only accepts https links inside this project's repository), the OpenUsage credit and the no-analytics statement.
-- Each setting has one home. General Settings groups, in order: Appearance and Language, Home (usage style, density,
-  used/remaining), Menu Bar (macOS), Data Refresh, then notifications and shortcuts. The Menu Bar group holds everything
+- Each setting has one home. General Settings groups, in order: Appearance and Language, Usage Style, Home (density, used/remaining), Menu Bar (macOS), Data Refresh, then notifications and shortcuts. The Menu Bar group holds everything
   about the menu bar: a live preview at the top, style and icon position, and every shown account with its switch; a switched-on
-  account lists its metrics as chips to pick up to three for the menu bar. Hints about three rings or value-only metrics appear
-  only when they apply. Order comes from Account Management, linked with Adjust Order.
-- Account Management alone shows or hides accounts on Home and sets their order (which the menu bar also uses); on macOS it
-  ends with a menu bar summary linking to General Settings.
-- An account's Account Settings tab only holds what belongs to that account: a line naming the account it affects, Home
-  Metrics (Home / Details only / Hidden per metric), read-only Menu Bar and Home Usage Style summaries that link to General
-  Settings, the note, the API key and removal. The Usage tab ends with a link to choose which metrics appear on Home.
-  The three alerts share one card.
-  History provides filtering, seven-day pagination and expandable model records.
+  account lists its metrics with plus/minus controls to add or remove up to three for the menu bar. Hints about three rings or value-only metrics appear
+  only when they apply. Order comes from Subscription Management, linked with Adjust Order.
+- Subscription Management shows or hides accounts on Home and sets their order (which the macOS menu bar also uses).
+  Rows are not detail links: each has a display switch and an actions menu for removing the account, with inline confirmation.
+  Sorting exposes drag handles, also operable with the keyboard arrow keys. During a drag the full row follows the pointer and neighbouring rows make space; releasing commits the order, while Escape or pointer cancellation restores it. Auto-scrolling keeps longer lists reachable. Reduced Motion removes the settling animation. Removing a service also works when it has no separate saved identity, without deleting its login or history.
+- Account details have no tabs or duplicate global-setting links. View mode shows quota, history,
+  three equal-width actions for Edit Home Display, note and confirmed removal, plus API-key fields where needed.
+  Edit mode replaces the view with metric placement and ordering controls. Changes stay in a local
+  draft until Confirm submits the whole layout; Cancel, the header back action and Escape discard
+  the draft. Saving failures keep the editor open for retry. Windows and Linux share this account interaction.
+- General Settings › Usage Style first selects Unified Style (default) or Customize by Account.
+  Unified mode shows the shared style picker. Custom mode shows only guidance to open an account's
+  Edit Home Display, where style joins metric placement and order in the confirmed draft. Accounts of
+  the same provider are independent. The first switch to custom starts from the current shared style;
+  switching back to uniform keeps custom choices for later restoration. Style never affects the menu bar.
+- Notifications start with a master switch; enabling it reveals three alert options. Turning it off disables all alerts. The shortcut uses a compact recorder with an inline clear button. History provides filtering, seven-day pagination and expandable model records.
 - The production updater and About page remain available from More. Choosing Check
   for Updates immediately starts a check and opens its status page. The page's check
   button remains available for retrying; reopening during a check does not start a
@@ -136,12 +146,15 @@ tray integration remain platform-specific. This change does not publish a releas
   background. Windows/Linux keep one transparent TokenPlan application icon, with
   no usage plate, border, duplicated Home strip or quota tray settings. Stored Mac
   menu-bar selections are retained but not exposed by these two platforms.
-- Windows primary-click opens a two-item native menu: Show Home and Quit TokenPlan.
-  A Windows double-click directly brings Home forward. Linux requests the same
-  two-item menu on primary-click through StatusNotifier. SNI has no double-click
-  method and GNOME/KDE consume the click stream while rendering that menu, so Linux
-  does not promise a separate double-click shortcut. Show Home resets navigation,
-  restores a minimized window, raises it and requests keyboard focus.
+- Windows left-click directly shows Home beside the tray icon; right-click opens the native
+  Show Home / Quit TokenPlan menu. Double-click has no separate action or single-click delay.
+  Linux requests the same split through SNI Activate and its standard context menu. Some
+  GNOME extensions always show a menu on left-click; Show Home remains available there.
+  SNI has no distinct double-click callback. Show Home resets navigation, restores the window,
+  raises it and requests keyboard focus. Valid activation coordinates anchor the panel near
+  the icon; otherwise it centers on the current monitor (or primary monitor). Content resizing
+  keeps that placement inside the work area. Linux coordinate reporting and window placement
+  still depend on the desktop host/compositor, especially under Wayland.
 - Windows/Linux persist the automatic-refresh switch without the classic client's
   old forced-enable migration. Existing preferences and local history remain intact.
 
@@ -161,7 +174,7 @@ selection limits and persistence without modifying installed preferences.
 `~/Library/Caches/TokenPlan/NavigationPreview.noindex/TokenPlan Design Preview.app`.
 Close it before rebuilding. Its helper uses synthetic accounts in memory and never
 reads credentials or installed preferences. Refresh, notifications and credentials
-are simulated; real updater actions are disabled. The intermediate app is removed
+are simulated; Check for Updates remains visible but explains that preview updates are disabled. The intermediate app is removed
 to avoid duplicate search results. No production installation or update feed changes.
 
 Screenshots in `screenshots/navigation-preview/` use synthetic data. The tray raster
@@ -180,3 +193,12 @@ automation timed out on the transient panel; visual acceptance here uses the Web
 screenshots and exported native icon renderer. Windows/Linux native runtime behavior
 has not been exercised on this Mac; the three-OS packaging workflow includes the new
 navigation suite for subsequent native build validation.
+
+Design builds also isolate pending-account records and new folders inside their own cache, refuse registration of real folders, and do not launch official CLI login commands, register system shortcuts, or send notifications. Account creation is for interaction review only; live authorization and usage require the production helper.
+
+The owner accepted the revised account/settings pages and drag interaction on 2026-10-23.
+The independent preview and its dedicated cache, preferences and WebKit data were removed;
+the installed production app was left running. Shared browser checks passed on all three
+shell contracts (277 checks plus the later focused drag checks). Rust checks passed with
+one external-artifact check intentionally ignored. Windows/Linux native tray and window
+behavior still needs target-system acceptance; browser checks do not verify those integrations.

@@ -7,7 +7,7 @@ export const metricSchema = z.object({
  values:z.array(z.object({amount:z.number(),unit:z.string(),label:z.string()})),
 });
 export const accountSchema = z.object({
- added:z.boolean().optional(),
+ added:z.boolean().optional(),loginDirectories:z.array(z.string()).default([]),
  id:z.string(), family:z.string(), name:z.string(), email:z.string(), plan:z.string(), enabled:z.boolean(), tray:z.boolean(), removable:z.boolean(), apiKey:z.boolean(),
  warning:z.string().optional(), connection:z.string().optional(), note:z.string(), error:z.string(), fetchedAt:z.string(), metrics:z.array(metricSchema),
  observations:z.array(z.object({date:z.string(),label:z.string(),value:n,unit:z.string().nullable()})).default([]),

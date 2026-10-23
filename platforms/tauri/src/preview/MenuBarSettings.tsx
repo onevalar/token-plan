@@ -1,4 +1,4 @@
-import {ChevronRight} from 'lucide-react';
+import {ChevronRight,Plus,Minus} from 'lucide-react';
 import {Button} from '../components/arc/button/button';
 import {Switch} from '../components/arc/switch/switch';
 import {metricName} from '../Metrics';
@@ -32,11 +32,11 @@ export function MenuBarSettings({state,t,tr,language,disabled,change,openAccount
     return <div className="menu-bar-account" data-on={a.tray} key={a.id}>
      <Switch label={label} checked={a.tray} disabled={disabled} onCheckedChange={value=>void change({method:'tray',accountId:a.id,value})}/>
      {a.tray&&(pinnable.length?<div className="metric-chips" role="group" aria-label={`${label} · ${tr('Menu Bar')}`}>
-      {pinnable.map(m=><button type="button" className="metric-chip" key={m.id} aria-pressed={m.pinned} disabled={disabled||!m.pinned&&count>=MAX_PINNED} onClick={()=>void change({method:'metric',accountId:a.id,metricId:m.id,value:{pinned:!m.pinned}})}>{metricName(m,language)}</button>)}
+      {pinnable.map(m=><Button size="sm" variant="secondary" type="button" className="metric-chip" key={m.id} aria-pressed={m.pinned} disabled={disabled||!m.pinned&&count>=MAX_PINNED} onClick={()=>void change({method:'metric',accountId:a.id,metricId:m.id,value:{pinned:!m.pinned}})} aria-label={`${tr(m.pinned?'Remove':'Add')} · ${metricName(m,language)}`}>{m.pinned?<Minus size={13} aria-hidden="true"/>:<Plus size={13} aria-hidden="true"/>}{metricName(m,language)}</Button>)}
      </div>:<p className="menu-bar-account-note">{tr('No usage metrics are available yet.')}</p>)}
     </div>;
    })}
-   <div className="linked-setting"><span>{tr('Same order as Account Management')}</span><Button size="sm" variant="ghost" onClick={openAccounts}>{tr('Adjust Order')}<ChevronRight size={14} aria-hidden="true"/></Button></div>
+   <div className="linked-setting"><span>{tr('Same order as Subscription Management')}</span><Button size="sm" variant="ghost" onClick={openAccounts}>{tr('Adjust Order')}<ChevronRight size={14} aria-hidden="true"/></Button></div>
   </div>}
  </Group>;
 }
