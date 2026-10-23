@@ -108,7 +108,8 @@ pub fn application_icon()->tauri::Result<tauri::image::Image<'static>> {
     Ok(tauri::image::Image::new_owned(rgba,32,32))
 }
 
-#[cfg(not(target_os="linux"))]
+// Windows tray code is type-checked in every platform's test build.
+#[cfg(any(not(target_os="linux"),test))]
 pub fn rect_anchor(rect:tauri::Rect)->Option<(i32,i32,i32)> {
     let position=rect.position.to_physical::<f64>(1.0);
     let size=rect.size.to_physical::<f64>(1.0);
@@ -116,7 +117,7 @@ pub fn rect_anchor(rect:tauri::Rect)->Option<(i32,i32,i32)> {
     Some(((position.x+size.width/2.) as i32,position.y as i32,(position.y+size.height) as i32))
 }
 
-#[cfg(not(target_os="linux"))]
+#[cfg(any(not(target_os="linux"),test))]
 pub fn primary_anchor(event:&tauri::tray::TrayIconEvent)->Option<(i32,i32,i32)> {
     use tauri::tray::{TrayIconEvent,MouseButton,MouseButtonState};
     match event {
@@ -143,7 +144,6 @@ pub fn quit_label(language:&str) -> &'static str {
 mod tests {
     use super::*;
     fn fixture() -> DesktopState { serde_json::from_str(include_str!("../../tests/fixtures/desktop.json")).unwrap() }
-    #[cfg(not(target_os="linux"))]
     #[test]
     fn only_primary_release_opens_home_and_preserves_physical_coordinates() {
         use tauri::tray::{TrayIconEvent,MouseButton,MouseButtonState};

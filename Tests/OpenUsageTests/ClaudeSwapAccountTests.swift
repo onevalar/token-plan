@@ -43,7 +43,15 @@ final class ClaudeSwapAccountTests: XCTestCase {
         ])
         XCTAssertEqual(assembly.identityKeysByCard.count, 3)
         XCTAssertTrue(assembly.claudeCards.allSatisfy { !$0.allowsUnattributedPiUsage })
-        XCTAssertTrue(assembly.claudeCards.allSatisfy { $0.additionalLogDirectories.count == 3 })
+        let swapDirectories = Set(ClaudeSwapAccount.discover(files: files, home: home).map(\.sessionDirectory))
+        for card in assembly.claudeCards {
+            // The active default account also retains its CLI history directory.
+            // Other accounts must not inherit that account's default directory.
+            let expected = card.identityKey == account.identityKey
+                ? swapDirectories.union([home.path + "/.claude"]) : swapDirectories
+            XCTAssertEqual(Set(card.additionalLogDirectories), expected)
+            XCTAssertEqual(card.additionalLogDirectories.count, expected.count)
+        }
         XCTAssertEqual(store.defaultBadgeHolder(family: "claude")?.sources.map(\.kind), [.defaultHome, .claudeSwap])
         let again = await ProviderAccountAssembly.make(observer: observer, accountsStore: store)
         XCTAssertEqual(assembly.claudeCards, again.claudeCards)
