@@ -47,7 +47,7 @@ pub fn language(state: &DesktopState) -> &str {
     if state.settings.language == "system" { &state.settings.locale } else { &state.settings.language }
 }
 
-/// macOS keeps the wide template-image strip; other platforms use square native cells.
+/// macOS keeps the wide usage strip; other platforms keep the application icon.
 #[cfg(target_os = "macos")]
 pub fn update(app: &tauri::AppHandle, state: &DesktopState) -> tauri::Result<()> {
     let Some(tray) = app.tray_by_id("root") else { return Ok(()) };
@@ -96,6 +96,40 @@ pub fn menu(app: &tauri::AppHandle, language: &str, lines: &[String]) -> tauri::
     Ok(menu)
 }
 
+/// The original transparent product icon, with no usage plate or border.
+#[cfg(any(not(target_os="macos"),test))]
+pub fn application_icon()->tauri::Result<tauri::image::Image<'static>> {
+    use resvg::tiny_skia::{Pixmap,Transform};
+    let source=Pixmap::decode_png(include_bytes!("../icons/icon.png"))
+        .map_err(|error|std::io::Error::other(error.to_string()))?;
+    let mut icon=Pixmap::new(32,32).unwrap();
+    icon.draw_pixmap(0,0,source.as_ref(),&resvg::tiny_skia::PixmapPaint{quality:resvg::tiny_skia::FilterQuality::Bicubic,..Default::default()},Transform::from_scale(32./source.width() as f32,32./source.height() as f32),None);
+    let rgba=icon.pixels().iter().flat_map(|pixel|{let p=pixel.demultiply();[p.red(),p.green(),p.blue(),p.alpha()]}).collect();
+    Ok(tauri::image::Image::new_owned(rgba,32,32))
+}
+
+/// Delay a Windows primary-click menu until the double-click interval expires.
+#[cfg(any(target_os="windows",test))]
+#[derive(Default)]
+pub struct Clicks {revision:u64,ignore_until:u64}
+#[cfg(any(target_os="windows",test))]
+impl Clicks {
+    pub fn primary(&mut self,now:u64)->Option<u64> {
+        if now<self.ignore_until{return None;}
+        self.revision+=1;Some(self.revision)
+    }
+    pub fn double(&mut self,now:u64,interval:u64) {self.revision+=1;self.ignore_until=now.saturating_add(interval);}
+    pub fn current(&self,revision:u64)->bool {self.revision==revision}
+}
+
+pub fn open_label(language:&str)->&'static str {
+    let language=language.replace('_',"-");
+    if language.starts_with("zh") {if language.contains("Hant")||language.contains("TW")||language.contains("HK"){"顯示主畫面"}else{"显示主页面"}}
+    else if language.starts_with("ja"){"ホームを表示"}
+    else if language.starts_with("ko"){"홈 표시"}
+    else{"Show Home"}
+}
+
 pub fn quit_label(language:&str) -> &'static str {
     let language = language.replace('_', "-");
     let normalized = if language.starts_with("zh") { if language.contains("Hant") || language.contains("TW") || language.contains("HK") { "zh-Hant" } else { "zh-Hans" } } else { language.split('-').next().unwrap_or("en") };
@@ -106,6 +140,23 @@ pub fn quit_label(language:&str) -> &'static str {
 mod tests {
     use super::*;
     fn fixture() -> DesktopState { serde_json::from_str(include_str!("../../tests/fixtures/desktop.json")).unwrap() }
+    #[test]
+    fn a_double_click_cancels_the_single_click_menu_and_its_trailing_release() {
+        let mut clicks=Clicks::default();let pending=clicks.primary(100).unwrap();
+        assert!(clicks.current(pending));clicks.double(200,500);
+        assert!(!clicks.current(pending));assert!(clicks.primary(210).is_none());
+        assert!(clicks.primary(800).is_some());
+    }
+    #[test]
+    fn application_tray_icon_has_no_plate_or_border() {
+        let icon=application_icon().unwrap();
+        assert_eq!((icon.width(),icon.height()),(32,32));
+        let pixels=icon.rgba().chunks_exact(4).collect::<Vec<_>>();
+        assert!(pixels.iter().any(|p|p[3]>0));
+        for x in 0..32 {assert_eq!(pixels[x][3],0);assert_eq!(pixels[31*32+x][3],0);}
+        for y in 0..32 {assert_eq!(pixels[y*32][3],0);assert_eq!(pixels[y*32+31][3],0);}
+        assert_eq!(open_label("zh-CN"),"显示主页面");
+    }
     #[test]
     fn visible_accounts_are_contiguous_in_both_styles() {
         let mut s=fixture(); s.accounts[0].enabled=false;

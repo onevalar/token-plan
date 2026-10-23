@@ -68,6 +68,8 @@ export interface ConfirmMorphProps {
   /** A press outside the control cancels an open question. Defaults to true. */
   cancelOnOutsidePress?: boolean;
   disabled?: boolean;
+  /** Fill the row and center every state, keeping confirmation in the same place. */
+  fullWidth?: boolean;
   className?: string;
   /** Receives the root element, which also takes focus while the action is pending. */
   ref?: Ref<HTMLDivElement>;
@@ -169,7 +171,7 @@ export function ConfirmMorph({
   label, icon, prompt, confirmLabel = "Delete", cancelLabel = "Cancel", pendingLabel = "Deleting", doneLabel = "Deleted", errorLabel = "Couldn’t finish",
   retryLabel = "Retry", undoLabel = "Undo", undoingLabel = "Restoring", tone = "danger", confirmMode = "press", holdDuration = 1000, countdown = 3, countdownLabel,
   onConfirm, onUndo, onCancel, state: stateProp, defaultState = "idle", onStateChange, confirmTimeout = 6000, resultTimeout = 5000, cancelOnOutsidePress = true,
-  disabled = false, className, ref,
+  disabled = false, fullWidth = false, className, ref,
 }: ConfirmMorphProps) {
   const reduced = useReducedFlag();
   const uid = useId();
@@ -429,13 +431,13 @@ export function ConfirmMorph({
     }
   })();
 
-  return <div ref={rootRef} className={[styles.root, className].filter(Boolean).join(" ")} data-state={state} data-face={faceKey} data-tone={tone} data-mode={confirmMode}
+  return <div ref={rootRef} className={[styles.root, className].filter(Boolean).join(" ")} data-full-width={fullWidth || undefined} data-state={state} data-face={faceKey} data-tone={tone} data-mode={confirmMode}
     data-disabled={disabled || undefined} tabIndex={-1} onKeyDown={onKeyDown} aria-busy={state === "pending" || undefined}
     onFocusCapture={() => { holds.current.focus = true; sync(); }}
     onBlurCapture={event => { if (!event.currentTarget.contains(event.relatedTarget)) { holds.current.focus = false; sync(); } }}
     onPointerEnter={() => { holds.current.hover = true; sync(); }} onPointerLeave={() => { holds.current.hover = false; sync(); }}
     onPointerCancel={() => { holds.current.hover = false; sync(); }}>
-    <motion.div className={styles.surface} style={{ width }}>
+    <motion.div className={styles.surface} style={{ width: fullWidth ? "100%" : width }}>
       <AnimatePresence initial={false}>
         <Face key={faceKey} id={faceKey} reduced={reduced} onSize={onFaceSize} labelledBy={faceKey === "confirming" ? promptId : undefined}>{face}</Face>
       </AnimatePresence>

@@ -1,0 +1,45 @@
+/* Settings layout: General Settings groups, the Home style picker, menu bar accounts and links to settings owned elsewhere. */
+.mac-preview .usage-style-picker { border-bottom:1px solid var(--border); }
+.mac-preview .usage-style-toggle { display:flex;align-items:center;gap:8px;width:100%;min-height:46px;padding:5px 0;border:0;background:none;font:inherit;font-size:13px;color:var(--foreground);text-align:left;cursor:pointer; }
+.mac-preview .usage-style-toggle > span:first-child { flex:1; }
+.mac-preview .usage-style-current { color:var(--text-secondary); }
+.mac-preview .usage-style-toggle svg { flex:none;color:var(--text-secondary);transition:transform .15s ease; }
+@media (prefers-reduced-motion:reduce) { .mac-preview .usage-style-toggle svg { transition:none; } }
+.mac-preview .usage-style-toggle svg[data-open="true"] { transform:rotate(180deg); }
+.mac-preview .usage-style-toggle:focus-visible { outline:2px solid var(--foreground);outline-offset:2px;border-radius:4px; }
+.mac-preview .usage-style-card-content { display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0;max-width:100%; }
+/* Arc's animated label has a measured inline width and a nowrap phase. Bound every
+   label layer to its card before allowing localized names to wrap. */
+.mac-preview .usage-style-option > span { width:100% !important; }
+.mac-preview .usage-style-option > span > span,.mac-preview .usage-style-option > span > span > span { width:100%;min-width:0;white-space:normal; }
+.mac-preview .usage-style-card-content > span { max-width:100%;white-space:normal;overflow-wrap:anywhere; }
+.mac-preview .usage-style-options { display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;padding:2px 0 12px; }
+.mac-preview .usage-style-option { display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;height:auto;min-height:66px;padding:8px 2px;font-size:11px;line-height:1.3;white-space:normal;text-align:center;color:var(--text-secondary); }
+.mac-preview .usage-style-option svg { color:var(--foreground);flex:none; }
+.mac-preview .usage-style-option[aria-pressed="true"] { border-color:var(--foreground);box-shadow:inset 0 0 0 1px var(--foreground);background:var(--background);color:var(--foreground);font-weight:500; }
+
+.mac-preview .menu-bar-hint { color:var(--text-secondary);font-size:12px;text-align:center;margin:0;padding:8px 0;border-bottom:1px solid var(--border); }
+.mac-preview .menu-bar-accounts { border-top:1px solid var(--border);padding-top:4px; }
+.mac-preview .menu-bar-accounts-heading { display:flex;align-items:baseline;justify-content:space-between;gap:8px;padding:8px 0 6px; }
+.mac-preview .menu-bar-accounts-heading h3 { margin:0;font-size:13px;font-weight:500; }
+.mac-preview .menu-bar-accounts-heading span { font-size:12px;color:var(--text-secondary); }
+.mac-preview .menu-bar-account { border-top:1px solid var(--border);padding:5px 0; }
+.mac-preview .menu-bar-account > button[role="switch"] { width:100%;display:flex;flex-direction:row-reverse;justify-content:space-between;gap:14px;min-height:36px; }
+.mac-preview .menu-bar-account > button[role="switch"] > span:last-child { flex:1;min-width:0;text-align:left;font-size:13px;line-height:1.5;overflow-wrap:anywhere; }
+.mac-preview .menu-bar-account[data-on="false"] > button[role="switch"] > span:last-child { color:var(--text-secondary); }
+.mac-preview .metric-chips { display:flex;flex-wrap:wrap;gap:6px;padding:2px 0 6px; }
+.mac-preview .metric-chip { font:inherit;font-size:12px;line-height:1.4;min-height:26px;padding:3px 10px;border:1px solid var(--border-strong);border-radius:var(--radius-pill);background:var(--surface);color:var(--text-secondary);cursor:pointer; }
+.mac-preview .metric-chip[aria-pressed="true"] { background:var(--foreground);border-color:var(--foreground);color:var(--background); }
+.mac-preview .metric-chip:disabled { opacity:.45;cursor:default; }
+.mac-preview .metric-chip:focus-visible { outline:2px solid var(--foreground);outline-offset:2px; }
+.mac-preview .menu-bar-account-note { margin:0 0 6px;font-size:12px;color:var(--text-secondary); }
+
+.mac-preview .linked-setting { display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:2px 8px;padding:6px 0;font-size:12px;color:var(--foreground); }
+.mac-preview .menu-bar-accounts .linked-setting,.mac-preview .service-configuration .linked-setting { border-top:1px solid var(--border);color:var(--text-secondary); }
+.mac-preview .linked-label { color:var(--text-secondary);margin-right:6px; }
+.mac-preview .linked-setting > button { min-height:28px;padding-inline:4px;font-size:12px;gap:2px;margin-left:auto; }
+.mac-preview .linked-settings { margin:-12px 2px 20px; }
+.mac-preview .scope-note { margin:0 0 14px;padding:8px 10px;font-size:12px;line-height:1.5;color:var(--text-secondary);background:var(--surface-muted);border-radius:var(--radius-control);overflow-wrap:anywhere; }
+.mac-preview .placement-link { display:flex;margin:12px auto 0;font-size:12px;min-height:28px;gap:2px; }
+.mac-preview .detail-notice { margin-bottom:14px; }
+.mac-preview .detail-notice .inline-error { flex:1;min-width:0;margin:0; }

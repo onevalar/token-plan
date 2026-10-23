@@ -23,7 +23,7 @@ public static class AntigravityUsage
         if (root.TryGetProperty("response", out var response)) root = response;
         if (!root.TryGetProperty("groups", out var groups) || groups.ValueKind != JsonValueKind.Array) throw new InvalidDataException();
         var values = new Dictionary<string, UsageWindow>();
-        var labels = new[] { ("gemini-5h", "Session"), ("gemini-weekly", "Weekly"), ("3p-5h", "Claude"), ("3p-weekly", "Claude Weekly"), ("gemini-argon-wtu-weekly", "Argon Weekly") };
+        var labels = new[] { ("gemini-5h", "Session", 18000), ("gemini-weekly", "Weekly", 604800), ("3p-5h", "Claude", 18000), ("3p-weekly", "Claude Weekly", 604800), ("gemini-argon-wtu-weekly", "Argon Weekly", 604800) };
         foreach (var group in groups.EnumerateArray())
         {
             if (!group.TryGetProperty("buckets", out var buckets) || buckets.ValueKind != JsonValueKind.Array) continue;
@@ -32,7 +32,7 @@ public static class AntigravityUsage
                 var id = UsageParser.String(bucket, "bucketId");
                 if (id == null || !labels.Any(p => p.Item1 == id) || values.ContainsKey(id)) continue;
                 if (!bucket.TryGetProperty("remainingFraction", out var fraction) || fraction.ValueKind != JsonValueKind.Number || !fraction.TryGetDouble(out var remaining) || !double.IsFinite(remaining)) continue;
-                values[id] = new(labels.First(p => p.Item1 == id).Item2, Math.Round((1 - Math.Clamp(remaining, 0, 1)) * 100), DateTimeOffset.TryParse(UsageParser.String(bucket, "resetTime"), out var reset) ? reset : null);
+                values[id] = new(labels.First(p => p.Item1 == id).Item2, Math.Round((1 - Math.Clamp(remaining, 0, 1)) * 100), DateTimeOffset.TryParse(UsageParser.String(bucket, "resetTime"), out var reset) ? reset : null, PeriodSeconds: labels.First(p => p.Item1 == id).Item3);
             }
         }
         return new("antigravity", "Antigravity", plan, labels.Where(p => values.ContainsKey(p.Item1)).Select(p => values[p.Item1]).ToArray(), now);

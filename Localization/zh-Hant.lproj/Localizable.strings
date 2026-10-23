@@ -78,6 +78,7 @@
 "Additional Claude and Codex logins can come from Claude Swap, Codex Swap, supported Codex homes or pi. TokenPlan only reads these logins; it does not switch accounts." = "多個 Claude、Codex 登入可來自 Claude Swap、Codex Swap、支援的 Codex 目錄或 pi。TokenPlan 只讀取登入，不負責切換帳號。";
 "Additional accounts could not be read. Check the account configuration folders." = "無法讀取其他帳號，請檢查帳號設定資料夾。";
 "Adds a global `tokenplan` command agents can use to monitor limits." = "加入一個全域 `tokenplan` 指令，供代理程式用來監控額度。";
+"Adjust Order" = "調整順序";
 "Advanced" = "進階";
 "Advanced: Use an Existing Folder" = "進階：使用現有資料夾";
 "Agent" = "智慧代理";
@@ -134,6 +135,7 @@
 "Cannot reach the provider. Check your connection." = "無法連接服務，請檢查網路連線。";
 "Cash" = "現金";
 "Change Service" = "更換服務";
+"Change in General Settings" = "在一般設定中變更";
 "Chat" = "聊天";
 "Check Automatically" = "自動檢查";
 "Check Connection" = "檢查連線";
@@ -144,6 +146,7 @@
 "Checked. No new usage data." = "已檢查，暫無新的用量資料。";
 "Checking for updates…" = "正在檢查更新…";
 "Checks hourly and shows a banner when an update is available." = "每小時檢查一次，有更新時顯示橫幅。";
+"Choose Which Metrics Appear on Home" = "調整首頁顯示哪些指標";
 "Choose a service to see how to connect an account." = "先選擇服務，再連接帳號。";
 "Choose at most two tray metrics per account." = "每個帳號最多選擇兩項系統匣指標。";
 "Choose services and accounts to show. Hiding them keeps stars, overview and refresh unchanged." = "選擇顯示的服務和帳號。隱藏不會改變星號、總覽或重新整理。";
@@ -155,6 +158,7 @@
 "Choose where each item appears. System Tray shows up to two values; uncheck one before choosing a replacement." = "顯示設定決定內容出現在首頁、詳細資訊或隱藏。勾選「系統匣」可在系統匣選單顯示數值，最多兩項；更換時先取消一項。";
 "Choose which accounts appear in your overview and refresh automatically." = "選擇在概覽中顯示並自動重新整理的帳號。";
 "Choose which accounts appear on Home. Hidden accounts stay in this list." = "選擇在首頁顯示的帳號。關閉顯示後，帳號仍保留在這裡。";
+"Choose which accounts appear on Home. The same order is used in the menu bar." = "選擇要在首頁顯示的帳號。選單列也依這裡的順序排列。";
 "Claude Code logs on this device. Includes logs from different sign-ins, not the current account's complete usage." = "統計本機 Claude Code 日誌，包含不同登入留下的記錄，並非目前帳號的全部用量。";
 "Claude Desktop login couldn't be read. Open Claude Desktop, then try again." = "無法讀取 Claude Desktop 的登入資訊。請開啟 Claude Desktop 後再試。";
 "Claude Desktop login found. Refresh once and choose Always Allow to connect it." = "發現 Claude Desktop 登入資訊。重新整理一次並選擇「永遠允許」即可連接。";
@@ -380,9 +384,12 @@
 "History comes from logs on this device. It may not cover every account or device." = "歷史來自本機記錄，不一定涵蓋所有帳號與裝置。";
 "Home" = "首頁顯示";
 "Home Layout" = "首頁配置";
+"Home Metrics" = "首頁指標";
+"Home Page" = "首頁";
 "Home Usage Style" = "首頁用量樣式";
 "Horizontal Bar" = "橫條";
 "I Have Signed In — Check Again" = "我已登入，重新檢查";
+"Icon Only" = "僅圖示";
 "Icon Position" = "圖示位置";
 "If an indicator is hidden, move it from the taskbar overflow area into the system tray." = "如果圖示被隱藏，可從工作列的收合區域拖到系統匣中。";
 "Increase Transparency" = "增加透明度";
@@ -490,6 +497,7 @@
 "No OpenCode Go subscription on this key." = "此金鑰下沒有 OpenCode Go 訂閱。";
 "No OpenRouter API key. Set OPENROUTER_API_KEY or add it to ~/.config/tokenplan/openrouter.json." = "沒有 OpenRouter 的 API 金鑰。請設定 OPENROUTER_API_KEY，或將其加入 ~/.config/tokenplan/openrouter.json。";
 "No Z.ai API key. Set ZAI_API_KEY or add it to ~/.config/tokenplan/zai.json." = "沒有 Z.ai 的 API 金鑰。請設定 ZAI_API_KEY，或將其加入 ~/.config/tokenplan/zai.json。";
+"No accounts are shown in the menu bar yet." = "還沒有帳號顯示在選單列。";
 "No accounts yet. Add one to start tracking your usage." = "尚無帳號。新增一個，開始追蹤用量。";
 "No active Coding Plan found for this key." = "這個金鑰下找不到有效的程式開發方案。";
 "No active Cursor subscription." = "沒有有效的 Cursor 訂閱。";
@@ -517,6 +525,7 @@
 "No valid login for this Codex account. Sign in with Codex, xswap, or pi, then refresh." = "這個 Codex 帳號沒有有效登入。請用 Codex、xswap 或 pi 登入後再重新整理。";
 "None" = "無";
 "Not Now" = "稍後再說";
+"Not Shown" = "未顯示";
 "Not detected yet" = "尚未偵測到";
 "Not logged in. Run `claude` to authenticate." = "尚未登入。請執行 `claude` 完成驗證。";
 "Not logged in. Run `codex` to authenticate." = "尚未登入。請執行 `codex` 完成驗證。";
@@ -698,6 +707,7 @@
 "Reveal in Finder" = "在 Finder 中顯示";
 "Ring" = "環形";
 "Run devin auth login or sign in to Devin and try again." = "請執行 devin auth login 或登入 Devin 後再試。";
+"Same order as Account Management" = "順序與「帳號管理」相同";
 "Save" = "儲存";
 "Saved" = "已儲存";
 "Saved account. Refresh to check its current connection." = "帳號已保留，重新整理後檢查目前連線。";
@@ -724,6 +734,7 @@
 "Shares use %@ recorded tokens from this day and source, not a plan limit or a full bill." = "占比以當天此來源記錄的 %@ token 為總數，不代表方案額度或完整帳單。";
 "Show" = "顯示";
 "Show First Usage Metric" = "顯示首項用量";
+"Show Home" = "顯示主畫面";
 "Show Log Folder" = "開啟日誌資料夾";
 "Show Note in Overview" = "在總覽顯示備註";
 "Show TokenPlan" = "開啟 TokenPlan";
@@ -801,6 +812,7 @@
 "The system credential reader is missing. Install libsecret-tools, or open Antigravity and refresh." = "缺少系統憑證讀取工具。請安裝 libsecret-tools，或開啟 Antigravity 後重新整理。";
 "The update could not be installed. Your current version is unchanged." = "更新安裝失敗，目前版本未變更。";
 "Theme" = "主題";
+"These settings only affect %@." = "以下設定只影響 %@。";
 "These three readings share one allowance. More expensive models use it up faster. They are not each model's own remaining amount." = "這三條是同一份額度。貴的模型會更快用完，不是每個模型各自的剩餘量。";
 "These variants are included in the model above, not added again." = "這些細分已計入上方模型，不重複累加。";
 "This Mac" = "這台 Mac";
@@ -867,6 +879,7 @@
 "Up to %lld stars per provider" = "每個服務商最多 %lld 個星號";
 "Up to 2 stars per provider" = "每個服務商最多 2 個星號";
 "Up to date" = "已是最新";
+"Up to three metrics each" = "每個帳號最多 3 項指標";
 "Update Available" = "有新版本";
 "Update available" = "有可用更新";
 "Updated" = "更新於";
@@ -880,6 +893,7 @@
 "Usage Needs Attention" = "請留意用量";
 "Usage Notifications" = "用量通知";
 "Usage Overview" = "用量總覽";
+"Usage Style" = "用量樣式";
 "Usage Trend" = "用量趨勢";
 "Usage could not be read; see the details below." = "用量讀取失敗，請查看下方原因。";
 "Usage history could not be read. New readings will start a fresh history." = "無法讀取歷史記錄，新的讀數將重新建立記錄。";

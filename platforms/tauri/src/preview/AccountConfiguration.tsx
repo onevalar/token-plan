@@ -1,29 +1,27 @@
 import {useState} from 'react';
-import {Plus} from 'lucide-react';
+import {ChevronRight,Plus} from 'lucide-react';
 import {Button} from '../components/arc/button/button';
 import {Select} from '../components/arc/select/select';
-import {Switch} from '../components/arc/switch/switch';
 import {Input} from '../components/arc/input/input';
 import {ConfirmMorph} from '../components/arc/confirm-morph/confirm-morph';
 import {metricName} from '../Metrics';
 import {providerText} from '../providerText';
-import {TrayGlyph} from './TrayPreview';
-import type {Account,DesktopState,Send} from '../desktop';
+import {homeUsageStyles,type HomeUsageStyle} from '../homeUsage';
+import type {Account,Send} from '../desktop';
 import type {Copy} from '../copy';
-import {Group,ToggleRow,useChange} from './shared';
+import {Group,useChange} from './shared';
 
 export type AccountDraft={note?:string;key?:string};
 
-export function AccountConfiguration({account:a,send,t,busy,language,traySettings,badge,draft,onDraftChange}:{draft:AccountDraft;onDraftChange:(patch:AccountDraft)=>void;badge?:number|null;traySettings:DesktopState['settings'];account:Account;send:Send;t:Copy;busy:boolean;language:string}) {
+export function AccountConfiguration({platform,account:a,send,t,busy,language,usageStyle,openGeneral,draft,onDraftChange}:{platform:string;draft:AccountDraft;onDraftChange:(patch:AccountDraft)=>void;usageStyle:HomeUsageStyle;openGeneral:()=>void;account:Account;send:Send;t:Copy;busy:boolean;language:string}) {
  const tr=(s:string)=>providerText(s,language);
  const note=draft.note??a.note,key=draft.key??'';
  // The note stays out of the way until someone wants one; an unsaved draft keeps its editor open.
  const [noteOpen,setNoteOpen]=useState(false),editingNote=noteOpen||draft.note!==undefined;
  const [saving,setSaving]=useState<'note'|'key'|null>(null),[feedback,setFeedback]=useState<Partial<Record<'note'|'key','saved'|'failed'>>>({});
  const {pending,change,notice}=useChange(send,t),disabled=busy||pending;
+ const supportsTray=platform==='macos';
  const pinned=a.metrics.filter(m=>m.pinned).slice(0,3);
- const ring=traySettings.trayStyle==='ring'&&pinned.length>0&&pinned.every(m=>m.percent!=null||m.unit==='percent');
- const apply=(method:string,value:unknown)=>change({method,accountId:a.id,value});
  const edit=(field:'note'|'key',value:string)=>{onDraftChange({[field]:value});setFeedback(f=>({...f,[field]:undefined}));};
  const save=async(field:'note'|'key')=>{
   if(disabled||saving||field==='note'&&note===a.note||field==='key'&&!key.trim())return;
@@ -34,27 +32,18 @@ export function AccountConfiguration({account:a,send,t,busy,language,traySetting
  };
  return <div className="account-configuration">
   {notice}
-  <Group title={t.placement}>
-   <ToggleRow label={t.enabled} checked={a.enabled} disabled={disabled} onCheckedChange={value=>void apply('enabled',value)}/>
-   <ToggleRow label={tr('Show in Menu Bar')} checked={a.tray} disabled={disabled||!a.enabled} onCheckedChange={value=>void apply('tray',value)}/>
-  </Group>
-  <Group title={tr('Metrics')} description={tr('Choose up to three menu bar metrics per account.')}>
-   {pinned.length>0&&<div className="account-tray-preview" aria-label={tr('Menu Bar Preview')}>
-    <TrayGlyph badge={badge} family={a.family} metrics={pinned} style={traySettings.trayStyle} position={traySettings.ringIconPosition}/>
-    <ol className="ring-legend">{pinned.map((m,i)=><li key={m.id}><span>{ring?tr(i===0?'Outer Ring':pinned.length===3&&i===1?'Middle Ring':'Inner Ring'):String(i+1)}</span><strong>{metricName(m,language)}</strong></li>)}</ol>
-   </div>}
-   {pinned.length===0&&a.tray&&<div className="empty-tray-selection"><p className="group-description" role="status">{tr(a.metrics.some(m=>m.pinnable)?'Only the icon is shown. No usage metric is selected.':'No usage metrics are available yet.')}</p>
-    {a.metrics.some(m=>m.pinnable)&&<Button size="sm" variant="secondary" disabled={disabled} onClick={()=>{const metric=a.metrics.find(m=>m.pinnable);if(metric)void change({method:'metric',accountId:a.id,metricId:metric.id,value:{pinned:true}});}}>{tr('Show First Usage Metric')}</Button>}
-   </div>}
-   {pinned.length===3&&ring&&<p className="group-description">{tr('Three rings use the left icon layout.')}</p>}
-   {pinned.length>0&&traySettings.trayStyle==='ring'&&!ring&&<p className="group-description">{tr('Metrics without a percentage are shown as values.')}</p>}
-   <div className="metric-column-labels"><span>{tr('Content')}</span><span>{tr('Location')}</span><span>{tr('Menu Bar')}</span></div>
-   {a.metrics.map(m=><div className="placement-row" key={m.id}>
+  <p className="scope-note">{tr(`These settings only affect ${a.email?`${a.name} · ${a.email}`:a.name}.`)}</p>
+  <Group title={tr('Home Metrics')}>
+   <div className="metric-column-labels" data-tray="false"><span>{tr('Content')}</span><span>{tr('Location')}</span></div>
+   {a.metrics.map(m=><div className="placement-row" data-tray="false" key={m.id}>
     <span>{metricName(m,language)}</span>
     <div className="visually-labelled-select"><Select label={`${metricName(m,language)} · ${t.placement}`} value={m.placement} disabled={disabled} options={(['home','details','hidden'] as const).map(value=>({value,label:t[value]}))} onValueChange={placement=>void change({method:'metric',accountId:a.id,metricId:m.id,value:{placement}})}/></div>
-    {m.pinnable?<Switch aria-label={`${metricName(m,language)} · ${t.pin}`} checked={m.pinned} disabled={disabled||(!m.pinned&&a.metrics.filter(x=>x.pinned).length>=3)} onCheckedChange={pinned=>void change({method:'metric',accountId:a.id,metricId:m.id,value:{pinned}})}/>:<span className="muted unavailable-pin">—</span>}
    </div>)}
   </Group>
+  <div className="linked-settings">
+   {supportsTray&&<LinkedSetting label={tr('Menu Bar')} value={!a.tray?tr('Not Shown'):pinned.length?pinned.map(m=>metricName(m,language)).join(' · '):tr('Icon Only')} action={tr('Change in General Settings')} onOpen={openGeneral}/>}
+   <LinkedSetting label={tr('Home Usage Style')} value={tr(homeUsageStyles[usageStyle])} action={tr('Change in General Settings')} onOpen={openGeneral}/>
+  </div>
   <Group title={tr('Account Details')}>
    {editingNote?<form className="note-editor" onSubmit={e=>{e.preventDefault();void save('note');}}>
     <Input label={t.note} value={note} readOnly={disabled||!!saving} maxLength={2000} autoFocus error={feedback.note==='failed'?t.failed:undefined} onChange={e=>edit('note',e.target.value)}/>
@@ -74,8 +63,13 @@ export function AccountConfiguration({account:a,send,t,busy,language,traySetting
    </form>}
   </Group>
   {a.removable&&<section className="danger-zone">
-   <ConfirmMorph label={t.remove} prompt={tr('Remove?')} confirmLabel={t.remove} cancelLabel={t.cancel} pendingLabel={tr('Removing…')} doneLabel={t.done} errorLabel={t.failed} retryLabel={t.remove} disabled={disabled} onConfirm={()=>send({method:'remove',accountId:a.id})}/>
+   <ConfirmMorph fullWidth label={t.remove} prompt={tr('Remove?')} confirmLabel={t.remove} cancelLabel={t.cancel} pendingLabel={tr('Removing…')} doneLabel={t.done} errorLabel={t.failed} retryLabel={t.remove} disabled={disabled} onConfirm={()=>send({method:'remove',accountId:a.id})}/>
    <p className="group-description">{tr('Terminal login and history are kept.')}</p>
   </section>}
  </div>;
+}
+
+/** A setting owned by General Settings: shown here read-only, with a way to go and change it. */
+function LinkedSetting({label,value,action,onOpen}:{label:string;value:string;action:string;onOpen:()=>void}) {
+ return <div className="linked-setting"><span><span className="linked-label">{label}</span>{value}</span><Button size="sm" variant="ghost" onClick={onOpen}>{action}<ChevronRight size={14} aria-hidden="true"/></Button></div>;
 }

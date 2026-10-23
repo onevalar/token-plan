@@ -5,7 +5,8 @@ export async function mockDesktop(page:Page,language='zh-Hans',cloud=false,data:
   // One-time tips are off unless a test opts in with window.__tips, so the other tests keep a stable Home.
   if(!(window as any).__tips){try{localStorage.setItem('tokenplan.tip.welcome','1');localStorage.setItem('tokenplan.tip.alerts','1');}catch{/* storage unavailable */}}
   const state:any=structuredClone(data);state.sync={available:cloud,enabled:false,syncing:false,error:"",devices:[]};state.settings.language=language;
-  (window as any).__fetchTick=0;let sequence=0;const callbacks=new Map();
+  (window as any).__fetchTick=0;let sequence=0;const callbacks=new Map();const events=new Map<string,Set<number>>();
+  (window as any).__emitTauriEvent=(event:string,payload:unknown)=>events.get(event)?.forEach(id=>callbacks.get(id)?.({event,id,payload}));
   Object.defineProperty(window,'__TAURI_EVENT_PLUGIN_INTERNALS__',{value:{unregisterListener:()=>{}}});
   Object.defineProperty(window,'__TAURI_INTERNALS__',{value:{
    transformCallback:(fn:unknown)=>{callbacks.set(++sequence,fn);return sequence;},
@@ -19,6 +20,8 @@ export async function mockDesktop(page:Page,language='zh-Hans',cloud=false,data:
     if(command==='shortcut_capture'){(window as any).__shortcutPaused=args.paused;return;}
     if(command==='plugin:app|version')return '0.0.0';
     if(command==='panel_frame')return (window as any).__panelFrame??{platform:'macos',rounded:true};
+    if(command==='plugin:event|listen'){if(!events.has(args.event))events.set(args.event,new Set());events.get(args.event)!.add(args.handler);return args.handler;}
+    if(command==='plugin:event|unlisten'){events.get(args.event)?.delete(args.eventId);return;}
     if(command.startsWith('plugin:event|'))return ++sequence;
     if(command==='plugin:updater|check')return {rid:8,version:'9.9.9',currentVersion:'0.0.0',body:'Fixture update',rawJson:{}};
     if(command==='plugin:updater|download_and_install')throw 'fixture_signature_error';

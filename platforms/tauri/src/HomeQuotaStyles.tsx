@@ -10,14 +10,19 @@ type Style=Exclude<HomeUsageStyle,'bars'|'gauges'|'cells'>;
 type Props={metrics:Metric[];style:Style}&Omit<MetricRowProps,'metric'>;
 
 export function HomeQuotaStyles({metrics,style,...props}:Props) {
- const quotas=metrics.filter(isQuotaMetric),first=metrics.indexOf(quotas[0]);
- // Pair only independent windows in this account. Never sum or average their percentages.
- const paired=style==='concentric'&&quotas.length===2&&quotas.every(m=>(m.periodSeconds??0)>0)&&
-  quotas[0].periodSeconds!==quotas[1].periodSeconds&&metrics[first+1]===quotas[1];
+ // Pair adjacent independent windows; an extra model pool does not disable the pair.
+ const paired=new Map<number,Metric[]>(),consumed=new Set<number>();
+ if(style==='concentric')for(let i=0;i<metrics.length-1;i++){
+  const a=metrics[i],b=metrics[i+1];
+  if(!consumed.has(i)&&isQuotaMetric(a)&&isQuotaMetric(b)&&(a.periodSeconds??0)>0&&(b.periodSeconds??0)>0&&a.periodSeconds!==b.periodSeconds){
+   paired.set(i,[a,b]);consumed.add(i+1);i++;
+  }
+ }
  return <div className="home-metrics home-variants" data-style={style}>{metrics.map((metric,index)=>{
+  if(consumed.has(index))return null;
   if(!isQuotaMetric(metric))return <div className="home-metric-row" key={metric.id}><MetricRow metric={metric} {...props}/></div>;
-  if(paired&&index===first+1)return null;
-  if(paired&&index===first)return <div className="home-concentric" key={metric.id}>
+  const quotas=paired.get(index);
+  if(quotas)return <div className="home-concentric" key={metric.id}>
    <svg viewBox="0 0 100 90" aria-hidden="true" focusable="false">{quotas.map((m,i)=>{
     const r=quotaReading({metric:m,...props});return <GaugeArc key={m.id} value={r.value} radius={i===0?42:28} tone={r.tone==='critical'?'danger':'accent'}/>;
    })}</svg>

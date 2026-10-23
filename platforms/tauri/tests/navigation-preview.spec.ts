@@ -22,7 +22,7 @@ test('contextual navigation scopes refresh and restores origin, tab, range and s
  await expect(visible(page).locator('.usage-summary')).toHaveCount(0);
  await page.getByRole('button',{name:'排序',exact:true}).click();
  await visible(page).getByRole('button',{name:'Claude second.with.a.long.address@example.com',exact:true}).click();
- await expect(page.getByRole('button',{name:'设置',exact:true})).toHaveAttribute('aria-pressed','true');
+ await expect(page.getByRole('button',{name:'账号设置',exact:true})).toHaveAttribute('aria-pressed','true');
  await page.getByRole('button',{name:'用量',exact:true}).click();
  await page.getByRole('button',{name:'刷新',exact:true}).click();
  expect(await page.evaluate(()=>(window as any).__requests.at(-1))).toEqual({method:'refresh',accountId:'claude:second',force:true});
@@ -32,7 +32,7 @@ test('contextual navigation scopes refresh and restores origin, tab, range and s
  await expect(page.getByRole('button',{name:'昨天',exact:true})).toHaveAttribute('aria-pressed','true');
  await back(page);
  await expect(page.getByRole('button',{name:'昨天',exact:true})).toHaveAttribute('aria-pressed','true');
- await page.getByRole('button',{name:'设置',exact:true}).click();
+ await page.getByRole('button',{name:'账号设置',exact:true}).click();
  await openNote(page);
  await page.getByRole('textbox',{name:'备注',exact:true}).focus();
  await page.getByRole('textbox',{name:'备注',exact:true}).fill('Draft note');
@@ -191,7 +191,7 @@ for(const theme of ['light','dark'] as const)test(`390px visual review ${theme}`
  await setup(page,data);
  for(const screen of ['home','detail','account-settings','configure','settings','history']){
   if(screen==='detail')await page.locator('.dashboard').getByRole('button',{name:'Codex',exact:true}).click();
-  if(screen==='account-settings')await page.getByRole('button',{name:'设置',exact:true}).click();
+  if(screen==='account-settings')await page.getByRole('button',{name:'账号设置',exact:true}).click();
   if(screen==='configure'){await back(page);await menu(page,'账号管理');}
   if(screen==='settings'){await back(page);await menu(page,'通用设置');}
   if(screen==='history'){await back(page);await menu(page,'用量历史');}
@@ -295,7 +295,7 @@ test('home density persists, reduces space without dropping metrics, and toolbar
  await menu(page,'通用设置');
  await expect(visible(page).getByText('iCloud',{exact:true})).toHaveCount(0);
  await expect(page.getByRole('switch',{name:'跨 Mac 同步',exact:true})).toHaveCount(0);
- await page.getByRole('combobox',{name:'首页布局',exact:true}).click();
+ await page.getByRole('combobox',{name:'密度',exact:true}).click();
  await page.getByRole('option',{name:'宽松',exact:true}).click();
  await back(page);
  expect(await home.locator('.metric').count()).toBe(metrics);
@@ -310,7 +310,7 @@ test('home density persists, reduces space without dropping metrics, and toolbar
 
 test('account note stays collapsed until wanted, saves inline and removal sits in its own section',async({page})=>{
  await setup(page);await page.locator('.dashboard').getByRole('button',{name:'Claude first@example.com',exact:true}).click();
- await page.getByRole('button',{name:'设置',exact:true}).click();
+ await page.getByRole('button',{name:'账号设置',exact:true}).click();
  await expect(page.getByRole('textbox',{name:'备注',exact:true})).toHaveCount(0);
  await openNote(page);
  const note=page.getByRole('textbox',{name:'备注',exact:true});
@@ -326,6 +326,7 @@ test('account note stays collapsed until wanted, saves inline and removal sits i
 });
 
 for(const theme of ['light','dark'] as const)test(`ring layout and three metrics stay consistent in ${theme}`,async({page},info)=>{
+ test.skip(info.project.metadata.platform!=='macos','Live menu-bar metrics are macOS only.');
  await page.emulateMedia({colorScheme:theme});
  const data=largeDesktop(),a=data.accounts[0];data.settings.trayStyle='ring';
  data.accounts.forEach(x=>x.tray=x.id===a.id);
@@ -336,19 +337,17 @@ for(const theme of ['light','dark'] as const)test(`ring layout and three metrics
  await expect(page.getByRole('button',{name:'圆环左侧',exact:true})).toHaveAttribute('aria-pressed','true');
  await expect(visible(page).locator('.menu-bar-preview .tray-glyph')).toHaveAttribute('data-layout','left');
  expect(await page.evaluate(()=>(window as any).__requests.at(-1))).toEqual({method:'settings',value:{ringIconPosition:'left'}});
- await back(page);await page.locator('.dashboard').getByRole('button',{name:'Claude first@example.com',exact:true}).click();
- await page.getByRole('button',{name:'设置',exact:true}).click();
- const rows=visible(page).locator('.placement-row');
- await rows.nth(2).getByRole('switch').click();
- await expect(rows.nth(2).getByRole('switch')).toBeChecked();
- await expect(rows.nth(3).getByRole('switch')).toBeDisabled();
- await expect(visible(page).locator('.ring-legend')).toContainText('外环');
- await expect(visible(page).locator('.ring-legend')).toContainText('中环');
- await expect(visible(page).locator('.ring-legend')).toContainText('内环');
- await expect(visible(page).locator('.account-tray-preview svg > g')).toHaveCount(3);
+ // Each account's menu bar metrics are chosen right here, up to three.
+ const chips=visible(page).locator('.menu-bar-account').first().locator('.metric-chip');
+ await expect(chips).toHaveCount(4);
+ await chips.nth(2).click();
+ await expect(chips.nth(2)).toHaveAttribute('aria-pressed','true');
+ expect(await page.evaluate(()=>(window as any).__requests.at(-1))).toEqual({method:'metric',accountId:a.id,metricId:'test.2',value:{pinned:true}});
+ await expect(chips.nth(3)).toBeDisabled();
+ await expect(visible(page).locator('.menu-bar-preview svg > g')).toHaveCount(3);
+ await expect(visible(page).locator('.menu-bar-hint')).toHaveText('三环模式使用左侧图标布局。');
  await noOverflow(page);
  await page.screenshot({path:info.outputPath(`three-metric-account-${theme}.png`),animations:'disabled'});
- await back(page);await menu(page,'通用设置');
  await page.getByRole('button',{name:'圆环内',exact:true}).click();
  // Preserve inside preference, but keep a legible logo beside three rings.
  await expect(visible(page).locator('.menu-bar-preview .tray-glyph')).toHaveAttribute('data-layout','left');
@@ -372,6 +371,7 @@ for(const theme of ['light','dark'] as const)test(`ring layout and three metrics
 });
 
 test('three-ring badges share the center and keep a compact stable footprint',async({page},info)=>{
+ test.skip(info.project.metadata.platform!=='macos','Live menu-bar metrics are macOS only.');
  const data=largeDesktop();
  data.accounts.forEach(a=>a.tray=a.family==='claude');
  for(const a of data.accounts.filter(a=>a.family==='claude'))a.metrics=[25,50,75].map((percent,i)=>({...a.metrics[0],id:`ring.${i}`,label:`Ring ${i+1}`,percent,pinned:true,hasData:true,unit:'percent'}));
@@ -384,11 +384,7 @@ test('three-ring badges share the center and keep a compact stable footprint',as
  await glyphs.first().scrollIntoViewIfNeeded();
  await page.screenshot({path:info.outputPath('compact-three-ring-badges.png'),animations:'disabled'});
  await back(page);
- if(info.project.metadata.platform!=='macos'){
-  await expect(visible(page).locator('.tray-panel-strip .tray-center-badge')).toHaveText(['1','2']);
-  await visible(page).locator('.tray-panel-account').first().click();
-  await expect(page.getByRole('heading',{level:1})).toHaveText('Claude');
- }
+
 });
 
 test('production update entry preserves errors and the about page is not a design preview',async({page})=>{
@@ -409,15 +405,15 @@ test('account drafts survive navigation without being saved and return restores 
  await setup(page,data);
  const first=page.locator('.dashboard').getByRole('button',{name:'Claude first@example.com',exact:true});
  await first.focus();await page.keyboard.press('Enter');
- await page.getByRole('button',{name:'设置',exact:true}).click();
+ await page.getByRole('button',{name:'账号设置',exact:true}).click();
  await openNote(page);
  await page.getByRole('textbox',{name:'备注',exact:true}).fill('Unsaved first account');
  await page.getByRole('textbox',{name:'API 密钥',exact:true}).fill('synthetic-test-key');
  await back(page);await expect(first).toBeFocused();
  await page.locator('.dashboard').getByRole('button',{name:'Claude second.with.a.long.address@example.com',exact:true}).click();
- await page.getByRole('button',{name:'设置',exact:true}).click();
+ await page.getByRole('button',{name:'账号设置',exact:true}).click();
  await expect(page.getByRole('textbox',{name:'备注',exact:true})).toHaveCount(0);
- await back(page);await first.click();await page.getByRole('button',{name:'设置',exact:true}).click();
+ await back(page);await first.click();await page.getByRole('button',{name:'账号设置',exact:true}).click();
  await expect(page.getByRole('textbox',{name:'备注',exact:true})).toHaveValue('Unsaved first account');
  const key=page.getByRole('textbox',{name:'API 密钥',exact:true});
  await expect(key).toHaveValue('synthetic-test-key');
@@ -434,7 +430,7 @@ test('account drafts survive navigation without being saved and return restores 
 
 test('note saves report pending, failure and success nearby and long content stays within the panel',async({page})=>{
  await setup(page);await page.locator('.dashboard').getByRole('button',{name:'Claude first@example.com',exact:true}).click();
- await page.getByRole('button',{name:'设置',exact:true}).click();
+ await page.getByRole('button',{name:'账号设置',exact:true}).click();
  await openNote(page);
  const note=page.getByRole('textbox',{name:'备注',exact:true}),form=visible(page).locator('form').filter({has:note});
  const value='audit_identifier_'.repeat(14);
@@ -510,7 +506,7 @@ test('unavailable saved account remains configurable and offers reconnect guidan
  await visible(page).locator('.dashboard').getByRole('button',{name:`${account.name} ${account.email}`,exact:true}).click();
  await expect(page.getByRole('button',{name:'打开终端登录',exact:true})).toBeVisible();
  await expect(visible(page).getByText('账号已保留。请重新连接登录后，再检测账号。',{exact:true})).toBeVisible();
- await page.getByRole('button',{name:'设置',exact:true}).click();
+ await page.getByRole('button',{name:'账号设置',exact:true}).click();
  await expect(page.getByRole('button',{name:'添加备注',exact:true})).toBeVisible();
  await noOverflow(page);
 });
@@ -652,7 +648,7 @@ test('a problem card offers the one next step instead of only describing it',asy
  await back(page);
  // Missing key: straight to the key field.
  await home.locator('.account-block').filter({hasText:'DeepSeek'}).getByRole('button',{name:'设置 API 密钥',exact:true}).click();
- await expect(page.getByRole('button',{name:'设置',exact:true})).toHaveAttribute('aria-pressed','true');
+ await expect(page.getByRole('button',{name:'账号设置',exact:true})).toHaveAttribute('aria-pressed','true');
  await expect(page.getByRole('textbox',{name:'API 密钥',exact:true})).toBeVisible();
  await noOverflow(page);
 });
@@ -666,8 +662,8 @@ test('each home heading has one usage entry, with settings inside details',async
  await first.getByRole('button',{name:'Claude first@example.com',exact:true}).focus();
  await page.keyboard.press('Enter');
  await expect(page.getByRole('button',{name:'用量',exact:true})).toHaveAttribute('aria-pressed','true');
- await page.getByRole('button',{name:'设置',exact:true}).click();
- await expect(page.getByRole('button',{name:'设置',exact:true})).toHaveAttribute('aria-pressed','true');
+ await page.getByRole('button',{name:'账号设置',exact:true}).click();
+ await expect(page.getByRole('button',{name:'账号设置',exact:true})).toHaveAttribute('aria-pressed','true');
  await back(page);
  const names=visible(page).locator('.metric-name');
  await expect(names.first()).toHaveAttribute('title','5 小时窗口');
@@ -712,14 +708,42 @@ test('about offers project links and credits the original project',async({page})
  await noOverflow(page);
 });
 
-test('the menu bar account list is collapsed until opened',async({page})=>{
- await setup(page);await menu(page,'通用设置');
- const row=visible(page).getByRole('button',{name:/显示在菜单栏的账号/});
- await expect(row).toHaveAttribute('aria-expanded','false');
- await expect(row).toContainText('7 / 7');
- await expect(visible(page).getByRole('switch',{name:/Claude · first@example.com/})).toHaveCount(0);
- await row.click();
- await expect(visible(page).getByRole('switch',{name:/Claude · first@example.com/})).toBeVisible();
+test('menu bar accounts show their switch and metric choices without extra steps',async({page},info)=>{
+ test.skip(info.project.metadata.platform!=='macos','Live menu-bar metrics are macOS only.');
+ const data=largeDesktop();data.accounts[2].tray=false;
+ await setup(page,data);await menu(page,'通用设置');
+ const accounts=visible(page).locator('.menu-bar-account');
+ await expect(accounts).toHaveCount(data.accounts.filter(a=>a.enabled).length);
+ await expect(accounts.first().getByRole('switch',{name:'Claude · first@example.com',exact:true})).toBeChecked();
+ await expect(accounts.first().locator('.metric-chip')).not.toHaveCount(0);
+ // An account kept out of the menu bar takes one line and offers no metric choices.
+ const off=accounts.nth(2);
+ await expect(off.getByRole('switch')).not.toBeChecked();await expect(off.locator('.metric-chip')).toHaveCount(0);
+ await off.getByRole('switch').click();
+ expect(await page.evaluate(()=>(window as any).__requests.at(-1))).toEqual({method:'tray',accountId:data.accounts[2].id,value:true});
+ await expect(off.locator('.metric-chip')).not.toHaveCount(0);
+ // Order is owned by Account Management.
+ await visible(page).getByRole('button',{name:'调整顺序',exact:true}).click();
+ await expect(page.getByRole('heading',{level:1})).toHaveText('账号管理');
+ await expect(visible(page).locator('.linked-setting')).toContainText('显示在菜单栏的账号');
+ await visible(page).getByRole('button',{name:'在通用设置中更改',exact:true}).click();
+ await expect(page.getByRole('heading',{level:1})).toHaveText('通用设置');
+ await noOverflow(page);
+});
+
+test('account settings only hold what belongs to that account and link to the rest',async({page})=>{
+ await setup(page);
+ await page.locator('.dashboard').getByRole('button',{name:'Claude first@example.com',exact:true}).click();
+ await page.getByRole('button',{name:'账号设置',exact:true}).click();
+ await expect(visible(page).locator('.scope-note')).toHaveText('以下设置只影响 Claude · first@example.com。');
+ await expect(visible(page).getByRole('switch')).toHaveCount(0);
+ await expect(visible(page).locator('.menu-bar-preview,.account-tray-preview')).toHaveCount(0);
+ await visible(page).getByRole('button',{name:'在通用设置中更改',exact:true}).last().click();
+ await expect(page.getByRole('heading',{level:1})).toHaveText('通用设置');
+ await back(page);
+ await page.getByRole('button',{name:'用量',exact:true}).click();
+ await visible(page).getByRole('button',{name:'调整首页显示哪些指标',exact:true}).click();
+ await expect(page.getByRole('button',{name:'账号设置',exact:true})).toHaveAttribute('aria-pressed','true');
  await noOverflow(page);
 });
 

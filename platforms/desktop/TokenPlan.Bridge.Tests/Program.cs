@@ -25,6 +25,10 @@ try {
   try { await Call(session,new{method="settings",value=new{ringIconPosition="invalid"}}); throw new Exception("Invalid position accepted"); } catch(InvalidDataException) { }
   // Synthetic quota results exercise the actual bridge cap, not just the UI switch.
   var cache=(System.Collections.Concurrent.ConcurrentDictionary<string,ProviderResult>)typeof(DesktopSession).GetField("results",System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic)!.GetValue(session)!;
+  cache["antigravity"]=new("antigravity","Antigravity",AntigravityUsage.Parse("""{"groups":[{"buckets":[{"bucketId":"gemini-5h","remainingFraction":0.8},{"bucketId":"gemini-weekly","remainingFraction":0.6},{"bucketId":"gemini-argon-wtu-weekly","remainingFraction":0.4}]}]}""",DateTimeOffset.UtcNow),null);
+  var quotaState=await Call(session,new{method="state"});
+  var agMetrics=quotaState.GetProperty("accounts").EnumerateArray().Single(a=>a.GetProperty("id").GetString()=="antigravity").GetProperty("metrics").EnumerateArray().ToArray();
+  Assert(agMetrics.Select(m=>m.GetProperty("periodSeconds").GetDouble()).SequenceEqual(new[]{18000d,604800d,604800d}),"Antigravity window periods reach the shared frontend");
   cache["claude"]=new("claude","Claude",new("claude","Claude","Pro",new[]{"a","b","c","d"}.Select(label=>new UsageWindow(label,25,null)).ToArray(),DateTimeOffset.UtcNow),null);
   state=await Call(session,new{method="metric",accountId="claude",metricId="c",value=new{pinned=true}});
   Assert(state.GetProperty("accounts").EnumerateArray().Single(a=>a.GetProperty("id").GetString()=="claude").GetProperty("metrics").EnumerateArray().Count(m=>m.GetProperty("pinned").GetBoolean())==3,"Bridge accepts third pin");

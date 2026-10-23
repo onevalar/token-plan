@@ -16,8 +16,9 @@ async function settings(page:Page,language='en') {
  await page.getByRole('menuitem',{name:textFor(language).settings,exact:true}).click();
 }
 async function choose(page:Page,name:string,language='en') {
- await page.getByRole('combobox',{name:providerText('Home Usage Style',language),exact:true}).click();
- await page.getByRole('option',{name,exact:true}).click();
+ const label=providerText('Usage Style',language),toggle=page.getByRole('button',{name:new RegExp(`^${label}`)});
+ if(await toggle.getAttribute('aria-expanded')==='false')await toggle.click();
+ await page.getByRole('group',{name:label,exact:true}).getByRole('button',{name,exact:true}).click();
 }
 const back=(page:Page,language='en')=>page.getByRole('button',{name:messages(language).back,exact:true}).click();
 
@@ -26,17 +27,22 @@ test('Home style persists independently of density, tray and details, with keybo
  await mockDesktop(page,'en',false,data);await page.goto('/');
  await expect(home(page)).toHaveAttribute('data-usage-style','bars');
  await settings(page);
- const tray=await page.locator('.menu-bar-preview').innerHTML();
- const select=page.getByRole('combobox',{name:'Home Usage Style',exact:true});
- await select.focus();await page.keyboard.press('Enter');
- await expect(page.getByRole('option',{name:'Bars',exact:true})).toBeFocused();
- await page.keyboard.press('ArrowDown');await expect(page.getByRole('option',{name:'Gauges',exact:true})).toBeFocused();await page.keyboard.press('Enter');
- await expect(select).toBeFocused();await expect(home(page)).toHaveAttribute('data-usage-style','gauges');
- await select.press('Enter');await expect(page.getByRole('option',{name:'Gauges',exact:true})).toBeFocused();
- await page.keyboard.press('Escape');await expect(select).toBeFocused();
+ const tray=await page.locator('.menu-bar-preview').count()?await page.locator('.menu-bar-preview').innerHTML():null;
+ // Collapsed to one row until opened; every style is then a pressed-state button reachable from the keyboard.
+ const toggle=page.getByRole('button',{name:/^Usage Style/}),options=page.getByRole('group',{name:'Usage Style',exact:true});
+ await expect(toggle).toHaveAttribute('aria-expanded','false');await expect(toggle).toContainText('Bars');await expect(options).toHaveCount(0);
+ await toggle.focus();await page.keyboard.press('Enter');await expect(toggle).toHaveAttribute('aria-expanded','true');
+ await expect(options.getByRole('button')).toHaveCount(8);
+ await expect(options.getByRole('button',{name:'Bars',exact:true})).toHaveAttribute('aria-pressed','true');
+ await options.getByRole('button',{name:'Gauges',exact:true}).focus();await page.keyboard.press('Enter');
+ await expect(home(page)).toHaveAttribute('data-usage-style','gauges');
+ await expect(options.getByRole('button',{name:'Gauges',exact:true})).toHaveAttribute('aria-pressed','true');
+ await expect(options.getByRole('button',{name:'Bars',exact:true})).toHaveAttribute('aria-pressed','false');
+ await expect(toggle).toContainText('Gauges');
+ await toggle.click();await expect(options).toHaveCount(0);
  expect(await page.evaluate(()=>(window as any).__panelHides??0)).toBe(0);
- expect(await page.locator('.menu-bar-preview').innerHTML()).toBe(tray);
- await page.getByRole('combobox',{name:'Home Layout',exact:true}).click();await page.getByRole('option',{name:'Comfortable',exact:true}).click();
+ expect(await page.locator('.menu-bar-preview').count()?await page.locator('.menu-bar-preview').innerHTML():null).toBe(tray);
+ await page.getByRole('combobox',{name:'Density',exact:true}).click();await page.getByRole('option',{name:'Comfortable',exact:true}).click();
  await back(page);
  await expect(home(page).getByRole('meter',{name:'5h · Used',exact:true}).first()).toHaveAttribute('aria-valuetext','46%');
  await home(page).getByRole('button',{name:'Claude first@example.com',exact:true}).click();
@@ -52,7 +58,7 @@ test('Home style persists independently of density, tray and details, with keybo
   await settings(page);await choose(page,label);await back(page);await page.reload();
   await expect(home(page)).toHaveAttribute('data-usage-style',style);
   await expect(page.locator('.mac-preview')).toHaveAttribute('data-density','comfortable');
-  await settings(page);await expect(page.getByRole('combobox',{name:'Home Usage Style',exact:true})).toContainText(label);await back(page);
+  await settings(page);await expect(page.getByRole('button',{name:/^Usage Style/})).toContainText(label);await back(page);
  }
 });
 
@@ -147,7 +153,9 @@ test('concentric rings keep independent readings and never pair unrelated quotas
  await expect(accounts.nth(0).getByRole('meter',{name:'5h · Used',exact:true})).toHaveAttribute('aria-valuetext','37%');
  await expect(accounts.nth(0).getByRole('meter',{name:'1w · Used',exact:true})).toHaveAttribute('aria-valuetext','82% · Near quota limit');
  await expect(accounts.nth(0)).toContainText('Outer Ring');await expect(accounts.nth(0)).toContainText('Inner Ring');
- for(let i=1;i<=5;i++)await expect(accounts.nth(i).locator('.home-concentric')).toHaveCount(0);
+ for(let i=1;i<=4;i++)await expect(accounts.nth(i).locator('.home-concentric')).toHaveCount(0);
+ await expect(accounts.nth(5).locator('.home-concentric')).toHaveCount(1);
+ await expect(accounts.nth(5).locator('.home-compact')).toHaveCount(1);
  await expect(accounts.nth(4).locator('.home-metrics > *').nth(1)).toContainText('$7.25');
  await expect(accounts.nth(6).getByRole('meter')).toHaveCount(1);
  await expect(accounts.nth(6)).toContainText(messages('en').missing);
@@ -169,5 +177,25 @@ for(const language of ['en','zh-Hans','zh-Hant','ja','ko'])test(`Home styles fit
    const bodies=await home(page).locator('.quota-body').evaluateAll(elements=>elements.slice(0,2).map(e=>e.getBoundingClientRect().y));
    if(bodies.length)expect(Math.abs(bodies[0]-bodies[1])).toBeLessThan(1);
   }
+ }
+});
+
+for(const language of ['en','zh-Hans','zh-Hant','ja','ko'])test(`style picker keeps localized labels inside their cards: ${language}`,async({page},info)=>{
+ await mockDesktop(page,language,false,largeDesktop());await page.goto('/');await settings(page,language);
+ const label=providerText('Usage Style',language);
+ await page.getByRole('button',{name:new RegExp(`^${label}`)}).click();
+ const options=page.getByRole('group',{name:label,exact:true});
+ await expect(options.getByRole('button')).toHaveCount(8);
+ await options.scrollIntoViewIfNeeded();await page.evaluate(()=>document.fonts.ready);
+ for(const colorScheme of ['light','dark'] as const){
+  await page.emulateMedia({colorScheme});
+  const bounds=await options.locator('.usage-style-option').evaluateAll(buttons=>buttons.flatMap(button=>{
+   const label=button.querySelector('.usage-style-card-content > span')!,range=document.createRange();range.selectNodeContents(label);
+   const box=button.getBoundingClientRect();
+   return [...range.getClientRects()].map(rect=>({text:label.textContent,left:rect.left-box.left,right:box.right-rect.right,top:rect.top-box.top,bottom:box.bottom-rect.bottom}));
+  }));
+  for(const b of bounds){expect(b.left,b.text!).toBeGreaterThanOrEqual(2);expect(b.right,b.text!).toBeGreaterThanOrEqual(2);expect(b.top,b.text!).toBeGreaterThanOrEqual(2);expect(b.bottom,b.text!).toBeGreaterThanOrEqual(2);}
+  expect(await visible(page).evaluate(e=>e.scrollWidth<=e.clientWidth)).toBe(true);
+  await page.screenshot({path:info.outputPath(`style-picker-${language}-${colorScheme}.png`),animations:'disabled'});
  }
 });

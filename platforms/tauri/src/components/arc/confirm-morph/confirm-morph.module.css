@@ -144,3 +144,10 @@
   .surface::after { border-color: var(--border-strong); }
   .confirm { background: color-mix(in oklab, var(--danger) 22%, transparent); }
 }
+
+/* Wide account actions keep a stable target while the confirmation changes. */
+.root[data-full-width] { display:flex;width:100%; }
+.root[data-full-width] .surface { justify-content:center;height:var(--control-height-md); }
+.root[data-full-width] .face[data-face="idle"],
+.root[data-full-width] .face[data-face="idle"] .part { width:100%; }
+.root[data-full-width] .trigger { width:100%;justify-content:center; }

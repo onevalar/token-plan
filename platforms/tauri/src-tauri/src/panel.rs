@@ -60,6 +60,7 @@ pub fn show(app:&tauri::AppHandle) {
     }
     #[cfg(not(target_os="macos"))]
     if let Some(window)=app.get_webview_window("main") {
+        checked(app,window.set_always_on_top(true));
         checked(app,window.show());
         checked(app,window.unminimize());
         checked(app,window.set_focus());

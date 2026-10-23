@@ -78,6 +78,7 @@
 "Additional Claude and Codex logins can come from Claude Swap, Codex Swap, supported Codex homes or pi. TokenPlan only reads these logins; it does not switch accounts." = "追加のClaude/CodexログインはClaude Swap、Codex Swap、対応するCodexホーム、piから読み取れます。TokenPlanはアカウントを切り替えません。";
 "Additional accounts could not be read. Check the account configuration folders." = "追加アカウントを読み取れません。設定フォルダーを確認してください。";
 "Adds a global `tokenplan` command agents can use to monitor limits." = "エージェントが上限を監視できるグローバルな `tokenplan` コマンドを追加します。";
+"Adjust Order" = "並び順を変更";
 "Advanced" = "詳細";
 "Advanced: Use an Existing Folder" = "詳細：既存のフォルダを使う";
 "Agent" = "エージェント";
@@ -134,6 +135,7 @@
 "Cannot reach the provider. Check your connection." = "サービスに接続できません。ネットワークを確認してください。";
 "Cash" = "現金";
 "Change Service" = "サービスを変更";
+"Change in General Settings" = "一般設定で変更";
 "Chat" = "チャット";
 "Check Automatically" = "自動的に確認";
 "Check Connection" = "接続を確認";
@@ -144,6 +146,7 @@
 "Checked. No new usage data." = "確認済みです。新しい使用量データはありません。";
 "Checking for updates…" = "更新を確認中…";
 "Checks hourly and shows a banner when an update is available." = "1 時間ごとに確認し、更新があるとバナーを表示します。";
+"Choose Which Metrics Appear on Home" = "ホームに表示する指標を選ぶ";
 "Choose a service to see how to connect an account." = "サービスを選んで、アカウントを接続します。";
 "Choose at most two tray metrics per account." = "アカウントごとに最大2項目です。";
 "Choose services and accounts to show. Hiding them keeps stars, overview and refresh unchanged." = "表示するサービスとアカウントを選択します。非表示にしてもスター、概要、更新は変わりません。";
@@ -155,6 +158,7 @@
 "Choose where each item appears. System Tray shows up to two values; uncheck one before choosing a replacement." = "各項目の表示場所を選びます。システムトレイには最大2つの値を表示できます。変更するには先に1つ選択を解除してください。";
 "Choose which accounts appear in your overview and refresh automatically." = "概要に表示し、自動更新するアカウントを選びます。";
 "Choose which accounts appear on Home. Hidden accounts stay in this list." = "ホームに表示するアカウントを選びます。非表示にしても、この一覧に残ります。";
+"Choose which accounts appear on Home. The same order is used in the menu bar." = "ホームに表示するアカウントを選びます。メニューバーもこの順序で並びます。";
 "Claude Code logs on this device. Includes logs from different sign-ins, not the current account's complete usage." = "この端末の Claude Code ログを集計します。別のログイン時の記録も含み、現在のアカウント全体の使用量ではありません。";
 "Claude Desktop login couldn't be read. Open Claude Desktop, then try again." = "Claude Desktop のログイン情報を読み取れません。Claude Desktop を開いてからもう一度お試しください。";
 "Claude Desktop login found. Refresh once and choose Always Allow to connect it." = "Claude Desktop のログインが見つかりました。一度更新して「常に許可」を選ぶと接続できます。";
@@ -380,9 +384,12 @@
 "History comes from logs on this device. It may not cover every account or device." = "この端末のログによる履歴です。すべてのアカウントや端末を含むとは限りません。";
 "Home" = "ホーム";
 "Home Layout" = "ホームの表示";
+"Home Metrics" = "ホームの指標";
+"Home Page" = "ホーム";
 "Home Usage Style" = "ホームの使用量表示";
 "Horizontal Bar" = "横棒";
 "I Have Signed In — Check Again" = "サインインしました。もう一度確認";
+"Icon Only" = "アイコンのみ";
 "Icon Position" = "アイコンの位置";
 "If an indicator is hidden, move it from the taskbar overflow area into the system tray." = "アイコンが隠れている場合は、タスクバーのオーバーフロー領域からシステムトレイに移動してください。";
 "Increase Transparency" = "透明度を上げる";
@@ -490,6 +497,7 @@
 "No OpenCode Go subscription on this key." = "このキーには OpenCode Go のサブスクリプションがありません。";
 "No OpenRouter API key. Set OPENROUTER_API_KEY or add it to ~/.config/tokenplan/openrouter.json." = "OpenRouter の API キーがありません。OPENROUTER_API_KEY を設定するか、~/.config/tokenplan/openrouter.json に追加してください。";
 "No Z.ai API key. Set ZAI_API_KEY or add it to ~/.config/tokenplan/zai.json." = "Z.ai の API キーがありません。ZAI_API_KEY を設定するか、~/.config/tokenplan/zai.json に追加してください。";
+"No accounts are shown in the menu bar yet." = "メニューバーに表示中のアカウントはまだありません。";
 "No accounts yet. Add one to start tracking your usage." = "アカウントがありません。追加すると使用状況を確認できます。";
 "No active Coding Plan found for this key." = "このキーに有効な Coding Plan が見つかりません。";
 "No active Cursor subscription." = "有効な Cursor サブスクリプションがありません。";
@@ -517,6 +525,7 @@
 "No valid login for this Codex account. Sign in with Codex, xswap, or pi, then refresh." = "この Codex アカウントには有効なログインがありません。Codex、xswap、または pi でサインインしてから更新してください。";
 "None" = "なし";
 "Not Now" = "今はしない";
+"Not Shown" = "非表示";
 "Not detected yet" = "まだ検出されていません";
 "Not logged in. Run `claude` to authenticate." = "ログインしていません。`claude` を実行して認証してください。";
 "Not logged in. Run `codex` to authenticate." = "ログインしていません。`codex` を実行して認証してください。";
@@ -698,6 +707,7 @@
 "Reveal in Finder" = "Finder で表示";
 "Ring" = "リング";
 "Run devin auth login or sign in to Devin and try again." = "devin auth login を実行するか Devin にサインインしてから、もう一度お試しください。";
+"Same order as Account Management" = "並び順は「アカウント管理」と同じです";
 "Save" = "保存";
 "Saved" = "保存しました";
 "Saved account. Refresh to check its current connection." = "アカウントは保存されています。更新して接続を確認してください。";
@@ -724,6 +734,7 @@
 "Shares use %@ recorded tokens from this day and source, not a plan limit or a full bill." = "割合はこの日のこの記録元の %@ トークンを基準とし、プランの上限や請求全体を示すものではありません。";
 "Show" = "表示";
 "Show First Usage Metric" = "最初の使用量を表示";
+"Show Home" = "ホームを表示";
 "Show Log Folder" = "ログフォルダーを開く";
 "Show Note in Overview" = "概要にメモを表示";
 "Show TokenPlan" = "TokenPlan を表示";
@@ -801,6 +812,7 @@
 "The system credential reader is missing. Install libsecret-tools, or open Antigravity and refresh." = "資格情報ツールがありません。libsecret-tools をインストールするか、Antigravity を開いて更新してください。";
 "The update could not be installed. Your current version is unchanged." = "更新をインストールできませんでした。現在のバージョンは変更されていません。";
 "Theme" = "テーマ";
+"These settings only affect %@." = "以下の設定は %@ のみに適用されます。";
 "These three readings share one allowance. More expensive models use it up faster. They are not each model's own remaining amount." = "この3つは同じ利用枠です。高いモデルほど早く消費され、モデルごとの残りではありません。";
 "These variants are included in the model above, not added again." = "この内訳は上のモデルに含まれており、再加算しません。";
 "This Mac" = "この Mac";
@@ -867,6 +879,7 @@
 "Up to %lld stars per provider" = "プロバイダーごとにスターは最大 %lld つ";
 "Up to 2 stars per provider" = "プロバイダーごとにスターは最大 2 つ";
 "Up to date" = "最新です";
+"Up to three metrics each" = "各アカウント最大 3 項目";
 "Update Available" = "アップデートがあります";
 "Update available" = "更新があります";
 "Updated" = "更新日時";
@@ -880,6 +893,7 @@
 "Usage Needs Attention" = "使用量を確認してください";
 "Usage Notifications" = "使用量の通知";
 "Usage Overview" = "使用量の概要";
+"Usage Style" = "使用量の表示";
 "Usage Trend" = "使用量の推移";
 "Usage could not be read; see the details below." = "使用量を読み取れません。以下の詳細を確認してください。";
 "Usage history could not be read. New readings will start a fresh history." = "履歴を読み込めませんでした。新しい取得結果から履歴を作り直します。";

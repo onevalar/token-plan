@@ -8,7 +8,8 @@ tray integration remain platform-specific. This change does not publish a releas
 
 - Home offers Compact (default) and Comfortable spacing. The preference stays on
   this device; the previous macOS preview preference is preserved on upgrade.
-- General Settings offers eight Home Usage Styles: Bars (default), Gauges,
+- General Settings › Home offers eight Home Usage Styles, shown as one collapsed row with the
+  current style; opening it shows a small drawing of every style at once: Bars (default), Gauges,
   Percentage Grid, Compact Rings, Quota Ruler, Concentric Rings, Numbers and
   Segmented Bar. The choice stays on this device, independently of spacing,
   used/remaining mode and tray style. It changes Home only, not account details
@@ -20,9 +21,9 @@ tray integration remain platform-specific. This change does not publish a releas
   Over-limit numbers are never clipped: a gauge stops at its endpoint but keeps
   the real percentage; a grid outside 0–100% shows the number without a grid.
   A segmented bar has 20 pieces with a partially filled last piece, so small
-  changes are not rounded to a whole piece. Concentric rings pair only two adjacent
-  quotas with different known periods in one account; other arrangements use
-  independent compact rings. Each ring has its own name, number and reset time.
+  changes are not rounded to a whole piece. Concentric rings pair adjacent quotas with different known periods in one
+  account. Extra quotas remain as independent compact rings; a third model pool
+  no longer disables the first pair. Each ring has its own name, number and reset time.
   Reopening Home and refreshing do not replay fill animations or celebrate exhaustion.
 - These are independent quota displays, not combined goal rings, quota composition
   charts or forecasts without real data.
@@ -40,10 +41,13 @@ tray integration remain platform-specific. This change does not publish a releas
   Model details within a daily source record use a composition ring for recorded
   tokens, not quota or spending. The denominator is that source's total for that day;
   missing model assignments remain an unclassified portion, rather than enlarging
-  known shares. Exact token and cost values and nested variants remain available.
+  known shares. Exact token counts and nested variants remain available. Model and variant costs
+  use two decimal places, including the detailed readings; calculations retain their
+  original precision.
   Zero, invalid or contradictory totals, or more than six nonzero portions, keep a
   list with an explanation instead. Unknown cost remains unknown. History summaries,
-  daily record lists, account information and current quota details stay unchanged.
+  daily totals and current quota details stay unchanged. Account removal uses a full-row
+  action with an inline confirmation; terminal login and history remain available.
 - Quota bar rows show the provider's actual period (such as 5h, 1w or 30d) separately
   from the model or allowance name. Names do not add extra rows. Long names are
   shortened with an ellipsis; their full text remains in account settings and
@@ -89,16 +93,25 @@ tray integration remain platform-specific. This change does not publish a releas
   the bottom of the account settings, apart from notes and the API key.
 - Problem cards carry one button for the next step: Try Again (temporary failures, refreshes just that account), Sign In Again
   (a CLI login that needs authorizing), Check Connection, Set API Key (opens the key field) or View Details. Each Home account has
-  one heading/arrow entry into Usage; settings live in the detail page's Settings tab, not a neighboring hover shortcut. Window labels (5h, 1w) and reset countdowns have plain-language
+  one heading/arrow entry into Usage; settings live in the detail page's Account Settings tab, not a neighboring hover shortcut.
+  The detail page offers the same Try Again and Set API Key buttons beside an error (sign-in help is already on the page). Window labels (5h, 1w) and reset countdowns have plain-language
   tooltips ("5-hour window", "Resets in 3h").
 - First use shows a short welcome once (what appears automatically, what 5h/1w and the hourglass mean, where to add another login).
   Later, when an account is at 70% or more and every alert is off, one card offers to turn alerts on (asking for notification
   permission first). Both can be dismissed; the choice is kept per device in the webview's own storage and never in preferences.
 - About shows the version, a one-line description, links to the project, release notes, issue reporting and license (opened by a native
   command that only accepts https links inside this project's repository), the OpenUsage credit and the no-analytics statement.
-- Settings group appearance, refresh, tray, notifications and shortcuts. The menu-bar account list is collapsed behind a row that shows
-  how many are selected. The three alerts
-  share one card, and the tray account list is labelled as such.
+- Each setting has one home. General Settings groups, in order: Appearance and Language, Home (usage style, density,
+  used/remaining), Menu Bar (macOS), Data Refresh, then notifications and shortcuts. The Menu Bar group holds everything
+  about the menu bar: a live preview at the top, style and icon position, and every shown account with its switch; a switched-on
+  account lists its metrics as chips to pick up to three for the menu bar. Hints about three rings or value-only metrics appear
+  only when they apply. Order comes from Account Management, linked with Adjust Order.
+- Account Management alone shows or hides accounts on Home and sets their order (which the menu bar also uses); on macOS it
+  ends with a menu bar summary linking to General Settings.
+- An account's Account Settings tab only holds what belongs to that account: a line naming the account it affects, Home
+  Metrics (Home / Details only / Hidden per metric), read-only Menu Bar and Home Usage Style summaries that link to General
+  Settings, the note, the API key and removal. The Usage tab ends with a link to choose which metrics appear on Home.
+  The three alerts share one card.
   History provides filtering, seven-day pagination and expandable model records.
 - The production updater and About page remain available from More. Choosing Check
   for Updates immediately starts a check and opens its status page. The page's check
@@ -108,7 +121,7 @@ tray integration remain platform-specific. This change does not publish a releas
 
 ## Tray indicators
 
-- Each account can select up to three metrics. Both Swift and .NET bridges persist
+- On macOS, each account can select up to three metrics. Both Swift and .NET bridges persist
   selections and icon position, reject a fourth metric, and preserve selections
   when switching between rings and percentages. The classic clients retain their
   existing two-metric editing limit.
@@ -120,9 +133,15 @@ tray integration remain platform-specific. This change does not publish a releas
   settings. Permanent faint tracks remain visible for empty/missing usage. Progress
   follows the used/remaining preference. Non-percentage metrics use numeric values.
 - macOS draws the indicators in one native template image, adapting to the menu-bar
-  background. Windows/Linux reserve a square system-tray slot: it retains TokenPlan's
-  app icon, while the popup shows the same clickable account indicators. The native
-  tooltip/menu lists all three selected readings in saved account order.
+  background. Windows/Linux keep one transparent TokenPlan application icon, with
+  no usage plate, border, duplicated Home strip or quota tray settings. Stored Mac
+  menu-bar selections are retained but not exposed by these two platforms.
+- Windows primary-click opens a two-item native menu: Show Home and Quit TokenPlan.
+  A Windows double-click directly brings Home forward. Linux requests the same
+  two-item menu on primary-click through StatusNotifier. SNI has no double-click
+  method and GNOME/KDE consume the click stream while rendering that menu, so Linux
+  does not promise a separate double-click shortcut. Show Home resets navigation,
+  restores a minimized window, raises it and requests keyboard focus.
 - Windows/Linux persist the automatic-refresh switch without the classic client's
   old forced-enable migration. Existing preferences and local history remain intact.
 

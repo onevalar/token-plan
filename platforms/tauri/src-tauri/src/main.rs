@@ -8,8 +8,6 @@ mod notifications;
 mod model;
 mod tray;
 mod tray_image;
-#[cfg(any(not(target_os="macos"),test))]
-mod tray_cells;
 #[cfg(target_os="windows")]
 mod windows_tray;
 mod panel;
@@ -21,6 +19,11 @@ use tauri::{
     menu::{Menu, MenuItem},
     tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
 };
+
+fn show_home(app:&tauri::AppHandle) {
+    let _=tauri::Emitter::emit(app,"show-home",());
+    panel::show(app);
+}
 
 fn show(app: &tauri::AppHandle) {
     panel::show(app);
@@ -59,10 +62,7 @@ fn main() {
         .invoke_handler(tauri::generate_handler![bridge::desktop_request, shortcuts::shortcut_capture, panel::panel_frame, panel::panel_content_height, account_setup::account_login, account_setup::account_directory, links::open_link, quit, hide])
         .setup(|app| {
             #[cfg(target_os="windows")]
-            {
-                app.manage(windows_tray::WindowsTrays::default());
-                windows_tray::listen(app.handle());
-            }
+            app.manage(windows_tray::WindowsTray::default());
             // A missing global-hotkey backend (e.g. a Wayland-only session) must not prevent startup.
             if app.handle().plugin(tauri_plugin_global_shortcut::Builder::new().with_handler(|app,_,event| {
                 if event.state()==tauri_plugin_global_shortcut::ShortcutState::Pressed {
@@ -83,22 +83,33 @@ fn main() {
             // Linux uses a single StatusNotifier item from linux_tray instead.
             #[cfg(not(target_os="linux"))]
             {
-                let open = MenuItem::with_id(app, "open", "TokenPlan", true, None::<&str>)?;
+                let open = MenuItem::with_id(app, "open", if cfg!(target_os="macos"){"TokenPlan"}else{tray::open_label("en")}, true, None::<&str>)?;
                 let quit = MenuItem::with_id(app, "quit", "Quit TokenPlan", true, None::<&str>)?;
                 let menu = Menu::with_items(app, &[&open, &quit])?;
                 TrayIconBuilder::with_id("root")
-                    .icon(tauri::image::Image::from_bytes(include_bytes!(
-                        "../icons/icon.png"
-                    ))?)
+                    .icon({
+                        #[cfg(target_os="windows")] {tray::application_icon()?}
+                        #[cfg(target_os="macos")] {tauri::image::Image::from_bytes(include_bytes!("../icons/icon.png"))?}
+                    })
                     .tooltip(app.config().product_name.as_deref().unwrap_or("TokenPlan"))
                     .menu(&menu)
                     .show_menu_on_left_click(false)
                     .on_menu_event(|app, event| match event.id.as_ref() {
-                        "open" => show(app),
+                        "open" => {
+                            #[cfg(target_os="macos")] show(app);
+                            #[cfg(not(target_os="macos"))] show_home(app);
+                        },
                         "quit" => app.exit(0),
                         _ => {}
                     })
                     .on_tray_icon_event(|tray, event| {
+                        #[cfg(target_os="windows")]
+                        match event {
+                            TrayIconEvent::DoubleClick {button:MouseButton::Left,..}=>windows_tray::double(tray.app_handle()),
+                            TrayIconEvent::Click {button:MouseButton::Left,button_state:MouseButtonState::Up,..}=>windows_tray::primary(tray.app_handle()),
+                            _=>{}
+                        }
+                        #[cfg(target_os="macos")]
                         if let TrayIconEvent::Click {
                                 button: MouseButton::Left,
                                 button_state: MouseButtonState::Up,

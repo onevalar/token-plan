@@ -53,27 +53,22 @@ an automatic change to its saved pins.
 - History uses the native history sources. Mac account-scoped histories remain separate;
   device-scoped CLI logs on Windows/Linux are counted once per provider. Existing desktop
   quota-history files are read and extended. Missing/partial data is not rendered as zero.
-- macOS uses one wide template-image strip containing every selected account. Windows
-  and Linux now draw live native tray indicators instead of a permanent application icon.
-  Each inside-layout account uses a square ring indicator (up to three rings); the left
-  layout and three-ring groups have a separate provider mark. In percentage/value mode,
-  every selected metric gets a readable square cell after its provider mark. No selected
-  metric is dropped on style changes. Three-ring groups center the account number.
-- Native tray cells have a neutral dark plate and a light foreground so they remain visible
-  on light and dark panels independently of the application's theme. A faint complete track
-  remains visible at zero use; missing data remains an em dash in value mode. Each cell's
-  existing native tooltip and context menu identify its account and all pinned readings.
-- Account numbering is contiguous among visible accounts of each service; one visible
-  account has no ordinal. Stable positional slots update in place when values, order,
-  visibility or style change. Obsolete slots are removed and a TokenPlan mark remains when
-  all accounts are off. Desktop environments can still reorder, space or hide tray slots;
-  Windows users may need to move new indicators out of taskbar overflow. The panel retains
-  an ordered account strip as a companion, not as a substitute for native indicators.
-- Left-click opens the panel, and the native context menu includes open/quit. Linux uses
-  StatusNotifierItem through `ksni` because Tauri's AppIndicator adapter does not deliver
-  left-click activation. The window remains accessible when a desktop has no SNI host.
-- General settings share language, appearance, refresh interval, used/remaining display and
-  tray configuration. Provider text reuses the repository's five-language translation tables.
+- macOS uses one wide template-image strip containing every selected account.
+  Windows/Linux use one transparent product icon, without a drawn background or
+  border. Account quota indicators, their settings and the duplicate indicator
+  strip inside Home are removed on Windows/Linux. Existing selections remain stored.
+- The Windows tray menu opens on primary-click and contains Show Home and Quit.
+  Double-click opens Home directly. Linux exposes the same native SNI menu on
+  primary-click; the protocol does not provide a distinct double-click callback.
+  Showing Home resets navigation and restores, raises and focuses the window.
+  Linux still keeps an accessible window if no SNI host exists.
+- Antigravity's Windows/Linux parser now carries 5-hour and weekly periods from
+  exact bucket IDs, matching the Mac mapper; unknown pools remain excluded and
+  reset times are never inferred. This also makes the independent Home rings pair
+  correctly when the provider has both session and weekly quotas.
+- General settings share language, appearance, Home style and density, used/remaining display,
+  menu bar configuration (including each account's menu bar metrics) and refresh interval.
+  Account settings keep only per-account choices and link to General Settings for the rest. Provider text reuses the repository's five-language translation tables.
 - Tauri's updater checks in the background or on request, verifies signatures, shows install
   progress and restarts after installation. A background check failure does not interrupt work.
   The update preference is persisted. A failed installation is shown explicitly.
@@ -274,6 +269,6 @@ ambiguous existing empty configurations are preserved. Windows/Linux persist per
 default pins when the first usable snapshot arrives and never replace an explicit empty
 array. No metrics are seeded from an unauthenticated heading.
 
-Shared account settings explain icon-only mode and offer a one-click first metric;
+The menu bar settings show an icon-only account as switched on with no metric chip selected;
 the native tray summaries distinguish no selected metric from missing quota data.
 This also lets legacy accounts recover without overwriting deliberate preferences.

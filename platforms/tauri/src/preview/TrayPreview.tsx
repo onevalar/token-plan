@@ -36,6 +36,5 @@ export function RingLayoutPicker({value,onChange,disabled,tr}:{value:string;onCh
     <span>{tr(position==='inside'?'Inside the Ring':'Left of the Rings')}</span></span>
    </Button>)}
   </div>
-  <p className="group-description">{tr('Three metrics automatically place the icon on the left. Your selections are kept when switching styles.')}</p>
  </div>;
 }

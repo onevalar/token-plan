@@ -47,7 +47,7 @@ function OriginalModels({row,language,readings}:Props&{readings:Readings}) {
 export function HistoryModelBreakdown({row,language}:Props) {
  const tr=(text:string)=>providerText(text,language);
  const exactFormatter=new Intl.NumberFormat(language,{maximumFractionDigits:20});
- const costFormatter=new Intl.NumberFormat(language,{style:'currency',currency:'USD',currencyDisplay:'narrowSymbol',minimumFractionDigits:2,maximumFractionDigits:20});
+ const costFormatter=new Intl.NumberFormat(language,{style:'currency',currency:'USD',currencyDisplay:'narrowSymbol',minimumFractionDigits:2,maximumFractionDigits:2});
  const percentFormatter=new Intl.NumberFormat(language,{style:'percent',maximumFractionDigits:2});
  const exact=(value:number)=>exactFormatter.format(value),cost=(value:number|null)=>value==null?tr('Cost Unknown'):costFormatter.format(value);
  const readings={tr,exact,cost},info=composition(row);
