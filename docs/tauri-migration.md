@@ -4,7 +4,7 @@ The October 21 navigation redesign is enabled in normal builds on all three plat
 following the owner’s approval. See [mac-navigation-preview.md](mac-navigation-preview.md)
 for behavior, platform tray differences and the isolated design-review bundle.
 
-TokenPlan's new desktop interface lives in `platforms/tauri`. React and the free Arc
+TokenPlan's new desktop interface lives in `platforms/tauri`. React and Arc
 components provide one interface for macOS, Windows and Linux. A fixed bundled helper
 continues to use the existing Swift providers on Mac and .NET providers on Windows/Linux.
 The installed native app and stable update feeds are not replaced by development builds.
@@ -62,6 +62,12 @@ an automatic change to its saved pins.
   Windows/Linux use one transparent product icon, without a drawn background or
   border. Account quota indicators, their settings and the duplicate indicator
   strip inside Home are removed on Windows/Linux. Existing selections remain stored.
+- Token Trend + Values is an optional macOS menu-bar style rendered by Rust, not by
+  the webview. It uses daily token records over 14 calendar days, including today, with gaps
+  for missing days and current selected readings alongside. It does not reuse quota
+  percentages as history. Empty recent history falls back to values; no pins keeps
+  the icon alone. The bridges save `settings.trayStyle = "sparkline"`; the Mac helper's
+  private `tokenplan.desktop.trayStyle` override leaves classic preferences unchanged.
 - Windows left-click shows Home near the tray icon; right-click opens Show Home / Quit.
   Linux uses SNI Activate for Home and the host's standard context menu for right-click.
   Hosts that force a menu on left-click retain Show Home as a fallback. There is no distinct
@@ -170,7 +176,10 @@ in addition to the regression that rejects a modified archive.
 The frontend never receives credentials. It cannot select helper paths or execute shell
 commands. Rust accepts a fixed command list and typed display data, caps response size, and
 terminates a stalled helper. API keys are only submitted for storage, never read back.
-Arc's upstream MIT license is bundled; no Arc Pro source is redistributed.
+The free Arc components retain their bundled MIT license. The optional Tick Ring adapts
+authorized Arc Pro Activity Rings source, embedded in this application under Arc's
+October 24, 2026 license. Its source notices, Pro terms and MIT exception are retained
+and bundled separately. It must not be distributed as a standalone component or library.
 
 A passing browser test does not prove platform tray behavior, notarization or installed
 updates. Keep native views until packaged acceptance and the first production upgrade have
@@ -249,6 +258,9 @@ matched directory paths to the UI, never credential contents.
 Home usage styles are local UI preferences. Unified mode retains the existing global style;
 Customize by Account exposes a style picker inside each account's Edit Home Display. Switching
 modes preserves per-account choices, including different styles for two accounts of one service.
+The nine choices include Tick Ring, with one independent dial per quota. It uses the same
+saved `tokenplan.homeUsagePreferences` record, displayed percentages, reset times and warning
+threshold as the other styles. No provider, history source or stored reading is changed.
 
 ### Connection diagnosis
 

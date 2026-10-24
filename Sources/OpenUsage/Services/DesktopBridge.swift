@@ -155,6 +155,7 @@ public final class DesktopBridge {
                 if key.isEmpty { try provider.deleteAPIKey() } else { try provider.saveAPIKey(key) }
             case "settings":
                 guard let settings = value as? [String: Any] else { throw Failure.invalid }
+                let trayStyle = try settings["trayStyle"].map { try DesktopTrayStyle(validating: $0) }
                 if let flags = settings["notifications"] as? [Bool], flags.count == 3 {
                     for (key, flag) in zip(["underTenPercent", "healthyToClose", "closeToRunningOut"], flags) { defaults.set(flag, forKey: "tokenplan.notifications.\(key)") }
                 }
@@ -163,10 +164,6 @@ public final class DesktopBridge {
                 if let position = settings["ringIconPosition"] as? String {
                     guard ["inside", "left"].contains(position) else { throw Failure.invalid }
                     defaults.set(position, forKey: "tokenplan.desktop.ringIconPosition")
-                }
-                if let style = settings["trayStyle"] as? String {
-                    guard let parsed = MenuBarStyle(rawValue: style) else { throw Failure.invalid }
-                    layout.menuBarStyle = parsed
                 }
                 if let language = settings["language"] as? String {
                     guard LanguageSetting(rawValue: language) != nil else { throw Failure.invalid }
@@ -182,6 +179,7 @@ public final class DesktopBridge {
                 }
                 if let automatic = settings["autoUpdates"] as? Bool { defaults.set(automatic, forKey: "SUAutomaticallyCheckForUpdates") }
                 if let automatic = settings["autoRefresh"] as? Bool { defaults.set(automatic, forKey: "tokenplan.desktop.autoRefresh") }
+                trayStyle?.save(defaults: defaults)
             default: throw Failure.invalid
             }
             return try JSONSerialization.data(withJSONObject: ["ok": true, "state": snapshot()])
@@ -199,7 +197,8 @@ public final class DesktopBridge {
             records: accounts.records, order: layout.providerOrder)
     }
 
-    private func snapshot() -> [String: Any] {
+    private func snapshot() throws -> [String: Any] {
+        let trayStyle = try DesktopTrayStyle.read(defaults: defaults, legacyStyle: layout.menuBarStyle)
         let entries: [[String: Any]] = accountIDs().compactMap { id in
             if let record = accounts.records.first(where: { $0.id == id }), !record.removedTombstone,
                observedIdentities[id] != record.identityKey {
@@ -264,7 +263,7 @@ public final class DesktopBridge {
             "locale": Locale.current.identifier,
             "appearance": defaults.string(forKey: AppearanceSetting.key) ?? "system",
             "language": defaults.string(forKey: LanguageSetting.key) ?? "system",
-            "trayStyle": layout.menuBarStyle.rawValue,
+            "trayStyle": trayStyle,
             "ringIconPosition": defaults.string(forKey: "tokenplan.desktop.ringIconPosition") == "left" ? "left" : "inside",
             "refreshMinutes": RefreshSetting.minutes(defaults: defaults),
             "autoUpdates": defaults.object(forKey: "SUAutomaticallyCheckForUpdates") as? Bool ?? true,

@@ -3,12 +3,15 @@ import {Button} from '../components/arc/button/button';
 import {ProviderLogo} from '../Dashboard';
 import logoSizes from '../tray-logo-sizes.json';
 import type {Metric} from '../desktop';
+import {tokenReading,type TokenTrend} from '../trayTrend';
+import {StaticSparkline} from '../components/arc/sparkline/static-sparkline';
 
 type TrayMetric=Pick<Metric,'hasData'|'percent'|'amount'|'unit'>;
-export function TrayGlyph({family,metrics,badge,style='ring',position='inside'}:{family:string;metrics:TrayMetric[];badge?:number|null;style?:string;position?:string}) {
+export function TrayGlyph({family,metrics,badge,style='ring',position='inside',trend,tokensLabel='tokens'}:{family:string;metrics:TrayMetric[];badge?:number|null;style?:string;position?:string;trend?:TokenTrend;tokensLabel?:string}) {
  const selected=metrics.slice(0,3),ring=style==='ring'&&selected.length>0&&selected.every(m=>m.percent!=null||m.unit==='percent');
  const triple=ring&&selected.length===3;
  const left=ring&&(position==='left'||triple);
+ const sparkline=style==='sparkline'&&selected.length>0&&trend?.values.some(value=>value!=null)?trend:undefined;
  const sizes=logoSizes[family as keyof typeof logoSizes]??logoSizes.tokenplan;
  const side=(ring&&!left?sizes[selected.length>1?1:0]:selected.length?28:32)*.7;
  const rings=<svg className="tray-rings" width="28" height="28" viewBox="0 0 40 40" aria-hidden="true">{selected.map((m,i)=>{
@@ -22,7 +25,8 @@ export function TrayGlyph({family,metrics,badge,style='ring',position='inside'}:
   </span>
   {badge!=null&&!triple&&<sup className="tray-badge">{badge<=9?badge:'+'}</sup>}
   {left&&rings}
-  {!ring&&selected.length>0&&<span className={`tray-values ${selected.length===3?'three-values':''}`}>{selected.map((m,i)=><span key={i}>{reading(m)}</span>)}</span>}
+  {sparkline&&<><StaticSparkline values={sparkline.values}/><span className="tray-trend-values"><span>{tokenReading(sparkline.values.at(-1)??null)} {tokensLabel}{(sparkline.partial||sparkline.invalid)&&'*'}</span><span>{selected.map(reading).join(' · ')}</span></span></>}
+  {!ring&&!sparkline&&selected.length>0&&<span className={`tray-values ${selected.length===3?'three-values':''}`}>{selected.map((m,i)=><span key={i}>{reading(m)}</span>)}</span>}
  </span>;
 }
 

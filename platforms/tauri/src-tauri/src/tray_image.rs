@@ -1,5 +1,6 @@
 //! macOS menu-bar strip rendering and shared provider artwork/font helpers.
 use crate::{model::{Account, DesktopState}, tray::visible};
+use crate::{i18n::translated,tray_sparkline::{self,TokenTrend}};
 use resvg::{tiny_skia, usvg};
 use std::{collections::HashMap, sync::{Arc, OnceLock}};
 use tauri::image::Image;
@@ -54,9 +55,9 @@ fn text(pixmap: &mut tiny_skia::Pixmap, value: &str, x: f32, baseline: f32, size
     draw(pixmap, &svg, tiny_skia::Transform::identity());
 }
 
-pub(crate) fn reading(metric: &crate::model::Metric) -> String {
+fn reading(metric: &crate::model::Metric) -> String {
     if !metric.has_data { return "—".into(); }
-    metric.percent.map(|v| format!("{:.0}%", v.clamp(0.0, 999.0)))
+    metric.percent.map(|v| format!("{v:.0}%"))
         .or_else(|| metric.amount.map(|v| if v >= 1000.0 { format!("{:.0}k", v / 1000.0) } else { format!("{v:.0}") }))
         .unwrap_or_else(|| "—".into())
 }
@@ -80,7 +81,12 @@ fn render(account: &Account, badge: Option<usize>, style: &str) -> Image<'static
     render_position(account,badge,style,"inside")
 }
 
+#[cfg(test)]
 fn render_position(account: &Account, badge: Option<usize>, style: &str, position: &str) -> Image<'static> {
+    render_with_trend(account,badge,style,position,None,"en")
+}
+
+fn render_with_trend(account: &Account, badge: Option<usize>, style: &str, position: &str, trend: Option<&TokenTrend>, language: &str) -> Image<'static> {
     let mut pixmap = tiny_skia::Pixmap::new(512, HEIGHT).unwrap();
     let pinned: Vec<_> = account.metrics.iter().filter(|m| m.pinned).take(3).collect();
     let ring = style == "ring" && !pinned.is_empty() && pinned.iter().all(|m| m.percent.is_some() || m.unit == "percent");
@@ -118,7 +124,15 @@ fn render_position(account: &Account, badge: Option<usize>, style: &str, positio
     } else {
         draw_logo(&mut pixmap, &account.family, 6.0, 6.0, 28.0);
         let x = core_width as f32 + 4.0;
-        if pinned.len() == 1 { text(&mut pixmap, &reading(pinned[0]), x, 29.0, 24.0); }
+        if let Some(trend)=trend.filter(|t|style=="sparkline"&&t.has_data()) {
+            draw(&mut pixmap,&trend.svg(),tiny_skia::Transform::from_translate(x,0.0));
+            let text_x=x+tray_sparkline::WIDTH as f32+6.0;
+            let tokens=format!("{} {}{}",tray_sparkline::token_reading(trend.today()),translated("tokens",language),if trend.partial||trend.invalid{"*"}else{""});
+            text(&mut pixmap,&tokens,text_x,17.0,17.0);
+            // These are independent current readings, not points on the token graph.
+            text(&mut pixmap,&pinned.iter().map(|m|reading(m)).collect::<Vec<_>>().join(" · "),text_x,37.0,17.0);
+        }
+        else if pinned.len() == 1 { text(&mut pixmap, &reading(pinned[0]), x, 29.0, 24.0); }
         else if pinned.len() == 2 { text(&mut pixmap, &reading(pinned[0]), x, 17.0, 17.0); text(&mut pixmap, &reading(pinned[1]), x, 37.0, 17.0); }
         else { text(&mut pixmap,&pinned.iter().map(|m|reading(m)).collect::<Vec<_>>().join(" · "),x,28.0,21.0); }
     }
@@ -134,7 +148,13 @@ fn render_position(account: &Account, badge: Option<usize>, style: &str, positio
 /// The whole macOS menu-bar strip: every selected account in saved order, or the
 /// TokenPlan mark when none is selected.
 pub fn strip(state: &DesktopState) -> Image<'static> {
-    let groups: Vec<_> = visible(state).into_iter().map(|(a, badge)| render_position(a, badge, &state.settings.tray_style, &state.settings.ring_icon_position)).collect();
+    strip_at(state,chrono::Local::now().date_naive())
+}
+
+pub(crate) fn strip_at(state:&DesktopState,today:chrono::NaiveDate)->Image<'static> {
+    let trends=if state.settings.tray_style=="sparkline"{tray_sparkline::for_accounts(state,today)}else{HashMap::new()};
+    if trends.values().any(|t|t.invalid) {eprintln!("Menu-bar trend omitted invalid or duplicate daily-token records; see the account's history.");}
+    let groups: Vec<_> = visible(state).into_iter().map(|(a, badge)| render_with_trend(a, badge, &state.settings.tray_style, &state.settings.ring_icon_position,trends.get(&a.id),crate::tray::language(state))).collect();
     if groups.is_empty() {
         let mut pixmap = tiny_skia::Pixmap::new(HEIGHT, HEIGHT).unwrap();
         draw_logo(&mut pixmap, "tokenplan", 2.0, 2.0, 36.0);

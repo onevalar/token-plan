@@ -8,6 +8,8 @@
 .quota-title { align-self:end;text-align:center;font-size:var(--text-xs);font-weight:500;overflow-wrap:anywhere; }
 .quota-body { display:flex;align-items:center;justify-content:center;min-height:96px;min-width:0;width:100%; }
 .quota-gauge { width:96px;max-width:100%; }
+.quota-ticks { width:116px;max-width:100%; }
+.home-metrics[data-style="ticks"] .quota-body { min-height:116px; }
 .quota-cells { display:flex;align-items:center;justify-content:center;gap:8px;min-width:0;width:100%; }
 .quota-grid { width:84px;max-width:58%;min-width:0;flex:0 1 84px; }
 .quota-number { display:flex;flex-direction:column;gap:3px;min-width:0;width:5ch;flex:none;font-size:var(--text-xl);font-variant-numeric:tabular-nums; }

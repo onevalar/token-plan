@@ -1,5 +1,6 @@
-use std::{collections::HashMap,sync::OnceLock};
+use std::collections::HashMap;
 use crate::model::{DesktopState,Metric};
+use crate::i18n::translated;
 use tauri::{Manager,Emitter};
 use tokio::sync::Mutex;
 #[derive(Clone,Default)]
@@ -8,12 +9,6 @@ struct Observation {reset:Option<i64>,bucket:i8,under:bool,primed:bool,fired:[bo
 pub struct Alerts(Mutex<HashMap<String,Observation>>);
 const TITLES:[&str;3]=["Almost Out","Cutting It Close","Will Run Out"];
 const BODIES:[&str;3]=["Under 10% usage remaining for this window.","Projected to finish close to your limit.","Projected to finish before the limit resets."];
-fn translated<'a>(text:&'a str,language:&str)->&'a str {
-    static TABLE:OnceLock<serde_json::Value>=OnceLock::new();
-    let table=TABLE.get_or_init(||serde_json::from_str(include_str!("../../src/provider-translations.json")).unwrap_or_default());
-    let lang=if language.starts_with("zh") {if language.contains("Hant")||language.contains("TW")||language.contains("HK"){"zh-Hant"}else{"zh-Hans"}}else{language.split(['-','_']).next().unwrap_or("en")};
-    table[lang][text].as_str().unwrap_or(text)
-}
 fn transition(previous:&Observation,used:f64,bucket:i8,reset:Option<i64>,enabled:[bool;3])->(Observation,Vec<usize>) {
     let mut next=previous.clone();
     if reset.is_some_and(|r|next.reset.is_none_or(|old|r>old+1000)) {next.fired=[false;3];next.bucket=-1;next.under=false;}

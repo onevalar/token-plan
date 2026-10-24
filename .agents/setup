@@ -1,18 +1,19 @@
 #!/usr/bin/env bash
 # Prepares a fresh Amp orb for TokenPlan.
 #
-# Installs the Debian packages the desktop client needs, the .NET SDK pinned by
-# platforms/desktop/global.json, the NuGet packages from the desktop lockfiles, and a warm Debug
-# build, so a new orb can build and test without downloading the toolchain again. Idempotent: Amp
-# reruns this on a stale snapshot, and a warm run only re-checks state.
+# Installs the Debian packages and pinned Rust toolchain the Tauri shell needs, the .NET SDK pinned
+# by platforms/desktop/global.json, the NuGet packages from the desktop lockfiles, and a warm .NET
+# Debug build. Idempotent: Amp reruns this on a stale snapshot, and a warm run only re-checks state.
+# Rust builds and tests stay separate so setup does not compete for memory with agent work.
 #
 # The macOS client needs SwiftUI/AppKit, which Linux orbs do not have; Swift work belongs on a Mac
-# orb or runner. This script therefore prepares the cross-platform `.NET` client and the Python
-# helper scripts.
+# orb or runner. This script prepares the Linux Tauri shell, `.NET` backend, and Python helpers.
 set -euo pipefail
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 desktop_dir="$repo_root/platforms/desktop"
+tauri_dir="$repo_root/platforms/tauri"
+cargo_root="${CARGO_HOME:-$HOME/.cargo}"
 dotnet_root="${TOKENPLAN_DOTNET_ROOT:-$HOME/.dotnet}"
 dotnet_link=/usr/local/bin/dotnet
 msbuild_options=(-m:2 /nodeReuse:false /p:UseSharedCompilation=false)
@@ -31,7 +32,12 @@ export MSBUILDDISABLENODEREUSE=1
 # nsis: makensis builds the Windows installer from Linux (script/build_desktop_installers.sh).
 # xvfb: runs the Linux client itself, for fixture and visual checks.
 # fonts-noto-cjk: CJK text renders faithfully in desktop UI checks and screenshots.
-system_packages=(ca-certificates curl fonts-noto-cjk nsis xvfb)
+# Tauri libraries match .github/workflows/tauri-preview.yml; WebKit pulls in GTK 3 development files.
+# build-essential and pkg-config provide the native compiler/linker and library discovery.
+system_packages=(
+  ca-certificates curl fonts-noto-cjk nsis xvfb
+  build-essential pkg-config libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev patchelf
+)
 missing_packages=()
 for package in "${system_packages[@]}"; do
   if [ "$(dpkg-query -W -f='${Status}' "$package" 2>/dev/null || true)" != "install ok installed" ]; then
@@ -47,6 +53,51 @@ if [ ${#missing_packages[@]} -gt 0 ]; then
 else
   printf '==> System packages already present\n'
 fi
+
+# --- Rust toolchain ------------------------------------------------------------------------------
+step "Checking the Rust toolchain pinned by platforms/tauri/rust-toolchain.toml"
+rust_version="$(python3 -c 'import sys, tomllib; print(tomllib.load(open(sys.argv[1], "rb"))["toolchain"]["channel"])' "$tauri_dir/rust-toolchain.toml")"
+
+if [ ! -x "$cargo_root/bin/rustup" ]; then
+  curl --proto '=https' --tlsv1.2 -fsSL https://sh.rustup.rs \
+    | sh -s -- -y --no-modify-path --profile minimal --default-toolchain "$rust_version"
+fi
+if "$cargo_root/bin/rustup" run "$rust_version" rustc --version >/dev/null 2>&1; then
+  printf '    Rust %s already installed\n' "$rust_version"
+else
+  "$cargo_root/bin/rustup" toolchain install "$rust_version" --profile minimal --no-self-update
+fi
+
+# Match the .NET entry point below: agent shells need these without sourcing a user profile.
+for tool in cargo rustc rustdoc rustup; do
+  rust_link="/usr/local/bin/$tool"
+  if [ ! -L "$rust_link" ] || [ "$(readlink "$rust_link")" != "$cargo_root/bin/$tool" ]; then
+    as_root ln -sfn "$cargo_root/bin/$tool" "$rust_link"
+    printf '    linked %s -> %s/bin/%s\n' "$rust_link" "$cargo_root" "$tool"
+  fi
+done
+finished_step
+
+step "Verifying Rust and Tauri libraries from a clean login shell"
+(
+  cd "$tauri_dir"
+  env -i HOME="$HOME" PATH=/usr/local/bin:/usr/bin:/bin bash -lc '
+    set -euo pipefail
+    for tool in rustc cargo; do
+      version="$("$tool" --version)"
+      printf "    %s\n" "$version"
+      if [[ "$version" != "$tool $1 "* ]]; then
+        printf "!! Expected %s %s from rust-toolchain.toml\n" "$tool" "$1" >&2
+        exit 1
+      fi
+    done
+    for module in gtk+-3.0 webkit2gtk-4.1 javascriptcoregtk-4.1 libsoup-3.0 ayatana-appindicator3-0.1 librsvg-2.0; do
+      printf "    %s " "$module"
+      pkg-config --modversion "$module"
+    done
+  ' bash "$rust_version"
+)
+finished_step
 
 # --- .NET SDK ------------------------------------------------------------------------------------
 step "Checking the .NET SDK pinned by platforms/desktop/global.json"

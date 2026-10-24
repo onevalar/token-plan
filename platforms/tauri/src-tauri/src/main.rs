@@ -6,9 +6,11 @@ mod account_records;
 mod links;
 mod shortcuts;
 mod notifications;
+mod i18n;
 mod model;
 mod tray;
 mod tray_image;
+mod tray_sparkline;
 #[cfg(any(target_os="windows",test))]
 mod windows_tray;
 mod panel;

@@ -57,17 +57,59 @@ try {
   state=await Call(session,new{method="remove",accountId="claude:second"});
   Assert(!state.GetProperty("accounts").EnumerateArray().Any(a=>a.GetProperty("id").GetString()=="claude:second"),"Removed account hidden");
   Assert(Preferences.Load(file).ProviderNotes["claude"]=="kept","Existing notes preserved");
+  var beforeStyle=state.GetProperty("settings");
+  var savedPreferences=File.ReadAllText(file);
+  state=await Call(session,new{method="settings",value=new{trayStyle="sparkline"}});
+  Assert(state.GetProperty("settings").GetProperty("trayStyle").GetString()=="sparkline","Sparkline is exported immediately");
+  foreach(var setting in beforeStyle.EnumerateObject().Where(p=>p.Name!="trayStyle"))
+   Assert(JsonElement.DeepEquals(setting.Value,state.GetProperty("settings").GetProperty(setting.Name)),"Style changes preserve "+setting.Name);
+  Assert(File.ReadAllText(file)==savedPreferences,"Style changes preserve pins, layout, notes and all shared preferences");
+  var savedSession=File.ReadAllText(Path.Combine(root,"tauri-session.json"));
+  foreach(var invalid in new object?[]{"invalid","","Sparkline","ring ",42,true,null,new[]{"sparkline"}}) {
+   try { await Call(session,new{method="settings",value=new{trayStyle=invalid,ringIconPosition="inside",autoRefresh=true,language="en"}}); throw new Exception("Invalid style accepted"); } catch(InvalidDataException) { }
+   Assert(File.ReadAllText(file)==savedPreferences && File.ReadAllText(Path.Combine(root,"tauri-session.json"))==savedSession,"Invalid style does not overwrite saved settings");
+   var unchanged=await Call(session,new{method="state"});
+   Assert(JsonElement.DeepEquals(unchanged.GetProperty("settings"),state.GetProperty("settings")),"Invalid style does not partly change live settings");
+  }
+  try { await Call(session,new{method="settings",value=new{trayStyle="ring",ringIconPosition="invalid"}}); throw new Exception("Invalid settings accepted"); } catch(InvalidDataException) { }
+  Assert((await Call(session,new{method="state"})).GetProperty("settings").GetProperty("trayStyle").GetString()=="sparkline","A rejected settings request does not replace the valid style");
+  Assert(File.ReadAllText(Path.Combine(root,"tauri-session.json"))==savedSession,"A rejected settings request does not persist a different style");
  }
- using(var session=new DesktopSession(file)){
+ foreach(var savedStyle in new[]{"sparkline","ring","percentage"}) {
+  using var session=new DesktopSession(file);
   var state=await Call(session,new{method="state"});
-  Assert(state.GetProperty("settings").GetProperty("trayStyle").GetString()=="percentage","Persisted style");
+  Assert(state.GetProperty("settings").GetProperty("trayStyle").GetString()==savedStyle,"Persisted "+savedStyle+" style");
   Assert(state.GetProperty("settings").GetProperty("ringIconPosition").GetString()=="left","Persisted ring position");
   Assert(!state.GetProperty("settings").GetProperty("autoRefresh").GetBoolean(),"Refresh preference survives restart");
   Assert(!state.GetProperty("settings").GetProperty("autoUpdates").GetBoolean(),"Persisted updater preference");
+  Assert(state.GetProperty("settings").GetProperty("language").GetString()=="zh-Hans","Language survives style changes and restart");
+  Assert(Preferences.Load(file).PinnedMetrics["claude"].SequenceEqual(new[]{"a","b","c"}),"All three pins survive style changes and restart");
   var hidden = state.GetProperty("accounts").EnumerateArray().Single(a=>a.GetProperty("id").GetString()=="claude");
   Assert(hidden.GetProperty("added").GetBoolean() && !hidden.GetProperty("enabled").GetBoolean(),"Hidden membership survives restart");
   Assert(!state.GetProperty("accounts").EnumerateArray().Any(a=>a.GetProperty("id").GetString()=="claude:second"),"Tombstone survives relaunch");
   Assert(!state.ToString().Contains("CredentialFingerprint"),"No authentication fields exported");
+  if(savedStyle=="percentage") continue;
+  var nextStyle=savedStyle=="sparkline"?"ring":"percentage";
+  var beforeStyle=state.GetProperty("settings");
+  var savedPreferences=File.ReadAllText(file);
+  state=await Call(session,new{method="settings",value=new{trayStyle=nextStyle}});
+  Assert(state.GetProperty("settings").GetProperty("trayStyle").GetString()==nextStyle,"Can switch back to "+nextStyle);
+  foreach(var setting in beforeStyle.EnumerateObject().Where(p=>p.Name!="trayStyle"))
+   Assert(JsonElement.DeepEquals(setting.Value,state.GetProperty("settings").GetProperty(setting.Name)),"Switching back preserves "+setting.Name);
+  Assert(File.ReadAllText(file)==savedPreferences,"Switching back preserves all shared preferences");
+ }
+ var styleDir=Path.Combine(root,"tray-style-migration");Directory.CreateDirectory(styleDir);
+ var styleFile=Path.Combine(styleDir,"preferences.json");
+ var styleStateFile=Path.Combine(styleDir,"tauri-session.json");
+ File.WriteAllText(styleStateFile,"{}");
+ using(var session=new DesktopSession(styleFile)) {
+  Assert((await Call(session,new{method="state"})).GetProperty("settings").GetProperty("trayStyle").GetString()=="ring","Missing saved style keeps the existing default");
+  Assert(File.ReadAllText(styleStateFile)=="{}","Reading a missing style does not rewrite saved settings");
+ }
+ foreach(var invalid in new object?[]{"invalid","",42,null}) {
+  var saved=JsonSerializer.Serialize(new{trayStyle=invalid});File.WriteAllText(styleStateFile,saved);
+  try { using var session=new DesktopSession(styleFile); throw new Exception("Invalid saved style silently accepted"); } catch(InvalidDataException) { }
+  Assert(File.ReadAllText(styleStateFile)==saved,"Invalid saved style is diagnosed without rewriting it");
  }
  // Login switches must not replace the previous account's durable identity or customization.
  var switchDir=Path.Combine(root,"switching");Directory.CreateDirectory(switchDir);

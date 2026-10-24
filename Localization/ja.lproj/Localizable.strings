@@ -424,6 +424,7 @@
 "Interface review uses example data. No accounts are connected." = "画面確認用のサンプルデータです。アカウントには接続していません。";
 "Invalid Claude OAuth URL: %@. Check CLAUDE_CODE_CUSTOM_OAUTH_URL / CLAUDE_LOCAL_OAUTH_API_BASE." = "Claude の OAuth URL が無効です：%@。CLAUDE_CODE_CUSTOM_OAUTH_URL / CLAUDE_LOCAL_OAUTH_API_BASE を確認してください。";
 "Invalid HTTP response." = "HTTP 応答が無効です。";
+"Invalid or duplicate token records are omitted." = "無効または重複したトークン記録はグラフに表示しません。";
 "Just Updated" = "更新したばかり";
 "Keep Running When Window Closes" = "ウィンドウを閉じても実行を続ける";
 "Keep at least one metric in the overview." = "概要に少なくとも1項目を残してください。";
@@ -483,6 +484,7 @@
 "Metrics without a percentage are shown as values." = "割合のない項目を含む場合は数値で表示します。";
 "Middle Ring" = "中央";
 "Minutes" = "分";
+"Missing days stay blank. Without recent records, only selected values appear. Device history appears once per provider. An asterisk marks partial or invalid history." = "記録のない日は空白にし、最近の記録がなければ数値のみ表示します。端末の履歴はプロバイダーごとに一度だけ表示し、不完全または無効な記録には星印を付けます。";
 "Model Breakdown" = "モデル別内訳";
 "Model token counts are invalid. Showing the original model list." = "モデルのトークン数が無効なため、元のモデル一覧を表示します。";
 "Model tokens exceed the recorded total. Showing the original model list." = "モデルのトークン合計が記録総数を超えるため、元のモデル一覧を表示します。";
@@ -531,6 +533,7 @@
 "No providers are enabled." = "有効なプロバイダーがありません。";
 "No quota data is available." = "利用可能な割り当てデータがありません。";
 "No readings in this range. Successful refreshes will appear here." = "この期間の履歴はありません。正常に更新されると、ここに表示されます。";
+"No recent token records; showing selected values only." = "最近のトークン記録がないため、選択した数値のみ表示します。";
 "No recorded token usage was found in the local logs." = "ローカルログにトークン使用量の記録がありません。";
 "No reported token usage was found in the Cursor export." = "Cursor のエクスポートにトークン使用量の記録がありません。";
 "No signed-in account was found in this folder yet. Finish signing in, then check again." = "このフォルダーにログイン済みのアカウントはまだ見つかりません。ログインを完了して再確認してください。";
@@ -600,6 +603,7 @@
 "Overview" = "概要";
 "Overview and details always use horizontal bars. Ring is available only in the menu bar." = "概要と詳細には常に横棒を使用します。リングはメニューバーでのみ利用できます。";
 "Overview: %@" = "概要：%@";
+"Partial History" = "一部の履歴";
 "Party Mode" = "パーティーモード";
 "Party mode is on, so this stays paused." = "パーティーモードがオンのため、これは一時停止されています。";
 "Pay as you go" = "従量課金";
@@ -647,6 +651,7 @@
 "Recalculating Estimates…" = "見積もりを再計算中…";
 "Receive pre-release builds before they ship to everyone" = "一般公開前のプレリリース版を受け取ります";
 "Record Shortcut" = "ショートカットを記録";
+"Recorded Daily Tokens · 14 Days" = "日別トークン記録 · 14日間";
 "Recorded Tokens" = "記録済みトークン";
 "Recorded token counts are invalid. Showing the original model list." = "記録されたトークン合計が無効なため、元のモデル一覧を表示します。";
 "Reduce Animations" = "アニメーションを減らす";
@@ -821,6 +826,7 @@
 "The connection timed out. Check whether the desktop app can use your proxy or VPN, then retry." = "接続がタイムアウトしました。デスクトップアプリからプロキシや VPN を利用できるか確認して再試行してください。";
 "The connection timed out. Try again later." = "接続がタイムアウトしました。後で再試行してください。";
 "The global shortcut could not be registered. Check system keyboard settings." = "グローバルショートカットを登録できません。システムのキーボード設定を確認してください。";
+"The line shows recorded daily tokens over the last 14 days, including today. The top value is today’s tokens; your selected current readings stay below." = "折れ線は今日を含む過去14日間の日別トークン記録です。上段は今日のトークン数、下段は選択した現在の使用量です。";
 "The link could not be opened. Try again from your system browser or file manager." = "リンクを開けません。システムのブラウザーまたはファイルマネージャーから再試行してください。";
 "The log folder could not be opened." = "ログフォルダーを開けませんでした。";
 "The login changed during refresh. Try refreshing again." = "更新中にログイン情報が変更されました。再度更新してください。";
@@ -852,9 +858,11 @@
 "This shortcut is unavailable. Choose another combination." = "このショートカットは使用できません。別の組み合わせを選んでください。";
 "Three metrics automatically place the icon on the left. Your selections are kept when switching styles." = "3項目ではアイコンを自動的に左側へ配置します。表示形式を切り替えても選択は保持されます。";
 "Three rings use the left icon layout." = "3つのリングではアイコンを左側に表示します。";
+"Tick Ring" = "目盛りリング";
 "Time Format" = "時刻形式";
 "Time Range" = "期間";
 "Today" = "今日";
+"Token Trend + Values" = "トークン推移と数値";
 "Token Usage" = "トークン使用量";
 "Token conflict. Run `codex` to log in again." = "トークンが競合しています。`codex` を実行して再ログインしてください。";
 "Token expired. Run `claude` to log in again." = "トークンの有効期限が切れました。`claude` を実行して再ログインしてください。";

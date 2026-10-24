@@ -2,7 +2,7 @@ import type {MetricRowProps} from './Metrics';
 import {metricName,usageTone} from './Metrics';
 import {providerText} from './providerText';
 
-export const homeUsageStyles={bars:'Bars',gauges:'Gauges',cells:'Percentage Grid',rings:'Compact Rings',ruler:'Quota Ruler',concentric:'Concentric Rings',numbers:'Numbers',segments:'Segmented Bar'} as const;
+export const homeUsageStyles={bars:'Bars',gauges:'Gauges',cells:'Percentage Grid',rings:'Compact Rings',ruler:'Quota Ruler',concentric:'Concentric Rings',numbers:'Numbers',segments:'Segmented Bar',ticks:'Tick Ring'} as const;
 export type HomeUsageStyle=keyof typeof homeUsageStyles;
 export function isHomeUsageStyle(value:string):value is HomeUsageStyle {return Object.hasOwn(homeUsageStyles,value);}
 

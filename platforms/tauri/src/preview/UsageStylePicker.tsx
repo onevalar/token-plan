@@ -15,6 +15,7 @@ function StyleGlyph({style}:{style:HomeUsageStyle}) {
   concentric:<>{ring(20,9.5,68,2.5)}{ring(20,5,31,2.5)}</>,
   numbers:<text x="20" y="17" textAnchor="middle" fontSize="13" fontWeight="700" fill="currentColor">68%</text>,
   segments:<>{[0,1,2,3,4].map(i=><rect key={i} x={2+i*7.6} y="9" width="6.4" height="6" rx="1.5" fill="currentColor" opacity={i<3?1:.2}/>)}</>,
+  ticks:<>{[11,29].map((cx,j)=><g key={cx} stroke="currentColor" strokeWidth="1.2" strokeLinecap="round">{Array.from({length:16},(_,i)=><path key={i} d={`M${cx} 3.5v3`} transform={`rotate(${i*22.5} ${cx} 12)`} opacity={i<(j===0?11:5)?1:.2}/>)}</g>)}</>,
  };
  return <svg width="40" height="24" viewBox="0 0 40 24" aria-hidden="true">{glyph[style]}</svg>;
 }

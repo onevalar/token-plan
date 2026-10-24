@@ -424,6 +424,7 @@
 "Interface review uses example data. No accounts are connected." = "화면 검토용 예시 데이터입니다. 실제 계정에 연결되지 않았습니다.";
 "Invalid Claude OAuth URL: %@. Check CLAUDE_CODE_CUSTOM_OAUTH_URL / CLAUDE_LOCAL_OAUTH_API_BASE." = "Claude OAuth URL이 올바르지 않습니다: %@. CLAUDE_CODE_CUSTOM_OAUTH_URL / CLAUDE_LOCAL_OAUTH_API_BASE를 확인하세요.";
 "Invalid HTTP response." = "HTTP 응답이 올바르지 않습니다.";
+"Invalid or duplicate token records are omitted." = "유효하지 않거나 중복된 토큰 기록은 그래프에서 제외합니다.";
 "Just Updated" = "방금 업데이트됨";
 "Keep Running When Window Closes" = "창을 닫아도 계속 실행";
 "Keep at least one metric in the overview." = "개요에 지표를 하나 이상 남겨 주세요.";
@@ -483,6 +484,7 @@
 "Metrics without a percentage are shown as values." = "백분율이 없는 지표가 포함되면 숫자로 표시합니다.";
 "Middle Ring" = "가운데 링";
 "Minutes" = "분";
+"Missing days stay blank. Without recent records, only selected values appear. Device history appears once per provider. An asterisk marks partial or invalid history." = "기록이 없는 날은 비워 두고, 최근 기록이 없으면 수치만 표시합니다. 기기 기록은 제공업체별로 한 번만 표시하며, 불완전하거나 유효하지 않은 기록에는 별표가 붙습니다.";
 "Model Breakdown" = "모델별 내역";
 "Model token counts are invalid. Showing the original model list." = "모델 토큰 수가 유효하지 않아 원래 모델 목록을 표시합니다.";
 "Model tokens exceed the recorded total. Showing the original model list." = "모델 토큰 합계가 기록된 총량보다 커서 원래 모델 목록을 표시합니다.";
@@ -531,6 +533,7 @@
 "No providers are enabled." = "사용 중인 제공업체가 없습니다.";
 "No quota data is available." = "사용 가능한 할당량 데이터가 없습니다.";
 "No readings in this range. Successful refreshes will appear here." = "이 기간의 기록이 없습니다. 새로고침에 성공하면 여기에 표시됩니다.";
+"No recent token records; showing selected values only." = "최근 토큰 기록이 없어 선택한 수치만 표시합니다.";
 "No recorded token usage was found in the local logs." = "로컬 로그에 기록된 토큰 사용량이 없습니다.";
 "No reported token usage was found in the Cursor export." = "Cursor 내보내기에 보고된 토큰 사용량이 없습니다.";
 "No signed-in account was found in this folder yet. Finish signing in, then check again." = "이 폴더에서 로그인된 계정을 찾지 못했습니다. 로그인을 완료한 뒤 다시 확인하세요.";
@@ -600,6 +603,7 @@
 "Overview" = "개요";
 "Overview and details always use horizontal bars. Ring is available only in the menu bar." = "개요와 상세에는 항상 가로 막대를 사용합니다. 링은 메뉴 막대에서만 사용할 수 있습니다.";
 "Overview: %@" = "개요: %@";
+"Partial History" = "일부 기록";
 "Party Mode" = "파티 모드";
 "Party mode is on, so this stays paused." = "파티 모드가 켜져 있어 이 설정은 일시 중지됩니다.";
 "Pay as you go" = "종량제";
@@ -647,6 +651,7 @@
 "Recalculating Estimates…" = "추정치 다시 계산 중…";
 "Receive pre-release builds before they ship to everyone" = "정식 배포 전에 사전 출시 빌드를 받습니다";
 "Record Shortcut" = "단축키 기록";
+"Recorded Daily Tokens · 14 Days" = "일일 토큰 기록 · 14일";
 "Recorded Tokens" = "기록된 토큰";
 "Recorded token counts are invalid. Showing the original model list." = "기록된 토큰 합계가 유효하지 않아 원래 모델 목록을 표시합니다.";
 "Reduce Animations" = "애니메이션 줄이기";
@@ -821,6 +826,7 @@
 "The connection timed out. Check whether the desktop app can use your proxy or VPN, then retry." = "연결 시간이 초과되었습니다. 데스크톱 앱에서 프록시나 VPN을 사용할 수 있는지 확인한 후 다시 시도하세요.";
 "The connection timed out. Try again later." = "연결 시간이 초과되었습니다. 나중에 다시 시도하세요.";
 "The global shortcut could not be registered. Check system keyboard settings." = "전역 단축키를 등록할 수 없습니다. 시스템 키보드 설정을 확인하세요.";
+"The line shows recorded daily tokens over the last 14 days, including today. The top value is today’s tokens; your selected current readings stay below." = "선은 오늘을 포함한 최근 14일의 일일 토큰 기록입니다. 위에는 오늘의 토큰 수, 아래에는 선택한 현재 사용량이 표시됩니다.";
 "The link could not be opened. Try again from your system browser or file manager." = "링크를 열 수 없습니다. 시스템 브라우저나 파일 관리자에서 다시 시도하세요.";
 "The log folder could not be opened." = "로그 폴더를 열 수 없습니다.";
 "The login changed during refresh. Try refreshing again." = "새로 고침 중 로그인 정보가 변경되었습니다. 다시 새로 고침하세요.";
@@ -852,9 +858,11 @@
 "This shortcut is unavailable. Choose another combination." = "이 단축키를 사용할 수 없습니다. 다른 조합을 선택하세요.";
 "Three metrics automatically place the icon on the left. Your selections are kept when switching styles." = "지표가 3개이면 아이콘이 자동으로 왼쪽에 표시됩니다. 스타일을 바꿔도 선택 항목은 유지됩니다.";
 "Three rings use the left icon layout." = "링 3개 모드에서는 아이콘을 왼쪽에 표시합니다.";
+"Tick Ring" = "눈금 링";
 "Time Format" = "시간 형식";
 "Time Range" = "기간";
 "Today" = "오늘";
+"Token Trend + Values" = "토큰 추이와 수치";
 "Token Usage" = "토큰 사용량";
 "Token conflict. Run `codex` to log in again." = "토큰 충돌. `codex`를 실행해 다시 로그인하세요.";
 "Token expired. Run `claude` to log in again." = "토큰이 만료되었습니다. `claude`를 실행해 다시 로그인하세요.";

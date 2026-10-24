@@ -10,7 +10,7 @@ test.beforeEach(async({page},info)=>{await page.addInitScript(platform=>{(window
 const providerText=(key:string,language:string)=>(translations as Record<string,Record<string,string>>)[language]?.[key]??key;
 const visible=(page:Page)=>page.locator('.preview-page:not([hidden])');
 const home=(page:Page)=>page.locator('.dashboard');
-const extraStyles={rings:'Compact Rings',ruler:'Quota Ruler',concentric:'Concentric Rings',numbers:'Numbers',segments:'Segmented Bar'};
+const extraStyles={rings:'Compact Rings',ruler:'Quota Ruler',concentric:'Concentric Rings',numbers:'Numbers',segments:'Segmented Bar',ticks:'Tick Ring'};
 async function settings(page:Page,language='en') {
  await page.getByRole('button',{name:messages(language).more,exact:true}).click();
  await page.getByRole('menuitem',{name:textFor(language).settings,exact:true}).click();
@@ -32,7 +32,7 @@ test('Home style persists independently of density, tray and details, with keybo
  const toggle=page.getByRole('button',{name:/^Usage Style/}),options=page.getByRole('group',{name:'Usage Style',exact:true});
  await expect(toggle).toHaveAttribute('aria-expanded','false');await expect(toggle).toContainText('Bars');await expect(options).toHaveCount(0);
  await toggle.focus();await page.keyboard.press('Enter');await expect(toggle).toHaveAttribute('aria-expanded','true');
- await expect(options.getByRole('button')).toHaveCount(8);
+ await expect(options.getByRole('button')).toHaveCount(9);
  await expect(options.getByRole('button',{name:'Bars',exact:true})).toHaveAttribute('aria-pressed','true');
  await options.getByRole('button',{name:'Gauges',exact:true}).focus();await page.keyboard.press('Enter');
  await expect(home(page)).toHaveAttribute('data-usage-style','gauges');
@@ -62,6 +62,37 @@ test('Home style persists independently of density, tray and details, with keybo
  }
 });
 
+test('Tick Ring persists per account and survives switching to a uniform style and back',async({page})=>{
+ const data=largeDesktop();data.accounts=data.accounts.slice(0,2);
+ await mockDesktop(page,'en',false,data);await page.goto('/');await settings(page);await choose(page,'Gauges');
+ await page.getByRole('combobox',{name:'Apply Style',exact:true}).click();
+ await page.getByRole('option',{name:'Customize by Account',exact:true}).click();await back(page);
+ await home(page).getByRole('button',{name:'Claude first@example.com',exact:true}).click();
+ await page.getByRole('button',{name:'Edit Home Display',exact:true}).click();await choose(page,'Tick Ring');
+ const editor=visible(page).locator('.home-metric-editor');
+ await expect(editor.getByRole('button',{name:'Tick Ring',exact:true})).toHaveAttribute('aria-pressed','true');
+ // The account picker is a draft: cancelling must leave the prior style untouched.
+ await editor.getByRole('button',{name:textFor('en').cancel,exact:true}).click();
+ await page.getByRole('button',{name:'Edit Home Display',exact:true}).click();
+ await expect(editor.getByRole('button',{name:/^Usage Style/})).toContainText('Gauges');await choose(page,'Tick Ring');
+ await editor.getByRole('button',{name:'Confirm Changes',exact:true}).click();await expect(editor).toHaveCount(0);await back(page);
+ const accounts=home(page).locator('.account-block');
+ await expect(accounts.nth(0).locator('.home-metrics')).toHaveAttribute('data-style','ticks');
+ await expect(accounts.nth(1).locator('.home-metrics')).toHaveAttribute('data-style','gauges');
+ await page.reload();
+ await expect(accounts.nth(0).locator('.home-metrics')).toHaveAttribute('data-style','ticks');
+ await expect(accounts.nth(1).locator('.home-metrics')).toHaveAttribute('data-style','gauges');
+ expect(await page.evaluate(()=>JSON.parse(localStorage.getItem('tokenplan.homeUsagePreferences')!).accounts)).toEqual({claude:'ticks'});
+ await settings(page);await page.getByRole('combobox',{name:'Apply Style',exact:true}).click();
+ await page.getByRole('option',{name:'Unified Style',exact:true}).click();await choose(page,'Percentage Grid');await back(page);await page.reload();
+ await expect(accounts.nth(0).locator('.home-metrics')).toHaveAttribute('data-style','cells');
+ await expect(accounts.nth(1).locator('.home-metrics')).toHaveAttribute('data-style','cells');
+ await settings(page);await page.getByRole('combobox',{name:'Apply Style',exact:true}).click();
+ await page.getByRole('option',{name:'Customize by Account',exact:true}).click();await back(page);await page.reload();
+ await expect(accounts.nth(0).locator('.home-metrics')).toHaveAttribute('data-style','ticks');
+ await expect(accounts.nth(1).locator('.home-metrics')).toHaveAttribute('data-style','gauges');
+});
+
 test('unreadable preferences and failed saves stay visible and recover without changing the previous style',async({page})=>{
  await page.addInitScript(()=>localStorage.setItem('tokenplan.homeUsageStyle','unrecognized'));
  await mockDesktop(page,'en');await page.goto('/');await settings(page);
@@ -75,7 +106,8 @@ test('unreadable preferences and failed saves stay visible and recover without c
  await expect(visible(page).getByRole('alert')).toHaveCount(0);await expect(home(page)).toHaveAttribute('data-usage-style','cells');
 });
 
-for(const style of ['gauges','cells','rings','ruler','concentric','numbers','segments'] as const)for(const remaining of [false,true])test(`${style} preserves ${remaining?'remaining':'used'} readings, limits, missing data and metric order`,async({page})=>{
+for(const style of ['gauges','cells','rings','ruler','concentric','numbers','segments','ticks'] as const)for(const remaining of [false,true])test(`${style} preserves ${remaining?'remaining':'used'} readings, limits, missing data and metric order`,async({page})=>{
+ if(style==='ticks')await page.emulateMedia({reducedMotion:'no-preference'});
  const data=largeDesktop(),account=data.accounts[0],base=account.metrics[0];data.accounts=[account];data.settings.showRemaining=remaining;
  // Asymmetric readings make a double inversion and rounded threshold visibly wrong.
  const values=remaining?[100,20.4,20,0,-12,62.4]:[0,79.6,80,100,112,37.6];
@@ -106,6 +138,16 @@ for(const style of ['gauges','cells','rings','ruler','concentric','numbers','seg
    const color=await tile.locator('.home-number-value strong').evaluate(e=>getComputedStyle(e).color);
    await expect(tile.locator('.home-number-value > span')).toHaveCSS('color',color);
   }
+  if(style==='ticks'){
+   await expect(tile.locator('.quota-ticks strong')).toHaveText(shown[i]);await expect(tile.locator('.quota-ticks')).toContainText(mode);
+   await expect(tile.locator('.quota-ticks mask circle')).toHaveAttribute('stroke-dasharray',`${Math.max(0,Math.min(1,values[i]/100))} 1`);
+  }
+ }
+ if(style==='ticks'){
+  const rings=home(page).locator('.quota-ticks'),ids=await rings.locator('mask').evaluateAll(es=>es.map(e=>e.id));
+  expect(new Set(ids).size).toBe(values.length+1); // Includes the independent not-started quota, never the missing readings.
+  await expect(rings.locator('button,[tabindex]')).toHaveCount(0);
+  expect(await rings.evaluateAll(es=>es.flatMap(e=>e.getAnimations({subtree:true})).length)).toBe(0);
  }
  if(style==='segments'){
   const fills=await home(page).locator('[data-metric="quota-5"] .home-segment-track > span > span').evaluateAll(es=>es.map(e=>new DOMMatrix(getComputedStyle(e).transform).a));
@@ -134,6 +176,7 @@ for(const style of ['gauges','cells','rings','ruler','concentric','numbers','seg
  await page.evaluate(()=>{(window as any).__beforeRefresh=(state:any)=>{state.accounts[0].metrics[0].percent=7;};});
  await page.getByRole('button',{name:messages('en').refresh,exact:true}).click();
  await expect(home(page).locator('[data-metric="quota-0"]')).toContainText('7%');
+ if(style==='ticks')await expect(home(page).locator('[data-metric="quota-0"] .quota-ticks mask circle')).toHaveAttribute('stroke-dasharray','0.07 1');
 });
 
 test('concentric rings keep independent readings and never pair unrelated quotas',async({page})=>{
@@ -185,7 +228,7 @@ for(const language of ['en','zh-Hans','zh-Hant','ja','ko'])test(`style picker ke
  const label=providerText('Usage Style',language);
  await page.getByRole('button',{name:new RegExp(`^${label}`)}).click();
  const options=page.getByRole('group',{name:label,exact:true});
- await expect(options.getByRole('button')).toHaveCount(8);
+ await expect(options.getByRole('button')).toHaveCount(9);
  await options.scrollIntoViewIfNeeded();await page.evaluate(()=>document.fonts.ready);
  for(const colorScheme of ['light','dark'] as const){
   await page.emulateMedia({colorScheme});

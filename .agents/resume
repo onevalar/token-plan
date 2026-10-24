@@ -4,10 +4,23 @@
 # 10 seconds Amp waits. A Mac orb has no SDK here; that is not a failure.
 set -euo pipefail
 
+cargo_root="${CARGO_HOME:-$HOME/.cargo}"
 dotnet_root="${TOKENPLAN_DOTNET_ROOT:-$HOME/.dotnet}"
 dotnet_link=/usr/local/bin/dotnet
 profile_file=/etc/profile.d/tokenplan-dotnet.sh
 profile_marker='# TokenPlan orb setup: keep the .NET CLI quiet for login shells and orb services.'
+
+for tool in cargo rustc rustdoc rustup; do
+  [ -x "$cargo_root/bin/$tool" ] || continue
+  rust_link="/usr/local/bin/$tool"
+  if [ ! -L "$rust_link" ] || [ "$(readlink "$rust_link" 2>/dev/null)" != "$cargo_root/bin/$tool" ]; then
+    if [ -w "$(dirname "$rust_link")" ]; then
+      ln -sfn "$cargo_root/bin/$tool" "$rust_link"
+    elif ! sudo -n ln -sfn "$cargo_root/bin/$tool" "$rust_link"; then
+      printf 'Could not link %s; run .agents/setup to repair the toolchain.\n' "$rust_link" >&2
+    fi
+  fi
+done
 
 [ -x "$dotnet_root/dotnet" ] || exit 0
 

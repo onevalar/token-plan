@@ -424,6 +424,7 @@
 "Interface review uses example data. No accounts are connected." = "介面評審使用範例資料，尚未連接真實帳號。";
 "Invalid Claude OAuth URL: %@. Check CLAUDE_CODE_CUSTOM_OAUTH_URL / CLAUDE_LOCAL_OAUTH_API_BASE." = "Claude OAuth 網址無效：%@。請檢查 CLAUDE_CODE_CUSTOM_OAUTH_URL / CLAUDE_LOCAL_OAUTH_API_BASE。";
 "Invalid HTTP response." = "HTTP 回應無效。";
+"Invalid or duplicate token records are omitted." = "無效或重複的 token 記錄不繪入走勢。";
 "Just Updated" = "剛剛更新";
 "Keep Running When Window Closes" = "關閉視窗後繼續執行";
 "Keep at least one metric in the overview." = "請在總覽至少保留一項指標。";
@@ -483,6 +484,7 @@
 "Metrics without a percentage are shown as values." = "包含非百分比指標時以數值顯示。";
 "Middle Ring" = "中環";
 "Minutes" = "分鐘";
+"Missing days stay blank. Without recent records, only selected values appear. Device history appears once per provider. An asterisk marks partial or invalid history." = "缺少記錄的日期留空；沒有近期記錄時僅顯示讀數。裝置層級歷史每個服務商只顯示一次；星號表示記錄不完整或含無效資料。";
 "Model Breakdown" = "模型明細";
 "Model token counts are invalid. Showing the original model list." = "模型 token 數值無效，改為顯示原始模型清單。";
 "Model tokens exceed the recorded total. Showing the original model list." = "模型 token 總和超過記錄總數，改為顯示原始模型清單。";
@@ -531,6 +533,7 @@
 "No providers are enabled." = "尚未啟用提供方。";
 "No quota data is available." = "暫無可用額度資料。";
 "No readings in this range. Successful refreshes will appear here." = "此時間範圍內暫無記錄，成功重新整理後會顯示在此。";
+"No recent token records; showing selected values only." = "近期沒有 token 記錄，僅顯示所選讀數。";
 "No recorded token usage was found in the local logs." = "本機日誌中暫無已記錄的 Token 用量。";
 "No reported token usage was found in the Cursor export." = "Cursor 匯出中暫無已回報的 Token 用量。";
 "No signed-in account was found in this folder yet. Finish signing in, then check again." = "這個目錄中還沒有偵測到已登入的帳號，請完成登入後再次偵測。";
@@ -600,6 +603,7 @@
 "Overview" = "概覽";
 "Overview and details always use horizontal bars. Ring is available only in the menu bar." = "總覽和詳情一律使用橫向進度條，環形僅用於選單列。";
 "Overview: %@" = "總覽：%@";
+"Partial History" = "部分歷史記錄";
 "Party Mode" = "派對模式";
 "Party mode is on, so this stays paused." = "派對模式已開啟，因此此項暫停。";
 "Pay as you go" = "按量付費";
@@ -647,6 +651,7 @@
 "Recalculating Estimates…" = "正在重新計算估算…";
 "Receive pre-release builds before they ship to everyone" = "在正式發布前搶先收到預發布版本";
 "Record Shortcut" = "錄製快速鍵";
+"Recorded Daily Tokens · 14 Days" = "每日 token 記錄 · 14 天";
 "Recorded Tokens" = "已記錄 token";
 "Recorded token counts are invalid. Showing the original model list." = "記錄的 token 總數無效，改為顯示原始模型清單。";
 "Reduce Animations" = "減少動畫";
@@ -821,6 +826,7 @@
 "The connection timed out. Check whether the desktop app can use your proxy or VPN, then retry." = "連線逾時，請檢查桌面應用程式是否能使用代理或 VPN 後重試。";
 "The connection timed out. Try again later." = "連線逾時，請稍後重試。";
 "The global shortcut could not be registered. Check system keyboard settings." = "無法註冊全域快速鍵，請檢查系統鍵盤設定。";
+"The line shows recorded daily tokens over the last 14 days, including today. The top value is today’s tokens; your selected current readings stay below." = "折線顯示含今天在內的近 14 天每日 token 記錄。上方數字是今天的 token，下方保留你選擇的目前用量讀數。";
 "The link could not be opened. Try again from your system browser or file manager." = "無法開啟連結，請透過系統瀏覽器或檔案管理員重試。";
 "The log folder could not be opened." = "無法開啟日誌資料夾。";
 "The login changed during refresh. Try refreshing again." = "重新整理期間登入資訊發生變化，請再次重新整理。";
@@ -852,9 +858,11 @@
 "This shortcut is unavailable. Choose another combination." = "此快捷鍵無法使用，請選擇其他組合。";
 "Three metrics automatically place the icon on the left. Your selections are kept when switching styles." = "選擇三項指標時，圖示自動放在左側。切換樣式會保留所選指標。";
 "Three rings use the left icon layout." = "三環模式使用左側圖示配置。";
+"Tick Ring" = "刻度圓環";
 "Time Format" = "時間格式";
 "Time Range" = "時間範圍";
 "Today" = "今天";
+"Token Trend + Values" = "Token 走勢與讀數";
 "Token Usage" = "Token 用量";
 "Token conflict. Run `codex` to log in again." = "權杖衝突。請執行 `codex` 重新登入。";
 "Token expired. Run `claude` to log in again." = "權杖已過期。請執行 `claude` 重新登入。";

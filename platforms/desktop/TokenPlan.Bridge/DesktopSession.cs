@@ -53,7 +53,11 @@ public sealed partial class DesktopSession : IDisposable
             if (doc.RootElement.TryGetProperty("shortcut", out var binding)) shortcut = binding.GetString() ?? "";
             if (doc.RootElement.TryGetProperty("ringIconPosition", out var position)) ringIconPosition = position.GetString() == "left" ? "left" : "inside";
             if (doc.RootElement.TryGetProperty("autoUpdates", out var automatic)) autoUpdates = automatic.GetBoolean();
-            trayStyle = doc.RootElement.GetProperty("trayStyle").GetString() is "percentage" ? "percentage" : "ring";
+            if (doc.RootElement.TryGetProperty("trayStyle", out var style))
+            {
+                try { trayStyle = ParseTrayStyle(style); }
+                catch (InvalidDataException) { DiagnosticLog.Write("bridge", "Saved desktop tray style is invalid."); throw; }
+            }
             if (doc.RootElement.TryGetProperty("cooldowns", out var cooldowns)) service.RestoreCooldowns(cooldowns.Deserialize<Dictionary<string, DateTimeOffset>>() ?? []);
             if (doc.RootElement.TryGetProperty("accountOrder", out var order)) accountOrder = order.Deserialize<List<string>>() ?? [];
             if (doc.RootElement.TryGetProperty("addedAccounts", out var added)) addedAccounts = added.Deserialize<HashSet<string>>() ?? [];
@@ -154,6 +158,7 @@ public sealed partial class DesktopSession : IDisposable
     }
     void ApplySettings(JsonElement value)
     {
+        var nextTrayStyle = value.TryGetProperty("trayStyle", out var style) ? ParseTrayStyle(style) : trayStyle;
         if (value.TryGetProperty("notifications", out var alerts)) { var flags = alerts.Deserialize<bool[]>(); if (flags?.Length != 3) throw new InvalidDataException(); notifications = flags; }
         if (value.TryGetProperty("shortcut", out var binding)) { var text = binding.GetString() ?? ""; if (text.Length > 100) throw new InvalidDataException(); shortcut = text; }
         if (value.TryGetProperty("showRemaining", out var remaining)) preferences = preferences with { ShowRemaining = remaining.GetBoolean() };
@@ -175,8 +180,12 @@ public sealed partial class DesktopSession : IDisposable
         if (value.TryGetProperty("autoUpdates", out var updates)) autoUpdates = updates.GetBoolean();
         if (value.TryGetProperty("autoRefresh", out var automatic)) preferences = preferences with { AutoRefresh = automatic.GetBoolean() };
         if (value.TryGetProperty("ringIconPosition", out var position)) ringIconPosition = position.GetString() is "inside" or "left" ? position.GetString()! : throw new InvalidDataException();
-        if (value.TryGetProperty("trayStyle", out var style)) trayStyle = style.GetString() is "ring" or "percentage" ? style.GetString()! : throw new InvalidDataException();
+        trayStyle = nextTrayStyle;
     }
+    static string ParseTrayStyle(JsonElement value) =>
+        value.ValueKind == JsonValueKind.String && value.GetString() is "ring" or "percentage" or "sparkline"
+            ? value.GetString()! : throw new InvalidDataException();
+
     readonly object persistenceLock = new();
     void Persist()
     {

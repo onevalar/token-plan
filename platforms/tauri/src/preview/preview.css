@@ -160,6 +160,11 @@
 .mac-preview .tray-values { display:flex;flex-direction:column;gap:0;margin-left:2.8px;font-size:12px;line-height:14px;font-weight:600;font-variant-numeric:tabular-nums; }
 .mac-preview .tray-values.three-values { flex-direction:row;align-items:center;font-size:14px;gap:5px; }
 .mac-preview .tray-values.three-values span+span::before { content:'·';margin-right:5px; }
+.mac-preview .tray-sparkline { margin-left:2.8px;flex:none; }
+.mac-preview .tray-trend-values { display:flex;flex-direction:column;margin-left:4.2px;white-space:nowrap;font-size:12px;line-height:14px;font-weight:600;font-variant-numeric:tabular-nums; }
+.mac-preview .menu-bar-trend-help { padding-block:8px;color:var(--text-secondary);font-size:12px;line-height:1.5;overflow-wrap:anywhere; }
+.mac-preview .menu-bar-trend-help p { margin:0; }
+.mac-preview .menu-bar-trend-help p+p { margin-top:6px; }
 .mac-preview .account-tray-preview { display:flex;align-items:center;gap:16px;padding:4px 0 12px;border-bottom:1px solid var(--border);margin-bottom:8px; }
 .mac-preview .ring-legend { list-style:none;display:grid;gap:5px;margin:0;padding:0;font-size:12px; }
 .mac-preview .ring-legend li { display:flex;gap:10px;align-items:baseline; }

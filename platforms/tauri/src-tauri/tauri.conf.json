@@ -55,6 +55,8 @@
     "category": "Utility",
     "resources": {
       "../src/components/arc/LICENSE": "licenses/Arc-LICENSE",
+      "../src/components/arc/NOTICE.md": "licenses/Arc-NOTICE.md",
+      "../src/components/arc/tick-ring/LICENSE.md": "licenses/Arc-Pro-LICENSE.md",
       "../../../LICENSE": "licenses/TokenPlan-LICENSE"
     }
   },

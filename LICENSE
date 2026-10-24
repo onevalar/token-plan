@@ -20,3 +20,14 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+Third-party license exception
+
+The Arc Pro adaptations in
+platforms/tauri/src/components/arc/tick-ring/tick-ring.tsx and
+platforms/tauri/src/components/arc/tick-ring/tick-ring.module.css are NOT covered
+by the MIT license above. Copyright (c) 2026 Elia Kuratli. They are included only
+as part of the TokenPlan application under the Arc Pro license:
+https://uiarc.dev/license
+See platforms/tauri/src/components/arc/tick-ring/LICENSE.md for the applicable
+notice and terms. Do not redistribute them as a standalone component or library.

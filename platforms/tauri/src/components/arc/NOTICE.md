@@ -14,7 +14,8 @@ items. Their public documentation labels them free/open-source:
 - https://uiarc.dev/r/arc-foundation.json
 - https://uiarc.dev/r/arc-motion-tokens.json
 
-Retrieved 2026-10-20. No Arc Pro components are included.
+Retrieved 2026-10-20. These foundational components are free; the later Tick Ring
+adaptation is Arc Pro and has a separate license, described below.
 The upstream MIT license is retained in `LICENSE`, retrieved from
 https://github.com/kuratlielia/arc-library/blob/main/LICENSE.
 
@@ -58,3 +59,28 @@ https://uiarc.dev/r/donut-chart.json. It keeps a fixed recorded-token denominato
 omits hidden-category renormalization, hover resizing, tooltips and animation. Exact
 readings and zero-token models remain in the accompanying legend; invalid or overly
 fragmented data retains the original list. Both use the existing MIT license.
+
+StaticSparkline was adapted on 2026-10-24 from the free registry:
+https://uiarc.dev/r/sparkline.json. Its point/line mapping is also ported to
+`src-tauri/src/tray_sparkline.rs` for the actual native macOS menu-bar image.
+Both use the existing MIT license. Calendar-day slots, a zero baseline and
+straight segments replace min/max-normalized smoothing. Missing days break the
+line, zero stays zero, and a single record stays a point. There are no invented
+samples, forecasts, scrubbing, tooltips, fill animations or rolling numbers.
+
+## Arc Pro Exception: Tick Ring
+
+`tick-ring/tick-ring.tsx` and `tick-ring/tick-ring.module.css` adapt Activity Rings,
+retrieved through the authorized Arc MCP connection on 2026-10-24:
+https://uiarc.dev/components/activity-rings.
+They retain the upstream radial tick geometry and circular mask, but present
+one independent quota per dial, without averaged goals, dates, completion
+celebrations or motion. This is a TokenPlan-specific adaptation, not the
+upstream component API.
+
+These two files are **not covered by the project or Arc free-component MIT
+licenses**. Copyright (c) 2026 Elia Kuratli. The applicable Arc Pro terms are in
+`tick-ring/LICENSE.md` and https://uiarc.dev/license (updated 2026-10-24).
+The license permits embedding Pro source in a public open-source end product,
+not distributing it as a standalone component, library, registry, kit or template.
+Retain the notices and license exception in source and bundled licenses.

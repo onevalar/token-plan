@@ -8,10 +8,10 @@ tray integration remain platform-specific. This change does not publish a releas
 
 - Home offers Compact (default) and Comfortable spacing. The preference stays on
   this device; the previous macOS preview preference is preserved on upgrade.
-- In Unified mode, General Settings › Usage Style offers eight Home Usage Styles, shown as one collapsed row with the
+- In Unified mode, General Settings › Usage Style offers nine Home Usage Styles, shown as one collapsed row with the
   current style; opening it shows a small drawing of every style at once: Bars (default), Gauges,
   Percentage Grid, Compact Rings, Quota Ruler, Concentric Rings, Numbers and
-  Segmented Bar. The choice stays on this device, independently of spacing,
+  Segmented Bar, plus Tick Ring. The choice stays on this device, independently of spacing,
   used/remaining mode and tray style. It changes Home only, not account details
   or history. Each account and quota keeps its own reading; nothing is averaged
   or combined. Balances and existing history charts keep their original form and order.
@@ -25,6 +25,9 @@ tray integration remain platform-specific. This change does not publish a releas
   account. Extra quotas remain as independent compact rings; a third model pool
   no longer disables the first pair. Each ring has its own name, number and reset time.
   Reopening Home and refreshing do not replay fill animations or celebrate exhaustion.
+  Tick Ring uses a separate marked dial for each quota. Its illuminated extent follows
+  the same percentage; the number keeps the actual reading, including overflow.
+  It is available in both Unified Style and each account's confirmed custom style.
 - These are independent quota displays, not combined goal rings, quota composition
   charts or forecasts without real data.
 - Home has matching icon-only Refresh/More actions. Inner pages have Back, a page
@@ -133,8 +136,22 @@ tray integration remain platform-specific. This change does not publish a releas
 
 - On macOS, each account can select up to three metrics. Both Swift and .NET bridges persist
   selections and icon position, reject a fourth metric, and preserve selections
-  when switching between rings and percentages. The classic clients retain their
+  when switching between rings, percentages and Token Trend + Values. The classic clients retain their
   existing two-metric editing limit.
+- Token Trend + Values draws recorded daily tokens for the last 14 local calendar days,
+  including today, next to the provider icon. Today's token count is above the selected
+  current readings. The line is not quota history or a prediction, and switching between
+  Used and Remaining never inverts it or joins different quota windows.
+  Only dated daily history is used, not the older undated/zero-filled metric charts.
+  Missing days break the line, an explicit zero stays zero, and one record stays a dot.
+  With no recent history it shows selected values only; no selected metrics means icon only.
+  Device-scoped history appears once per provider among visible pinned accounts with data;
+  account-scoped records remain separate. An asterisk marks partial or invalid history.
+  Invalid dates/counts and duplicate dates are omitted and diagnosed rather than summed.
+- The native menu-bar style is saved separately from the Home style. The Mac helper uses
+  `tokenplan.desktop.trayStyle`, initially inheriting the existing classic selection without
+  changing it. Windows/Linux retain this setting in `tauri-session.json` but still show only
+  the application icon. No classic SwiftUI view, store or menu style is extended.
 - One/two rings support a centered or left-hand provider icon. Three rings place
   the icon on the left and the account number in the center of the rings. Their
   footprint is fixed whether numbered or not; changing the count does not move the
@@ -167,8 +184,12 @@ The packaging workflow runs the relevant navigation project on each actual OS.
 `npm run test:ui` retains existing regression coverage with the new navigation.
 
 Rust raster checks cover provider clearance, tracks, arcs, badge sizes, center
-placement and all selected values. Swift pin tests and .NET bridge checks cover
-selection limits and persistence without modifying installed preferences.
+placement, dated-token gaps, zero records and all selected values. Swift pin/style tests
+and .NET bridge checks cover selection limits and persistence without modifying installed
+preferences. `TOKENPLAN_TREND_REVIEW=/absolute/path.png cargo test --manifest-path
+src-tauri/Cargo.toml export_native_trend_review` exports the actual native trend renderer
+on light/dark backgrounds. This is raster output, not a live macOS menu-bar screenshot;
+native behavior needs separate macOS acceptance, with the scope recorded below.
 
 `RUSTUP_TOOLCHAIN=1.90.0 npm run preview:mac` builds the isolated review app at
 `~/Library/Caches/TokenPlan/NavigationPreview.noindex/TokenPlan Design Preview.app`.
@@ -202,3 +223,25 @@ the installed production app was left running. Shared browser checks passed on a
 shell contracts (277 checks plus the later focused drag checks). Rust checks passed with
 one external-artifact check intentionally ignored. Windows/Linux native tray and window
 behavior still needs target-system acceptance; browser checks do not verify those integrations.
+
+### Tick Ring and Token Trend Acceptance, 2026-10-24
+
+An independent macOS copy matched the implementation handoff. It passed four Swift
+style tests, 37 Rust checks (one signed-artifact check ignored), 47 frontend tests,
+eight packaging-script tests and 36 macOS WebKit checks.
+
+The native Tauri preview used its Python fixture, not real accounts. The app's light
+and dark appearances showed independent tick readings, the actual system menu bar kept
+the token trend visible with the panel closed, and the Home style survived app restart.
+Refresh was exercised against fixture state, not a live provider. This does not prove
+that every refresh replaces the native image; unchanged images can be reused.
+
+The real Swift helper compiled but was not run. `TOKENPLAN_DEFAULTS_SUITE` isolates
+preferences, not account discovery, credential files or Keychain access, including
+initialization before a state/settings request. Do not use a fresh defaults domain as
+a guarantee that a real helper cannot read installed accounts. Fixture restarts and
+standalone preference tests do not verify the real helper's cross-process persistence.
+
+Real Swift-helper/Tauri save-and-restart, live-account refresh, macOS system-wide
+light/dark switching, VoiceOver and constrained multi-account menu-bar width remain
+unverified. App-theme screenshots and composited raster images do not replace these checks.

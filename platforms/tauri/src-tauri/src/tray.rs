@@ -19,14 +19,17 @@ pub fn visible(state: &DesktopState) -> Vec<(&Account, Option<usize>)> {
     }).collect()
 }
 
-/// One line per selected account, for the tooltip and the tray menu.
+/// Selected readings, plus a separately labelled token history when that style is active.
 pub fn summaries(state: &DesktopState) -> Vec<String> {
-    visible(state).into_iter().map(|(account, badge)| {
+    let trends=if state.settings.tray_style=="sparkline"{crate::tray_sparkline::for_accounts(state,chrono::Local::now().date_naive())}else{HashMap::new()};
+    visible(state).into_iter().flat_map(|(account, badge)| {
         let readings = account.metrics.iter().filter(|m| m.pinned && m.has_data).take(3)
             .map(|m| m.percent.map(|v| format!("{} {:.0}%", m.label, v)).unwrap_or_else(|| format!("{} {}", m.label, m.amount.map(|v| v.to_string()).unwrap_or_else(|| "—".into()))))
             .collect::<Vec<_>>().join(" · ");
         let name = match badge { Some(n) => format!("{} {}", account.name, n), None => account.name.clone() };
-        if readings.is_empty() { format!("{name}: {}", empty_reading(language(state), account.metrics.iter().any(|m| m.pinned))) } else { format!("{name}: {readings}") }
+        let mut lines=vec![if readings.is_empty() { format!("{name}: {}", empty_reading(language(state), account.metrics.iter().any(|m| m.pinned))) } else { format!("{name}: {readings}") }];
+        if let Some(trend)=trends.get(&account.id) {lines.push(trend.summary(language(state)));}
+        lines
     }).collect()
 }
 
