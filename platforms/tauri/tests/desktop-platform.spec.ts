@@ -42,7 +42,9 @@ for(const theme of ['light','dark'] as const)test(`Antigravity keeps periods and
  await expect(visible(page).locator('.metric-scope')).toHaveText(['Argon']);
  await settings(page);
  await page.getByRole('button',{name:/^用量样式/}).click();
- await page.getByRole('group',{name:'用量样式',exact:true}).getByRole('button',{name:'独立同心环',exact:true}).click();
+ await page.getByRole('group',{name:'用量样式',exact:true}).getByRole('button',{name:'环形',exact:true}).click();
+ await page.getByRole('combobox',{name:'子样式',exact:true}).click();
+ await page.getByRole('option',{name:'双环',exact:true}).click();
  await page.getByRole('button',{name:'返回',exact:true}).click();
  await expect(visible(page).locator('.home-concentric > svg > g')).toHaveCount(2);
  await expect(visible(page).locator('.home-concentric-readings .home-reading')).toHaveCount(2);
