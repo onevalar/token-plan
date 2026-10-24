@@ -280,7 +280,9 @@
 "Daily quota" = "日次の上限";
 "Dark" = "ダーク";
 "Dashboard" = "ダッシュボード";
+"Dashboard Ring" = "メーターリング";
 "Data Refresh" = "データ更新";
+"Data stays on this device. No analytics or crash reports are collected." = "データはこのデバイスに保存されます。統計データやクラッシュレポートは収集しません。";
 "Date" = "日付";
 "Date Range" = "期間";
 "Debug" = "デバッグ";
@@ -466,6 +468,7 @@
 "Local CLI" = "ローカルCLI";
 "Local Service Files" = "ローカルサービスファイル";
 "Local Time" = "現地時間";
+"Local data is read only for display. No user information is collected." = "ローカルデータは表示のためだけに読み取ります。ユーザー情報は収集しません。";
 "Local quota readings from the last 30 days. The most recent successful reading per hour is kept." = "直近30日間のローカル上限履歴です。各時間帯の最後に正常取得した値を保存します。";
 "Local token history is still updating." = "ローカルのトークン履歴はまだ更新中です。";
 "Local token logs could not be read. Try refreshing again." = "ローカルのトークンログを読み取れませんでした。再度更新してください。";
@@ -755,6 +758,7 @@
 "Run devin auth login or sign in to Devin and try again." = "devin auth login を実行するか Devin にサインインしてから、もう一度お試しください。";
 "Same order as Account Management" = "並び順は「アカウント管理」と同じです";
 "Same order as Subscription Management" = "並び順は「サブスクリプション管理」と同じです";
+"Sample Data" = "サンプルデータ";
 "Save" = "保存";
 "Saved" = "保存しました";
 "Saved account. Refresh to check its current connection." = "アカウントは保存されています。更新して接続を確認してください。";
@@ -806,6 +810,7 @@
 "Sign in with the Codex CLI, then refresh." = "Codex CLI でログインしてから更新してください。";
 "Sign in with the Cursor desktop app, then refresh." = "Cursor デスクトップアプリでログインしてから更新してください。";
 "Single Ring" = "単一リング";
+"Single Ring Ticks" = "単一リングの目盛り";
 "Single Row" = "1行";
 "Some Cursor export rows were invalid. Totals may be incomplete." = "Cursor のエクスポートに無効な行があり、集計が不完全な可能性があります。";
 "Some accounts could not be refreshed. Check their status." = "一部のアカウントを更新できませんでした。状態を確認してください。";
@@ -818,8 +823,10 @@
 "Source Split" = "内訳バー";
 "Spark" = "Spark";
 "Spark Weekly" = "Spark 週間";
+"Special Designs" = "特別なデザイン";
 "Split by the last 7 days of model use (estimate)" = "直近7日のモデル使用量で按分（推定）";
 "Squares" = "四角";
+"Standard Bar" = "標準バー";
 "Star for menu bar" = "メニューバーにスターを付ける";
 "Starred for menu bar" = "メニューバーにスター付きで追加しました";
 "Start Antigravity or run `agy` and try again." = "Antigravity を起動するか `agy` を実行してから、もう一度お試しください。";
@@ -829,6 +836,7 @@
 "Status Lights" = "ステータスランプ";
 "Status: %@" = "状態：%@";
 "Stop" = "停止";
+"Style Preview" = "スタイルプレビュー";
 "Subscription" = "契約";
 "Subscription Details" = "契約の詳細";
 "Subscription Management" = "サブスクリプション管理";
@@ -988,6 +996,7 @@
 "Uses a separate configuration directory and keeps your current login. Install the official CLI first if the command is unavailable." = "専用の設定フォルダを使用し、現在のログインを保持します。コマンドが見つからない場合は公式 CLI をインストールしてください。";
 "Uses your provider login. No TokenPlan sign-in is needed." = "サービスの既存ログインを利用します。TokenPlanへのログインは不要です。";
 "Using reset credit…" = "リセットクレジットを使用中…";
+"Variant" = "バリエーション";
 "Version" = "バージョン";
 "Vertical Bar" = "縦棒";
 "View Details" = "詳細を見る";

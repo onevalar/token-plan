@@ -280,7 +280,9 @@
 "Daily quota" = "每日額度";
 "Dark" = "深色";
 "Dashboard" = "儀表板";
+"Dashboard Ring" = "儀表環";
 "Data Refresh" = "資料重新整理";
+"Data stays on this device. No analytics or crash reports are collected." = "資料儲存在本機，不收集統計或當機報告。";
 "Date" = "日期";
 "Date Range" = "日期範圍";
 "Debug" = "除錯";
@@ -466,6 +468,7 @@
 "Local CLI" = "本機命令列工具";
 "Local Service Files" = "本機服務檔案";
 "Local Time" = "當地時間";
+"Local data is read only for display. No user information is collected." = "讀取本機資料僅用於顯示，不收集任何使用者資訊。";
 "Local quota readings from the last 30 days. The most recent successful reading per hour is kept." = "儲存最近 30 天的本機額度讀數，每小時保留最後一次成功重新整理的結果。";
 "Local token history is still updating." = "本機 token 記錄仍在更新。";
 "Local token logs could not be read. Try refreshing again." = "無法讀取本機 Token 日誌，請重新整理。";
@@ -755,6 +758,7 @@
 "Run devin auth login or sign in to Devin and try again." = "請執行 devin auth login 或登入 Devin 後再試。";
 "Same order as Account Management" = "順序與「帳號管理」相同";
 "Same order as Subscription Management" = "順序與「訂閱管理」相同";
+"Sample Data" = "範例資料";
 "Save" = "儲存";
 "Saved" = "已儲存";
 "Saved account. Refresh to check its current connection." = "帳號已保留，重新整理後檢查目前連線。";
@@ -806,6 +810,7 @@
 "Sign in with the Codex CLI, then refresh." = "請先在 Codex CLI 中登入，再重新整理。";
 "Sign in with the Cursor desktop app, then refresh." = "請先在 Cursor 桌面應用程式中登入，再重新整理。";
 "Single Ring" = "單環";
+"Single Ring Ticks" = "單環刻度";
 "Single Row" = "單行";
 "Some Cursor export rows were invalid. Totals may be incomplete." = "部分 Cursor 匯出記錄無效，統計可能不完整。";
 "Some accounts could not be refreshed. Check their status." = "部分帳號重新整理失敗，請查看帳號狀態。";
@@ -818,8 +823,10 @@
 "Source Split" = "來源分段條";
 "Spark" = "Spark";
 "Spark Weekly" = "Spark 每週";
+"Special Designs" = "特殊設計";
 "Split by the last 7 days of model use (estimate)" = "依近 7 天的模型用量拆分（估算）";
 "Squares" = "方塊";
+"Standard Bar" = "標準橫條";
 "Star for menu bar" = "加星號到選單列";
 "Starred for menu bar" = "已加星號到選單列";
 "Start Antigravity or run `agy` and try again." = "請啟動 Antigravity 或執行 `agy` 後再試。";
@@ -829,6 +836,7 @@
 "Status Lights" = "狀態信號燈";
 "Status: %@" = "狀態：%@";
 "Stop" = "停止";
+"Style Preview" = "樣式預覽";
 "Subscription" = "訂閱";
 "Subscription Details" = "訂閱詳情";
 "Subscription Management" = "訂閱管理";
@@ -988,6 +996,7 @@
 "Uses a separate configuration directory and keeps your current login. Install the official CLI first if the command is unavailable." = "使用獨立設定目錄，不覆蓋目前登入。若找不到命令，請先安裝對應的官方 CLI。";
 "Uses your provider login. No TokenPlan sign-in is needed." = "讀取服務已有登入，無需登入 TokenPlan。";
 "Using reset credit…" = "正在使用重置額度…";
+"Variant" = "子樣式";
 "Version" = "版本";
 "Vertical Bar" = "直柱";
 "View Details" = "查看詳情";

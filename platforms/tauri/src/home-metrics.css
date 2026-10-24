@@ -25,3 +25,11 @@
 .quota-missing { display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center; }
 .quota-missing > span:first-child { font-size:var(--text-2xl); }
 .mac-preview[data-density="comfortable"] .home-metrics { row-gap:20px;padding-block:12px 4px; }
+
+/* Grid tiles: one reading per column, with stable vertical alignment. */
+.home-metrics[data-style="cells"] .quota-cells { flex-direction:column;gap:8px; }
+.home-metrics[data-style="cells"] .quota-grid { width:76px;max-width:100%;flex:auto; }
+.home-metrics[data-style="cells"] .quota-number { flex-direction:row;align-items:baseline;justify-content:center;width:auto;gap:5px; }
+.home-metrics[data-style="cells"] .quota-number strong { font-size:20px; }
+.home-metrics[data-style="cells"] .quota-body { min-height:0; }
+.home-metrics[data-style="cells"] .quota-warning:empty,.home-metrics[data-style="cells"] .quota-expiries:empty { display:none; }

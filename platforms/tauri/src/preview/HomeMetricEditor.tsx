@@ -25,7 +25,7 @@ export function HomeMetricEditor({account,send,t,busy,language,finish,usageStyle
   catch{setError(t.failed);}finally{savingRef.current=false;setSaving(false);}
  };
  return <form className="home-metric-editor" tabIndex={-1} aria-label={tr('Home Display')} onSubmit={e=>{e.preventDefault();void save();}}>
-  {usageStylePreference.mode==='custom'&&<UsageStylePicker value={style} onChange={setStyle} tr={tr} disabled={disabled}/>}
+  {usageStylePreference.mode==='custom'&&<UsageStylePicker language={language} value={style} onChange={setStyle} tr={tr} disabled={disabled}/>}
   <Group title={tr('Home Display')}>
    <div data-sort-list>{rows.map(m=><div className="placement-row metric-edit-row" data-tray="false" data-sort-id={m.id} key={m.id}>
     <span>{metricName(m,language)}</span>

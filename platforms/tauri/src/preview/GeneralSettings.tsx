@@ -23,7 +23,7 @@ export function GeneralSettings({state,send,t,busy,language,now,densityPreferenc
   </Group>
   <Group title={tr('Usage Style')}>
    <SelectRow label={tr('Apply Style')} value={usageStylePreference.mode} options={[{value:'uniform',label:tr('Unified Style')},{value:'custom',label:tr('Customize by Account')}]} onValueChange={value=>usageStylePreference.changeMode(value as 'uniform'|'custom')}/>
-   {usageStylePreference.mode==='uniform'?<UsageStylePicker value={usageStylePreference.style} onChange={usageStylePreference.changeStyle} tr={tr}/>:<p className="group-description">{tr('Open an account, then choose Edit Home Display to set its usage style.')}</p>}
+   {usageStylePreference.mode==='uniform'?<UsageStylePicker language={language} remaining={state.settings.showRemaining} value={usageStylePreference.style} onChange={usageStylePreference.changeStyle} tr={tr}/>:<p className="group-description">{tr('Open an account, then choose Edit Home Display to set its usage style.')}</p>}
   </Group>
   <Group title={tr('Home Page')}>
    <SelectRow label={tr('Density')} value={densityPreference.density} options={[{value:'compact',label:tr('Compact')},{value:'comfortable',label:tr('Comfortable')}]} onValueChange={value=>densityPreference.changeDensity(value as Density)}/>

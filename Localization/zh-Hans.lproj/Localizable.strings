@@ -280,7 +280,9 @@
 "Daily quota" = "每日额度";
 "Dark" = "深色";
 "Dashboard" = "仪表盘";
+"Dashboard Ring" = "仪表环";
 "Data Refresh" = "数据刷新";
+"Data stays on this device. No analytics or crash reports are collected." = "数据保存在本机，不收集统计或崩溃报告。";
 "Date" = "日期";
 "Date Range" = "日期范围";
 "Debug" = "调试";
@@ -466,6 +468,7 @@
 "Local CLI" = "本机命令行工具";
 "Local Service Files" = "本地服务文件";
 "Local Time" = "本地时间";
+"Local data is read only for display. No user information is collected." = "读取本机数据仅用于展示，不收集任何用户信息。";
 "Local quota readings from the last 30 days. The most recent successful reading per hour is kept." = "保存最近 30 天的本机额度读数，每小时保留最后一次成功刷新的结果。";
 "Local token history is still updating." = "本地 token 历史仍在更新。";
 "Local token logs could not be read. Try refreshing again." = "无法读取本机 Token 日志，请重新刷新。";
@@ -755,6 +758,7 @@
 "Run devin auth login or sign in to Devin and try again." = "请运行 devin auth login 或登录 Devin 后重试。";
 "Same order as Account Management" = "顺序与“账号管理”相同";
 "Same order as Subscription Management" = "顺序与“订阅管理”相同";
+"Sample Data" = "示例数据";
 "Save" = "保存";
 "Saved" = "已保存";
 "Saved account. Refresh to check its current connection." = "账号已保留，刷新后检查当前连接。";
@@ -806,6 +810,7 @@
 "Sign in with the Codex CLI, then refresh." = "请先在 Codex CLI 中登录，再刷新。";
 "Sign in with the Cursor desktop app, then refresh." = "请先在 Cursor 桌面应用中登录，再刷新。";
 "Single Ring" = "单环";
+"Single Ring Ticks" = "单环刻度";
 "Single Row" = "单行";
 "Some Cursor export rows were invalid. Totals may be incomplete." = "部分 Cursor 导出记录无效，统计可能不完整。";
 "Some accounts could not be refreshed. Check their status." = "部分账号刷新失败，请查看账号状态。";
@@ -818,8 +823,10 @@
 "Source Split" = "来源分段条";
 "Spark" = "Spark";
 "Spark Weekly" = "Spark 每周";
+"Special Designs" = "特殊设计";
 "Split by the last 7 days of model use (estimate)" = "按近 7 天的模型用量拆分（估算）";
 "Squares" = "方块";
+"Standard Bar" = "标准横条";
 "Star for menu bar" = "加星标到菜单栏";
 "Starred for menu bar" = "已加星标到菜单栏";
 "Start Antigravity or run `agy` and try again." = "请启动 Antigravity 或运行 `agy` 后重试。";
@@ -829,6 +836,7 @@
 "Status Lights" = "状态信号灯";
 "Status: %@" = "状态：%@";
 "Stop" = "停止";
+"Style Preview" = "样式预览";
 "Subscription" = "订阅";
 "Subscription Details" = "订阅详情";
 "Subscription Management" = "订阅管理";
@@ -988,6 +996,7 @@
 "Uses a separate configuration directory and keeps your current login. Install the official CLI first if the command is unavailable." = "使用独立配置目录，不覆盖当前登录。若提示找不到命令，请先安装对应的官方 CLI。";
 "Uses your provider login. No TokenPlan sign-in is needed." = "读取服务已有登录，无需登录 TokenPlan。";
 "Using reset credit…" = "正在使用重置额度…";
+"Variant" = "子样式";
 "Version" = "版本";
 "Vertical Bar" = "竖柱";
 "View Details" = "查看详情";

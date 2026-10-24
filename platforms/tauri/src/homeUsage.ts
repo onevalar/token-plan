@@ -7,6 +7,19 @@ import {providerText} from './providerText';
  * (bars, gauges, cells, rings, ruler, concentric, numbers, segments, ticks) stay valid and keep their look.
  */
 export const homeUsageFamilies={bars:'Bars',ruler:'Quota Ruler',cells:'Cells',rings:'Rings',gauges:'Gauges',numbers:'Numbers',vessel:'Containers',frame:'Border Progress',sources:'Source Split',columns:'Side-by-Side Columns',signal:'Status Lights',rowfill:'Row Fill'} as const;
+// Presentation groups are independent of persisted renderer IDs.
+export const styleCategories=[
+ {id:'bars',label:'Bars',styles:['bars','ruler','sources','rowfill']},
+ {id:'cells',label:'Cells',styles:['cells','segments']},
+ {id:'rings',label:'Rings',styles:['rings','concentric','ticks','gauges']},
+ {id:'vessel',label:'Containers',styles:['vessel','vessel:tank','vessel:thermometer','vessel:hourglass']},
+ {id:'numbers',label:'Numbers',styles:['numbers']},
+ {id:'columns',label:'Side-by-Side Columns',styles:['columns']},
+ {id:'signal',label:'Status Lights',styles:['signal']},
+ {id:'frame',label:'Border Progress',styles:['frame']},
+] as const;
+export function categoryOf(id:string){const root=id.split(':')[0];return styleCategories.find(c=>c.styles.some(s=>s.split(':')[0]===root))??styleCategories[0];}
+export function variantLabel(id:string){return ({bars:'Standard Bar',rings:'Single Ring',concentric:'Double Ring',ticks:'Single Ring Ticks',gauges:'Dashboard Ring',cells:'Grid',segments:'Single Row',vessel:'Battery','vessel:tank':'Tank','vessel:thermometer':'Thermometer','vessel:hourglass':'Hourglass'} as Record<string,string>)[id]??styleLabel(id);}
 export type HomeUsageFamily=keyof typeof homeUsageFamilies;
 export type HomeUsageStyle=string;
 export type CellShape='square'|'capsule'|'rising';

@@ -53,8 +53,7 @@ function Item({spec,sources,...props}:ItemProps) {
    <rect className="home-frame-track" x="2" y="2" width="336" height="60" rx="16" pathLength="100"/>
    {r.value!==null&&<rect className="home-frame-fill" x="2" y="2" width="336" height="60" rx="16" pathLength="100" strokeDasharray={`${clamp(r.value)} 100`}/>}
   </svg>
-  <div className="home-frame-body">{heading}<div className="home-quota-meta"><span className={r.warning?'quota-warning':''}>{r.value===null?props.missing:r.warning}</span><Reset {...props}/></div></div>
-  <MetricExpiries {...props}/>
+  <div className="home-frame-body"><strong className="home-frame-value">{r.value===null?'—':r.valueText}</strong><div className="home-frame-details"><span>{r.name}</span>{r.value===null?<span className="home-frame-missing">{props.missing}</span>:<Reset {...props}/>}</div></div>
  </div>;
  if(spec.family==='signal'){
   const level=usageLevel(r.used),lit=['calm','watch','critical'].indexOf(level);

@@ -280,7 +280,9 @@
 "Daily quota" = "일일 한도";
 "Dark" = "다크";
 "Dashboard" = "대시보드";
+"Dashboard Ring" = "계기판 링";
 "Data Refresh" = "데이터 새로 고침";
+"Data stays on this device. No analytics or crash reports are collected." = "데이터는 이 기기에 저장되며, 통계 데이터나 충돌 보고서는 수집하지 않습니다.";
 "Date" = "날짜";
 "Date Range" = "기간";
 "Debug" = "디버그";
@@ -466,6 +468,7 @@
 "Local CLI" = "로컬 CLI";
 "Local Service Files" = "로컬 서비스 파일";
 "Local Time" = "현지 시간";
+"Local data is read only for display. No user information is collected." = "기기의 데이터는 표시 목적으로만 읽으며, 사용자 정보는 수집하지 않습니다.";
 "Local quota readings from the last 30 days. The most recent successful reading per hour is kept." = "최근 30일간의 이 기기 한도 기록입니다. 매시간 마지막으로 성공한 조회 결과를 보관합니다.";
 "Local token history is still updating." = "로컬 토큰 기록이 아직 업데이트 중입니다.";
 "Local token logs could not be read. Try refreshing again." = "로컬 토큰 로그를 읽을 수 없습니다. 다시 새로고침하세요.";
@@ -755,6 +758,7 @@
 "Run devin auth login or sign in to Devin and try again." = "devin auth login을 실행하거나 Devin에 로그인한 뒤 다시 시도하세요.";
 "Same order as Account Management" = "순서는 \"계정 관리\"와 같습니다";
 "Same order as Subscription Management" = "순서는 \"구독 관리\"와 같습니다";
+"Sample Data" = "샘플 데이터";
 "Save" = "저장";
 "Saved" = "저장됨";
 "Saved account. Refresh to check its current connection." = "계정이 저장되어 있습니다. 새로 고쳐 현재 연결을 확인하세요.";
@@ -806,6 +810,7 @@
 "Sign in with the Codex CLI, then refresh." = "Codex CLI에 로그인한 후 새로고침하세요.";
 "Sign in with the Cursor desktop app, then refresh." = "Cursor 데스크톱 앱에 로그인한 후 새로고침하세요.";
 "Single Ring" = "단일 링";
+"Single Ring Ticks" = "단일 링 눈금";
 "Single Row" = "한 줄";
 "Some Cursor export rows were invalid. Totals may be incomplete." = "일부 Cursor 내보내기 행이 잘못되어 집계가 불완전할 수 있습니다.";
 "Some accounts could not be refreshed. Check their status." = "일부 계정을 새로 고치지 못했습니다. 계정 상태를 확인하세요.";
@@ -818,8 +823,10 @@
 "Source Split" = "출처별 분할";
 "Spark" = "Spark";
 "Spark Weekly" = "Spark 주간";
+"Special Designs" = "특수 디자인";
 "Split by the last 7 days of model use (estimate)" = "최근 7일 모델 사용량 기준 분할(추정)";
 "Squares" = "사각형";
+"Standard Bar" = "기본 막대";
 "Star for menu bar" = "메뉴 막대에 별표 추가";
 "Starred for menu bar" = "메뉴 막대에 별표로 추가됨";
 "Start Antigravity or run `agy` and try again." = "Antigravity를 시작하거나 `agy`를 실행한 뒤 다시 시도하세요.";
@@ -829,6 +836,7 @@
 "Status Lights" = "상태 표시등";
 "Status: %@" = "상태: %@";
 "Stop" = "중지";
+"Style Preview" = "스타일 미리 보기";
 "Subscription" = "구독";
 "Subscription Details" = "구독 상세";
 "Subscription Management" = "구독 관리";
@@ -988,6 +996,7 @@
 "Uses a separate configuration directory and keeps your current login. Install the official CLI first if the command is unavailable." = "별도 설정 폴더를 사용하여 현재 로그인을 유지합니다. 명령을 찾을 수 없다면 공식 CLI를 먼저 설치하세요.";
 "Uses your provider login. No TokenPlan sign-in is needed." = "서비스의 기존 로그인을 사용합니다. TokenPlan 로그인은 필요 없습니다.";
 "Using reset credit…" = "초기화 크레딧 사용 중…";
+"Variant" = "세부 스타일";
 "Version" = "버전";
 "Vertical Bar" = "세로 막대";
 "View Details" = "자세히 보기";

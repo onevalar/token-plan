@@ -147,7 +147,7 @@ export function DesktopApp() {
     {route.page==='updates'&&<Updates showHeading={false} t={t} updater={updater} automatic={state?.settings.autoUpdates??true} onAutomatic={autoUpdates=>{void send({method:'settings',value:{autoUpdates}}).catch(()=>{});}}/>}
     {route.page==='about'&&<section className="about"><img src="/capsule.png" alt=""/>
      <div className="about-identity"><h2>TokenPlan</h2><p className="about-version">{version}</p>{import.meta.env.VITE_MAC_NAVIGATION_PREVIEW==='1'&&<p className="muted">{tr('Design Preview')}</p>}</div>
-     <p className="about-privacy">{tr('TokenPlan sends no analytics or crash reports.')}</p></section>}
+     <p className="about-privacy">{tr('Local data is read only for display. No user information is collected.')}</p></section>}
    </div></div>;
   })}</div>
  </main></MotionConfig>;

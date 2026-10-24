@@ -53,3 +53,10 @@
 .home-segment-track > span { display:block;position:relative;overflow:hidden;background:var(--border-strong);border-radius:2px; }
 .home-segment-track > span > span { position:absolute;inset:0;background:var(--quota-color);transform-origin:0; }
 @media(max-width:359px) { .home-concentric { grid-template-columns:80px minmax(0,1fr);gap:12px; } }
+
+/* Single rings share the available width instead of stretching each reading across it. */
+.home-metrics[data-style="rings"] { grid-template-columns:repeat(2,minmax(0,1fr));gap:12px; }
+.home-metrics[data-style="rings"] .home-compact { display:grid;grid-template-columns:32px minmax(0,1fr);gap:8px;align-items:start; }
+.home-metrics[data-style="rings"] .home-quota-heading { gap:4px;flex-wrap:wrap; }
+.home-metrics[data-style="rings"] .home-quota-meta { display:grid;gap:3px; }
+.home-metrics[data-style="rings"] .home-quota-meta .reset { font-size:var(--text-xs); }

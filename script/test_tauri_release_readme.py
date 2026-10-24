@@ -18,10 +18,15 @@ class ReleaseReadmeTests(unittest.TestCase):
 
     def test_classic_mac_download_survives_subsequent_publications(self):
         result = update_readme(self.text, '2.0.0', self.names)
-        classic = result.split('### macOS 经典版')[1].split('macOS 正式安装包已完成')[0]
+        classic = result.split('### macOS 经典版')[1].split('## 功能')[0]
         self.assertIn('/v1.0.12/TokenPlan-1.0.12.dmg', classic)
         self.assertIn('/v1.0.12/SHA256SUMS.txt', classic)
-        self.assertEqual(classic, self.text.split('### macOS 经典版')[1].split('macOS 正式安装包已完成')[0])
+        self.assertEqual(classic, self.text.split('### macOS 经典版')[1].split('## 功能')[0])
+    def test_publication_changes_only_the_download_block(self):
+        result = update_readme(self.text, '2.0.0', self.names)
+        self.assertEqual(result.split('<!-- download-links:start -->')[0], self.text.split('<!-- download-links:start -->')[0])
+        self.assertEqual(result.split('<!-- download-links:end -->')[1], self.text.split('<!-- download-links:end -->')[1])
+
     def test_incomplete_or_ambiguous_artifacts_are_rejected(self):
         for names in [self.names[:-1], self.names + ['duplicate.dmg']]:
             with self.assertRaises(ValueError):

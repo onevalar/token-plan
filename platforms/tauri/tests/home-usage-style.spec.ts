@@ -16,13 +16,13 @@ async function settings(page:Page,language='en') {
  await page.getByRole('menuitem',{name:textFor(language).settings,exact:true}).click();
 }
 // Earlier single-name styles are now a family tile plus an option.
-const legacy:Record<string,string[]>={'Percentage Grid':['Cells'],'Compact Rings':['Rings','Single Ring'],'Concentric Rings':['Rings','Double Ring'],'Tick Ring':['Rings','Ticks'],'Segmented Bar':['Cells','Single Row']};
+const legacy:Record<string,string[]>={'Gauges':['Rings','Dashboard Ring'],'Quota Ruler':['Bars','Quota Ruler'],'Numbers':['Numbers'],'Percentage Grid':['Cells','Grid'],'Compact Rings':['Rings','Single Ring'],'Concentric Rings':['Rings','Double Ring'],'Tick Ring':['Rings','Single Ring Ticks'],'Segmented Bar':['Cells','Single Row']};
 async function choose(page:Page,name:string,language='en') {
  const label=providerText('Usage Style',language),toggle=page.getByRole('button',{name:new RegExp(`^${label}`)});
  if(await toggle.getAttribute('aria-expanded')==='false')await toggle.click();
  const [tile,option]=legacy[name]??[name];
  await page.getByRole('group',{name:label,exact:true}).getByRole('button',{name:providerText(tile,language),exact:true}).click();
- if(option)await page.getByRole('group',{name:providerText(tile==='Cells'?'Layout':'Rings',language),exact:true}).getByRole('button',{name:providerText(option,language),exact:true}).click();
+ if(option){await page.getByRole('combobox',{name:providerText('Variant',language),exact:true}).click();await page.getByRole('option',{name:providerText(option,language),exact:true}).click();}
 }
 const back=(page:Page,language='en')=>page.getByRole('button',{name:messages(language).back,exact:true}).click();
 
@@ -34,15 +34,15 @@ test('Home style persists independently of density, tray and details, with keybo
  const tray=await page.locator('.menu-bar-preview').count()?await page.locator('.menu-bar-preview').innerHTML():null;
  // Collapsed to one row until opened; every style is then a pressed-state button reachable from the keyboard.
  const toggle=page.getByRole('button',{name:/^Usage Style/}),options=page.getByRole('group',{name:'Usage Style',exact:true});
- await expect(toggle).toHaveAttribute('aria-expanded','false');await expect(toggle).toContainText('Bars');await expect(options).toHaveCount(0);
+ await expect(toggle).toHaveAttribute('aria-expanded','false');await expect(toggle).toContainText('Standard Bar');await expect(options).toHaveCount(0);
  await toggle.focus();await page.keyboard.press('Enter');await expect(toggle).toHaveAttribute('aria-expanded','true');
- await expect(options.getByRole('button')).toHaveCount(12);
+ await expect(options.getByRole('button')).toHaveCount(8);
  await expect(options.getByRole('button',{name:'Bars',exact:true})).toHaveAttribute('aria-pressed','true');
- await options.getByRole('button',{name:'Gauges',exact:true}).focus();await page.keyboard.press('Enter');
+ await options.getByRole('button',{name:'Rings',exact:true}).focus();await page.keyboard.press('Enter');await page.getByRole('combobox',{name:'Variant',exact:true}).click();await page.getByRole('option',{name:'Dashboard Ring',exact:true}).click();
  await expect(home(page)).toHaveAttribute('data-usage-style','gauges');
- await expect(options.getByRole('button',{name:'Gauges',exact:true})).toHaveAttribute('aria-pressed','true');
+ await expect(options.getByRole('button',{name:'Rings',exact:true})).toHaveAttribute('aria-pressed','true');
  await expect(options.getByRole('button',{name:'Bars',exact:true})).toHaveAttribute('aria-pressed','false');
- await expect(toggle).toContainText('Gauges');
+ await expect(toggle).toContainText('Dashboard Ring');
  await toggle.click();await expect(options).toHaveCount(0);
  expect(await page.evaluate(()=>(window as any).__panelHides??0)).toBe(0);
  expect(await page.locator('.menu-bar-preview').count()?await page.locator('.menu-bar-preview').innerHTML():null).toBe(tray);
@@ -62,7 +62,7 @@ test('Home style persists independently of density, tray and details, with keybo
   await settings(page);await choose(page,label);await back(page);await page.reload();
   await expect(home(page)).toHaveAttribute('data-usage-style',style);
   await expect(page.locator('.mac-preview')).toHaveAttribute('data-density','comfortable');
-  await settings(page);await expect(page.getByRole('button',{name:/^Usage Style/})).toContainText(({'Compact Rings':'Rings','Segmented Bar':'Cells'} as Record<string,string>)[label]??label);await back(page);
+  await settings(page);await expect(page.getByRole('button',{name:/^Usage Style/})).toContainText(({'Compact Rings':'Single Ring','Segmented Bar':'Single Row','Concentric Rings':'Double Ring','Tick Ring':'Single Ring Ticks'} as Record<string,string>)[label]??label);await back(page);
  }
 });
 
@@ -74,11 +74,11 @@ test('Tick Ring persists per account and survives switching to a uniform style a
  await home(page).getByRole('button',{name:'Claude first@example.com',exact:true}).click();
  await page.getByRole('button',{name:'Edit Home Display',exact:true}).click();await choose(page,'Tick Ring');
  const editor=visible(page).locator('.home-metric-editor');
- await expect(editor.getByRole('button',{name:'Ticks',exact:true})).toHaveAttribute('aria-pressed','true');
+ await expect(editor.getByRole('combobox',{name:'Variant',exact:true})).toContainText('Single Ring Ticks');
  // The account picker is a draft: cancelling must leave the prior style untouched.
  await editor.getByRole('button',{name:textFor('en').cancel,exact:true}).click();
  await page.getByRole('button',{name:'Edit Home Display',exact:true}).click();
- await expect(editor.getByRole('button',{name:/^Usage Style/})).toContainText('Gauges');await choose(page,'Tick Ring');
+ await expect(editor.getByRole('button',{name:/^Usage Style/})).toContainText('Dashboard Ring');await choose(page,'Tick Ring');
  await editor.getByRole('button',{name:'Confirm Changes',exact:true}).click();await expect(editor).toHaveCount(0);await back(page);
  const accounts=home(page).locator('.account-block');
  await expect(accounts.nth(0).locator('.home-metrics')).toHaveAttribute('data-style','ticks');
@@ -103,7 +103,7 @@ test('unreadable preferences and failed saves stay visible and recover without c
  await expect(visible(page).getByRole('alert')).toHaveText('Could not load the Home usage style. Choose a style to save it again.');
  await choose(page,'Gauges');await expect(visible(page).getByRole('alert')).toHaveCount(0);
  await page.evaluate(()=>{const original=Storage.prototype.setItem;(window as any).__restoreStorage=()=>{Storage.prototype.setItem=original;};Storage.prototype.setItem=function(key,value){if(key==='tokenplan.homeUsagePreferences')throw new Error('fixture write denied');original.call(this,key,value);};});
- await choose(page,'Percentage Grid');await expect(visible(page).getByRole('alert')).toHaveText('Could not save. Try again.');
+ await page.getByRole('group',{name:'Usage Style',exact:true}).getByRole('button',{name:'Cells',exact:true}).click();await expect(visible(page).getByRole('alert')).toHaveText('Could not save. Try again.');
  await expect(home(page)).toHaveAttribute('data-usage-style','gauges');
  expect(await page.evaluate(()=>JSON.parse(localStorage.getItem('tokenplan.homeUsagePreferences')!).style)).toBe('gauges');
  await page.evaluate(()=>(window as any).__restoreStorage());await choose(page,'Percentage Grid');
@@ -232,7 +232,7 @@ for(const language of ['en','zh-Hans','zh-Hant','ja','ko'])test(`style picker ke
  const label=providerText('Usage Style',language);
  await page.getByRole('button',{name:new RegExp(`^${label}`)}).click();
  const options=page.getByRole('group',{name:label,exact:true});
- await expect(options.getByRole('button')).toHaveCount(12);
+ await expect(options.getByRole('button')).toHaveCount(8);
  await options.scrollIntoViewIfNeeded();await page.evaluate(()=>document.fonts.ready);
  for(const colorScheme of ['light','dark'] as const){
   await page.emulateMedia({colorScheme});
@@ -244,5 +244,39 @@ for(const language of ['en','zh-Hans','zh-Hant','ja','ko'])test(`style picker ke
   for(const b of bounds){expect(b.left,b.text!).toBeGreaterThanOrEqual(2);expect(b.right,b.text!).toBeGreaterThanOrEqual(2);expect(b.top,b.text!).toBeGreaterThanOrEqual(2);expect(b.bottom,b.text!).toBeGreaterThanOrEqual(2);}
   expect(await visible(page).evaluate(e=>e.scrollWidth<=e.clientWidth)).toBe(true);
   await page.screenshot({path:info.outputPath(`style-picker-${language}-${colorScheme}.png`),animations:'disabled'});
+ }
+});
+
+for(const dark of [false,true])test(`style preview follows variants without leaving settings: ${dark}`,async({page},info)=>{
+ const data=largeDesktop();data.settings.appearance=dark?'dark':'light';await mockDesktop(page,'en',false,data);await page.goto('/');await settings(page);
+ const preview=page.getByRole('region',{name:'Style Preview'});
+ for(const [name,id] of [['Percentage Grid','cells'],['Compact Rings','rings'],['Tick Ring','ticks']]){
+  await choose(page,name);await expect(preview.locator('.home-metrics')).toHaveAttribute('data-style',id);
+  await expect(preview).toContainText('46%');await expect(preview).toContainText('92%');
+  await preview.scrollIntoViewIfNeeded();expect(await preview.evaluate(e=>e.scrollWidth<=e.clientWidth)).toBe(true);
+  await preview.screenshot({path:info.outputPath(`${id}-${dark}.png`)});
+ }
+});
+
+for(const dark of [false,true])test(`border preview has a separate value and compact timing: ${dark}`,async({page},info)=>{
+ const data=largeDesktop();data.settings.appearance=dark?'dark':'light';await mockDesktop(page,'en',false,data);await page.goto('/');await settings(page);await choose(page,'Border Progress');
+ const preview=page.getByRole('region',{name:'Style Preview'}),frame=preview.locator('.home-frame').first();
+ await expect(frame.locator('.home-frame-value')).toHaveText('46%');await expect(frame.locator('.home-frame-details')).toContainText('5h');
+ await expect(preview).not.toContainText('Used');await expect(preview).not.toContainText('Near quota limit');await expect(page.getByRole('combobox',{name:'Variant',exact:true})).toHaveCount(0);
+ const value=await frame.locator('.home-frame-value').boundingBox(),details=await frame.locator('.home-frame-details').boundingBox();expect(value!.x+value!.width).toBeLessThan(details!.x);
+ await preview.scrollIntoViewIfNeeded();await preview.screenshot({path:info.outputPath(`border-${dark}.png`)});
+});
+
+test('style dropdowns update previews and preserve rounded inset layout',async({page},info)=>{
+ await mockDesktop(page,'zh-Hans',false,largeDesktop());await page.goto('/');await settings(page,'zh-Hans');await choose(page,'Bars','zh-Hans');
+ const preview=page.getByRole('region',{name:'样式预览'});
+ await expect(page.getByRole('combobox',{name:'子样式',exact:true})).toContainText('标准横条');
+ await page.getByRole('combobox',{name:'预测',exact:true}).click();await page.getByRole('option',{name:'显示预测',exact:true}).click();
+ await expect(preview.locator('.home-forecast')).toHaveCount(2);
+ await page.getByRole('combobox',{name:'预测',exact:true}).click();await page.getByRole('option',{name:'关闭',exact:true}).click();
+ for(const theme of ['light','dark'] as const){await page.emulateMedia({colorScheme:theme});await preview.scrollIntoViewIfNeeded();
+  const layout=await preview.evaluate(e=>{const surface=e.closest('.preference-surface')!,a=e.getBoundingClientRect(),b=surface.getBoundingClientRect();return {radius:parseFloat(getComputedStyle(e).borderRadius),inset:b.bottom-a.bottom,overflow:e.scrollWidth>e.clientWidth};});
+  expect(layout.radius).toBeGreaterThan(0);expect(layout.inset).toBeGreaterThanOrEqual(10);expect(layout.overflow).toBe(false);
+  await preview.screenshot({path:info.outputPath(`rounded-preview-${theme}.png`)});
  }
 });

@@ -707,7 +707,7 @@ for(const language of ['en','zh-Hans','zh-Hant','ja','ko'])for(const theme of ['
  const about=visible(page).locator('.about');
  await expect(about.getByRole('heading',{name:'TokenPlan'})).toBeVisible();
  await expect(about.locator('.about-version')).toHaveText('0.0.0');
- const key='TokenPlan sends no analytics or crash reports.';
+ const key='Local data is read only for display. No user information is collected.';
  await expect(about.locator('.about-privacy')).toHaveText((providerTranslations as Record<string,Record<string,string>>)[language]?.[key]??key);
  await expect(about.getByRole('button').or(about.getByRole('link'))).toHaveCount(0);
  await expect(about).not.toContainText('Robin Ebers');

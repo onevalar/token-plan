@@ -245,3 +245,12 @@ standalone preference tests do not verify the real helper's cross-process persis
 Real Swift-helper/Tauri save-and-restart, live-account refresh, macOS system-wide
 light/dark switching, VoiceOver and constrained multi-account menu-bar width remain
 unverified. App-theme screenshots and composited raster images do not replace these checks.
+
+Home style selection has eight entries arranged four per row: Bars, Cells, Rings,
+Containers, Numbers, Side-by-Side Columns, Status Lights and Border Progress. Bars includes the ruler, source split and row fill;
+Rings includes the dashboard gauge. The first four entries expose variants; the last four select their design directly. Saved style IDs
+remain unchanged. Border Progress places the value on the left and the period and countdown on the right, without visible mode or warning copy. Both global and account style selectors show an immediate sample
+using the same Home renderer; account edits still apply only on Confirm.
+
+Style variants and forecast, shape and cell-count options use aligned dropdowns.
+The sample preview is inset inside its settings group with the shared control radius.

@@ -1,7 +1,10 @@
 import {useState} from 'react';
+import {HomeMetrics} from '../HomeMetrics';
+import {metricSchema} from '../desktop';
+import {SelectRow} from './shared';
 import {ChevronDown} from 'lucide-react';
 import {Button} from '../components/arc/button/button';
-import {defaultStyle,familyOf,homeUsageFamilies,sameLook,styleOptions,type HomeUsageFamily,styleLabel,type HomeUsageStyle} from '../homeUsage';
+import {categoryOf,styleCategories,variantLabel,sameLook,styleOptions,type HomeUsageFamily,styleLabel,type HomeUsageStyle} from '../homeUsage';
 
 /** A small drawing of each Home style, so the choice can be made without trying every option. */
 function StyleGlyph({style}:{style:HomeUsageFamily}) {
@@ -24,20 +27,25 @@ function StyleGlyph({style}:{style:HomeUsageFamily}) {
 }
 
 /** Collapsed to one row showing the current style; expands into every style at once. */
-export function UsageStylePicker({value,onChange,tr,disabled=false}:{disabled?:boolean;value:HomeUsageStyle;onChange:(style:HomeUsageStyle)=>void;tr:(s:string)=>string}) {
- const [open,setOpen]=useState(false),current=familyOf(value),groups=styleOptions(value);
+export function UsageStylePicker({value,onChange,tr,language,remaining=false,disabled=false}:{language:string;remaining?:boolean;disabled?:boolean;value:HomeUsageStyle;onChange:(style:HomeUsageStyle)=>void;tr:(s:string)=>string}) {
+ const [open,setOpen]=useState(false),current=categoryOf(value),groups=styleOptions(value).filter(g=>['Forecast','Shape','Cell Count'].includes(g.name)&&current.id!=='vessel');
  return <div className="usage-style-picker">
   <button type="button" className="usage-style-toggle" disabled={disabled} aria-expanded={open} onClick={()=>setOpen(o=>!o)}>
-   <span>{tr('Usage Style')}</span><span className="usage-style-current">{tr(styleLabel(value))}</span><ChevronDown size={15} aria-hidden="true" data-open={open}/>
+   <span>{tr('Usage Style')}</span><span className="usage-style-current">{tr(variantLabel(value))}</span><ChevronDown size={15} aria-hidden="true" data-open={open}/>
   </button>
   {open&&<><div className="usage-style-options" role="group" aria-label={tr('Usage Style')}>
-   {(Object.entries(homeUsageFamilies) as [HomeUsageFamily,string][]).map(([family,label])=><Button key={family} disabled={disabled} type="button" variant="secondary" className="usage-style-option" aria-pressed={current===family} onClick={()=>current!==family&&onChange(defaultStyle(family))}>
-    <span className="usage-style-card-content"><StyleGlyph style={family}/><span>{tr(label)}</span></span>
+   {styleCategories.map(category=><Button key={category.id} disabled={disabled} type="button" variant="secondary" className="usage-style-option" aria-pressed={current.id===category.id} onClick={()=>current.id!==category.id&&onChange(category.styles[0])}>
+    <span className="usage-style-card-content"><StyleGlyph style={category.id}/><span>{tr(category.label)}</span></span>
    </Button>)}
   </div>
-  {groups.map(group=><div className="usage-style-choices" role="group" aria-label={tr(group.name)} key={group.name}>
-   <span>{tr(group.name)}</span>
-   <div>{group.choices.map(c=><Button key={c.id} disabled={disabled} type="button" variant="secondary" size="sm" aria-pressed={sameLook(c.id,value)} onClick={()=>onChange(c.id)}>{tr(c.label)}</Button>)}</div>
-  </div>)}</>}
+  {current.styles.length>1&&<SelectRow label={tr('Variant')} disabled={disabled} value={current.styles.find(id=>sameLook(id,value))??current.styles.find(id=>id.split(':')[0]===value.split(':')[0])??current.styles[0]} options={current.styles.map(id=>({value:id,label:tr(variantLabel(id))}))} onValueChange={onChange}/>}
+  {groups.map(group=><SelectRow key={group.name} label={tr(group.name)} disabled={disabled} value={group.choices.find(c=>sameLook(c.id,value))?.id??group.choices[0].id} options={group.choices.map(c=>({value:c.id,label:tr(c.label)}))} onValueChange={onChange}/>)}</>}
+  <StylePreview value={value} language={language} remaining={remaining} tr={tr}/>
  </div>;
+}
+
+function StylePreview({value,language,remaining,tr}:{value:string;language:string;remaining:boolean;tr:(s:string)=>string}) {
+ const [now]=useState(()=>Date.now());
+ const metrics=[['5h',46,18000],['1w',92,604800]].map(([label,used,period])=>metricSchema.parse({id:`preview-${label}`,label,placement:'home',pinned:false,pinnable:true,hasData:true,unit:'percent',percent:remaining?100-Number(used):used,amount:null,resetsAt:new Date(now+Number(period)*.4*1000).toISOString(),periodSeconds:period,values:[]}));
+ return <section className="usage-live-preview" aria-label={tr('Style Preview')}><div className="usage-preview-label">{tr('Style Preview')} · {tr('Sample Data')}</div><HomeMetrics metrics={metrics} style={value} language={language} remaining={remaining} now={now} missing="—" sources={[{name:'Model A',share:.7},{name:'Model B',share:.3}]}/></section>;
 }
