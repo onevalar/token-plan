@@ -6,17 +6,20 @@ import {isQuotaMetric,MetricRow,MetricReset,MetricExpiries,type MetricRowProps} 
 import {providerText} from './providerText';
 import './home-metrics.css';
 import {HomeQuotaStyles} from './HomeQuotaStyles';
-import {quotaReading,quotaMeter,type HomeUsageStyle} from './homeUsage';
+import {HomeExtraStyles,type SourceShare} from './HomeExtraStyles';
+import {parseStyle,quotaReading,quotaMeter,type HomeUsageStyle} from './homeUsage';
 
 export type {HomeUsageStyle} from './homeUsage';
 type ReadingProps=Omit<MetricRowProps,'metric'>;
-export function HomeMetrics({metrics,style,...reading}:{metrics:Metric[];style:HomeUsageStyle}&ReadingProps) {
- if(style==='bars')return <>{metrics.map(metric=><MetricRow key={metric.id} metric={metric} {...reading}/>)}</>;
- if(style!=='gauges'&&style!=='cells'&&style!=='ticks')return <HomeQuotaStyles metrics={metrics} style={style} {...reading}/>;
- return <div className="home-metrics" data-style={style}>{metrics.map(metric=>isQuotaMetric(metric)?
-  <QuotaTile key={metric.id} metric={metric} style={style} {...reading}/>:
+export function HomeMetrics({metrics,style,sources=[],...reading}:{metrics:Metric[];style:HomeUsageStyle;sources?:SourceShare[]}&ReadingProps) {
+ const spec=parseStyle(style)??parseStyle('bars')!,{root}=spec;
+ if(root==='cells'||root==='gauges'||root==='ticks')return <div className="home-metrics" data-style={root}>{metrics.map(metric=>isQuotaMetric(metric)?
+  <QuotaTile key={metric.id} metric={metric} style={root} {...reading}/>:
   <div className="home-metric-row" key={metric.id}><MetricRow metric={metric} {...reading}/></div>
  )}</div>;
+ if(['rings','concentric','ruler','numbers','segments'].includes(root))return <HomeQuotaStyles metrics={metrics} spec={spec} {...reading}/>;
+ if(spec.family==='bars'&&!spec.forecast)return <>{metrics.map(metric=><MetricRow key={metric.id} metric={metric} {...reading}/>)}</>;
+ return <HomeExtraStyles metrics={metrics} spec={spec} sources={sources} {...reading}/>;
 }
 
 function QuotaTile({metric:m,style,now,language,missing,remaining=false}:MetricRowProps&{style:'gauges'|'cells'|'ticks'}) {

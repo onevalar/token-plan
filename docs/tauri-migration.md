@@ -255,6 +255,16 @@ login takes precedence when the same identity is also in the default directory, 
 account switch does not disconnect that saved account. macOS and the .NET engines expose only
 matched directory paths to the UI, never credential contents.
 
+Home offers twelve style families: Bars, Quota Ruler, Cells, Rings, Gauges, Numbers, Containers
+(battery, tank, thermometer, hourglass), Border Progress, Source Split, Side-by-Side Columns,
+Status Lights and Row Fill. Choosing one reveals its options: Bars and Quota Ruler can show a
+striped forecast of where use will land by reset; Rings are single, double or tick; Cells are a
+grid or a single row of squares, capsules or rising bars with 5, 10 or 20 cells. Earlier saved
+choices keep their look. Source Split spreads the used part over each model's share of the last
+seven days (an estimate) and falls back to a plain bar for accounts without a model split; Side-by-Side
+Columns need two or more limits and fall back to rows otherwise. Status Lights are calm under 50%
+used, watch under 80%, critical from 80%.
+
 Home usage styles are local UI preferences. Unified mode retains the existing global style;
 Customize by Account exposes a style picker inside each account's Edit Home Display. Switching
 modes preserves per-account choices, including different styles for two accounts of one service.

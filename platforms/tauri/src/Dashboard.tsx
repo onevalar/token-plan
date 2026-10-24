@@ -7,6 +7,7 @@ import {accountTitle} from './usage';
 import {providerText} from './providerText';
 import {isQuotaMetric} from './Metrics';
 import {HomeMetrics,type HomeUsageStyle} from './HomeMetrics';
+import type {SourceShare} from './HomeExtraStyles';
 import {connectionAction} from './connection';
 
 export function ProviderLogo({family}:{family:string}) {
@@ -31,6 +32,13 @@ export function problemAction(a:Account,run:{open:(id:string)=>void;settings:(id
  if(kind==='inspect')return {label:'Check Connection',run:()=>run.open(a.id)};
  return {label:'View Details',run:()=>run.open(a.id)};
 }
+/** Each model's share of the account's tokens over its last seven days of history; empty when no model split exists. */
+export function modelShares(history:Account['history']):SourceShare[] {
+ const days=[...history].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,7),totals=new Map<string,number>();
+ for(const d of days)for(const m of d.models)totals.set(m.model,(totals.get(m.model)??0)+m.tokens);
+ const sum=[...totals.values()].reduce((n,v)=>n+v,0);
+ return sum>0?[...totals].filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]).map(([name,v])=>({name,share:v/sum})):[];
+}
 export function Dashboard({accounts,open,openSettings,retry,busy=false,now,language,missing,remaining,usageStyle='bars',accountStyle}:{accounts:Account[];open:(id:string)=>void;openSettings:(id:string)=>void;retry:(id:string)=>void;busy?:boolean;now:number;language:string;missing:string;remaining:boolean;usageStyle?:HomeUsageStyle;accountStyle?:(id:string)=>HomeUsageStyle}) {
  return <div className="dashboard" data-usage-style={usageStyle}>
   {accounts.some(a=>a.enabled&&(accountStyle?.(a.id)??usageStyle)==='cells'&&a.metrics.some(m=>m.placement==='home'&&isQuotaMetric(m)))&&<p className="home-grid-caption">{providerText('Each cell is 1%.',language)}</p>}
@@ -48,7 +56,7 @@ export function Dashboard({accounts,open,openSettings,retry,busy=false,now,langu
     </Button>
    </div>
    {(a.error||a.warning)&&<div className="notice-block"><p role="status" className="notice">{providerText(a.error||a.warning||"",language)}</p>{(()=>{const action=problemAction(a,{open,settings:openSettings,retry});return action&&<Button size="sm" variant="secondary" className="notice-action" disabled={busy} onClick={action.run}>{providerText(action.label,language)}</Button>;})()}</div>}
-   <HomeMetrics metrics={a.metrics.filter(m=>m.placement==='home')} style={accountStyle?.(a.id)??usageStyle} now={now} missing={missing} language={language} remaining={remaining}/>
+   <HomeMetrics sources={modelShares(a.history)} metrics={a.metrics.filter(m=>m.placement==='home')} style={accountStyle?.(a.id)??usageStyle} now={now} missing={missing} language={language} remaining={remaining}/>
   </div>)}
  </section>)}</div>;
 }

@@ -15,10 +15,14 @@ async function settings(page:Page,language='en') {
  await page.getByRole('button',{name:messages(language).more,exact:true}).click();
  await page.getByRole('menuitem',{name:textFor(language).settings,exact:true}).click();
 }
+// Earlier single-name styles are now a family tile plus an option.
+const legacy:Record<string,string[]>={'Percentage Grid':['Cells'],'Compact Rings':['Rings','Single Ring'],'Concentric Rings':['Rings','Double Ring'],'Tick Ring':['Rings','Ticks'],'Segmented Bar':['Cells','Single Row']};
 async function choose(page:Page,name:string,language='en') {
  const label=providerText('Usage Style',language),toggle=page.getByRole('button',{name:new RegExp(`^${label}`)});
  if(await toggle.getAttribute('aria-expanded')==='false')await toggle.click();
- await page.getByRole('group',{name:label,exact:true}).getByRole('button',{name,exact:true}).click();
+ const [tile,option]=legacy[name]??[name];
+ await page.getByRole('group',{name:label,exact:true}).getByRole('button',{name:providerText(tile,language),exact:true}).click();
+ if(option)await page.getByRole('group',{name:providerText(tile==='Cells'?'Layout':'Rings',language),exact:true}).getByRole('button',{name:providerText(option,language),exact:true}).click();
 }
 const back=(page:Page,language='en')=>page.getByRole('button',{name:messages(language).back,exact:true}).click();
 
@@ -32,7 +36,7 @@ test('Home style persists independently of density, tray and details, with keybo
  const toggle=page.getByRole('button',{name:/^Usage Style/}),options=page.getByRole('group',{name:'Usage Style',exact:true});
  await expect(toggle).toHaveAttribute('aria-expanded','false');await expect(toggle).toContainText('Bars');await expect(options).toHaveCount(0);
  await toggle.focus();await page.keyboard.press('Enter');await expect(toggle).toHaveAttribute('aria-expanded','true');
- await expect(options.getByRole('button')).toHaveCount(9);
+ await expect(options.getByRole('button')).toHaveCount(12);
  await expect(options.getByRole('button',{name:'Bars',exact:true})).toHaveAttribute('aria-pressed','true');
  await options.getByRole('button',{name:'Gauges',exact:true}).focus();await page.keyboard.press('Enter');
  await expect(home(page)).toHaveAttribute('data-usage-style','gauges');
@@ -58,7 +62,7 @@ test('Home style persists independently of density, tray and details, with keybo
   await settings(page);await choose(page,label);await back(page);await page.reload();
   await expect(home(page)).toHaveAttribute('data-usage-style',style);
   await expect(page.locator('.mac-preview')).toHaveAttribute('data-density','comfortable');
-  await settings(page);await expect(page.getByRole('button',{name:/^Usage Style/})).toContainText(label);await back(page);
+  await settings(page);await expect(page.getByRole('button',{name:/^Usage Style/})).toContainText(({'Compact Rings':'Rings','Segmented Bar':'Cells'} as Record<string,string>)[label]??label);await back(page);
  }
 });
 
@@ -70,7 +74,7 @@ test('Tick Ring persists per account and survives switching to a uniform style a
  await home(page).getByRole('button',{name:'Claude first@example.com',exact:true}).click();
  await page.getByRole('button',{name:'Edit Home Display',exact:true}).click();await choose(page,'Tick Ring');
  const editor=visible(page).locator('.home-metric-editor');
- await expect(editor.getByRole('button',{name:'Tick Ring',exact:true})).toHaveAttribute('aria-pressed','true');
+ await expect(editor.getByRole('button',{name:'Ticks',exact:true})).toHaveAttribute('aria-pressed','true');
  // The account picker is a draft: cancelling must leave the prior style untouched.
  await editor.getByRole('button',{name:textFor('en').cancel,exact:true}).click();
  await page.getByRole('button',{name:'Edit Home Display',exact:true}).click();
@@ -212,7 +216,7 @@ for(const language of ['en','zh-Hans','zh-Hant','ja','ko'])test(`Home styles fit
  for(const theme of ['light','dark'] as const){
   await page.emulateMedia({colorScheme:theme});
   for(const style of ['Gauges','Percentage Grid',...Object.values(extraStyles)]){
-   await settings(page,language);await choose(page,providerText(style,language),language);await back(page,language);
+   await settings(page,language);await choose(page,style,language);await back(page,language);
    const tiles=home(page).locator('.home-quota,.home-reading');await expect(tiles.first()).toContainText(providerText('Used',language));
    await expect(tiles.nth(1)).toContainText(providerText('Near quota limit',language));
    expect(await visible(page).evaluate(e=>e.scrollWidth<=e.clientWidth+1)).toBe(true);
@@ -228,7 +232,7 @@ for(const language of ['en','zh-Hans','zh-Hant','ja','ko'])test(`style picker ke
  const label=providerText('Usage Style',language);
  await page.getByRole('button',{name:new RegExp(`^${label}`)}).click();
  const options=page.getByRole('group',{name:label,exact:true});
- await expect(options.getByRole('button')).toHaveCount(9);
+ await expect(options.getByRole('button')).toHaveCount(12);
  await options.scrollIntoViewIfNeeded();await page.evaluate(()=>document.fonts.ready);
  for(const colorScheme of ['light','dark'] as const){
   await page.emulateMedia({colorScheme});

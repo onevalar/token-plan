@@ -1,15 +1,15 @@
 import {GaugeArc} from './components/arc/gauge/gauge';
 import type {Metric} from './desktop';
 import {isQuotaMetric,MetricExpiries,MetricReset,MetricRow,type MetricRowProps} from './Metrics';
-import {quotaReading,quotaMeter,type HomeUsageStyle} from './homeUsage';
+import {forecastSpan,projectedUsed,quotaReading,quotaMeter,type StyleSpec} from './homeUsage';
 import {providerText} from './providerText';
 import {countdown} from './usage';
 import './home-quota-styles.css';
 
-type Style=Exclude<HomeUsageStyle,'bars'|'gauges'|'cells'>;
-type Props={metrics:Metric[];style:Style}&Omit<MetricRowProps,'metric'>;
+type Props={metrics:Metric[];spec:StyleSpec}&Omit<MetricRowProps,'metric'>;
 
-export function HomeQuotaStyles({metrics,style,...props}:Props) {
+export function HomeQuotaStyles({metrics,spec,...props}:Props) {
+ const style=spec.root;
  // Pair adjacent independent windows; an extra model pool does not disable the pair.
  const paired=new Map<number,Metric[]>(),consumed=new Set<number>();
  if(style==='concentric')for(let i=0;i<metrics.length-1;i++){
@@ -33,7 +33,7 @@ export function HomeQuotaStyles({metrics,style,...props}:Props) {
     </div>;
    })}</div>
   </div>;
-  return <Quota key={metric.id} metric={metric} style={style} {...props}/>;
+  return <Quota key={metric.id} metric={metric} spec={spec} {...props}/>;
  })}</div>;
 }
 
@@ -52,9 +52,9 @@ function Reset(props:MetricRowProps) {
  return <span className="home-reset">{timed?<span>{providerText('Resets in',language)}</span>:null}<MetricReset {...props}/></span>;
 }
 
-function Quota({style,...props}:MetricRowProps&{style:Style}) {
- const {metric:m,remaining=false}=props,r=quotaReading(props),threshold=remaining?20:80;
- const attributes={'data-metric':m.id,'data-tone':r.tone};
+function Quota({spec,...props}:MetricRowProps&{spec:StyleSpec}) {
+ const {metric:m,remaining=false}=props,r=quotaReading(props),threshold=remaining?20:80,style=spec.root;
+ const attributes={'data-metric':m.id,'data-tone':r.tone},forecast=projectedUsed(m,props.now,r.used);
  if(style==='numbers')return <article className="home-reading home-number" {...attributes} aria-label={r.label}>
   <div className="home-number-label"><span>{r.name}</span><small>{r.mode}</small></div>
   <span className="home-quota-sr">{r.description}</span>
@@ -68,19 +68,21 @@ function Quota({style,...props}:MetricRowProps&{style:Style}) {
   {r.value===null?<p className="home-quota-unknown quota-missing">{props.missing}</p>:<div {...quotaMeter(r)}>
    <div className="home-ruler-graphic" aria-hidden="true">
     <div className="home-ruler-bar"><div className="home-ruler-track"><span style={{transform:`scaleX(${Math.max(0,Math.min(1,r.value/100))})`}}/></div>
+     {spec.forecast&&forecast!==null&&<span className="home-forecast-stripe" style={forecastSpan(r.used!,forecast,remaining)}/>}
      <span className="home-ruler-limit" style={{left:remaining?'0%':'100%'}}/>
      <span className="home-ruler-threshold" style={{left:`${threshold}%`}}/>
     </div>
     <div className="home-ruler-ticks">{[0,20,40,60,80,100].map(tick=><span key={tick} style={{left:`${tick}%`}}>{tick===threshold?`${tick} ⚑`:tick}</span>)}</div>
    </div>
   </div>}
+  {spec.forecast&&forecast!==null&&<p className="home-forecast-note">{providerText('Projected %@ by reset',props.language).replace('%@',`${Math.round(forecast)}%`)}</p>}
   {r.warning&&<p className="quota-warning">{r.warning}</p>}<MetricExpiries {...props}/>
  </div>;
  if(style==='segments')return <div className="home-reading home-segments" {...attributes}>
   <div className="home-segment-label"><span>{r.name} · {r.mode}</span><Reset {...props}/></div>
   <div className="home-segment-reading">
    {r.value===null?<div className="home-quota-unknown quota-missing">{props.missing}</div>:<div {...quotaMeter(r)}>
-    <div className="home-segment-track" aria-hidden="true">{Array.from({length:20},(_,i)=><span key={i}><span style={{transform:`scaleX(${Math.max(0,Math.min(1,r.value!/5-i))})`}}/></span>)}</div>
+    <div className="home-segment-track" data-shape={spec.shape} aria-hidden="true" style={{gridTemplateColumns:`repeat(${spec.count},minmax(0,1fr))`}}>{Array.from({length:spec.count},(_,i)=><span key={i} style={spec.shape==='rising'?{height:`${40+60*i/Math.max(1,spec.count-1)}%`}:undefined}><span style={{transform:`scaleX(${Math.max(0,Math.min(1,r.value!/(100/spec.count)-i))})`}}/></span>)}</div>
    </div>}
    <strong aria-hidden="true">{r.value===null?'—':r.valueText}</strong>
   </div>

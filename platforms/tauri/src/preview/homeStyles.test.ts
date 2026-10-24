@@ -1,11 +1,16 @@
 import {describe,it,expect} from 'vitest';
 import {homeStyleKey,readHomeStyles,homeStyleMode,homeStyleFor} from './useHomeUsageStyle';
-import {homeUsageStyles} from '../homeUsage';
+import {homeUsageFamilies,parseStyle,canonicalStyle,styleOptions} from '../homeUsage';
 import {sameLoginDirectory} from './AccountOnboarding';
 describe('account style preferences',()=>{
- it('adds Tick Ring after the eight established styles',()=>{
-  expect(Object.keys(homeUsageStyles)).toEqual(['bars','gauges','cells','rings','ruler','concentric','numbers','segments','ticks']);
-  expect(homeUsageStyles.ticks).toBe('Tick Ring');
+ it('offers twelve style families and keeps every earlier saved style valid',()=>{
+  expect(Object.keys(homeUsageFamilies)).toHaveLength(12);
+  for(const old of ['bars','gauges','cells','rings','ruler','concentric','numbers','segments','ticks'])expect(parseStyle(old)).not.toBeNull();
+  expect(parseStyle('segments')?.family).toBe('cells');expect(parseStyle('concentric')?.family).toBe('rings');
+  expect(parseStyle('segments:capsule:10')).toMatchObject({shape:'capsule',count:10});
+  expect(parseStyle('segments:capsule:7')).toBeNull();expect(parseStyle('vessel:tank')?.vessel).toBe('tank');expect(parseStyle('nope')).toBeNull();
+  expect(canonicalStyle('segments')).toBe(canonicalStyle('segments:square:20'));
+  expect(styleOptions('rings')[0].choices.map(c=>c.id)).toEqual(['rings','concentric','ticks']);
  });
  it('migrates the legacy global choice and preserves per-account choices through uniform mode',()=>{
   const getItem=(key:string)=>key==='tokenplan.homeUsageStyle'?'rings':null;

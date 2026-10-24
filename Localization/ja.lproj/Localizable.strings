@@ -96,6 +96,7 @@
 "Allow Notifications" = "通知を許可";
 "Allow TokenPlan notifications in system settings, then try again." = "システム設定でTokenPlanの通知を許可して再試行してください。";
 "Almost Out" = "もうすぐ上限";
+"Almost used up" = "まもなく使い切り";
 "Always Visible" = "常に表示";
 "Amp CLI did not report subscription quotas. Only the credit balance is available." = "Amp CLIから契約の上限が報告されていません。クレジット残高のみ表示できます。";
 "Amp CLI not found. Install Amp and run amp login in Terminal." = "Amp CLIが見つかりません。Ampをインストールし、ターミナルでamp loginを実行してください。";
@@ -130,15 +131,20 @@
 "Balance and Benefits" = "残高と特典";
 "Bars" = "バー";
 "Based on OpenUsage by Robin Ebers, released under the MIT License." = "Robin Ebers 氏の OpenUsage（MIT ライセンス）をもとにしています。";
+"Battery" = "電池";
 "Beta Updates" = "ベータ版アップデート";
 "Billing" = "請求";
 "Blended cost per megatoken %@ across %lld providers" = "%2$lld 社のプロバイダーの百万トークンあたり平均コスト %1$@";
+"Border Progress" = "枠線の進捗";
 "Cache Read" = "キャッシュ読み取り";
 "Cache Write" = "キャッシュ書き込み";
 "Cancel" = "キャンセル";
 "Cannot reach the provider. Check the desktop app's network, proxy, or VPN connection." = "サービスに接続できません。デスクトップアプリのネットワーク、プロキシ、VPN 接続を確認してください。";
 "Cannot reach the provider. Check your connection." = "サービスに接続できません。ネットワークを確認してください。";
+"Capsules" = "カプセル";
 "Cash" = "現金";
+"Cell Count" = "セル数";
+"Cells" = "セル";
 "Change Service" = "サービスを変更";
 "Change in General Settings" = "一般設定で変更";
 "Changes apply after you confirm. Cancel keeps your previous display." = "確定すると変更が適用されます。キャンセルすると元の表示が維持されます。";
@@ -206,6 +212,7 @@
 "Connection" = "接続";
 "Console" = "コンソール";
 "Consumes one reset credit. Only the usage windows eligible on the server will be reset. This can't be undone." = "リセットクレジットを1つ消費します。サーバーが対象とする利用枠のみリセットされます。この操作は取り消せません。";
+"Containers" = "容器";
 "Content" = "項目";
 "Content Item" = "表示項目";
 "Continue Setup" = "接続を続ける";
@@ -303,6 +310,7 @@
 "Display Metrics" = "表示項目";
 "Done" = "完了";
 "Done." = "完了。";
+"Double Ring" = "二重リング";
 "Download and Install Update" = "更新をダウンロードしてインストール";
 "Downloading Update…" = "更新をダウンロード中…";
 "Drag metrics here" = "ここに指標をドラッグ";
@@ -355,6 +363,7 @@
 "Folder authorization failed. Select the folder again." = "フォルダを許可できませんでした。再度選択してください。";
 "Folder authorized. Enable the service and refresh its usage." = "フォルダを許可しました。サービスを有効にして使用量を更新してください。";
 "Follow System" = "システムに従う";
+"Forecast" = "予測";
 "Found on This Mac" = "この Mac で見つかったもの";
 "Found on this Mac" = "この Mac で見つかりました";
 "Free tier" = "無料プラン";
@@ -383,6 +392,7 @@
 "Global shortcuts are unavailable in this desktop session." = "このデスクトップ環境ではグローバルショートカットを利用できません。";
 "Got It" = "わかりました";
 "Granted" = "付与済み";
+"Grid" = "グリッド";
 "Grok Bot" = "Grok Bot";
 "Grok Bot usage" = "Grok Bot の使用量";
 "Grok auth expired. Run `grok login` again." = "Grok の認証が期限切れです。もう一度 `grok login` を実行してください。";
@@ -405,6 +415,7 @@
 "Home Page" = "ホーム";
 "Home Usage Style" = "ホームの使用量表示";
 "Horizontal Bar" = "横棒";
+"Hourglass" = "砂時計";
 "I Have Signed In — Check Again" = "サインインしました。もう一度確認";
 "Icon Only" = "アイコンのみ";
 "Icon Position" = "アイコンの位置";
@@ -438,6 +449,7 @@
 "Last Updated" = "最終更新";
 "Last updated %@ ago" = "%@ 前に更新";
 "Launch at Login" = "ログイン時に起動";
+"Layout" = "レイアウト";
 "Left" = "残り";
 "Left of the Rings" = "リングの左側";
 "License" = "ライセンス";
@@ -569,6 +581,7 @@
 "Notifications, appearance and more" = "通知、外観など";
 "Notify When Usage Reaches" = "通知する使用率";
 "Numbers" = "数値";
+"Off" = "オフ";
 "On Demand" = "必要時に表示";
 "One ring per selected account: Claude 5h, Codex Pro 1w, Plus 5h. Other plans use the quota with least remaining." = "選択した各アカウントに1つのリング：Claude 5h、Codex Pro 1w、Plus 5h。その他のプランは残り枠が最も少ない制限を表示します。";
 "Only includes %@." = "%@ のみ含まれます。";
@@ -613,6 +626,7 @@
 "Personal" = "個人";
 "Pin to tray" = "トレイに固定";
 "Platform" = "プラットフォーム";
+"Plenty left" = "余裕あり";
 "Preferences could not be read. Changes can be saved again in Settings." = "設定を読み込めませんでした。設定画面から保存し直せます。";
 "Preferences could not be saved. Check the app data folder permissions." = "設定を保存できませんでした。アプリデータフォルダーの権限を確認してください。";
 "Press Shortcut" = "キーを押してください";
@@ -625,6 +639,7 @@
 "Privacy Policy" = "プライバシーポリシー";
 "Project Home" = "プロジェクトのホーム";
 "Project Website" = "プロジェクトサイト";
+"Projected %@ by reset" = "リセット時の予測 %@";
 "Projected to finish before the limit resets." = "上限がリセットされる前に使い切る見込みです。";
 "Projected to finish close to your limit." = "上限に近い状態で終わる見込みです。";
 "Provider App / CLI" = "サービスのアプリ／CLI";
@@ -734,6 +749,9 @@
 "Retrying in ~%@." = "約 %@ 後に再試行します。";
 "Reveal in Finder" = "Finder で表示";
 "Ring" = "リング";
+"Rings" = "リング";
+"Rising Bars" = "階段バー";
+"Row Fill" = "行全体の塗りつぶし";
 "Run devin auth login or sign in to Devin and try again." = "devin auth login を実行するか Devin にサインインしてから、もう一度お試しください。";
 "Same order as Account Management" = "並び順は「アカウント管理」と同じです";
 "Same order as Subscription Management" = "並び順は「サブスクリプション管理」と同じです";
@@ -759,10 +777,12 @@
 "Set Up" = "設定";
 "Settings" = "設定";
 "Settings…" = "設定…";
+"Shape" = "形";
 "Share of Recorded Tokens" = "記録済みトークンの構成";
 "Shares use %@ recorded tokens from this day and source, not a plan limit or a full bill." = "割合はこの日のこの記録元の %@ トークンを基準とし、プランの上限や請求全体を示すものではありません。";
 "Show" = "表示";
 "Show First Usage Metric" = "最初の使用量を表示";
+"Show Forecast" = "予測を表示";
 "Show Home" = "ホームを表示";
 "Show Log Folder" = "ログフォルダーを開く";
 "Show Note in Overview" = "概要にメモを表示";
@@ -776,6 +796,7 @@
 "Show or hide TokenPlan" = "TokenPlanを表示・非表示";
 "Show remaining quota" = "残りの使用枠を表示";
 "Shown Services" = "表示するサービス";
+"Side-by-Side Columns" = "縦棒の並列";
 "Sign In Again" = "再度サインイン";
 "Sign In to Another Account" = "別のアカウントにログイン";
 "Sign in to GitHub Copilot in your editor, or run gh auth login, and try again." = "エディタで GitHub Copilot にサインインするか、gh auth login を実行してからもう一度お試しください。";
@@ -784,6 +805,8 @@
 "Sign in with Claude Code, then refresh." = "Claude Code でログインしてから更新してください。";
 "Sign in with the Codex CLI, then refresh." = "Codex CLI でログインしてから更新してください。";
 "Sign in with the Cursor desktop app, then refresh." = "Cursor デスクトップアプリでログインしてから更新してください。";
+"Single Ring" = "単一リング";
+"Single Row" = "1行";
 "Some Cursor export rows were invalid. Totals may be incomplete." = "Cursor のエクスポートに無効な行があり、集計が不完全な可能性があります。";
 "Some accounts could not be refreshed. Check their status." = "一部のアカウントを更新できませんでした。状態を確認してください。";
 "Some failed" = "一部失敗";
@@ -792,14 +815,18 @@
 "Some models could not be priced. This estimate is incomplete." = "一部モデルの料金が不明なため、推定は不完全です。";
 "Some usage data is unavailable. Available readings are shown below." = "一部の使用量を取得できません。取得できたデータを表示しています。";
 "Sonnet" = "Sonnet";
+"Source Split" = "内訳バー";
 "Spark" = "Spark";
 "Spark Weekly" = "Spark 週間";
+"Split by the last 7 days of model use (estimate)" = "直近7日のモデル使用量で按分（推定）";
+"Squares" = "四角";
 "Star for menu bar" = "メニューバーにスターを付ける";
 "Starred for menu bar" = "メニューバーにスター付きで追加しました";
 "Start Antigravity or run `agy` and try again." = "Antigravity を起動するか `agy` を実行してから、もう一度お試しください。";
 "Start Over" = "やり直す";
 "Startup settings could not be saved. Check system permissions." = "起動設定を保存できません。システムの権限を確認してください。";
 "Status" = "状態";
+"Status Lights" = "ステータスランプ";
 "Status: %@" = "状態：%@";
 "Stop" = "停止";
 "Subscription" = "契約";
@@ -812,6 +839,7 @@
 "System Tray" = "システムトレイ";
 "System credentials could not be read. Open Antigravity and refresh, or check your login keyring." = "資格情報を読み取れません。Antigravity を開いて更新するか、ログインキーリングを確認してください。";
 "System credentials could not be read. Unlock your login keyring and try again." = "システム認証情報を読み取れません。キーリングを解除して再試行してください。";
+"Tank" = "タンク";
 "Team accounts have no personal quota. Spend below is still from your Grok logs." = "チームアカウントには個人の上限がありません。以下の支出は引き続き Grok のログから取得しています。";
 "Team request-based usage data unavailable. Try again later." = "チームのリクエスト単位の使用量データを取得できません。後でもう一度お試しください。";
 "Terminal Helper" = "ターミナルヘルパー";
@@ -843,6 +871,7 @@
 "The system credential reader is missing. Install libsecret-tools, or open Antigravity and refresh." = "資格情報ツールがありません。libsecret-tools をインストールするか、Antigravity を開いて更新してください。";
 "The update could not be installed. Your current version is unchanged." = "更新をインストールできませんでした。現在のバージョンは変更されていません。";
 "Theme" = "テーマ";
+"Thermometer" = "温度計";
 "These settings only affect %@." = "以下の設定は %@ のみに適用されます。";
 "These three readings share one allowance. More expensive models use it up faster. They are not each model's own remaining amount." = "この3つは同じ利用枠です。高いモデルほど早く消費され、モデルごとの残りではありません。";
 "These variants are included in the model above, not added again." = "この内訳は上のモデルに含まれており、再加算しません。";
@@ -859,6 +888,7 @@
 "Three metrics automatically place the icon on the left. Your selections are kept when switching styles." = "3項目ではアイコンを自動的に左側へ配置します。表示形式を切り替えても選択は保持されます。";
 "Three rings use the left icon layout." = "3つのリングではアイコンを左側に表示します。";
 "Tick Ring" = "目盛りリング";
+"Ticks" = "目盛り";
 "Time Format" = "時刻形式";
 "Time Range" = "期間";
 "Today" = "今日";
@@ -945,6 +975,7 @@
 "Usage request failed after refresh. Try again." = "更新後も使用量のリクエストに失敗しました。もう一度お試しください。";
 "Usage request failed. Check your connection." = "使用量のリクエストに失敗しました。接続を確認してください。";
 "Usage response invalid. Try again later." = "使用量の応答が無効です。後でもう一度お試しください。";
+"Usage rising" = "使用量が増加中";
 "Usage temporarily unavailable; retry later." = "使用量は一時的に取得できません。後で再試行してください。";
 "Usage updated." = "使用量を更新しました。";
 "Use" = "使用";

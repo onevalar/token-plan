@@ -96,6 +96,7 @@
 "Allow Notifications" = "알림 허용";
 "Allow TokenPlan notifications in system settings, then try again." = "시스템 설정에서 TokenPlan 알림을 허용한 후 다시 시도하세요.";
 "Almost Out" = "거의 소진";
+"Almost used up" = "거의 소진";
 "Always Visible" = "항상 표시";
 "Amp CLI did not report subscription quotas. Only the credit balance is available." = "Amp CLI에서 구독 한도를 보고하지 않았습니다. 크레딧 잔액만 확인할 수 있습니다.";
 "Amp CLI not found. Install Amp and run amp login in Terminal." = "Amp CLI를 찾을 수 없습니다. Amp를 설치하고 터미널에서 amp login을 실행하세요.";
@@ -130,15 +131,20 @@
 "Balance and Benefits" = "잔액 및 혜택";
 "Bars" = "막대";
 "Based on OpenUsage by Robin Ebers, released under the MIT License." = "Robin Ebers의 OpenUsage(MIT 라이선스)를 기반으로 합니다.";
+"Battery" = "배터리";
 "Beta Updates" = "베타 업데이트";
 "Billing" = "청구";
 "Blended cost per megatoken %@ across %lld providers" = "제공업체 %2$lld곳의 백만 토큰당 평균 비용 %1$@";
+"Border Progress" = "테두리 진행";
 "Cache Read" = "캐시 읽기";
 "Cache Write" = "캐시 쓰기";
 "Cancel" = "취소";
 "Cannot reach the provider. Check the desktop app's network, proxy, or VPN connection." = "서비스에 연결할 수 없습니다. 데스크톱 앱의 네트워크, 프록시 또는 VPN 연결을 확인하세요.";
 "Cannot reach the provider. Check your connection." = "서비스에 연결할 수 없습니다. 네트워크를 확인하세요.";
+"Capsules" = "캡슐";
 "Cash" = "현금";
+"Cell Count" = "셀 수";
+"Cells" = "셀";
 "Change Service" = "서비스 변경";
 "Change in General Settings" = "일반 설정에서 변경";
 "Changes apply after you confirm. Cancel keeps your previous display." = "확인하면 변경 사항이 적용됩니다. 취소하면 기존 표시 설정이 유지됩니다.";
@@ -206,6 +212,7 @@
 "Connection" = "연결";
 "Console" = "콘솔";
 "Consumes one reset credit. Only the usage windows eligible on the server will be reset. This can't be undone." = "초기화 크레딧 하나를 소비합니다. 서버에서 허용하는 사용량 기간만 초기화됩니다. 되돌릴 수 없습니다.";
+"Containers" = "용기";
 "Content" = "내용";
 "Content Item" = "콘텐츠 항목";
 "Continue Setup" = "연결 계속";
@@ -303,6 +310,7 @@
 "Display Metrics" = "표시 지표";
 "Done" = "완료";
 "Done." = "완료.";
+"Double Ring" = "이중 링";
 "Download and Install Update" = "업데이트 다운로드 및 설치";
 "Downloading Update…" = "업데이트 다운로드 중…";
 "Drag metrics here" = "여기로 지표를 끌어다 놓으세요";
@@ -355,6 +363,7 @@
 "Folder authorization failed. Select the folder again." = "폴더 권한을 허용하지 못했습니다. 다시 선택하세요.";
 "Folder authorized. Enable the service and refresh its usage." = "폴더가 허용되었습니다. 서비스를 활성화하고 사용량을 새로고침하세요.";
 "Follow System" = "시스템 설정 따르기";
+"Forecast" = "예측";
 "Found on This Mac" = "이 Mac에서 찾은 항목";
 "Found on this Mac" = "이 Mac에서 찾았습니다";
 "Free tier" = "무료 플랜";
@@ -383,6 +392,7 @@
 "Global shortcuts are unavailable in this desktop session." = "현재 데스크톱 환경에서 전역 단축키를 사용할 수 없습니다.";
 "Got It" = "확인";
 "Granted" = "지급됨";
+"Grid" = "그리드";
 "Grok Bot" = "Grok Bot";
 "Grok Bot usage" = "Grok Bot 사용량";
 "Grok auth expired. Run `grok login` again." = "Grok 인증이 만료되었습니다. `grok login`을 다시 실행하세요.";
@@ -405,6 +415,7 @@
 "Home Page" = "홈";
 "Home Usage Style" = "홈 사용량 스타일";
 "Horizontal Bar" = "가로 막대";
+"Hourglass" = "모래시계";
 "I Have Signed In — Check Again" = "로그인했습니다. 다시 확인";
 "Icon Only" = "아이콘만";
 "Icon Position" = "아이콘 위치";
@@ -438,6 +449,7 @@
 "Last Updated" = "최근 업데이트";
 "Last updated %@ ago" = "%@ 전에 업데이트됨";
 "Launch at Login" = "로그인 시 실행";
+"Layout" = "배열";
 "Left" = "남음";
 "Left of the Rings" = "링 왼쪽";
 "License" = "라이선스";
@@ -569,6 +581,7 @@
 "Notifications, appearance and more" = "알림, 모양 등";
 "Notify When Usage Reaches" = "알림 사용량 기준";
 "Numbers" = "숫자";
+"Off" = "끔";
 "On Demand" = "필요할 때 표시";
 "One ring per selected account: Claude 5h, Codex Pro 1w, Plus 5h. Other plans use the quota with least remaining." = "선택한 계정마다 링 하나: Claude 5h, Codex Pro 1w, Plus 5h. 다른 요금제는 남은 할당량이 가장 적은 한도를 표시합니다.";
 "Only includes %@." = "%@만 포함됩니다.";
@@ -613,6 +626,7 @@
 "Personal" = "개인";
 "Pin to tray" = "트레이에 고정";
 "Platform" = "플랫폼";
+"Plenty left" = "여유 있음";
 "Preferences could not be read. Changes can be saved again in Settings." = "환경설정을 읽을 수 없습니다. 설정에서 다시 저장할 수 있습니다.";
 "Preferences could not be saved. Check the app data folder permissions." = "환경설정을 저장할 수 없습니다. 앱 데이터 폴더 권한을 확인하세요.";
 "Press Shortcut" = "단축키를 누르세요";
@@ -625,6 +639,7 @@
 "Privacy Policy" = "개인정보 처리방침";
 "Project Home" = "프로젝트 홈";
 "Project Website" = "프로젝트 웹사이트";
+"Projected %@ by reset" = "재설정 시 예상 %@";
 "Projected to finish before the limit resets." = "한도가 초기화되기 전에 소진될 것으로 예상됩니다.";
 "Projected to finish close to your limit." = "한도에 가깝게 끝날 것으로 예상됩니다.";
 "Provider App / CLI" = "서비스 앱 / CLI";
@@ -734,6 +749,9 @@
 "Retrying in ~%@." = "약 %@ 후 재시도합니다.";
 "Reveal in Finder" = "Finder에서 보기";
 "Ring" = "링";
+"Rings" = "링";
+"Rising Bars" = "상승 막대";
+"Row Fill" = "행 전체 채우기";
 "Run devin auth login or sign in to Devin and try again." = "devin auth login을 실행하거나 Devin에 로그인한 뒤 다시 시도하세요.";
 "Same order as Account Management" = "순서는 \"계정 관리\"와 같습니다";
 "Same order as Subscription Management" = "순서는 \"구독 관리\"와 같습니다";
@@ -759,10 +777,12 @@
 "Set Up" = "설정";
 "Settings" = "설정";
 "Settings…" = "설정…";
+"Shape" = "모양";
 "Share of Recorded Tokens" = "기록된 토큰 구성";
 "Shares use %@ recorded tokens from this day and source, not a plan limit or a full bill." = "비율은 해당 날짜와 출처에 기록된 %@ 토큰을 기준으로 하며, 요금제 한도나 전체 청구 내역이 아닙니다.";
 "Show" = "표시";
 "Show First Usage Metric" = "첫 사용량 항목 표시";
+"Show Forecast" = "예측 표시";
 "Show Home" = "홈 표시";
 "Show Log Folder" = "로그 폴더 열기";
 "Show Note in Overview" = "개요에 메모 표시";
@@ -776,6 +796,7 @@
 "Show or hide TokenPlan" = "TokenPlan 표시 또는 숨기기";
 "Show remaining quota" = "남은 할당량 표시";
 "Shown Services" = "표시할 서비스";
+"Side-by-Side Columns" = "나란한 막대";
 "Sign In Again" = "다시 로그인";
 "Sign In to Another Account" = "새 계정 로그인";
 "Sign in to GitHub Copilot in your editor, or run gh auth login, and try again." = "편집기에서 GitHub Copilot에 로그인하거나 gh auth login을 실행한 뒤 다시 시도하세요.";
@@ -784,6 +805,8 @@
 "Sign in with Claude Code, then refresh." = "Claude Code에 로그인한 후 새로고침하세요.";
 "Sign in with the Codex CLI, then refresh." = "Codex CLI에 로그인한 후 새로고침하세요.";
 "Sign in with the Cursor desktop app, then refresh." = "Cursor 데스크톱 앱에 로그인한 후 새로고침하세요.";
+"Single Ring" = "단일 링";
+"Single Row" = "한 줄";
 "Some Cursor export rows were invalid. Totals may be incomplete." = "일부 Cursor 내보내기 행이 잘못되어 집계가 불완전할 수 있습니다.";
 "Some accounts could not be refreshed. Check their status." = "일부 계정을 새로 고치지 못했습니다. 계정 상태를 확인하세요.";
 "Some failed" = "일부 실패";
@@ -792,14 +815,18 @@
 "Some models could not be priced. This estimate is incomplete." = "일부 모델의 가격을 확인할 수 없어 추정치가 불완전합니다.";
 "Some usage data is unavailable. Available readings are shown below." = "일부 사용량을 가져올 수 없습니다. 확인된 데이터를 아래에 표시합니다.";
 "Sonnet" = "Sonnet";
+"Source Split" = "출처별 분할";
 "Spark" = "Spark";
 "Spark Weekly" = "Spark 주간";
+"Split by the last 7 days of model use (estimate)" = "최근 7일 모델 사용량 기준 분할(추정)";
+"Squares" = "사각형";
 "Star for menu bar" = "메뉴 막대에 별표 추가";
 "Starred for menu bar" = "메뉴 막대에 별표로 추가됨";
 "Start Antigravity or run `agy` and try again." = "Antigravity를 시작하거나 `agy`를 실행한 뒤 다시 시도하세요.";
 "Start Over" = "다시 시작";
 "Startup settings could not be saved. Check system permissions." = "시작 설정을 저장할 수 없습니다. 시스템 권한을 확인하세요.";
 "Status" = "상태";
+"Status Lights" = "상태 표시등";
 "Status: %@" = "상태: %@";
 "Stop" = "중지";
 "Subscription" = "구독";
@@ -812,6 +839,7 @@
 "System Tray" = "시스템 트레이";
 "System credentials could not be read. Open Antigravity and refresh, or check your login keyring." = "시스템 자격 증명을 읽을 수 없습니다. Antigravity를 열고 새로 고침하거나 로그인 키링을 확인하세요.";
 "System credentials could not be read. Unlock your login keyring and try again." = "시스템 자격 증명을 읽을 수 없습니다. 로그인 키링을 잠금 해제하고 다시 시도하세요.";
+"Tank" = "탱크";
 "Team accounts have no personal quota. Spend below is still from your Grok logs." = "팀 계정에는 개인 한도가 없습니다. 아래 지출은 계속 Grok 로그에서 가져옵니다.";
 "Team request-based usage data unavailable. Try again later." = "팀 요청 기반 사용량 데이터를 사용할 수 없습니다. 나중에 다시 시도하세요.";
 "Terminal Helper" = "터미널 도우미";
@@ -843,6 +871,7 @@
 "The system credential reader is missing. Install libsecret-tools, or open Antigravity and refresh." = "자격 증명 도구가 없습니다. libsecret-tools를 설치하거나 Antigravity를 열고 새로 고침하세요.";
 "The update could not be installed. Your current version is unchanged." = "업데이트를 설치하지 못했습니다. 현재 버전은 변경되지 않았습니다.";
 "Theme" = "테마";
+"Thermometer" = "온도계";
 "These settings only affect %@." = "아래 설정은 %@에만 적용됩니다.";
 "These three readings share one allowance. More expensive models use it up faster. They are not each model's own remaining amount." = "이 세 항목은 같은 한도입니다. 비싼 모델일수록 더 빨리 소진되며, 모델별 잔여량이 아닙니다.";
 "These variants are included in the model above, not added again." = "이 세부 항목은 위 모델에 이미 포함되어 있으며 다시 더하지 않습니다.";
@@ -859,6 +888,7 @@
 "Three metrics automatically place the icon on the left. Your selections are kept when switching styles." = "지표가 3개이면 아이콘이 자동으로 왼쪽에 표시됩니다. 스타일을 바꿔도 선택 항목은 유지됩니다.";
 "Three rings use the left icon layout." = "링 3개 모드에서는 아이콘을 왼쪽에 표시합니다.";
 "Tick Ring" = "눈금 링";
+"Ticks" = "눈금";
 "Time Format" = "시간 형식";
 "Time Range" = "기간";
 "Today" = "오늘";
@@ -945,6 +975,7 @@
 "Usage request failed after refresh. Try again." = "새로고침 후에도 사용량 요청에 실패했습니다. 다시 시도하세요.";
 "Usage request failed. Check your connection." = "사용량 요청에 실패했습니다. 연결을 확인하세요.";
 "Usage response invalid. Try again later." = "사용량 응답이 올바르지 않습니다. 나중에 다시 시도하세요.";
+"Usage rising" = "사용량 증가 중";
 "Usage temporarily unavailable; retry later." = "사용량을 일시적으로 읽을 수 없습니다. 나중에 다시 시도하세요.";
 "Usage updated." = "사용량이 업데이트되었습니다.";
 "Use" = "사용";
