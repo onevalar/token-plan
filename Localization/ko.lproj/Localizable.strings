@@ -868,6 +868,7 @@
 "TokenPlan needs permission to send alerts." = "TokenPlan이 알림을 보내려면 권한이 필요합니다.";
 "TokenPlan reads accounts that are already signed in on this Mac. Add one below, or sign in to another account." = "TokenPlan은 이 Mac에 로그인된 계정을 읽습니다. 아래에서 추가하거나 다른 계정에 로그인하세요.";
 "TokenPlan reads credentials on this device to retrieve your usage. No analytics or crash reporting is collected." = "TokenPlan은 이 기기의 자격 증명으로 사용량을 조회합니다. 분석 데이터나 충돌 보고서는 수집하지 않습니다.";
+"TokenPlan sends no analytics or crash reports." = "TokenPlan은 통계 데이터나 충돌 보고서를 전송하지 않습니다.";
 "TokenPlan sends no analytics or crash reports. Credentials stay on this computer." = "TokenPlan은 분석 데이터나 충돌 보고서를 보내지 않습니다. 자격 증명은 이 컴퓨터에만 보관됩니다.";
 "Tokens" = "토큰";
 "Tokens without a model stay in the total as unclassified records." = "모델이 없는 토큰도 합계에 포함하여 미분류 기록으로 표시합니다.";

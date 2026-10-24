@@ -868,6 +868,7 @@
 "TokenPlan needs permission to send alerts." = "TokenPlan がアラートを送信する許可が必要です。";
 "TokenPlan reads accounts that are already signed in on this Mac. Add one below, or sign in to another account." = "TokenPlan はこの Mac でサインイン済みのアカウントを読み取ります。下から追加するか、別のアカウントにサインインしてください。";
 "TokenPlan reads credentials on this device to retrieve your usage. No analytics or crash reporting is collected." = "TokenPlan はこのデバイスの資格情報を使用して使用量を取得します。分析データやクラッシュレポートは収集しません。";
+"TokenPlan sends no analytics or crash reports." = "TokenPlan は統計データやクラッシュレポートを送信しません。";
 "TokenPlan sends no analytics or crash reports. Credentials stay on this computer." = "TokenPlan は分析データやクラッシュレポートを送信しません。認証情報はこのコンピュータにのみ保存されます。";
 "Tokens" = "トークン";
 "Tokens without a model stay in the total as unclassified records." = "モデル不明のトークンも合計に含め、未分類の記録として表示します。";

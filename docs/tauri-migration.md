@@ -17,6 +17,10 @@ Windows/Linux left-click explicitly shows Home, so repeated clicks do not hide i
 is deferred briefly so a tray activation does not hide and immediately reopen it.
 The panel opens centered under (or, for a bottom taskbar, above) the clicked tray icon,
 inside that monitor's work area. On macOS it starts closed, so the first click opens it.
+macOS chooses the screen from the menu-bar click's current pointer location and uses
+AppKit logical screen coordinates for both placement and resizing. It does not mix
+Retina pixels with another display's scale or fall back to the laptop when an external
+menu bar is clicked. Resizing keeps the same menu edge and clicked screen.
 Like the native panel, it is a non-activating panel on macOS: it opens over another app's
 full-screen Space, leaves that app in front, and still takes keyboard input.
 Its corners are rounded on macOS and on Linux desktops with a compositor; without one,

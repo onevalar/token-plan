@@ -27,6 +27,7 @@ T = {
  'TokenPlan sends no analytics or crash reports. Credentials stay on this computer.': ('TokenPlan 不发送任何统计或崩溃报告，凭据只保留在这台电脑上。', 'TokenPlan 不傳送任何統計或當機報告，憑證只保留在這台電腦上。', 'TokenPlan は分析データやクラッシュレポートを送信しません。認証情報はこのコンピュータにのみ保存されます。', 'TokenPlan은 분석 데이터나 충돌 보고서를 보내지 않습니다. 자격 증명은 이 컴퓨터에만 보관됩니다.'),
 }
 T.update({
+ 'TokenPlan sends no analytics or crash reports.': ('TokenPlan 不发送任何统计或崩溃报告。', 'TokenPlan 不傳送任何統計或當機報告。', 'TokenPlan は統計データやクラッシュレポートを送信しません。', 'TokenPlan은 통계 데이터나 충돌 보고서를 전송하지 않습니다.'),
  'Not refreshed': ('未刷新', '未重新整理', '更新されていません', '새로고침 안 됨'),
  'Nothing new was fetched. Try again in a moment.': ('没有获取到新数据，请稍后再试。', '沒有取得新資料，請稍後再試。', '新しいデータを取得できませんでした。しばらくしてからお試しください。', '새 데이터를 가져오지 못했습니다. 잠시 후 다시 시도하세요.'),
 })

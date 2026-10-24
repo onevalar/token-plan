@@ -5,7 +5,9 @@ use tauri::{Emitter, Manager};
 pub struct Panel {
     revision: AtomicU64,
     persistent: AtomicBool,
-    content_height: AtomicU32,
+    pub(super) content_height: AtomicU32,
+    #[cfg(target_os="macos")]
+    pub(super) mac_anchor: std::sync::Mutex<Option<(f64,f64)>>,
     center_on_resize: AtomicBool,
     anchor: std::sync::Mutex<Option<(i32,i32,i32)>>,
 }
@@ -120,13 +122,6 @@ fn placement(anchor:(i32,i32,i32),origin:(i32,i32),area:(u32,u32),size:(u32,u32)
     };
     (x,y.clamp(origin.1,(area_bottom-size.1 as i32).max(origin.1)))
 }
-pub fn toggle_near(app:&tauri::AppHandle,center:i32,top:i32,bottom:i32) {
-    if let Some(window)=app.get_webview_window("main") {
-        if window.is_visible().unwrap_or(false) {hide(app);return;}
-    }
-    show_at(app,Some((center,top,bottom)));
-}
-
 /// Explicit show is idempotent: a second click never hides the newly opened page.
 /// No usable tray coordinates: center on the window's current monitor (or primary).
 pub fn show_at(app:&tauri::AppHandle,requested:Option<(i32,i32,i32)>) {
@@ -171,6 +166,10 @@ pub fn panel_content_height(app:tauri::AppHandle,height:f64)->Result<(),String> 
     let value=height.ceil() as u32;
     let previous=panel.content_height.swap(value,Ordering::SeqCst);
     if previous==value || panel.persistent.load(Ordering::SeqCst) {return Ok(());}
+    #[cfg(target_os="macos")]
+    return crate::mac_panel::resize(&app);
+    #[cfg(not(target_os="macos"))]
+    {
     let window=app.get_webview_window("main").ok_or("window_unavailable")?;
     let monitor=window.current_monitor().map_err(|e|e.to_string())?;
     if let Some(monitor)=monitor {
@@ -184,6 +183,7 @@ pub fn panel_content_height(app:tauri::AppHandle,height:f64)->Result<(),String> 
         }
     }
     Ok(())
+    }
 }
 
 /// How the web interface should draw the panel's outer frame.

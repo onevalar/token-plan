@@ -12,6 +12,8 @@ mod tray_image;
 #[cfg(any(target_os="windows",test))]
 mod windows_tray;
 mod panel;
+#[cfg(any(target_os="macos",test))]
+mod mac_panel;
 #[cfg(target_os="linux")]
 mod linux_tray;
 use tauri::Manager;
@@ -33,12 +35,6 @@ fn show_home_at(app:&tauri::AppHandle,anchor:Option<(i32,i32,i32)>) {
 
 fn show(app: &tauri::AppHandle) {
     panel::show(app);
-}
-
-/// Toggles the panel under a tray icon. Hosts that report only the click point pass
-/// the same value for the icon's top and bottom.
-fn show_near(app:&tauri::AppHandle,center:i32,top:i32,bottom:i32) {
-    panel::toggle_near(app,center,top,bottom);
 }
 
 #[tauri::command]
@@ -116,12 +112,9 @@ fn main() {
                         if let TrayIconEvent::Click {
                                 button: MouseButton::Left,
                                 button_state: MouseButtonState::Up,
-                                rect,
                                 ..
                             } = event {
-                            let position=rect.position.to_physical::<f64>(1.0);
-                            let size=rect.size.to_physical::<f64>(1.0);
-                            show_near(tray.app_handle(),(position.x+size.width/2.0) as i32,position.y as i32,(position.y+size.height) as i32);
+                            mac_panel::toggle(tray.app_handle());
                         }
                     })
                     .build(app)?;

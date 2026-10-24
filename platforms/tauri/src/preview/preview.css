@@ -248,10 +248,10 @@
 .mac-preview .disclosure-row svg[data-open="true"] { transform:rotate(180deg); }
 .mac-preview .service-search label { position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap; }
 .mac-preview .service-search input { min-height:36px;height:36px;font-size:13px; }
-.mac-preview .about { display:grid;justify-items:center;text-align:center;gap:6px; }
-.mac-preview .about-tagline { max-width:300px;margin:6px 0 2px;font-size:13px;line-height:1.6;color:var(--text-secondary); }
-.mac-preview .about-links { display:grid;width:100%;margin:8px 0;border-top:1px solid var(--border); }
-.mac-preview .about-links button { justify-content:space-between;min-height:44px;padding-inline:4px;border-bottom:1px solid var(--border);border-radius:0;font-size:13px; }
-.mac-preview .about-credit { max-width:300px;margin:4px 0 0;font-size:12px;line-height:1.6;color:var(--text-muted); }
+.mac-preview .about { display:grid;justify-items:center;text-align:center;gap:20px;padding:28px 12px; }
+.mac-preview .about-identity { display:grid;gap:4px; }
+.mac-preview .about-identity h2 { margin:0;font-size:22px;line-height:1.3; }
+.mac-preview .about-version { margin:0;font-size:13px;line-height:1.5;color:var(--text-secondary);font-variant-numeric:tabular-nums; }
+.mac-preview .about-privacy { max-width:260px;margin:4px 0 0;font-size:12px;line-height:1.65;color:var(--text-secondary);text-wrap:balance; }
 
 .mac-preview .metric-column-labels[data-tray="false"],.mac-preview .placement-row[data-tray="false"] { grid-template-columns:minmax(0,1fr) minmax(140px,1fr); }

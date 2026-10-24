@@ -3,7 +3,7 @@ import {invoke} from '@tauri-apps/api/core';
 import {listen} from '@tauri-apps/api/event';
 import {Updates,useUpdater} from '../Updates';
 import {getVersion} from '@tauri-apps/api/app';
-import {ChevronLeft,RefreshCw,Plus,Ellipsis,Check,TriangleAlert,ExternalLink} from 'lucide-react';
+import {ChevronLeft,RefreshCw,Plus,Ellipsis,Check,TriangleAlert} from 'lucide-react';
 import {MotionConfig} from 'motion/react';
 import {Button} from '../components/arc/button/button';
 import {DropdownMenu} from '../components/arc/dropdown-menu/dropdown-menu';
@@ -145,11 +145,9 @@ export function DesktopApp() {
     {state&&route.page==='add'&&<AddAccount setup={setups.records.find(r=>r.id===route.setupId)} onSetupChange={setups.reload} state={state} send={send} t={t} busy={busy} language={language} complete={finishAdding} open={accountId=>{back();push('detail',{accountId});}}/>}
     {state&&route.page==='history'&&<>{a&&<div className="history-account-context">{a.name}{a.email&&<span>{a.email}</span>}</div>}<HistoryPage accounts={a?[a]:state.accounts} t={t} language={language} initialRange={route.range}/></>}
     {route.page==='updates'&&<Updates showHeading={false} t={t} updater={updater} automatic={state?.settings.autoUpdates??true} onAutomatic={autoUpdates=>{void send({method:'settings',value:{autoUpdates}}).catch(()=>{});}}/>}
-    {route.page==='about'&&<section className="about"><img src="/capsule.png" alt=""/><h2>TokenPlan</h2><p>{version}</p>{import.meta.env.VITE_MAC_NAVIGATION_PREVIEW==='1'&&<p className="muted">{tr('Design Preview')}</p>}
-     <p className="about-tagline">{tr('Track your AI subscriptions and API balances from your menu bar or system tray.')}</p>
-     <div className="about-links">{([['Project Home','https://github.com/onevalar/token-plan'],['Release Notes','https://github.com/onevalar/token-plan/releases'],['Report a Problem','https://github.com/onevalar/token-plan/issues/new'],['License','https://github.com/onevalar/token-plan/blob/main/LICENSE']] as const).map(([label,url])=><Button key={url} size="sm" variant="ghost" onClick={()=>{void invoke('open_link',{url}).catch(e=>console.error('Link could not be opened',e));}}><span>{tr(label)}</span><ExternalLink size={14} aria-hidden="true"/></Button>)}</div>
-     <p className="about-credit">{tr('Based on OpenUsage by Robin Ebers, released under the MIT License.')}</p>
-     <p className="about-credit">{tr('TokenPlan sends no analytics or crash reports. Credentials stay on this computer.')}</p></section>}
+    {route.page==='about'&&<section className="about"><img src="/capsule.png" alt=""/>
+     <div className="about-identity"><h2>TokenPlan</h2><p className="about-version">{version}</p>{import.meta.env.VITE_MAC_NAVIGATION_PREVIEW==='1'&&<p className="muted">{tr('Design Preview')}</p>}</div>
+     <p className="about-privacy">{tr('TokenPlan sends no analytics or crash reports.')}</p></section>}
    </div></div>;
   })}</div>
  </main></MotionConfig>;

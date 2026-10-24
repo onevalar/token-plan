@@ -103,8 +103,8 @@ tray integration remain platform-specific. This change does not publish a releas
 - First use shows a short welcome once (what appears automatically, what 5h/1w and the hourglass mean, where to add another login).
   Later, when an account is at 70% or more and every alert is off, one card offers to turn alerts on (asking for notification
   permission first). Both can be dismissed; the choice is kept per device in the webview's own storage and never in preferences.
-- About shows the version, a one-line description, links to the project, release notes, issue reporting and license (opened by a native
-  command that only accepts https links inside this project's repository), the OpenUsage credit and the no-analytics statement.
+- About shows only the product icon, name, version and the no-analytics/no-crash-report statement.
+  Project links and attribution text are removed from this page; packaged license files remain unchanged.
 - Each setting has one home. General Settings groups, in order: Appearance and Language, Usage Style, Home (density, used/remaining), Menu Bar (macOS), Data Refresh, then notifications and shortcuts. The Menu Bar group holds everything
   about the menu bar: a live preview at the top, style and icon position, and every shown account with its switch; a switched-on
   account lists its metrics with plus/minus controls to add or remove up to three for the menu bar. Hints about three rings or value-only metrics appear

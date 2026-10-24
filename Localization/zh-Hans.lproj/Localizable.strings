@@ -868,6 +868,7 @@
 "TokenPlan needs permission to send alerts." = "TokenPlan 需要获得发送提醒的权限。";
 "TokenPlan reads accounts that are already signed in on this Mac. Add one below, or sign in to another account." = "TokenPlan 会读取这台 Mac 上已登录的账号。可以在下方直接添加，或登录另一个账号。";
 "TokenPlan reads credentials on this device to retrieve your usage. No analytics or crash reporting is collected." = "TokenPlan 使用本机凭据获取用量，不收集分析数据或崩溃报告。";
+"TokenPlan sends no analytics or crash reports." = "TokenPlan 不发送任何统计或崩溃报告。";
 "TokenPlan sends no analytics or crash reports. Credentials stay on this computer." = "TokenPlan 不发送任何统计或崩溃报告，凭据只保留在这台电脑上。";
 "Tokens" = "Token";
 "Tokens without a model stay in the total as unclassified records." = "未注明模型的 token 保留在总数中，显示为未归类记录。";

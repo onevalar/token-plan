@@ -699,14 +699,21 @@ test('the welcome can jump straight to adding an account',async({page})=>{
  await expect(page.getByRole('heading',{level:1})).toHaveText('添加账号');
 });
 
-test('about offers project links and credits the original project',async({page})=>{
- await setup(page);await menu(page,'关于');
- await expect(visible(page)).toContainText('Robin Ebers');
- await expect(visible(page)).toContainText('不发送任何统计或崩溃报告');
- await visible(page).getByRole('button',{name:'更新说明'}).click();
- await visible(page).getByRole('button',{name:'反馈问题'}).click();
- expect(await page.evaluate(()=>(window as any).__openedLinks)).toEqual(['https://github.com/onevalar/token-plan/releases','https://github.com/onevalar/token-plan/issues/new']);
+for(const language of ['en','zh-Hans','zh-Hant','ja','ko'])for(const theme of ['light','dark'] as const)test(`about is compact and has only identity and privacy copy: ${language} ${theme}`,async({page},info)=>{
+ await page.emulateMedia({colorScheme:theme});
+ await mockDesktop(page,language,false,largeDesktop());await page.goto('/');
+ await page.getByRole('button',{name:messages(language).more,exact:true}).click();
+ await page.getByRole('menuitem',{name:messages(language).about,exact:true}).click();
+ const about=visible(page).locator('.about');
+ await expect(about.getByRole('heading',{name:'TokenPlan'})).toBeVisible();
+ await expect(about.locator('.about-version')).toHaveText('0.0.0');
+ const key='TokenPlan sends no analytics or crash reports.';
+ await expect(about.locator('.about-privacy')).toHaveText((providerTranslations as Record<string,Record<string,string>>)[language]?.[key]??key);
+ await expect(about.getByRole('button').or(about.getByRole('link'))).toHaveCount(0);
+ await expect(about).not.toContainText('Robin Ebers');
+ expect(await about.evaluate(e=>e.getBoundingClientRect().height)).toBeLessThan(300);
  await noOverflow(page);
+ await page.screenshot({path:info.outputPath(`about-${language}-${theme}.png`),animations:'disabled'});
 });
 
 test('menu bar accounts show their switch and metric choices without extra steps',async({page},info)=>{
