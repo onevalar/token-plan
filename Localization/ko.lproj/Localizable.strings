@@ -147,7 +147,6 @@
 "Cells" = "셀";
 "Change Service" = "서비스 변경";
 "Change in General Settings" = "일반 설정에서 변경";
-"Changes apply after you confirm. Cancel keeps your previous display." = "확인하면 변경 사항이 적용됩니다. 취소하면 기존 표시 설정이 유지됩니다.";
 "Chat" = "채팅";
 "Check Automatically" = "자동으로 확인";
 "Check Connection" = "연결 확인";
@@ -202,7 +201,6 @@
 "Concentric Rings" = "독립 동심원";
 "Configuration Directory" = "설정 폴더";
 "Confirm" = "확인";
-"Confirm Changes" = "확인";
 "Connect Account" = "계정 연결";
 "Connect Amp with amp login, then refresh." = "amp login으로 로그인한 후 새로 고침하세요.";
 "Connect Existing Configuration Directory" = "기존 설정 폴더 연결";
@@ -270,7 +268,6 @@
 "Cursor token history needs a valid desktop session. Sign in with Cursor again." = "Cursor 토큰 기록에는 유효한 데스크톱 로그인이 필요합니다. Cursor에서 다시 로그인하세요.";
 "Custom Key" = "사용자 키";
 "Customize" = "사용자화";
-"Customize by Account" = "계정별 설정";
 "Customize…" = "사용자화…";
 "Cutting It Close" = "한도 근접";
 "Daily" = "일간";
@@ -561,6 +558,7 @@
 "No valid login for this Codex account. Sign in with Codex, xswap, or pi, then refresh." = "이 Codex 계정에 유효한 로그인이 없습니다. Codex, xswap 또는 pi로 로그인한 뒤 새로고침하세요.";
 "None" = "없음";
 "Not Now" = "나중에";
+"Not Set" = "설정 안 됨";
 "Not Shown" = "표시 안 함";
 "Not detected yet" = "아직 감지되지 않음";
 "Not logged in. Run `claude` to authenticate." = "로그인되어 있지 않습니다. `claude`를 실행해 인증하세요.";
@@ -594,7 +592,6 @@
 "Open System Settings" = "시스템 설정 열기";
 "Open Terminal to Sign In" = "터미널을 열어 로그인";
 "Open TokenPlan from anywhere" = "어디서나 TokenPlan 열기";
-"Open an account, then choose Edit Home Display to set its usage style." = "계정 상세에서 \"홈 표시 편집\"을 선택하여 사용량 스타일을 설정하세요.";
 "Open-Source Licenses" = "오픈 소스 라이선스";
 "OpenCode Go key was rejected. Log into OpenCode Go again." = "OpenCode Go 키가 거부되었습니다. OpenCode Go에 다시 로그인하세요.";
 "OpenCode not detected. Log in with OpenCode Go or use OpenCode locally first." = "OpenCode를 찾을 수 없습니다. OpenCode Go에 로그인하거나 먼저 로컬에서 OpenCode를 사용하세요.";
@@ -624,6 +621,7 @@
 "Party mode is on, so this stays paused." = "파티 모드가 켜져 있어 이 설정은 일시 중지됩니다.";
 "Pay as you go" = "종량제";
 "Pending Connections" = "연결 대기 중인 계정";
+"Per Subscription" = "구독 서비스별 설정";
 "Percentage" = "백분율";
 "Percentage Grid" = "백분율 격자";
 "Personal" = "개인";
@@ -706,6 +704,7 @@
 "Removing…" = "제거 중…";
 "Reopen Terminal" = "터미널 다시 열기";
 "Reorder" = "순서 변경";
+"Replace Key" = "키 변경";
 "Report a Problem" = "문제 신고";
 "Report an Issue" = "문제 신고";
 "Requests" = "요청";
@@ -779,6 +778,7 @@
 "Sessions start after you send your first message." = "첫 메시지를 보내면 세션이 시작됩니다.";
 "Set API Key" = "API 키 설정";
 "Set Up" = "설정";
+"Set a subscription's usage style in its details via Edit Home Display." = "구독 서비스 상세에서 \"홈 표시 편집\"으로 사용량 스타일을 설정하세요";
 "Settings" = "설정";
 "Settings…" = "설정…";
 "Shape" = "모양";

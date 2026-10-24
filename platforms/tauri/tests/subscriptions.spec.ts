@@ -2,38 +2,44 @@ import {test,expect,type Page} from '@playwright/test';
 import {mockDesktop} from './mock';
 import {largeDesktop} from './fixtures/largeDesktop';
 const visible=(page:Page)=>page.locator('.preview-page:not([hidden])');
+const editor=(page:Page)=>visible(page).locator('.home-metric-editor');
 const back=(page:Page)=>page.getByRole('button',{name:'返回',exact:true}).click();
 async function menu(page:Page,name:string){await page.getByRole('button',{name:'更多',exact:true}).click();await page.getByRole('menuitem',{name,exact:true}).click();}
 async function mode(page:Page,name:string){await page.getByRole('combobox',{name:'应用方式',exact:true}).click();await page.getByRole('option',{name,exact:true}).click();}
 async function style(page:Page,name:string){const toggle=visible(page).getByRole('button',{name:/^用量样式/});if(await toggle.getAttribute('aria-expanded')==='false')await toggle.click();const [category,variant]=({'分段额度条':['分格','单行'],'紧凑环形':['环形','单环']} as Record<string,string[]>)[name]??[name];await visible(page).getByRole('group',{name:'用量样式',exact:true}).getByRole('button',{name:category,exact:true}).click();if(variant){await visible(page).getByRole('combobox',{name:'子样式',exact:true}).click();await page.getByRole('option',{name:variant,exact:true}).click();}}
 async function edit(page:Page){await page.getByRole('button',{name:'Claude first@example.com',exact:true}).click();await page.getByRole('button',{name:'编辑首页显示',exact:true}).click();}
+const done=(page:Page)=>page.locator('header').getByRole('button',{name:'完成',exact:true}).click();
 test.beforeEach(async({page},info)=>{
  await page.addInitScript(platform=>(window as any).__panelFrame={platform,rounded:platform==='macos'},String(info.project.metadata.platform));
  await mockDesktop(page,'zh-Hans',false,largeDesktop());await page.goto('/');
 });
-test('each account has its own style; mode switching preserves saved choices and cancel preserves both drafts',async({page})=>{
- await menu(page,'通用设置');await style(page,'分段额度条');await mode(page,'按账号自定义');
+test('each account has its own style; changes apply at once and mode switching preserves choices',async({page})=>{
+ await menu(page,'通用设置');await style(page,'分段额度条');await mode(page,'按订阅服务自定义');
  await expect(visible(page).locator('.usage-style-picker')).toHaveCount(0);
- await expect(visible(page)).toContainText('进入账号详情');await back(page);
+ await expect(visible(page)).toContainText('订阅服务详情');await back(page);
  await edit(page);await expect(visible(page)).not.toContainText('以下设置只影响');
- await style(page,'紧凑环形');await page.getByRole('button',{name:'取消',exact:true}).last().click();await back(page);
- await expect(page.locator('.account-block').first()).toHaveAttribute('data-usage-style','segments');
- await edit(page);await style(page,'紧凑环形');await page.getByRole('button',{name:'确定',exact:true}).click();await back(page);
+ await style(page,'紧凑环形');
+ expect(await page.evaluate(()=>JSON.parse(localStorage.getItem('tokenplan.homeUsagePreferences')!).accounts)).toEqual({claude:'rings'});
+ await done(page);
+ await expect(visible(page).locator('.detail-group .home-metrics')).toHaveAttribute('data-style','rings');
+ await back(page);
  await expect(page.locator('.account-block').first()).toHaveAttribute('data-usage-style','rings');
  await expect(page.locator('.account-block').nth(1)).toHaveAttribute('data-usage-style','segments');
  await menu(page,'通用设置');await mode(page,'全局统一');await style(page,'醒目数字');await back(page);
  await expect(page.locator('.account-block').first()).toHaveAttribute('data-usage-style','numbers');
- await edit(page);await expect(visible(page).locator('.usage-style-picker')).toHaveCount(0);await page.getByRole('button',{name:'取消',exact:true}).last().click();await back(page);
- await menu(page,'通用设置');await mode(page,'按账号自定义');await back(page);await page.reload();
+ await edit(page);await expect(visible(page).locator('.usage-style-picker')).toHaveCount(0);await done(page);await back(page);
+ await menu(page,'通用设置');await mode(page,'按订阅服务自定义');await back(page);await page.reload();
  await expect(page.locator('.account-block').first()).toHaveAttribute('data-usage-style','rings');
  await expect(page.locator('.account-block').nth(1)).toHaveAttribute('data-usage-style','segments');
 });
-test('failed metric save rolls back style persistence and keeps the editor ready to retry',async({page})=>{
- await menu(page,'通用设置');await mode(page,'按账号自定义');await back(page);await edit(page);await style(page,'紧凑环形');
- await page.evaluate(()=>(window as any).__failNextRequest=true);await page.getByRole('button',{name:'确定',exact:true}).click();
+test('a rejected layout keeps the immediately applied account style',async({page})=>{
+ await menu(page,'通用设置');await mode(page,'按订阅服务自定义');await back(page);await edit(page);await style(page,'紧凑环形');
+ await page.evaluate(()=>(window as any).__failNextRequest=true);
+ await editor(page).locator('.metric-edit-row').first().getByRole('combobox').click();await page.getByRole('option',{name:'隐藏',exact:true}).click();
  await expect(visible(page).getByRole('alert')).toBeVisible();
- expect(await page.evaluate(()=>JSON.parse(localStorage.getItem('tokenplan.homeUsagePreferences')!).accounts)).toEqual({});
- await page.getByRole('button',{name:'确定',exact:true}).click();await back(page);
+ expect(await page.evaluate(()=>JSON.parse(localStorage.getItem('tokenplan.homeUsagePreferences')!).accounts)).toEqual({claude:'rings'});
+ await expect(editor(page).getByRole('combobox').first()).toContainText('单环');
+ await done(page);await back(page);
  await expect(page.locator('.account-block').first()).toHaveAttribute('data-usage-style','rings');
 });
 for(const theme of ['light','dark'] as const)test(`subscription management has direct controls without detail links in ${theme}`,async({page},info)=>{

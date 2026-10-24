@@ -26,8 +26,9 @@ test('platform settings expose live tray quotas only on macOS',async({page},info
  const rows=visible(page).locator('.placement-row');
  await expect(rows.first().getByRole('combobox')).toBeVisible();
  await rows.first().getByRole('combobox').click();await page.getByRole('option',{name:'仅详情',exact:true}).click();
- expect(await page.evaluate(()=>(window as any).__requests.filter((r:any)=>r.method==='metricLayout'))).toHaveLength(0);
- await page.getByRole('button',{name:'确定',exact:true}).click();
+ await expect.poll(async()=>(await page.evaluate(()=>(window as any).__requests.filter((r:any)=>r.method==='metricLayout'))).length).toBe(1);
+ await page.getByRole('button',{name:'完成',exact:true}).click();
+ expect(await page.evaluate(()=>(window as any).__requests.filter((r:any)=>r.method==='metricLayout'))).toHaveLength(1);
  expect(await page.evaluate(()=>(window as any).__requests.at(-1))).toMatchObject({method:'metricLayout',value:expect.arrayContaining([expect.objectContaining({placement:'details'})])});
  expect(await visible(page).evaluate(e=>e.scrollWidth<=e.clientWidth)).toBe(true);
  await page.screenshot({path:info.outputPath('account-settings.png'),animations:'disabled'});

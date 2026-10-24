@@ -50,10 +50,12 @@ test('Home style persists independently of density, tray and details, with keybo
  await back(page);
  await expect(home(page).getByRole('meter',{name:'5h · Used',exact:true}).first()).toHaveAttribute('aria-valuetext','46%');
  await home(page).getByRole('button',{name:'Claude first@example.com',exact:true}).click();
- await expect(visible(page).getByRole('progressbar')).toHaveCount(2);await expect(visible(page).getByRole('meter')).toHaveCount(0);
+ await expect(visible(page).locator('.detail-group .home-metrics')).toHaveAttribute('data-style','gauges');
+ await expect(visible(page).getByRole('meter')).toHaveCount(2);
  await back(page);await settings(page);await choose(page,'Percentage Grid');
  await page.getByRole('switch',{name:textFor('en').showRemaining,exact:true}).click();await back(page);
- await expect(home(page).getByRole('img',{name:'5h · Remaining · 54%. Each cell is 1%.',exact:true})).toHaveCount(1);
+ await expect(home(page).getByRole('img',{name:'5h · Remaining · 54%',exact:true})).toHaveCount(1);
+ await expect(home(page).locator('.home-grid-caption')).toHaveCount(0);
  await page.reload();await expect(home(page)).toHaveAttribute('data-usage-style','cells');
  await expect(page.locator('.mac-preview')).toHaveAttribute('data-density','comfortable');
  await settings(page);await choose(page,'Bars');await back(page);
@@ -70,16 +72,14 @@ test('Tick Ring persists per account and survives switching to a uniform style a
  const data=largeDesktop();data.accounts=data.accounts.slice(0,2);
  await mockDesktop(page,'en',false,data);await page.goto('/');await settings(page);await choose(page,'Gauges');
  await page.getByRole('combobox',{name:'Apply Style',exact:true}).click();
- await page.getByRole('option',{name:'Customize by Account',exact:true}).click();await back(page);
+ await page.getByRole('option',{name:'Per Subscription',exact:true}).click();await back(page);
  await home(page).getByRole('button',{name:'Claude first@example.com',exact:true}).click();
  await page.getByRole('button',{name:'Edit Home Display',exact:true}).click();await choose(page,'Tick Ring');
  const editor=visible(page).locator('.home-metric-editor');
  await expect(editor.getByRole('combobox',{name:'Variant',exact:true})).toContainText('Single Ring Ticks');
- // The account picker is a draft: cancelling must leave the prior style untouched.
- await editor.getByRole('button',{name:textFor('en').cancel,exact:true}).click();
- await page.getByRole('button',{name:'Edit Home Display',exact:true}).click();
- await expect(editor.getByRole('button',{name:/^Usage Style/})).toContainText('Dashboard Ring');await choose(page,'Tick Ring');
- await editor.getByRole('button',{name:'Confirm Changes',exact:true}).click();await expect(editor).toHaveCount(0);await back(page);
+ expect(await page.evaluate(()=>JSON.parse(localStorage.getItem('tokenplan.homeUsagePreferences')!).accounts)).toEqual({claude:'ticks'});
+ await page.locator('header').getByRole('button',{name:textFor('en').finishEditing,exact:true}).click();
+ await expect(editor).toHaveCount(0);await back(page);
  const accounts=home(page).locator('.account-block');
  await expect(accounts.nth(0).locator('.home-metrics')).toHaveAttribute('data-style','ticks');
  await expect(accounts.nth(1).locator('.home-metrics')).toHaveAttribute('data-style','gauges');
@@ -92,7 +92,7 @@ test('Tick Ring persists per account and survives switching to a uniform style a
  await expect(accounts.nth(0).locator('.home-metrics')).toHaveAttribute('data-style','cells');
  await expect(accounts.nth(1).locator('.home-metrics')).toHaveAttribute('data-style','cells');
  await settings(page);await page.getByRole('combobox',{name:'Apply Style',exact:true}).click();
- await page.getByRole('option',{name:'Customize by Account',exact:true}).click();await back(page);await page.reload();
+ await page.getByRole('option',{name:'Per Subscription',exact:true}).click();await back(page);await page.reload();
  await expect(accounts.nth(0).locator('.home-metrics')).toHaveAttribute('data-style','ticks');
  await expect(accounts.nth(1).locator('.home-metrics')).toHaveAttribute('data-style','gauges');
 });
@@ -143,7 +143,7 @@ for(const style of ['gauges','cells','rings','ruler','concentric','numbers','seg
    await expect(tile.locator('.home-number-value > span')).toHaveCSS('color',color);
   }
   if(style==='ticks'){
-   await expect(tile.locator('.quota-ticks strong')).toHaveText(shown[i]);await expect(tile.locator('.quota-ticks')).toContainText(mode);
+   await expect(tile.locator('.quota-ticks strong')).toHaveText(shown[i]);await expect(tile.locator('.quota-ticks')).not.toContainText(mode);
    await expect(tile.locator('.quota-ticks mask circle')).toHaveAttribute('stroke-dasharray',`${Math.max(0,Math.min(1,values[i]/100))} 1`);
   }
  }
@@ -160,10 +160,7 @@ for(const style of ['gauges','cells','rings','ruler','concentric','numbers','seg
   expect(fills[remaining?12:7]).toBeCloseTo(remaining?0.48:0.52,5);
   expect(fills.slice(remaining?13:8)).toEqual(Array(remaining?7:12).fill(0));
  }
- await expect(home(page).locator('[data-metric="quota-1"]')).not.toContainText('Near quota limit');
- await expect(home(page).locator('[data-metric="quota-2"] .quota-warning')).toHaveText('Near quota limit');
- await expect(home(page).locator('[data-metric="quota-3"] .quota-warning')).toHaveText('Quota exhausted');
- await expect(home(page).locator('[data-metric="quota-4"] .quota-warning')).toHaveText('Quota exceeded');
+ await expect(home(page).locator('.quota-warning')).toHaveCount(0);
  for(const id of ['missing','null']){
   const tile=home(page).locator(`[data-metric="${id}"]`);await expect(tile).toHaveAttribute('data-tone','normal');
   await expect(tile.getByRole('meter').or(tile.getByRole('img'))).toHaveCount(0);await expect(tile).toContainText(messages('en').missing);
@@ -183,6 +180,21 @@ for(const style of ['gauges','cells','rings','ruler','concentric','numbers','seg
  if(style==='ticks')await expect(home(page).locator('[data-metric="quota-0"] .quota-ticks mask circle')).toHaveAttribute('stroke-dasharray','0.07 1');
 });
 
+test('row fill puts the percentage left and stacks the period over the countdown without warning copy',async({page})=>{
+ const data=largeDesktop();data.accounts=[data.accounts[0]];
+ await page.addInitScript(()=>localStorage.setItem('tokenplan.homeUsageStyle','rowfill'));
+ await mockDesktop(page,'en',false,data);await page.goto('/');
+ const rows=home(page).locator('.home-rowfill');await expect(rows).toHaveCount(2);
+ const first=rows.first(),meta=first.locator('.home-rowfill-meta');
+ await expect(first.locator('.home-rowfill-value')).toHaveText('46%');
+ await expect(first).not.toContainText('Near quota limit');
+ await expect(home(page).locator('.quota-warning')).toHaveCount(0);
+ await expect(meta).toContainText('5h');
+ const valueBox=(await first.locator('.home-rowfill-value').boundingBox())!,metaBox=(await meta.boundingBox())!;
+ expect(valueBox.x+valueBox.width).toBeLessThanOrEqual(metaBox.x);
+ const periodBox=(await meta.locator(':scope > span').first().boundingBox())!,resetBox=(await meta.locator('.reset').boundingBox())!;
+ expect(periodBox.y+periodBox.height).toBeLessThanOrEqual(resetBox.y);
+});
 test('concentric rings keep independent readings and never pair unrelated quotas',async({page})=>{
  const data=largeDesktop(),base=data.accounts[0];
  data.accounts=Array.from({length:7},(_,i)=>({...structuredClone(base),id:`claude:pair-${i}`,email:`pair-${i}@example.com`}));
@@ -217,8 +229,10 @@ for(const language of ['en','zh-Hans','zh-Hant','ja','ko'])test(`Home styles fit
   await page.emulateMedia({colorScheme:theme});
   for(const style of ['Gauges','Percentage Grid',...Object.values(extraStyles)]){
    await settings(page,language);await choose(page,style,language);await back(page,language);
-   const tiles=home(page).locator('.home-quota,.home-reading');await expect(tiles.first()).toContainText(providerText('Used',language));
-   await expect(tiles.nth(1)).toContainText(providerText('Near quota limit',language));
+   const tiles=home(page).locator('.home-quota,.home-reading');await expect(tiles.first()).toContainText('46%');
+   await expect(tiles.first()).not.toContainText(providerText('Used',language));
+   await expect(tiles.first()).not.toContainText(providerText('Remaining',language));
+   await expect(tiles.nth(1)).toContainText('92%');await expect(home(page).locator('.quota-warning')).toHaveCount(0);
    expect(await visible(page).evaluate(e=>e.scrollWidth<=e.clientWidth+1)).toBe(true);
    expect(await tiles.evaluateAll(elements=>elements.every(e=>e.scrollWidth<=e.clientWidth+1))).toBe(true);
    const bodies=await home(page).locator('.quota-body').evaluateAll(elements=>elements.slice(0,2).map(e=>e.getBoundingClientRect().y));

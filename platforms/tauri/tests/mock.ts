@@ -46,6 +46,7 @@ export async function mockDesktop(page:Page,language='zh-Hans',cloud=false,data:
     if(r.method==='enabled'&&a){a.added=a.added||a.enabled||r.value;a.enabled=r.value;}
     if(r.method==='tray'&&a)a.tray=r.value;
     if(r.method==='note'&&a)a.note=r.value;
+    if(r.method==='key'&&a)a.apiKeyStatus=r.value?'saved':'notSet';
     if(r.method==='remove')state.accounts=state.accounts.filter((a:any)=>a.id!==r.accountId);
     if(r.method==='metricLayout'&&a)a.metrics=r.value.map((row:any)=>({...a.metrics.find((m:any)=>m.id===row.id),placement:row.placement}));
     if(r.method==='metric'&&a)Object.assign(a.metrics.find((m:any)=>m.id===r.metricId)!,r.value);

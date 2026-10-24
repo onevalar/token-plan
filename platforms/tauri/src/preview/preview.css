@@ -2,7 +2,7 @@
 :root[data-mac-preview="true"],:root[data-mac-preview="true"] body,:root[data-mac-preview="true"] #root { overflow:clip;scrollbar-gutter:auto; }
 .mac-preview { height:100%;max-width:none;padding:54px 0 0;display:flex;flex-direction:column;background:var(--background); }
 .mac-preview [hidden] { display:none !important; }
-.mac-preview .preview-header { position:fixed;top:0;left:0;right:0;z-index:20;height:54px;background:var(--background);border-radius:13px 13px 0 0;display:grid;grid-template-columns:40px minmax(0,1fr) 40px;align-items:center;gap:6px;padding:8px 24px;border-bottom:1px solid var(--border); }
+.mac-preview .preview-header { position:fixed;top:0;left:0;right:0;z-index:20;height:54px;background:var(--background);border-radius:13px 13px 0 0;display:grid;grid-template-columns:40px minmax(0,1fr) auto;align-items:center;gap:6px;padding:8px 24px;border-bottom:1px solid var(--border); }
 .mac-preview .page-title { display:flex;align-items:center;justify-content:center;min-width:0;gap:7px; }
 .mac-preview .page-title h1 { font-size:15px;line-height:24px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;outline:none; }
 .mac-preview .page-title .provider-logo { width:18px;height:18px; }
@@ -12,6 +12,9 @@
 .mac-preview .home-header .page-title { justify-content:flex-start;gap:8px; }
 .mac-preview .home-header h1 { font-size:17px; }
 .mac-preview .header-actions { display:flex;align-items:center;justify-content:flex-end;gap:4px;min-width:36px;--control-height-md:var(--control-height-sm); }
+.mac-preview .update-button { flex:none;gap:5px;height:32px;min-height:32px;padding-inline:9px;font-size:12px; }
+.mac-preview .update-button svg { flex:none;color:var(--text-secondary); }
+.mac-preview .update-version { color:var(--text-secondary);font-variant-numeric:tabular-nums; }
 .mac-preview .icon-button { width:36px;padding:0;flex:none; }
 .mac-preview .page-stack { min-height:0;flex:1;display:flex; }
 .mac-preview .preview-page { flex:1;min-width:0;overflow:auto;overscroll-behavior:contain;padding:14px 24px 22px;scrollbar-width:thin; }
@@ -49,8 +52,8 @@
 .mac-preview .preference-surface { background:var(--surface-muted);border:1px solid var(--border);border-radius:var(--radius-control);overflow:hidden;padding:0 12px; }
 .mac-preview .setting-select,.mac-preview .setting-toggle { min-height:46px;border-bottom:1px solid var(--border);padding:5px 0; }
 .mac-preview .setting-select:last-child,.mac-preview .setting-toggle:last-child { border:0; }
-.mac-preview .setting-select > div { display:grid;grid-template-columns:minmax(0,1fr) minmax(115px,48%);align-items:center;gap:8px; }
-.mac-preview .setting-select label { font-size:13px;font-weight:400;color:var(--foreground); }
+.mac-preview .setting-select > div { display:grid;grid-template-columns:minmax(0,1fr) minmax(115px,58%);align-items:center;gap:8px; }
+.mac-preview .setting-select label { font-size:13px;font-weight:400;color:var(--foreground);word-break:auto-phrase; }
 .mac-preview .setting-select [role="combobox"] { min-width:0;width:100%;height:36px;min-height:36px;padding-inline:10px;font-size:13px;background:var(--surface); }
 .mac-preview .setting-toggle > button[role="switch"] { width:100%;display:flex;flex-direction:row-reverse;justify-content:space-between;gap:14px;min-height:36px; }
 .mac-preview .setting-toggle > button[role="switch"] > span:last-child { flex:1;min-width:0;text-align:left;font-size:13px;line-height:1.5;overflow-wrap:anywhere; }
@@ -59,6 +62,8 @@
 .mac-preview .group-description { color:var(--text-secondary);font-size:12px;line-height:1.6;margin:7px 2px 12px; }
 .mac-preview .menu-bar-preview { display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:16px;padding:16px 4px;border-bottom:1px solid var(--border);font-size:12px; }
 
+.mac-preview .update-actions { display:flex;flex-wrap:wrap;align-items:center;gap:8px; }
+.mac-preview .update-actions button { flex:none; }
 .mac-preview .system-preferences .settings-list { gap:12px;padding:0 0 20px; }
 .mac-preview .system-preferences h3 { font-size:12px;font-weight:500;color:var(--text-secondary);margin-top:4px; }
 .mac-preview .notification-card { background:var(--surface-muted);border:1px solid var(--border);border-radius:var(--radius-control);padding:0 12px; }
@@ -243,7 +248,7 @@
 .mac-preview .notice-block { display:flex;align-items:center;justify-content:space-between;gap:10px;margin:2px 0 6px; }
 .mac-preview .notice-block .notice { margin:0;flex:1;min-width:0; }
 .mac-preview .notice-action { flex:none; }
-.mac-preview .account-detail-entry { width:100%;height:auto;min-height:44px;padding:4px 0;text-align:left; }
+.mac-preview .account-detail-entry { width:calc(100% + 16px);height:auto;min-height:44px;padding:4px 8px;margin-inline:-8px;text-align:left; }
 .mac-preview .account-detail-entry > span,.mac-preview .account-detail-entry > span > span,.mac-preview .account-detail-entry > span > span > span { display:flex;align-items:center;min-width:0;width:100% !important;gap:10px; }
 .mac-preview .account-detail-entry .identity-text { flex:1;min-width:0; }
 .mac-preview .account-chevron { flex:none;color:var(--text-secondary); }

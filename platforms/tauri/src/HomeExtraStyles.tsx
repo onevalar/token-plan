@@ -1,4 +1,5 @@
 import type {CSSProperties} from 'react';
+import {TrendingUp} from 'lucide-react';
 import type {Metric} from './desktop';
 import {isQuotaMetric,MetricExpiries,MetricReset,MetricRow,type MetricRowProps} from './Metrics';
 import {forecastSpan,projectedUsed,quotaMeter,quotaReading,usageLevel,type StyleSpec,type VesselShape} from './homeUsage';
@@ -23,15 +24,12 @@ export function HomeExtraStyles({metrics,spec,sources,...props}:Props) {
  )}</div>;
 }
 
-function Foot({r,...props}:MetricRowProps&{r:ReturnType<typeof quotaReading>}) {
- return <>{r.warning&&<p className="quota-warning">{r.warning}</p>}<MetricExpiries {...props}/></>;
-}
 function Missing({r,missing}:{r:ReturnType<typeof quotaReading>;missing:string}) {return r.value===null?<p className="home-quota-unknown quota-missing">{missing}</p>:null;}
 function Reset(props:MetricRowProps) {return props.metric.hasData?<MetricReset {...props}/>:null;}
 
 function Item({spec,sources,...props}:ItemProps) {
  const {metric:m}=props,r=quotaReading(props),attributes={'data-metric':m.id,'data-tone':r.tone};
- const heading=<div className="home-quota-heading"><span>{r.name} · {r.mode}</span><strong>{r.value===null?'—':r.valueText}</strong></div>;
+ const heading=<div className="home-quota-heading"><span>{r.name}</span><strong>{r.value===null?'—':r.valueText}</strong></div>;
  if(spec.family==='bars'){
   const forecast=projectedUsed(m,props.now,r.used);
   return <div className="home-reading home-forecast" {...attributes}>{heading}
@@ -40,13 +38,13 @@ function Item({spec,sources,...props}:ItemProps) {
     {forecast!==null&&<span className="home-forecast-stripe" style={forecastSpan(r.used!,forecast,props.remaining??false)}/>}
     <span className="home-ruler-limit" style={{left:props.remaining?'0%':'100%'}}/>
    </div></div>}
-   <div className="home-quota-meta"><span>{forecast!==null?providerText('Projected %@ by reset',props.language).replace('%@',`${Math.round(forecast)}%`):''}</span><Reset {...props}/></div>
-   <Missing r={r} missing={props.missing}/><Foot r={r} {...props}/>
+   <div className="home-quota-meta">{forecast!==null&&<span className="home-forecast-marker" aria-label={providerText('Projected %@ by reset',props.language).replace('%@',`${Math.round(forecast)}%`)}><TrendingUp size={13} aria-hidden="true"/><span aria-hidden="true">{Math.round(forecast)}%</span></span>}<Reset {...props}/></div>
+   <Missing r={r} missing={props.missing}/><MetricExpiries {...props}/>
   </div>;
  }
  if(spec.family==='vessel')return <div className="home-reading home-vessel" data-shape={spec.vessel} {...attributes}>
   <div className="home-vessel-graphic" {...quotaMeter(r)}>{r.value!==null&&<Vessel shape={spec.vessel} value={clamp(r.value)}/>}</div>
-  <div className="home-readout">{heading}<div className="home-quota-meta"><span className={r.warning?'quota-warning':''}>{r.value===null?props.missing:r.warning}</span><Reset {...props}/></div><MetricExpiries {...props}/></div>
+  <div className="home-readout">{heading}<div className="home-quota-meta">{r.value===null&&<span>{props.missing}</span>}{props.metric.hasData&&<Reset {...props}/>}</div><MetricExpiries {...props}/></div>
  </div>;
  if(spec.family==='frame')return <div className="home-reading home-frame" {...attributes} {...quotaMeter(r)}>
   <svg viewBox="0 0 340 64" preserveAspectRatio="none" aria-hidden="true" focusable="false">
@@ -57,20 +55,18 @@ function Item({spec,sources,...props}:ItemProps) {
  </div>;
  if(spec.family==='signal'){
   const level=usageLevel(r.used),lit=['calm','watch','critical'].indexOf(level);
-  const text=r.value===null?props.missing:providerText(level==='calm'?'Plenty left':level==='watch'?'Usage rising':'Almost used up',props.language);
   return <div className="home-reading home-signal" data-level={level} {...attributes}>
-   <div className="home-quota-heading"><span>{r.name} · {r.mode}</span><strong>{r.value===null?'—':r.valueText}</strong></div>
+   <div className="home-quota-heading"><span>{r.name}</span><strong>{r.value===null?'—':r.valueText}</strong></div>
    <div className="home-signal-line" {...quotaMeter(r)}>
-    <span className="home-signal-lamps" aria-hidden="true">{[0,1,2].map(i=><span key={i} data-on={r.value!==null&&i===lit}/>)}</span>
-    <span className="home-signal-text">{text}</span><Reset {...props}/>
+    <span className="home-signal-lamps" aria-hidden="true">{[0,1,2].map(i=><span key={i} data-on={r.value!==null&&i===lit}/>)}</span><Reset {...props}/>
    </div>
-   <Foot r={r} {...props}/>
+   {r.value===null&&<Missing r={r} missing={props.missing}/>}
+   <MetricExpiries {...props}/>
   </div>;
  }
  if(spec.family==='rowfill')return <div className="home-reading home-rowfill" {...attributes} {...quotaMeter(r)} style={{'--fill':`${r.value===null?0:clamp(r.value)}%`} as CSSProperties}>
-  <div className="home-quota-heading"><span>{r.name} · {r.mode}</span><strong>{r.value===null?'—':r.valueText}</strong></div>
-  <div className="home-quota-meta"><span className={r.warning?'quota-warning':''}>{r.value===null?props.missing:r.warning}</span><Reset {...props}/></div>
-  <MetricExpiries {...props}/>
+  <strong className="home-rowfill-value" aria-hidden="true">{r.value===null?'—':r.valueText}</strong>
+  <span className="home-rowfill-meta"><span>{r.name}</span><MetricReset {...props}/></span>
  </div>;
  return <Sources {...props} sources={sources}/>;
 }
@@ -104,13 +100,13 @@ function Sources({sources,...props}:MetricRowProps&{sources:SourceShare[]}) {
  const {metric:m}=props,r=quotaReading({...props,remaining:false});
  const used=r.used,top=sources.slice(0,3),rest=1-top.reduce((n,s)=>n+s.share,0),parts=[...top,...rest>0.005?[{name:providerText('Other',props.language),share:rest}]:[]];
  return <div className="home-reading home-sources" data-metric={m.id} data-tone={r.tone}>
-  <div className="home-quota-heading"><span>{r.name} · {providerText('Used',props.language)}</span><strong>{used===null?'—':`${Math.round(used)}%`}</strong></div>
+  <div className="home-quota-heading"><span>{r.name}</span><strong>{used===null?'—':`${Math.round(used)}%`}</strong></div>
   {used!==null&&<div role="meter" aria-label={`${r.name} · ${providerText('Used',props.language)}`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={clamp(used)} aria-valuetext={parts.map(p=>`${p.name} ${Math.round(used*p.share)}%`).join(', ')}>
    <div className="home-ruler-track home-sources-track" aria-hidden="true">{parts.map((p,i)=><span key={p.name} style={{width:`${clamp(used)*p.share}%`,opacity:[1,.7,.45,.25][i]}}/>)}</div>
    <ul className="home-sources-legend" aria-hidden="true">{parts.map((p,i)=><li key={p.name}><i style={{opacity:[1,.7,.45,.25][i]}}/><span>{p.name}</span><b>{Math.round(used*p.share)}%</b></li>)}</ul>
   </div>}
-  <div className="home-quota-meta"><span>{used===null?props.missing:providerText('Split by the last 7 days of model use (estimate)',props.language)}</span><Reset {...props}/></div>
-  <Foot r={r} {...props}/>
+  <div className="home-quota-meta">{used===null&&<span>{props.missing}</span>}<Reset {...props}/></div>
+  <MetricExpiries {...props}/>
  </div>;
 }
 
@@ -120,7 +116,7 @@ function Columns({metrics,...props}:{metrics:Metric[]}&Omit<MetricRowProps,'metr
   return <div className="home-column" data-metric={metric.id} data-tone={r.tone} key={metric.id}>
    <strong>{r.value===null?'—':r.valueText}</strong>
    <div className="home-column-track" {...quotaMeter(r)}><span className="home-column-fill" style={{height:`${r.value===null?0:clamp(r.value)}%`}}/>{r.tone==='critical'&&<span className="home-column-alert" aria-hidden="true">▲</span>}</div>
-   <span className="home-column-name">{r.name}</span><small>{r.value===null?props.missing:r.warning||r.mode}</small>
+   <span className="home-column-name">{r.name}</span>{r.value===null&&<small>{props.missing}</small>}
    <Reset {...props} metric={metric}/>
   </div>;
  })}</div>;

@@ -110,7 +110,8 @@ for(const language of ['en','zh-Hans','zh-Hant','ja','ko'])test(`quota labels an
   expect(boxes[3].scope!.height).toBe(boxes[2].scope!.height);
   if(width===350)expect(await rows.nth(3).locator('.metric-scope').evaluate(e=>e.scrollWidth>e.clientWidth)).toBe(true);
   await expect(rows.nth(3).getByRole('progressbar')).toHaveAccessibleName(/Sonnet 4.5 · Extended Context/);
-  expect(await page.locator('.dashboard').evaluate(e=>e.scrollWidth<=e.clientWidth+1)).toBe(true);
+  // Account rows paint an 8px hover gutter into the page padding on each side.
+  expect(await page.locator('.dashboard').evaluate(e=>e.scrollWidth<=e.clientWidth+16)).toBe(true);
   if(language==='zh-Hans')await page.screenshot({path:info.outputPath(`quota-${colorScheme}-${width}.png`),animations:'disabled'});
  }
  if(language==='zh-Hans'){
@@ -135,7 +136,8 @@ test('account settings allow zero home metrics and preserve another account',asy
  for(const row of await page.locator('.placement-row').all()){
   await row.getByRole('combobox').click();await page.getByRole('option',{name:'仅详情',exact:true}).click();
  }
- await page.getByRole('button',{name:'确定',exact:true}).click();
+ await expect.poll(()=>page.evaluate(()=>{const writes=(window as any).__requests.filter((r:any)=>r.method==='metricLayout');return writes.length>0&&writes.at(-1).value.every((row:any)=>row.placement==='details');})).toBe(true);
+ await page.getByRole('button',{name:'完成',exact:true}).click();
  await page.getByRole('button',{name:'返回',exact:true}).click();
  await expect(page.locator('.account-block').first().locator('.metric')).toHaveCount(0);
  await expect(page.locator('.account-block').nth(1).locator('.metric')).toHaveCount(2);
@@ -171,6 +173,37 @@ test('update installation errors stay visible and do not restart',async({page})=
  await page.getByRole('button',{name:'更多',exact:true}).click();await page.getByRole('menuitem',{name:'检查更新',exact:true}).click();
  await expect(page.getByRole('status')).toContainText('9.9.9');
  await page.getByRole('button',{name:'安装并重启',exact:true}).click();await expect(page.getByRole('status')).toContainText('更新安装失败');
+});
+test('the header reminds once, sits left of refresh and a skipped version stays dismissed',async({page})=>{
+ await mockDesktop(page);await page.goto('/');
+ await page.getByRole('button',{name:'更多',exact:true}).click();await page.getByRole('menuitem',{name:'检查更新',exact:true}).click();
+ await expect(page.getByRole('status')).toContainText('9.9.9');
+ await page.getByRole('button',{name:'返回',exact:true}).click();
+ const update=page.locator('.header-actions .update-button');
+ await expect(update).toContainText('更新');await expect(update).toContainText('9.9.9');
+ const updateBox=(await update.boundingBox())!,refreshBox=(await page.locator('.header-actions .refresh-button').boundingBox())!;
+ expect(updateBox.x).toBeLessThan(refreshBox.x);
+ await page.getByRole('button',{name:'Claude first@example.com',exact:true}).click();
+ await expect(page.locator('.header-actions .update-button')).toHaveCount(0);
+ await page.getByRole('button',{name:'返回',exact:true}).click();
+ await page.getByRole('button',{name:'更多',exact:true}).click();await page.getByRole('menuitem',{name:'通用设置',exact:true}).click();
+ await expect(page.locator('.header-actions .update-button')).toHaveCount(0);
+ await page.getByRole('button',{name:'返回',exact:true}).click();
+ await expect(update).toBeVisible();
+ await update.click();
+ await expect(page.getByRole('heading',{level:1})).toHaveText('检查更新');
+ await expect(page.getByRole('button',{name:'跳过此版本',exact:true})).toBeVisible();
+ await page.getByRole('button',{name:'跳过此版本',exact:true}).click();
+ await expect(page.getByRole('status')).toHaveText('不再提醒此版本。');
+ await expect(page.getByRole('button',{name:'跳过此版本',exact:true})).toHaveCount(0);
+ await page.getByRole('button',{name:'返回',exact:true}).click();
+ await expect(page.locator('.header-actions .update-button')).toHaveCount(0);
+ await page.reload();
+ await page.getByRole('button',{name:'更多',exact:true}).click();await page.getByRole('menuitem',{name:'检查更新',exact:true}).click();
+ await expect(page.getByRole('status')).toHaveText('不再提醒此版本。');
+ await expect(page.getByRole('button',{name:'安装并重启',exact:true})).toBeVisible();
+ await page.getByRole('button',{name:'返回',exact:true}).click();
+ await expect(page.locator('.header-actions .update-button')).toHaveCount(0);
 });
 test('update entry checks immediately, preserves pending work and allows retry after failure',async({page})=>{
  await mockDesktop(page);

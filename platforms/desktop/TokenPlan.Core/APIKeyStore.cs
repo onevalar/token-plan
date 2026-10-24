@@ -56,6 +56,18 @@ public sealed class APIKeyStore
         }
         finally { if (File.Exists(temporary)) File.Delete(temporary); }
     }
+    public string Status(string id)
+    {
+        var hasFile = File.Exists(FileFor(id));
+        var hasEnvironment = !string.IsNullOrWhiteSpace(environment(ProviderCatalog.Get(id).EnvironmentKey!));
+        return (hasFile, hasEnvironment) switch
+        {
+            (true, true) => "overrideActive",
+            (true, false) => "saved",
+            (false, true) => "fromEnvironment",
+            _ => "notSet"
+        };
+    }
     public void Delete(string id) => File.Delete(FileFor(id));
     static string Validate(string key)
     {

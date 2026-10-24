@@ -81,10 +81,15 @@ an automatic change to its saved pins.
   correctly when the provider has both session and weekly quotas.
 - General settings share language, appearance, Home style and density, used/remaining display,
   menu bar configuration (including each account's menu bar metrics) and refresh interval.
-  Account details switch between viewing usage and editing a draft of Home metrics. Confirm saves placement and order together; Cancel discards the draft. General Settings selects uniform or per-account Home styles; custom style editing joins each account’s display draft. Menu bar settings remain in General Settings. Provider text reuses the repository's five-language translation tables.
+  Account details switch between viewing usage and editing Home metrics. Current Quota uses the
+  account's effective Home usage style, so a per-subscription change appears immediately on
+  returning from the editor. Placement, order and per-account style changes save immediately; a rejected layout restores the last accepted one, and Done or Escape leaves the editor without another write. General Settings selects uniform or per-account Home styles; custom style editing joins each account’s immediately saved editor. Menu bar settings remain in General Settings. Provider text reuses the repository's five-language translation tables.
 - Tauri's updater checks in the background or on request, verifies signatures, shows install
   progress and restarts after installation. A background check failure does not interrupt work.
-  The update preference is persisted. A failed installation is shown explicitly.
+  The update preference is persisted. A failed installation is shown explicitly. An available
+  update appears as a compact version button left of Refresh on Home; Skip This Version records
+  that version locally and stops the reminder, while the Updates page can still install it.
+  A new version can remind again.
 
 ## Building and checking
 
@@ -263,11 +268,15 @@ grid or a single row of squares, capsules or rising bars with 5, 10 or 20 cells.
 choices keep their look. Source Split spreads the used part over each model's share of the last
 seven days (an estimate) and falls back to a plain bar for accounts without a model split; Side-by-Side
 Columns need two or more limits and fall back to rows otherwise. Status Lights are calm under 50%
-used, watch under 80%, critical from 80%.
+used, watch under 80%, critical from 80%. Row Fill puts the percentage on the left and stacks the
+period over the countdown on the right. No style shows a visible near-limit, exhausted or exceeded
+sentence; color alone carries that state.
 
 Home usage styles are local UI preferences. Unified mode retains the existing global style;
-Customize by Account exposes a style picker inside each account's Edit Home Display. Switching
+Per Subscription exposes a style picker inside each subscription's Edit Home Display. Switching
 modes preserves per-account choices, including different styles for two accounts of one service.
+Each account's Current Quota on its detail page mirrors its effective style, so leaving the
+editor shows the chosen look without a reload.
 The nine choices include Tick Ring, with one independent dial per quota. It uses the same
 saved `tokenplan.homeUsagePreferences` record, displayed percentages, reset times and warning
 threshold as the other styles. No provider, history source or stored reading is changed.

@@ -51,6 +51,11 @@ test('contextual navigation scopes refresh and restores origin, range and scroll
 test('settings have compact labels, conditional interval, immediate saves and local failures',async({page})=>{
  await setup(page);await menu(page,'通用设置');
  await expect(page.getByRole('button',{name:'刷新',exact:true})).toHaveCount(0);
+ const control=async(name:string)=>(await page.getByRole('combobox',{name,exact:true}).boundingBox())!;
+ const appearance=await control('外观');
+ for(const box of [await control('语言'),await control('应用方式'),(await page.locator('.usage-style-trigger').boundingBox())!]){
+  expect(box.width).toBeCloseTo(appearance.width,0);expect(box.height).toBeCloseTo(appearance.height,0);
+ }
  const count=await page.evaluate(()=>(window as any).__requests.length);
  await page.keyboard.press('Meta+r');
  expect(await page.evaluate(()=>(window as any).__requests.length)).toBe(count);
@@ -192,7 +197,7 @@ for(const theme of ['light','dark'] as const)test(`390px visual review ${theme}`
  for(const screen of ['home','detail','account-settings','configure','settings','history']){
   if(screen==='detail')await page.locator('.dashboard').getByRole('button',{name:'Codex',exact:true}).click();
   if(screen==='account-settings')await page.getByRole('button',{name:'编辑首页显示',exact:true}).click();
-  if(screen==='configure'){await visible(page).locator('.metric-edit-actions').getByRole('button',{name:'取消',exact:true}).click();await back(page);await menu(page,'订阅管理');}
+  if(screen==='configure'){await page.keyboard.press('Escape');await expect(visible(page).locator('.home-metric-editor')).toHaveCount(0);await back(page);await menu(page,'订阅管理');}
   if(screen==='settings'){await back(page);await menu(page,'通用设置');}
   if(screen==='history'){await back(page);await menu(page,'用量统计');}
   await noOverflow(page);
@@ -408,18 +413,23 @@ test('account drafts survive navigation without being saved and return restores 
 
  await openNote(page);
  await page.getByRole('textbox',{name:'备注',exact:true}).fill('Unsaved first account');
+ await expect(page.getByRole('textbox',{name:'API 密钥',exact:true})).toHaveCount(0);
+ await page.getByRole('button',{name:'设置 API 密钥',exact:true}).click();
  await page.getByRole('textbox',{name:'API 密钥',exact:true}).fill('synthetic-test-key');
  await back(page);await expect(first).toBeFocused();
  await page.locator('.dashboard').getByRole('button',{name:'Claude second.with.a.long.address@example.com',exact:true}).click();
 
  await expect(page.getByRole('textbox',{name:'备注',exact:true})).toHaveCount(0);
+ await expect(page.getByRole('textbox',{name:'API 密钥',exact:true})).toHaveCount(0);
  await back(page);await first.click();
  await expect(page.getByRole('textbox',{name:'备注',exact:true})).toHaveValue('Unsaved first account');
  const key=page.getByRole('textbox',{name:'API 密钥',exact:true});
  await expect(key).toHaveValue('synthetic-test-key');
  expect(await page.evaluate(()=>(window as any).__requests.filter((r:any)=>r.method==='note'))).toHaveLength(0);
+ expect(await page.evaluate(()=>(window as any).__requests.filter((r:any)=>r.method==='key'))).toHaveLength(0);
  await visible(page).locator('form').filter({has:key}).getByRole('button',{name:'保存',exact:true}).click();
- await expect(key).toHaveValue('');
+ await expect(key).toHaveCount(0);
+ await expect(visible(page).locator('.api-key-status')).toHaveText('已保存');
  await expect(page.getByRole('textbox',{name:'备注',exact:true})).toHaveValue('Unsaved first account');
 
  const history=page.getByRole('button',{name:'查看历史',exact:true});

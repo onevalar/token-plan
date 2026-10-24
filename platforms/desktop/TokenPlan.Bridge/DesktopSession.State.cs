@@ -2,6 +2,7 @@ using TokenPlan.Core;
 namespace TokenPlan.Bridge;
 public sealed partial class DesktopSession
 {
+    string KeyStatus(string id) => ProviderCatalog.Get(id).EnvironmentKey == null ? "notSet" : service.Keys.Status(id);
     IEnumerable<ProviderResult> Accounts()
     {
         var all = preferences.OrderedProviders.SelectMany(family =>
@@ -22,6 +23,7 @@ public sealed partial class DesktopSession
             added = addedAccounts.Contains(a.SettingsKey) || preferences.IsEnabled(a.Id) && preferences.AccountVisibility.GetValueOrDefault(a.SettingsKey, true),
             tray = preferences.TrayServices.GetValueOrDefault(a.Id, true) && preferences.TrayAccounts.GetValueOrDefault(a.SettingsKey, true),
             removable = Preferences.AccountRemovalKey(a) != null, apiKey = ProviderCatalog.Get(a.Id).EnvironmentKey != null,
+            apiKeyStatus = KeyStatus(a.Id),
             note = preferences.ProviderNotes.GetValueOrDefault(a.SettingsKey, ""), error = a.ErrorKey ?? "",
             fetchedAt = a.Snapshot?.FetchedAt.ToString("O") ?? "",
             metrics = preferences.OrderedMetrics(a.SettingsKey, a.Snapshot?.Windows ?? []).Select(w => new {

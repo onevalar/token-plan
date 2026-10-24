@@ -8,7 +8,7 @@ export const metricSchema = z.object({
 });
 export const accountSchema = z.object({
  added:z.boolean().optional(),loginDirectories:z.array(z.string()).default([]),
- id:z.string(), family:z.string(), name:z.string(), email:z.string(), plan:z.string(), enabled:z.boolean(), tray:z.boolean(), removable:z.boolean(), apiKey:z.boolean(),
+ id:z.string(), family:z.string(), name:z.string(), email:z.string(), plan:z.string(), enabled:z.boolean(), tray:z.boolean(), removable:z.boolean(), apiKey:z.boolean(), apiKeyStatus:z.enum(['notSet','fromEnvironment','saved','overrideActive']).default('notSet'),
  warning:z.string().optional(), connection:z.string().optional(), note:z.string(), error:z.string(), fetchedAt:z.string(), metrics:z.array(metricSchema),
  observations:z.array(z.object({date:z.string(),label:z.string(),value:n,unit:z.string().nullable()})).default([]),
  historyScope:z.enum(["device","account"]).default("account"),historyPartial:z.boolean().default(false),

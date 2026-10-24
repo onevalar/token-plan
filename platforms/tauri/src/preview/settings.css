@@ -1,19 +1,29 @@
 /* Settings layout: General Settings groups, the Home style picker, menu bar accounts and links to settings owned elsewhere. */
 .mac-preview .usage-style-picker { border-bottom:1px solid var(--border); }
-.mac-preview .usage-style-toggle { display:flex;align-items:center;gap:8px;width:100%;min-height:46px;padding:5px 0;border:0;background:none;font:inherit;font-size:13px;color:var(--foreground);text-align:left;cursor:pointer; }
-.mac-preview .usage-style-toggle > span:first-child { flex:1; }
-.mac-preview .usage-style-current { color:var(--text-secondary); }
+/* The picker is part of the Apply Style block in unified mode; its header already separates the two rows. */
+.mac-preview .preference-surface > .setting-select:has(+ .usage-style-picker) { border-bottom:0; }
+.mac-preview .usage-style-toggle { display:grid;grid-template-columns:minmax(0,1fr) minmax(115px,58%);align-items:center;gap:8px;width:100%;min-height:46px;padding:5px 0;border:0;background:none;font:inherit;font-size:13px;color:var(--foreground);text-align:left;cursor:pointer; }
+.mac-preview .usage-style-toggle > span:first-child { min-width:0;word-break:auto-phrase; }
+.mac-preview .usage-style-trigger { display:flex;align-items:center;justify-content:space-between;gap:var(--space-3);min-width:0;height:36px;padding:0 10px;border:1px solid var(--border);border-radius:var(--radius-control);background:var(--surface);font-size:13px; }
+.mac-preview .usage-style-current { min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--foreground); }
 .mac-preview .usage-style-toggle svg { flex:none;color:var(--text-secondary);transition:transform .15s ease; }
+@media (hover:hover) and (pointer:fine) { .mac-preview .usage-style-toggle:hover:not(:disabled) .usage-style-trigger { border-color:var(--border-strong);background:var(--surface-muted); } }
+.mac-preview .usage-style-toggle:disabled { cursor:not-allowed; }
+.mac-preview .usage-style-toggle:disabled .usage-style-trigger { opacity:.5; }
 @media (prefers-reduced-motion:reduce) { .mac-preview .usage-style-toggle svg { transition:none; } }
 .mac-preview .usage-style-toggle svg[data-open="true"] { transform:rotate(180deg); }
-.mac-preview .usage-style-toggle:focus-visible { outline:2px solid var(--foreground);outline-offset:2px;border-radius:4px; }
+.mac-preview .usage-style-toggle:focus-visible { outline:none; }
+.mac-preview .usage-style-toggle:focus-visible .usage-style-trigger { outline:2px solid var(--foreground);outline-offset:2px; }
 .mac-preview .usage-style-card-content { display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0;max-width:100%; }
 /* Arc's animated label has a measured inline width and a nowrap phase. Bound every
    label layer to its card before allowing localized names to wrap. */
 .mac-preview .usage-style-option > span { width:100% !important; }
 .mac-preview .usage-style-option > span > span,.mac-preview .usage-style-option > span > span > span { width:100%;min-width:0;white-space:normal; }
 .mac-preview .usage-style-card-content > span { max-width:100%;white-space:normal;overflow-wrap:anywhere; }
-.mac-preview .usage-style-options { display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;padding:2px 0 12px; }
+.mac-preview .usage-style-options { display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;padding:2px 0 8px; }
+/* Variant and Forecast are dropdowns inside the picker, not rows in a settings table. */
+.mac-preview .usage-style-picker > .setting-select { border-bottom:0;min-height:42px;padding:3px 0; }
+.mac-preview .usage-style-picker > .setting-select + .setting-select { margin-top:4px; }
 .mac-preview .usage-style-option { display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;height:auto;min-height:66px;padding:8px 2px;font-size:11px;line-height:1.3;white-space:normal;text-align:center;color:var(--text-secondary); }
 .mac-preview .usage-style-option svg { color:var(--foreground);flex:none; }
 .mac-preview .usage-style-option[aria-pressed="true"] { border-color:var(--foreground);box-shadow:inset 0 0 0 1px var(--foreground);background:var(--background);color:var(--foreground);font-weight:500; }
@@ -43,12 +53,9 @@
 .mac-preview .detail-notice .inline-error { flex:1;min-width:0;margin:0; }
 
 /* Account detail has one view and an explicit, reversible editing state. */
-.mac-preview .edit-home-button { width:100%;min-height:40px;margin:12px 0; }
 .mac-preview .placement-row.metric-edit-row[data-tray="false"] { grid-template-columns:minmax(0,1fr) minmax(96px,118px) auto;gap:8px; }
 .mac-preview .metric-order-actions { display:flex;justify-content:flex-end;gap:0; }
 .mac-preview .metric-order-actions button { min-width:28px;min-height:32px;padding:4px; }
-.mac-preview .metric-edit-actions { position:sticky;bottom:0;display:flex;gap:10px;padding:12px 0;background:var(--background); }
-.mac-preview .metric-edit-actions > button { flex:1;min-height:40px; }
 .mac-preview .home-metric-editor .preference-surface { padding:4px 12px; }
 .mac-preview .account-configuration { margin-top:20px; }
 
@@ -71,13 +78,28 @@
 .mac-preview .service-configuration .record-label small { display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
 .mac-preview .add-account .section-heading h2 { display:flex;align-items:center;gap:8px; }
 
-/* Compact action stack, with identical widths and rhythm. */
+/* Compact action stack: key status above one row of equally weighted account actions. */
 .mac-preview .account-configuration { margin-top:0;display:grid;gap:10px; }
-.mac-preview .edit-home-button { margin:16px 0 10px;min-height:42px; }
-.mac-preview .account-action-fields > .add-note { display:flex;justify-content:center;width:100%;min-height:42px;margin:0;padding:8px 12px;color:var(--foreground); }
 .mac-preview .account-configuration .danger-zone { margin:0;padding:0; }
 .mac-preview .account-action-fields:empty { display:none; }
 .mac-preview .note-editor,.mac-preview .note-row { padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius-control); }
+.mac-preview .api-key-summary { display:flex;align-items:center;gap:8px;min-height:36px;padding:0 2px;font-size:12px; }
+.mac-preview .api-key-name { color:var(--text-secondary); }
+.mac-preview .api-key-status { color:var(--foreground); }
+.mac-preview .api-key-status::before { content:"";display:inline-block;width:6px;height:6px;margin-right:6px;border-radius:50%;background:var(--text-muted);vertical-align:1px; }
+.mac-preview .api-key-status[data-state="saved"]::before,.mac-preview .api-key-status[data-state="overrideActive"]::before { background:var(--success); }
+.mac-preview .api-key-status[data-state="fromEnvironment"]::before { background:var(--accent); }
+.mac-preview .api-key-summary > button { margin-left:auto;padding-inline:4px;font-size:12px; }
+.mac-preview .key-editor { display:grid;gap:8px;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius-control); }
+.mac-preview .key-editor input { width:100%;min-height:36px;height:36px;font-size:13px; }
+.mac-preview .key-editor label { font-size:13px; }
+.mac-preview .key-editor-actions { display:flex;align-items:center;justify-content:flex-end;gap:8px; }
+.mac-preview .key-editor-actions .save-status { grid-column:auto;flex:1;margin:0;min-height:0; }
+.mac-preview .account-action-row { display:flex;flex-wrap:wrap;gap:8px;align-items:stretch; }
+.mac-preview .account-action-row > * { flex:1 1 0;min-width:0; }
+.mac-preview .account-action-row button { width:100%;min-height:38px;padding-inline:10px;font-size:12px; }
+.mac-preview .account-action-row .edit-home-button { min-height:38px;margin:0; }
+.mac-preview .account-action-row .note-action,.mac-preview .account-action-row .add-note { display:flex;justify-content:center;margin:0;color:var(--foreground); }
 .mac-preview .sort-handle { cursor:grab;touch-action:none;user-select:none;min-width:30px;min-height:36px;padding:4px;color:var(--text-secondary); }
 .mac-preview .sort-handle[data-dragging="true"] { cursor:grabbing;color:var(--foreground); }
 /* A lifted row follows the pointer; its neighbours slide into the reserved space. */
@@ -92,6 +114,8 @@
 .mac-preview .home-metric-editor .preference-surface { overflow:visible; }
 
 .mac-preview .usage-style-picker:last-child { border-bottom:0; }
+/* Keep the rule between Usage Style and Home Display, with equal room above and below it. */
+.mac-preview .home-metric-editor > .usage-style-picker { margin-bottom:12px; }
 .mac-preview .shortcut-setting { display:flex;flex-direction:column;align-items:center;gap:10px;padding:12px 0;font-size:13px; }
 .mac-preview .shortcut-controls { display:flex;align-items:center;justify-content:center;gap:4px;max-width:100%; }
 .mac-preview .shortcut-recorder { max-width:260px;min-height:34px;font-size:12px; }

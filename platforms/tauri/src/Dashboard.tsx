@@ -5,7 +5,6 @@ import {Button} from './components/arc/button/button';
 import type {Account} from './desktop';
 import {accountTitle} from './usage';
 import {providerText} from './providerText';
-import {isQuotaMetric} from './Metrics';
 import {HomeMetrics,type HomeUsageStyle} from './HomeMetrics';
 import type {SourceShare} from './HomeExtraStyles';
 import {connectionAction} from './connection';
@@ -41,7 +40,6 @@ export function modelShares(history:Account['history']):SourceShare[] {
 }
 export function Dashboard({accounts,open,openSettings,retry,busy=false,now,language,missing,remaining,usageStyle='bars',accountStyle}:{accounts:Account[];open:(id:string)=>void;openSettings:(id:string)=>void;retry:(id:string)=>void;busy?:boolean;now:number;language:string;missing:string;remaining:boolean;usageStyle?:HomeUsageStyle;accountStyle?:(id:string)=>HomeUsageStyle}) {
  return <div className="dashboard" data-usage-style={usageStyle}>
-  {accounts.some(a=>a.enabled&&(accountStyle?.(a.id)??usageStyle)==='cells'&&a.metrics.some(m=>m.placement==='home'&&isQuotaMetric(m)))&&<p className="home-grid-caption">{providerText('Each cell is 1%.',language)}</p>}
   {accountGroups(accounts).map(group=><section className="provider" data-provider={group.family} style={providerTheme(group.family)} key={group.accounts[0].id}>
   {group.accounts.length>1&&<div className="family-heading"><ProviderLogo family={group.family}/><h2>{group.accounts[0].name}</h2></div>}
   {group.accounts.map(a=><div className="account-block" data-usage-style={accountStyle?.(a.id)??usageStyle} key={a.id}>

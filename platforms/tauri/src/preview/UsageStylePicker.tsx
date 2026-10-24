@@ -31,7 +31,7 @@ export function UsageStylePicker({value,onChange,tr,language,remaining=false,dis
  const [open,setOpen]=useState(false),current=categoryOf(value),groups=styleOptions(value).filter(g=>['Forecast','Shape','Cell Count'].includes(g.name)&&current.id!=='vessel');
  return <div className="usage-style-picker">
   <button type="button" className="usage-style-toggle" disabled={disabled} aria-expanded={open} onClick={()=>setOpen(o=>!o)}>
-   <span>{tr('Usage Style')}</span><span className="usage-style-current">{tr(variantLabel(value))}</span><ChevronDown size={15} aria-hidden="true" data-open={open}/>
+   <span>{tr('Usage Style')}</span><span className="usage-style-trigger"><span className="usage-style-current">{tr(variantLabel(value))}</span><ChevronDown size={15} aria-hidden="true" data-open={open}/></span>
   </button>
   {open&&<><div className="usage-style-options" role="group" aria-label={tr('Usage Style')}>
    {styleCategories.map(category=><Button key={category.id} disabled={disabled} type="button" variant="secondary" className="usage-style-option" aria-pressed={current.id===category.id} onClick={()=>current.id!==category.id&&onChange(category.styles[0])}>

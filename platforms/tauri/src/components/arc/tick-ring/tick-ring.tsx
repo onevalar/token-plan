@@ -12,7 +12,7 @@ const SIZE=220,C=SIZE/2,BAND=13,OUTER=106,INNER=OUTER-BAND,MID=OUTER-BAND/2;
 const TICKS=Math.round((2*Math.PI*MID)/11/4)*4;
 
 /** Static, decorative quota dial. The caller supplies the accessible meter and unbounded readout. */
-export function TickRing({value,valueText,mode,tone='accent'}:{value:number;valueText:string;mode:string;tone?:'accent'|'danger'}) {
+export function TickRing({value,valueText,tone='accent'}:{value:number;valueText:string;tone?:'accent'|'danger'}) {
  const maskId=`tick-ring-${useId().replace(/[^a-zA-Z0-9_-]/g,'')}`;
  const fraction=Math.max(0,Math.min(1,value/100));
  const lines=Array.from({length:TICKS},(_,i)=>{
@@ -29,6 +29,6 @@ export function TickRing({value,valueText,mode,tone='accent'}:{value:number;valu
    <g className={styles.ticksBase}>{lines}</g>
    <g className={styles.ticksFill} mask={`url(#${maskId})`}>{lines}</g>
   </svg>
-  <div className={styles.center}><strong className={styles.number}>{valueText}</strong><span className={styles.mode}>{mode}</span></div>
+  <div className={styles.center}><strong className={styles.number}>{valueText}</strong></div>
  </div>;
 }

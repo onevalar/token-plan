@@ -2,7 +2,6 @@
 .home-reading { min-width:0;font-variant-numeric:tabular-nums;--quota-color:var(--provider-color,var(--usage-normal)); }
 .home-reading[data-tone="critical"] { --quota-color:var(--danger); }
 .home-reading[data-tone="critical"] strong,.home-reading[data-tone="critical"] .home-number-value { color:var(--danger); }
-.home-reading .quota-warning { margin:4px 0 0;text-align:left; }
 .home-reading .quota-missing { align-items:flex-start;text-align:left; }
 .home-reading .reset { flex-wrap:wrap;white-space:normal;overflow-wrap:anywhere; }
 .home-reading .expiries { overflow-wrap:anywhere; }
@@ -12,7 +11,8 @@
 .home-quota-heading strong { flex:none;font-weight:500; }
 .home-quota-meta { display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-top:3px;font-size:var(--text-xs);color:var(--text-secondary); }
 .home-quota-meta > span:first-child { min-width:0;overflow-wrap:anywhere; }
-.home-quota-meta .reset { flex:none; }
+.home-quota-meta .reset { flex:none;margin-left:auto; }
+.home-quota-meta .home-reset { margin-left:auto; }
 .home-compact { display:flex;gap:12px;align-items:center;min-height:40px; }
 .home-small-meter { width:32px;flex:none; }
 .home-small-meter svg { display:block;width:100%;overflow:visible; }

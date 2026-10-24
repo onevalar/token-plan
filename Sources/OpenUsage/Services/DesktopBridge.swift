@@ -197,6 +197,16 @@ public final class DesktopBridge {
             records: accounts.records, order: layout.providerOrder)
     }
 
+    private func apiKeyStatus(for id: String) -> String {
+        guard let provider = runtimes.first(where: { $0.provider.id == id }) as? any APIKeyManaging else { return "notSet" }
+        switch provider.apiKeyStatus {
+        case .notSet: return "notSet"
+        case .fromEnvironment: return "fromEnvironment"
+        case .saved: return "saved"
+        case .overrideActive: return "overrideActive"
+        }
+    }
+
     private func snapshot() throws -> [String: Any] {
         let trayStyle = try DesktopTrayStyle.read(defaults: defaults, legacyStyle: layout.menuBarStyle)
         let entries: [[String: Any]] = accountIDs().compactMap { id in
@@ -242,6 +252,7 @@ public final class DesktopBridge {
                 "plan": snapshot?.plan ?? "", "enabled": enablement.isEnabled(id),
                 "tray": layout.isMenuBarAccountVisible(id) && layout.isMenuBarServiceVisible(id),
                 "removable": accounts.records.contains { $0.id == id }, "apiKey": runtimes.first { $0.provider.id == id } is any APIKeyManaging,
+                "apiKeyStatus": apiKeyStatus(for: id),
                 "loginDirectories": loginDirectories[id] ?? [],
                 "connection": observedIdentities[id] == nil ? "unchecked" : "available",
                 "note": notes.note(for: id), "metrics": metrics, "history": history,

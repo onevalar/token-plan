@@ -1,8 +1,8 @@
 # Shared account setup and Home style settings: zh-Hans, zh-Hant, ja, ko.
 T = {
  'Unified Style': ('全局统一','全域統一','すべて共通','전체 통일'),
- 'Customize by Account': ('按账号自定义','依帳號自訂','アカウント別','계정별 설정'),
- 'Open an account, then choose Edit Home Display to set its usage style.': ('进入账号详情，点击“编辑首页显示”设置该账号的用量样式。','進入帳號詳情，點擊「編輯首頁顯示」設定該帳號的用量樣式。','アカウントの詳細で「ホームの表示を編集」を選ぶと、使用量の表示を設定できます。','계정 상세에서 "홈 표시 편집"을 선택하여 사용량 스타일을 설정하세요.'),
+ 'Per Subscription': ('按订阅服务自定义','依訂閱服務自訂','サブスクリプション別','구독 서비스별 설정'),
+ "Set a subscription's usage style in its details via Edit Home Display.": ('订阅服务详情，点击“编辑首页显示”进入设置用量样式','訂閱服務詳情，點擊「編輯首頁顯示」設定用量樣式','サブスクリプションの詳細で「ホームの表示を編集」から使用量スタイルを設定します','구독 서비스 상세에서 "홈 표시 편집"으로 사용량 스타일을 설정하세요'),
  'Subscription Management': ('订阅管理','訂閱管理','サブスクリプション管理','구독 관리'),
  'Usage Statistics': ('用量统计','用量統計','使用量の統計','사용량 통계'),
  'Same order as Subscription Management': ('顺序与“订阅管理”相同','順序與「訂閱管理」相同','並び順は「サブスクリプション管理」と同じです','순서는 "구독 관리"와 같습니다'),

@@ -1,7 +1,7 @@
 T = {
 'Add an API key in service settings, then refresh.': ('在服务设置中添加 API 密钥，然后刷新。','在服務設定中新增 API 金鑰，然後重新整理。','サービス設定で API キーを追加し、更新してください。','서비스 설정에서 API 키를 추가한 후 새로 고침하세요.'),
 'Remove': ('移除','移除','削除','제거'),
-'Saved': ('已保存','已儲存','保存しました','저장됨'),
+'Saved': ('已保存','已儲存','保存済み','저장됨'),
 'The API key could not be removed. Check local folder permissions.': ('无法移除 API 密钥，请检查本地文件夹权限。','無法移除 API 金鑰，請檢查本機資料夾權限。','API キーを削除できません。フォルダーの権限を確認してください。','API 키를 제거할 수 없습니다. 폴더 권한을 확인하세요.'),
 'The API key could not be saved. Check the key and local folder permissions.': ('无法保存 API 密钥，请检查密钥和本地文件夹权限。','無法儲存 API 金鑰，請檢查金鑰和本機資料夾權限。','API キーを保存できません。キーとフォルダーの権限を確認してください。','API 키를 저장할 수 없습니다. 키와 폴더 권한을 확인하세요.'),
 'The API key was rejected. Check the key in service settings.': ('API 密钥被拒绝，请在服务设置中检查密钥。','API 金鑰遭拒，請在服務設定中檢查金鑰。','API キーが拒否されました。サービス設定で確認してください。','API 키가 거부되었습니다. 서비스 설정에서 확인하세요.'),

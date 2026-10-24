@@ -3,7 +3,7 @@ import {invoke} from '@tauri-apps/api/core';
 import {listen} from '@tauri-apps/api/event';
 import {Updates,useUpdater} from '../Updates';
 import {getVersion} from '@tauri-apps/api/app';
-import {ChevronLeft,RefreshCw,Plus,Ellipsis,Check,TriangleAlert} from 'lucide-react';
+import {ChevronLeft,RefreshCw,Plus,Ellipsis,Check,TriangleAlert,ArrowUpCircle} from 'lucide-react';
 import {MotionConfig} from 'motion/react';
 import {Button} from '../components/arc/button/button';
 import {DropdownMenu} from '../components/arc/dropdown-menu/dropdown-menu';
@@ -116,9 +116,10 @@ export function DesktopApp() {
  const title=current.page==='detail'?account?.name??'':current.page==='settings'?t.settings:current.page==='configure'?tr('Subscription Management'):current.page==='add'?tr('Add Account'):current.page==='history'?tr('Usage Statistics'):current.page==='about'?basic.about:current.page==='updates'?t.checkUpdates:'TokenPlan';
  return <MotionConfig reducedMotion="user"><main className="mac-preview" data-density={densityPreference.density} onClickCapture={e=>{lastTrigger.current=(e.target as Element).closest<HTMLElement>('button');}}>
   <header className={`preview-header ${current.page==='home'?'home-header':current.page==='configure'?'configure-header':''}`}>
-   {current.page!=='home'&&<Button className="icon-button back-button" size="sm" variant="ghost" aria-label={current.editing?t.cancel:basic.back} disabled={!!current.editing&&busy} onClick={back}><ChevronLeft size={21}/></Button>}
+   {current.page!=='home'&&<Button className="icon-button back-button" size="sm" variant="ghost" aria-label={current.editing?t.finishEditing:basic.back} disabled={!!current.editing&&busy} onClick={back}><ChevronLeft size={21}/></Button>}
    <div className="page-title">{current.page==='home'?<img src="/capsule.png" alt=""/>:current.page==='detail'&&account?<ProviderLogo family={account.family}/>:null}<h1 ref={heading} tabIndex={-1}>{title}</h1></div>
    <div className="header-actions">
+    {current.page==='home'&&updater.status==='available'&&!updater.skipped&&<Button className="update-button" size="sm" variant="secondary" onClick={()=>push('updates')}><ArrowUpCircle size={15} aria-hidden="true"/><span>{t.update}</span><span className="update-version">{updater.version}</span></Button>}
     {refreshable&&<>
      {refreshOutcome&&<span className="refresh-status" data-tone={refreshOutcome.tone} aria-hidden="true">{tr(refreshOutcome.short)}</span>}
      <Button className="icon-button refresh-button" size="sm" variant="ghost" aria-label={basic.refresh} aria-busy={refreshing} aria-disabled={busy||refreshing} data-refreshing={refreshing} data-result={refreshOutcome?.tone} onClick={refresh}>
@@ -134,7 +135,6 @@ export function DesktopApp() {
   <p className="sr-only refresh-announcement" aria-live="polite" aria-atomic="true">{refreshFeedback?tr(refreshFeedback.pending?'Refreshing usage…':refreshFeedback.result!.message):''}</p>
   {error&&(!state||refreshable||current.page==='add'||current.page==='updates')&&<p role="alert" className="inline-error">{t[error as keyof typeof t]??basic[error as keyof typeof basic]??t.request_failed}</p>}
   {!state&&!error&&<p role="status">{basic.loading}</p>}
-  {current.page!=='updates'&&updater.status==='available'&&<Button variant="secondary" onClick={()=>push('updates')}>{t.updateAvailable} {updater.version}</Button>}
   <div className="page-stack">{routes.map(route=>{
    const a=state?.accounts.find(a=>a.id===route.accountId);
    return <div className="preview-page" data-page={route.page} key={route.key} hidden={route.key!==current.key}><div className="page-content">
@@ -142,7 +142,7 @@ export function DesktopApp() {
     {state&&a&&route.page==='detail'&&<AccountDetail onSetupChange={setups.reload} usageStylePreference={usageStylePreference} focusManagement={route.focusManagement} draft={drafts[a.id]??{}} onDraftChange={patch=>setDrafts(d=>({...d,[a.id]:{...d[a.id],...patch}}))} retry={retryAccount} account={a} editing={route.editing??false} onEditing={editing=>setRoutes(r=>r.map(item=>item.key===route.key?{...item,editing}:item))} history={range=>push('history',{accountId:a.id,range})} send={send} t={t} busy={busy} language={language} now={now} remaining={state.settings.showRemaining} missing={basic.missing}/>}
     {state&&route.page==='settings'&&<GeneralSettings platform={platform} openAccounts={()=>push('configure')} densityPreference={densityPreference} usageStylePreference={usageStylePreference} state={state} send={send} t={t} busy={busy} language={language} now={now}/>}
     {state&&route.page==='configure'&&<>{addedName&&<p role="status" className="added-note">{tr('Added to Home')}: {addedName}</p>}<ServiceConfiguration setups={setups} resume={setupId=>push('add',{setupId})} platform={platform} state={state} send={send} t={t} busy={busy} language={language}/></>}
-    {state&&route.page==='add'&&<AddAccount setup={setups.records.find(r=>r.id===route.setupId)} onSetupChange={setups.reload} state={state} send={send} t={t} busy={busy} language={language} complete={finishAdding} open={accountId=>{back();push('detail',{accountId});}}/>}
+    {state&&route.page==='add'&&<AddAccount setup={setups.records.find(r=>r.id===route.setupId)} onSetupChange={setups.reload} state={state} send={send} t={t} busy={busy} language={language} complete={finishAdding} open={accountId=>{back();push('detail',{accountId,focusManagement:true});}}/>}
     {state&&route.page==='history'&&<>{a&&<div className="history-account-context">{a.name}{a.email&&<span>{a.email}</span>}</div>}<HistoryPage accounts={a?[a]:state.accounts} t={t} language={language} initialRange={route.range}/></>}
     {route.page==='updates'&&<Updates showHeading={false} t={t} updater={updater} automatic={state?.settings.autoUpdates??true} onAutomatic={autoUpdates=>{void send({method:'settings',value:{autoUpdates}}).catch(()=>{});}}/>}
     {route.page==='about'&&<section className="about"><img src="/capsule.png" alt=""/>

@@ -12,6 +12,5 @@
 .ticksFill line { stroke:var(--ring);stroke-linecap:round;stroke-width:2.6; }
 .center { position:absolute;inset:20%;display:grid;place-content:center;justify-items:center;gap:4px;text-align:center;pointer-events:none; }
 .number { color:var(--foreground);font-family:var(--font-display);font-size:var(--text-2xl);font-weight:500;font-variant-numeric:tabular-nums;letter-spacing:var(--tracking-display);line-height:1;white-space:nowrap; }
-.mode { color:var(--text-secondary);font-size:var(--text-xs);line-height:1.25;overflow-wrap:anywhere; }
 .visual[data-tone="danger"] .number { color:var(--danger); }
 /* Intentionally no animation or transition, including on mount and refresh. */

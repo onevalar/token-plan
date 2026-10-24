@@ -12,8 +12,8 @@ tray integration remain platform-specific. This change does not publish a releas
   current style; opening it shows a small drawing of every style at once: Bars (default), Gauges,
   Percentage Grid, Compact Rings, Quota Ruler, Concentric Rings, Numbers and
   Segmented Bar, plus Tick Ring. The choice stays on this device, independently of spacing,
-  used/remaining mode and tray style. It changes Home only, not account details
-  or history. Each account and quota keeps its own reading; nothing is averaged
+  used/remaining mode and tray style. It changes Home and the account detail's Current Quota,
+  but not history or the menu bar. Each account and quota keeps its own reading; nothing is averaged
   or combined. Balances and existing history charts keep their original form and order.
 - All styles show the same percentages and reset times as bars, including
   missing readings and windows that have not started. A grid has 100 whole cells,
@@ -27,7 +27,7 @@ tray integration remain platform-specific. This change does not publish a releas
   Reopening Home and refreshing do not replay fill animations or celebrate exhaustion.
   Tick Ring uses a separate marked dial for each quota. Its illuminated extent follows
   the same percentage; the number keeps the actual reading, including overflow.
-  It is available in both Unified Style and each account's confirmed custom style.
+  It is available in both Unified Style and each account's custom style.
 - These are independent quota displays, not combined goal rings, quota composition
   charts or forecasts without real data.
 - Home has matching icon-only Refresh/More actions. Inner pages have Back, a page
@@ -69,7 +69,9 @@ tray integration remain platform-specific. This change does not publish a releas
 - Note and API-key drafts survive page navigation separately for each account, only
   in the running app's memory. They are not saved until Save is pressed and are lost
   when the app quits. Successful saves clear the draft; removing an account clears
-  its drafts. Saving, success and retryable errors appear beside the field.
+  its drafts. Saving, success and retryable errors appear beside the field. A key
+  field states whether a key comes from the environment, is saved, overrides one, or
+  is not set, and opens only when someone chooses Set API Key or Replace Key.
 - Removing an account requires confirmation and keeps the existing terminal login
   and history behavior. Confirmation timers pause while keyboard focus is inside,
   just as they do on hover. Reduced motion keeps loading feedback without rotation.
@@ -96,8 +98,10 @@ tray integration remain platform-specific. This change does not publish a releas
 - More groups General Settings, Subscription Management and Usage Statistics in that order; Check for
   Updates and About form the second group, and Quit remains separate.
 - An account's note is hidden behind Add Note (or shown as text with Edit) until wanted;
-  an unsaved draft keeps the editor open. Edit Home Display, Add Note and Remove Account
-  form three full-width actions below the account details; removal asks for confirmation.
+  an unsaved draft keeps the editor open. Edit Home Display, Add Note (or Edit) and
+  Remove Saved Key (when a key is saved) sit side by side in one action row
+  below the account details. Removing a key asks for confirmation; removing an account
+  remains a separate confirmed action.
 - Problem cards carry one button for the next step: Try Again (temporary failures, refreshes just that account), Sign In Again
   (a CLI login that needs authorizing), Check Connection, Set API Key (opens the key field) or View Details. Each Home account has
   one heading/arrow entry into Usage; account management is below the usage details; Home display changes use an explicit editor.
@@ -116,13 +120,16 @@ tray integration remain platform-specific. This change does not publish a releas
   Rows are not detail links: each has a display switch and an actions menu for removing the account, with inline confirmation.
   Sorting exposes drag handles, also operable with the keyboard arrow keys. During a drag the full row follows the pointer and neighbouring rows make space; releasing commits the order, while Escape or pointer cancellation restores it. Auto-scrolling keeps longer lists reachable. Reduced Motion removes the settling animation. Removing a service also works when it has no separate saved identity, without deleting its login or history.
 - Account details have no tabs or duplicate global-setting links. View mode shows quota, history,
-  three equal-width actions for Edit Home Display, note and confirmed removal, plus API-key fields where needed.
-  Edit mode replaces the view with metric placement and ordering controls. Changes stay in a local
-  draft until Confirm submits the whole layout; Cancel, the header back action and Escape discard
-  the draft. Saving failures keep the editor open for retry. Windows and Linux share this account interaction.
-- General Settings › Usage Style first selects Unified Style (default) or Customize by Account.
-  Unified mode shows the shared style picker. Custom mode shows only guidance to open an account's
-  Edit Home Display, where style joins metric placement and order in the confirmed draft. Accounts of
+  one action row for Edit Home Display, note and Remove Saved Key (when a key is saved),
+  plus API key status where a key is supported. Current Quota uses the account's effective
+  Home usage style, so a per-subscription style change is reflected as soon as the editor closes.
+  Edit mode replaces the view with metric placement,
+  ordering and per-subscription style controls. Every placement, order and style change saves
+  immediately; a rejected layout restores the last accepted one with a retryable error, while the
+  header Done or Escape leaves the editor without another write. Windows and Linux share this account interaction.
+- General Settings › Usage Style first selects Unified Style (default) or Per Subscription.
+  Unified mode shows the shared style picker. Custom mode shows only guidance to open a subscription's
+  Edit Home Display, where style joins metric placement and order in the same immediately saved editor. Accounts of
   the same provider are independent. The first switch to custom starts from the current shared style;
   switching back to uniform keeps custom choices for later restoration. Style never affects the menu bar.
 - Notifications start with a master switch; enabling it reveals three alert options. Turning it off disables all alerts. The shortcut uses a compact recorder with an inline clear button. History provides filtering, seven-day pagination and expandable model records.
@@ -131,6 +138,14 @@ tray integration remain platform-specific. This change does not publish a releas
   button remains available for retrying; reopening during a check does not start a
   second request. Opening an already-found update preserves that result. Automatic
   updates keep the existing signed updater flow. iCloud sync remains removed.
+- An available update is a reminder, not a permanent banner: on Home, a compact Update button
+  with the version sits immediately left of Refresh. Detail, Settings and other pages do not
+  carry it.
+  It opens the Updates page. Skip This Version remembers the dismissal per version
+  on the device and removes the header button; installation stays available from
+  the Updates page, and the next new version can remind again.
+- Home's cell grid is drawn without a caption describing percentages; the grid
+  itself carries the meaning, and its accessible label names the metric.
 
 ## Tray indicators
 
@@ -249,8 +264,8 @@ unverified. App-theme screenshots and composited raster images do not replace th
 Home style selection has eight entries arranged four per row: Bars, Cells, Rings,
 Containers, Numbers, Side-by-Side Columns, Status Lights and Border Progress. Bars includes the ruler, source split and row fill;
 Rings includes the dashboard gauge. The first four entries expose variants; the last four select their design directly. Saved style IDs
-remain unchanged. Border Progress places the value on the left and the period and countdown on the right, without visible mode or warning copy. Both global and account style selectors show an immediate sample
-using the same Home renderer; account edits still apply only on Confirm.
+remain unchanged. Border Progress places the value on the left and the period and countdown on the right; Row Fill uses the same split over a filled row. Styles show no visible warning sentence; color carries a near-limit or exhausted state. Both global and account style selectors show an immediate sample
+using the same Home renderer; account edits apply immediately.
 
 Style variants and forecast, shape and cell-count options use aligned dropdowns.
 The sample preview is inset inside its settings group with the shared control radius.

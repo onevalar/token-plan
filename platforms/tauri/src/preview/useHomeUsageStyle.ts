@@ -27,12 +27,5 @@ export function useHomeUsageStyle() {
  const current=useRef(preference);current.current=preference;
  const persist=(next:HomeStylePreferences)=>{localStorage.setItem(homeStyleKey,JSON.stringify(next));current.current=next;setPreference(next);setError('');};
  const change=(next:HomeStylePreferences)=>{try{persist(next);}catch(e){console.error('Home styles could not be saved',e);setError('Could not save. Try again.');}};
- // Check storage before saving metrics; a rejected helper request restores the previous style record.
- const saveAccount=async(id:string,style:HomeUsageStyle,saveMetrics:()=>Promise<unknown>)=>{
-  const previous=localStorage.getItem(homeStyleKey),next={...current.current,accounts:{...current.current.accounts,[id]:style}};
-  localStorage.setItem(homeStyleKey,JSON.stringify(next));
-  try{await saveMetrics();current.current=next;setPreference(next);setError('');}
-  catch(e){try{if(previous===null)localStorage.removeItem(homeStyleKey);else localStorage.setItem(homeStyleKey,previous);}catch(rollback){console.error('Home style rollback failed',rollback);setError('Could not save. Try again.');}throw e;}
- };
- return {...preference,error,styleFor:(id:string)=>homeStyleFor(preference,id),changeStyle:(style:HomeUsageStyle)=>change({...current.current,style}),changeMode:(mode:HomeStyleMode)=>change(homeStyleMode(current.current,mode)),saveAccount};
+ return {...preference,error,styleFor:(id:string)=>homeStyleFor(preference,id),changeStyle:(style:HomeUsageStyle)=>change({...current.current,style}),changeMode:(mode:HomeStyleMode)=>change(homeStyleMode(current.current,mode)),changeAccountStyle:(id:string,style:HomeUsageStyle)=>change({...current.current,accounts:{...current.current.accounts,[id]:style}})};
 }

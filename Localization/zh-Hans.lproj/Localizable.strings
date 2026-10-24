@@ -147,7 +147,6 @@
 "Cells" = "分格";
 "Change Service" = "更换服务";
 "Change in General Settings" = "在通用设置中更改";
-"Changes apply after you confirm. Cancel keeps your previous display." = "点击确定后应用修改；取消将保留原来的显示配置。";
 "Chat" = "聊天";
 "Check Automatically" = "自动检查";
 "Check Connection" = "检查连接";
@@ -202,7 +201,6 @@
 "Concentric Rings" = "独立同心环";
 "Configuration Directory" = "配置目录";
 "Confirm" = "确认";
-"Confirm Changes" = "确定";
 "Connect Account" = "连接账号";
 "Connect Amp with amp login, then refresh." = "运行 amp login 登录账号后刷新。";
 "Connect Existing Configuration Directory" = "连接已有配置目录";
@@ -270,7 +268,6 @@
 "Cursor token history needs a valid desktop session. Sign in with Cursor again." = "Cursor Token 历史需要有效的桌面登录，请在 Cursor 中重新登录。";
 "Custom Key" = "自定义密钥";
 "Customize" = "自定义";
-"Customize by Account" = "按账号自定义";
 "Customize…" = "自定义…";
 "Cutting It Close" = "接近上限";
 "Daily" = "每日";
@@ -561,6 +558,7 @@
 "No valid login for this Codex account. Sign in with Codex, xswap, or pi, then refresh." = "这个 Codex 账户没有有效登录。请用 Codex、xswap 或 pi 登录后再刷新。";
 "None" = "无";
 "Not Now" = "以后再说";
+"Not Set" = "未设置";
 "Not Shown" = "未显示";
 "Not detected yet" = "尚未检测到";
 "Not logged in. Run `claude` to authenticate." = "未登录。请运行 `claude` 完成认证。";
@@ -594,7 +592,6 @@
 "Open System Settings" = "打开系统设置";
 "Open Terminal to Sign In" = "打开终端登录";
 "Open TokenPlan from anywhere" = "在任何地方打开 TokenPlan";
-"Open an account, then choose Edit Home Display to set its usage style." = "进入账号详情，点击“编辑首页显示”设置该账号的用量样式。";
 "Open-Source Licenses" = "开源许可证";
 "OpenCode Go key was rejected. Log into OpenCode Go again." = "OpenCode Go 密钥被拒绝。请重新登录 OpenCode Go。";
 "OpenCode not detected. Log in with OpenCode Go or use OpenCode locally first." = "未检测到 OpenCode。请先登录 OpenCode Go 或在本地使用 OpenCode。";
@@ -624,6 +621,7 @@
 "Party mode is on, so this stays paused." = "派对模式已开启，因此此项暂停。";
 "Pay as you go" = "按量付费";
 "Pending Connections" = "待连接账号";
+"Per Subscription" = "按订阅服务自定义";
 "Percentage" = "百分比";
 "Percentage Grid" = "百分格";
 "Personal" = "个人";
@@ -706,6 +704,7 @@
 "Removing…" = "正在移除…";
 "Reopen Terminal" = "重新打开终端";
 "Reorder" = "排序";
+"Replace Key" = "更换密钥";
 "Report a Problem" = "反馈问题";
 "Report an Issue" = "反馈问题";
 "Requests" = "请求数";
@@ -779,6 +778,7 @@
 "Sessions start after you send your first message." = "发送第一条消息后，会话才会开始计时。";
 "Set API Key" = "设置 API 密钥";
 "Set Up" = "设置";
+"Set a subscription's usage style in its details via Edit Home Display." = "订阅服务详情，点击“编辑首页显示”进入设置用量样式";
 "Settings" = "设置";
 "Settings…" = "设置…";
 "Shape" = "形状";
