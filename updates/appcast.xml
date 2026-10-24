@@ -1,7 +1,16 @@
 <?xml version='1.0' encoding='utf-8'?>
 <rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
     <channel>
-        <item><title>TokenPlan 2.3.1</title><sparkle:version>1792810833</sparkle:version><sparkle:shortVersionString>2.3.1</sparkle:shortVersionString><sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion><description>&lt;pre&gt;# TokenPlan 2.3.1
+        <item><title>TokenPlan 2.3.2</title><sparkle:version>1792841203</sparkle:version><sparkle:shortVersionString>2.3.2</sparkle:shortVersionString><sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion><description>&lt;pre&gt;# TokenPlan 2.3.2
+
+- 扩展首页用量样式，整理为八个入口，支持子样式下拉选择和即时预览，保留全局统一及按账号自定义设置。
+- 优化分格、单环与环绕边框布局，统一预览圆角、边距和读数对齐。
+- macOS 菜单栏新增 token 趋势显示，完善多账号读数与相关设置。
+- 更新关于页隐私文案，精简 README，并保留第三方组件许可声明。
+- 同步三平台界面与五种语言，重新构建 macOS、Windows、Linux 安装包及签名更新文件。
+
+macOS 1.0.12 经典版继续保留下载。本机正式版不更新，由用户自行检查更新；Linux DEB 用户请下载安装新版安装包。
+&lt;/pre&gt;</description><enclosure url="https://github.com/onevalar/token-plan/releases/download/v2.3.2/TokenPlan_2.3.2_universal.dmg" length="30754182" type="application/octet-stream" sparkle:edSignature="zZMlA99ZE3sg7d+pLHHidAwkvlzCoDJ6O7hZ3Lta6k6XT1Isv0KL/QTYuKBVGbgT7pFg0gG4eUrS+Z5cDH33AA==" /></item><item><title>TokenPlan 2.3.1</title><sparkle:version>1792810833</sparkle:version><sparkle:shortVersionString>2.3.1</sparkle:shortVersionString><sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion><description>&lt;pre&gt;# TokenPlan 2.3.1
 
 - 精简关于页面：移除项目主页、更新说明、反馈问题和许可证跳转，以及来源说明。保留应用图标、名称、版本和“不发送任何统计或崩溃报告”的隐私文案，调整文字层级和间距，适配浅色、深色及五种语言。
 - 修复 macOS 外接显示器的菜单栏窗口定位：使用原生屏幕坐标，在点击图标的显示器上展开窗口，避免不同缩放比例导致窗口跑到笔记本屏幕。内容高度变化时保持菜单栏附近的位置，并限制在屏幕可用范围内。
