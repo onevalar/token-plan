@@ -8,6 +8,7 @@
     "build": "node scripts/sync-localizations.mjs && tsc --noEmit && vite build",
     "test": "vitest run src && node --test scripts/*.test.mjs",
     "test:ui": "playwright test",
+    "test:release-ui": "playwright test --config playwright.release.config.ts",
     "test:mac-preview": "playwright test --config playwright.preview.config.ts",
     "preview:mac": "node scripts/build-macos-preview.mjs",
     "tauri": "tauri",

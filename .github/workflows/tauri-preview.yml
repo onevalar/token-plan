@@ -7,6 +7,10 @@ on:
         description: 'Version to verify; does not publish a release'
         type: string
         default: '0.0.0'
+      checks_only:
+        description: 'Run regression checks without signing or packaging'
+        type: boolean
+        default: false
       production:
         description: 'Verify production identity and native Mac transition signature'
         type: boolean
@@ -24,6 +28,9 @@ on:
       version:
         type: string
         default: '0.0.0'
+      checks_only:
+        type: boolean
+        default: false
       production:
         type: boolean
         default: false
@@ -35,6 +42,42 @@ permissions:
   contents: read
 
 jobs:
+  interface:
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJSON(inputs.platforms == 'windows-linux' && '[{"os":"windows-latest","platform":"windows","browser":"chromium"},{"os":"ubuntu-24.04","platform":"linux","browser":"webkit"}]' || '[{"os":"macos-26","platform":"macos","browser":"webkit"},{"os":"windows-latest","platform":"windows","browser":"chromium"},{"os":"ubuntu-24.04","platform":"linux","browser":"webkit"}]') }}
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        working-directory: platforms/tauri
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.source_ref || github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: platforms/tauri/package-lock.json
+      - run: npm ci
+      - run: npm test
+      - name: Verify no UI cases were lost or duplicated
+        if: runner.os == 'Linux'
+        run: python3 ../../script/ci/check_ui_coverage.py
+      - name: Install the platform test engine
+        run: npx playwright install --with-deps ${{ matrix.browser }}
+      - name: Verify interface and platform layouts
+        run: npm run test:release-ui -- --project='${{ matrix.platform }}-*'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: interface-${{ matrix.platform }}
+          path: platforms/tauri/test-results-release/
+          retention-days: 7
+          if-no-files-found: warn
+
   build:
     strategy:
       fail-fast: false
@@ -65,10 +108,28 @@ jobs:
           sudo apt-get install -y libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev patchelf
       - name: Select Rust toolchain
         run: rustup toolchain install 1.90.0 --profile minimal
+      - name: Identify compiler cache
+        id: compiler
+        shell: bash
+        run: python3 ../../script/ci/compiler_cache_key.py
+      - name: Restore native build cache
+        id: native-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            ~/.nuget/packages
+            .build
+            platforms/tauri/src-tauri/target/debug/deps
+            platforms/tauri/src-tauri/target/debug/build
+            platforms/tauri/src-tauri/target/debug/.fingerprint
+          key: native-v1-${{ matrix.os }}-${{ runner.arch }}-${{ steps.compiler.outputs.toolchain }}-${{ hashFiles('platforms/tauri/src-tauri/Cargo.lock', 'Package.resolved', 'platforms/desktop/**/packages.lock.json') }}-${{ steps.compiler.outputs.source }}
+          restore-keys: |
+            native-v1-${{ matrix.os }}-${{ runner.arch }}-${{ steps.compiler.outputs.toolchain }}-${{ hashFiles('platforms/tauri/src-tauri/Cargo.lock', 'Package.resolved', 'platforms/desktop/**/packages.lock.json') }}-
       - run: npm ci
       - run: npm run build
       - run: python3 ../../script/test_tauri_migration_update.py
-      - run: npm test
       - name: Native backend regression checks
         if: runner.os != 'macOS'
         run: |
@@ -88,6 +149,8 @@ jobs:
         env:
           TOKENPLAN_NATIVE_TRAY_REVIEW: tray-native-review.png
         run: |
+          # Restage fresh helper resources even after restoring build-script outputs.
+          python3 -c "from pathlib import Path; Path('src-tauri/build.rs').touch()"
           cargo build --locked --manifest-path src-tauri/Cargo.toml
           cargo test --locked --manifest-path src-tauri/Cargo.toml
       - name: Native helper protocol smoke test
@@ -98,33 +161,33 @@ jobs:
           else
             node scripts/smoke-bridge.mjs src-tauri/target/debug/tokenplan-bridge
           fi
-      - name: Install test browser
-        run: npx playwright install --with-deps chromium
-      - run: npm run test:ui
-      - name: Install WebKit test engine
-        if: runner.os != 'Windows'
-        run: npx playwright install --with-deps webkit
-      - name: Verify WebKit interactions
-        if: runner.os != 'Windows'
-        env:
-          TOKENPLAN_TEST_ENGINE: webkit
-        run: npm run test:ui
-      - name: Verify shared navigation and three-metric layouts
-        run: npm run test:mac-preview -- --project=${{ runner.os == 'macOS' && 'macos' || runner.os == 'Windows' && 'windows' || 'linux' }}
+      - name: Save reusable main cache before signing
+        if: github.ref == 'refs/heads/main' && steps.native-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            ~/.nuget/packages
+            .build
+            platforms/tauri/src-tauri/target/debug/deps
+            platforms/tauri/src-tauri/target/debug/build
+            platforms/tauri/src-tauri/target/debug/.fingerprint
+          key: ${{ steps.native-cache.outputs.cache-primary-key }}
       - uses: apple-actions/import-codesign-certs@v7
-        if: runner.os == 'macOS'
+        if: runner.os == 'macOS' && !inputs.checks_only
         with:
           p12-file-base64: ${{ secrets.APPLE_CERTIFICATE }}
           p12-password: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
       - name: Select Mac signing identity
-        if: runner.os == 'macOS'
+        if: runner.os == 'macOS' && !inputs.checks_only
         shell: bash
         run: |
           identity=$(security find-identity -v -p codesigning | awk -F'"' '/Developer ID Application/ {print $2; exit}')
           test -n "$identity"
           echo "APPLE_SIGNING_IDENTITY=$identity" >> "$GITHUB_ENV"
       - name: Sign nested Swift framework helpers
-        if: runner.os == 'macOS'
+        if: runner.os == 'macOS' && !inputs.checks_only
         shell: bash
         run: |
           # Tauri signs the framework itself; Sparkle's nested apps also need our
@@ -132,6 +195,7 @@ jobs:
           codesign --force --deep --options runtime --timestamp --sign "$APPLE_SIGNING_IDENTITY" src-tauri/binaries/Sparkle.framework
           codesign --verify --deep --strict src-tauri/binaries/Sparkle.framework
       - name: Package signed updater artifacts
+        if: ${{ !inputs.checks_only }}
         shell: bash
         env:
           TOKENPLAN_VERSION: ${{ inputs.version || '0.0.0' }}
@@ -148,28 +212,29 @@ jobs:
             npm run tauri -- build --config src-tauri/tauri.package.json
           fi
       - name: Verify packaged updater signature
+        if: ${{ !inputs.checks_only }}
         run: node scripts/verify-artifacts.mjs
       - name: Verify Linux DEB migration from legacy and 2.0.4 packages
-        if: runner.os == 'Linux' && inputs.production
+        if: runner.os == 'Linux' && !inputs.checks_only && inputs.production
         shell: bash
         run: |
           package=$(find src-tauri/target/release/bundle/deb -maxdepth 1 -name '*.deb' -print -quit)
           python3 ../../script/ci/check_linux_deb.py "$package"
       - name: Sign the native Mac migration feed
-        if: runner.os == 'macOS' && inputs.production
+        if: runner.os == 'macOS' && !inputs.checks_only && inputs.production
         env:
           TOKENPLAN_VERSION: ${{ inputs.version }}
           SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
         run: python3 ../../script/sign_tauri_transition.py
       - name: Verify signed production helper can launch
-        if: runner.os == 'macOS' && inputs.production
+        if: runner.os == 'macOS' && !inputs.checks_only && inputs.production
         run: |
           node scripts/smoke-bridge.mjs 'src-tauri/target/universal-apple-darwin/release/bundle/macos/TokenPlan.app/Contents/Helpers/TokenPlan Bridge.app/Contents/MacOS/tokenplan-bridge'
           node scripts/smoke-bridge.mjs 'src-tauri/target/universal-apple-darwin/release/bundle/macos/TokenPlan.app/Contents/Helpers/TokenPlan Bridge.app/Contents/MacOS/tokenplan-bridge' --production-defaults
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: tauri-${{ runner.os }}
+          name: ${{ inputs.checks_only && 'native-checks' || 'tauri' }}-${{ runner.os }}
           path: |
             platforms/tauri/src-tauri/target/**/release/bundle/**/*.dmg
             platforms/tauri/src-tauri/target/**/release/bundle/**/*.app.tar.gz*
@@ -177,8 +242,6 @@ jobs:
             platforms/tauri/src-tauri/target/**/release/bundle/**/*.AppImage*
             platforms/tauri/src-tauri/target/**/release/bundle/**/*.deb
             platforms/tauri/transition/appcast.xml
-            platforms/tauri/test-results/
-            platforms/tauri/test-results-navigation/
             platforms/tauri/src-tauri/tray-native-review.png
           if-no-files-found: warn
       # Verification artifacts only. Published feeds require an approved stable version.

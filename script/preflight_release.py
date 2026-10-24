@@ -3,12 +3,12 @@
 
 Usage:
   script/preflight_release.py 2.0.8            run the checks (nothing is changed or pushed)
-  script/preflight_release.py 2.0.8 --tests    also run the unit, desktop and translation tests
+  script/preflight_release.py 2.0.8 --tests    also run unit, desktop, translation and three-platform UI tests
   script/preflight_release.py 2.0.8 --draft    print commit subjects since the last release to help write release/2.0.8.md
 
 The tag itself is always yours to push: this prints the command but never runs it.
 """
-import json, os, re, subprocess, sys
+import json, os, re, subprocess, sys, time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -42,7 +42,10 @@ def git(*args, check=True):
 
 
 def run(label, *cmd, cwd=None):
+    print(f'Running {label}...', flush=True)
+    started = time.monotonic()
     result = subprocess.run(cmd, cwd=cwd or ROOT, text=True, capture_output=True)
+    print(f'{label}: {"PASS" if result.returncode == 0 else "FAIL"} in {time.monotonic() - started:.1f}s', flush=True)
     tail = (result.stdout + result.stderr).strip().splitlines()[-3:]
     return result.returncode == 0, label, ' | '.join(tail)
 
@@ -71,11 +74,27 @@ def checks(version, with_tests):
     config = json.loads((ROOT / 'release' / 'update-config.json').read_text())
     out.append((config.get('publication_enabled') is True, 'publication is enabled', 'update-config.json has publication_enabled off'))
     out.append(run('translation tables are generated', 'python3', 'script/generate_localizations.py', '--report'))
-    if with_tests:
-        out.append(run('desktop core + translation checks', 'script/build_desktop.sh', 'test'))
-        out.append(run('shared UI unit tests', 'npx', 'vitest', 'run', 'src', cwd=ROOT / 'platforms' / 'tauri'))
-        out.append(run('release script tests', 'python3', '-m', 'unittest', 'discover', '-s', 'script', '-p', 'test_*.py'))
+    if with_tests and all(ok for ok, _, _ in out):
+        out.extend(regression_checks())
     return out
+
+
+def regression_checks():
+    project = ROOT / 'platforms' / 'tauri'
+    commands = [
+        ('shared UI unit tests', ('npm', 'test'), project),
+        ('UI coverage inventory', ('python3', 'script/ci/check_ui_coverage.py'), ROOT),
+        ('release script tests', ('python3', '-m', 'unittest', 'discover', '-s', 'script', '-p', 'test_*.py'), ROOT),
+        ('desktop core + translation checks', ('script/build_desktop.sh', 'test'), ROOT),
+        ('three-platform UI regression', ('npm', 'run', 'test:release-ui'), project),
+    ]
+    results = []
+    for label, command, cwd in commands:
+        result = run(label, *command, cwd=cwd)
+        results.append(result)
+        if not result[0]:
+            break  # Fix cheap failures before starting the long browser regression.
+    return results
 
 
 def draft(version):
@@ -105,6 +124,9 @@ def main(argv):
     if failed:
         print(f'\n{len(failed)} check(s) failed; do not tag yet.')
         return 1
+    if '--tests' not in argv:
+        print('\nMetadata checks passed. Run again with --tests before tagging; UI regression has not run.')
+        return 0
     print(f'\nReady. When you approve the version, push the tag yourself:\n  git tag v{version} && git push origin v{version}')
     return 0
 
