@@ -19,6 +19,7 @@ import {GeneralSettings} from './GeneralSettings';
 import {ServiceConfiguration} from './ServiceConfiguration';
 import {AddAccount} from './AddAccount';
 import {HomeTips} from './HomeTips';
+import {useQuotaSamples} from './useQuotaSamples';
 import {HistoryPage} from './HistoryPage';
 import {useDensity} from './useDensity';
 import {useHomeUsageStyle} from './useHomeUsageStyle';
@@ -31,6 +32,7 @@ type Page='home'|'detail'|'settings'|'configure'|'add'|'history'|'about'|'update
 type Route={key:number;page:Page;accountId?:string;setupId?:string;editing?:boolean;focusManagement?:boolean;range?:string};
 export function DesktopApp() {
  const {state,send,busy,error}=useDesktop();
+ const quotaSamples=useQuotaSamples(state?.accounts);
  const {feedback,refresh:refreshWithFeedback,refreshing}=useRefreshFeedback(send);
  const updater=useUpdater(import.meta.env.VITE_MAC_NAVIGATION_PREVIEW!=='1'&&(state?.settings.autoUpdates??false));
  const [platform,setPlatform]=useState('');
@@ -143,7 +145,7 @@ export function DesktopApp() {
     {state&&route.page==='settings'&&<GeneralSettings platform={platform} openAccounts={()=>push('configure')} densityPreference={densityPreference} usageStylePreference={usageStylePreference} state={state} send={send} t={t} busy={busy} language={language} now={now}/>}
     {state&&route.page==='configure'&&<>{addedName&&<p role="status" className="added-note">{tr('Added to Home')}: {addedName}</p>}<ServiceConfiguration setups={setups} resume={setupId=>push('add',{setupId})} platform={platform} state={state} send={send} t={t} busy={busy} language={language}/></>}
     {state&&route.page==='add'&&<AddAccount setup={setups.records.find(r=>r.id===route.setupId)} onSetupChange={setups.reload} state={state} send={send} t={t} busy={busy} language={language} complete={finishAdding} open={accountId=>{back();push('detail',{accountId,focusManagement:true});}}/>}
-    {state&&route.page==='history'&&<>{a&&<div className="history-account-context">{a.name}{a.email&&<span>{a.email}</span>}</div>}<HistoryPage accounts={a?[a]:state.accounts} t={t} language={language} initialRange={route.range}/></>}
+    {state&&route.page==='history'&&<>{quotaSamples.error&&<p role="alert">{tr(quotaSamples.error)}</p>}{a&&<div className="history-account-context">{a.name}{a.email&&<span>{a.email}</span>}</div>}<HistoryPage accounts={a?quotaSamples.accounts.filter(item=>item.id===a.id):quotaSamples.accounts} t={t} language={language} initialRange={route.range}/></>}
     {route.page==='updates'&&<Updates showHeading={false} t={t} updater={updater} automatic={state?.settings.autoUpdates??true} onAutomatic={autoUpdates=>{void send({method:'settings',value:{autoUpdates}}).catch(()=>{});}}/>}
     {route.page==='about'&&<section className="about"><img src="/capsule.png" alt=""/>
      <div className="about-identity"><h2>TokenPlan</h2><p className="about-version">{version}</p>{import.meta.env.VITE_MAC_NAVIGATION_PREVIEW==='1'&&<p className="muted">{tr('Design Preview')}</p>}</div>

@@ -63,6 +63,7 @@
 "Account Management" = "アカウント管理";
 "Account Note (Optional)" = "アカウントのメモ（任意）";
 "Account Settings" = "アカウント設定";
+"Account and Metric" = "アカウントと指標";
 "Account connected." = "アカウントを接続しました。";
 "Account identified. Enable it and refresh to load usage." = "アカウントを識別しました。有効にして更新すると使用量を取得できます。";
 "Account kept. Its login could not be identified. Check the configuration directory and access permissions, then detect again." = "アカウントは保持されています。対応するログインを識別できません。設定ディレクトリとアクセス権を確認して再検出してください。";
@@ -71,6 +72,8 @@
 "Accounts follow the order in Service Configuration." = "アカウントはサービス設定と同じ順序で表示されます。";
 "Accounts in the Menu Bar" = "メニューバーに表示するアカウント";
 "Activity" = "アクティビティ";
+"Activity Calendar" = "アクティビティカレンダー";
+"Actual samples only; gaps and resets are not connected." = "実際の観測のみ表示し、欠落やリセットをまたいで接続しません。";
 "Add" = "追加";
 "Add Account" = "アカウントを追加";
 "Add Note" = "メモを追加";
@@ -160,6 +163,7 @@
 "Choose Which Metrics Appear on Home" = "ホームに表示する指標を選ぶ";
 "Choose a service to see how to connect an account." = "サービスを選んで、アカウントを接続します。";
 "Choose at most two tray metrics per account." = "アカウントごとに最大2項目です。";
+"Choose modules in Display Settings." = "表示設定でモジュールを有効にしてください。";
 "Choose services and accounts to show. Hiding them keeps stars, overview and refresh unchanged." = "表示するサービスとアカウントを選択します。非表示にしてもスター、概要、更新は変わりません。";
 "Choose the service's local folder, such as .claude or .codex, to read its login and usage history." = "ログインと使用履歴を読むため、.claude や .codex などのサービスフォルダを選択してください。";
 "Choose up to three menu bar metrics per account." = "アカウントごとにメニューバーの表示項目を最大3つ選べます。";
@@ -229,10 +233,13 @@
 "Could not check or install the update. Try again later." = "更新を確認またはインストールできません。後で再試行してください。";
 "Could not complete this step. Check the directory or login and try again." = "操作を完了できませんでした。フォルダやログイン状態を確認し、再試行してください。";
 "Could not install the update. Try again later." = "更新をインストールできません。後で再試行してください。";
+"Could not load display settings." = "表示設定を読み込めませんでした。";
 "Could not load pending accounts. Try again." = "接続待ちのアカウントを読み込めません。再試行してください。";
+"Could not load quota samples." = "利用枠の観測を読み込めませんでした。";
 "Could not load the Home usage style. Choose a style to save it again." = "ホームの使用量表示を読み込めませんでした。表示形式を選び直して保存してください。";
 "Could not open a terminal. Copy this command and run it in your terminal." = "ターミナルを開けませんでした。このコマンドをコピーして実行してください。";
 "Could not refresh accounts. Check their status." = "アカウントを更新できませんでした。状態を確認してください。";
+"Could not save quota samples." = "利用枠の観測を保存できませんでした。";
 "Could not save. Try again." = "保存できません。再試行してください。";
 "Couldn't %@ the terminal helper: %@" = "ターミナルヘルパーを%1$@できませんでした：%2$@";
 "Couldn't copy the log path to the clipboard." = "ログのパスをクリップボードにコピーできませんでした。";
@@ -271,6 +278,7 @@
 "Customize…" = "カスタマイズ…";
 "Cutting It Close" = "上限間近";
 "Daily" = "日次";
+"Daily Bars" = "日別棒グラフ";
 "Daily Details" = "日別の詳細";
 "Daily Records" = "日別の記録";
 "Daily Token Usage" = "日別トークン使用量";
@@ -286,6 +294,7 @@
 "Default" = "標準";
 "Density" = "密度";
 "Design Preview" = "デザインプレビュー";
+"Detailed Statistics" = "詳細統計";
 "Details" = "詳細";
 "Details Only" = "詳細のみ";
 "Details only" = "詳細のみ";
@@ -307,6 +316,7 @@
 "Display Location" = "表示場所";
 "Display Location: %@" = "表示場所：%@";
 "Display Metrics" = "表示項目";
+"Display Settings" = "表示設定";
 "Done" = "完了";
 "Done." = "完了。";
 "Double Ring" = "二重リング";
@@ -316,8 +326,10 @@
 "Drag to Reorder" = "ドラッグして並べ替え";
 "Drunk Mode" = "ほろ酔いモード";
 "Each cell is 1%." = "1マスは1パーセントポイントです。";
+"Each darker band adds" = "濃いバンドごとの増加量";
 "Edit" = "編集";
 "Edit Home Display" = "ホームの表示を編集";
+"Empty cells have no recorded data, not zero usage." = "空欄は未記録を示し、使用量ゼロではありません。";
 "Enable Claude or Codex in Providers to read local token logs." = "プロバイダー画面で Claude または Codex を有効にすると、ローカルのトークンログを読み取れます。";
 "Enable Codex in Providers to read its local token logs." = "プロバイダー画面で Codex を有効にすると、ローカルのトークンログを読み取れます。";
 "Enable Notifications" = "通知を有効にする";
@@ -359,6 +371,7 @@
 "Filter by Service" = "サービスで絞り込み";
 "Find accounts" = "アカウントを検索";
 "Finish signing in inside the terminal window that opened." = "開いたターミナルのウィンドウでサインインを完了してください。";
+"Folded Bands" = "折り重ねバンド";
 "Folder authorization failed. Select the folder again." = "フォルダを許可できませんでした。再度選択してください。";
 "Folder authorized. Enable the service and refresh its usage." = "フォルダを許可しました。サービスを有効にして使用量を更新してください。";
 "Follow System" = "システムに従う";
@@ -527,6 +540,7 @@
 "No Ollama key found. Install Ollama and run `ollama signin` to track cloud usage." = "Ollama のキーが見つかりません。Ollama をインストールして `ollama signin` を実行するとクラウド使用量を追跡できます。";
 "No OpenCode Go subscription on this key." = "このキーには OpenCode Go のサブスクリプションがありません。";
 "No OpenRouter API key. Set OPENROUTER_API_KEY or add it to ~/.config/tokenplan/openrouter.json." = "OpenRouter の API キーがありません。OPENROUTER_API_KEY を設定するか、~/.config/tokenplan/openrouter.json に追加してください。";
+"No Recorded Data" = "記録データがありません";
 "No Z.ai API key. Set ZAI_API_KEY or add it to ~/.config/tokenplan/zai.json." = "Z.ai の API キーがありません。ZAI_API_KEY を設定するか、~/.config/tokenplan/zai.json に追加してください。";
 "No accounts are shown in the menu bar yet." = "メニューバーに表示中のアカウントはまだありません。";
 "No accounts yet. Add one to start tracking your usage." = "アカウントがありません。追加すると使用状況を確認できます。";
@@ -582,6 +596,7 @@
 "Notifications, appearance and more" = "通知、外観など";
 "Notify When Usage Reaches" = "通知する使用率";
 "Numbers" = "数値";
+"Observation List" = "観測記録";
 "Off" = "オフ";
 "On Demand" = "必要時に表示";
 "One ring per selected account: Claude 5h, Codex Pro 1w, Plus 5h. Other plans use the quota with least remaining." = "選択した各アカウントに1つのリング：Claude 5h、Codex Pro 1w、Plus 5h。その他のプランは残り枠が最も少ない制限を表示します。";
@@ -647,7 +662,9 @@
 "Providers" = "サブスクリプションとサービス";
 "Quit" = "終了";
 "Quit TokenPlan" = "TokenPlan を終了";
+"Quota Changes" = "利用枠の推移";
 "Quota History" = "使用枠の履歴";
+"Quota Line" = "利用枠バーンダウン";
 "Quota Readings" = "クォータ記録";
 "Quota Ruler" = "使用枠の目盛り";
 "Quota Style" = "使用量グラフ";
@@ -668,7 +685,9 @@
 "Receive pre-release builds before they ship to everyone" = "一般公開前のプレリリース版を受け取ります";
 "Record Shortcut" = "ショートカットを記録";
 "Recorded Daily Tokens · 14 Days" = "日別トークン記録 · 14日間";
+"Recorded Remaining Quota" = "観測時の残り利用枠";
 "Recorded Tokens" = "記録済みトークン";
+"Recorded Value" = "観測値";
 "Recorded token counts are invalid. Showing the original model list." = "記録されたトークン合計が無効なため、元のモデル一覧を表示します。";
 "Reduce Animations" = "アニメーションを減らす";
 "Refresh" = "更新";
@@ -820,7 +839,10 @@
 "Some models could not be priced. This estimate is incomplete." = "一部モデルの料金が不明なため、推定は不完全です。";
 "Some usage data is unavailable. Available readings are shown below." = "一部の使用量を取得できません。取得できたデータを表示しています。";
 "Sonnet" = "Sonnet";
+"Source Composition" = "ソース構成";
+"Source List" = "ソース一覧";
 "Source Split" = "内訳バー";
+"Source Treemap" = "ソースツリーマップ";
 "Spark" = "Spark";
 "Spark Weekly" = "Spark 週間";
 "Special Designs" = "特別なデザイン";
@@ -836,6 +858,7 @@
 "Status Lights" = "ステータスランプ";
 "Status: %@" = "状態：%@";
 "Stop" = "停止";
+"Style" = "スタイル";
 "Style Preview" = "スタイルプレビュー";
 "Subscription" = "契約";
 "Subscription Details" = "契約の詳細";
@@ -962,6 +985,7 @@
 "Updates are disabled in the design preview." = "デザインプレビューでは更新を実行しません。";
 "Updates blocked by Anthropic. Be patient — manual refreshes will make it worse." = "Anthropic により更新がブロックされています。しばらくお待ちください。手動更新はかえって悪化させます。";
 "Usage" = "使用量";
+"Usage Activity" = "使用状況";
 "Usage Display" = "使用量の表示";
 "Usage History" = "使用履歴";
 "Usage Needs Attention" = "使用量を確認してください";

@@ -99,7 +99,7 @@ tray integration remain platform-specific. This change does not publish a releas
   Updates and About form the second group, and Quit remains separate.
 - An account's note is hidden behind Add Note (or shown as text with Edit) until wanted;
   an unsaved draft keeps the editor open. Edit Home Display, Add Note (or Edit) and
-  Remove Saved Key (when a key is saved) sit side by side in one action row
+  Remove Saved Key (when a key is saved) use a wrapping action area
   below the account details. Removing a key asks for confirmation; removing an account
   remains a separate confirmed action.
 - Problem cards carry one button for the next step: Try Again (temporary failures, refreshes just that account), Sign In Again
@@ -120,7 +120,7 @@ tray integration remain platform-specific. This change does not publish a releas
   Rows are not detail links: each has a display switch and an actions menu for removing the account, with inline confirmation.
   Sorting exposes drag handles, also operable with the keyboard arrow keys. During a drag the full row follows the pointer and neighbouring rows make space; releasing commits the order, while Escape or pointer cancellation restores it. Auto-scrolling keeps longer lists reachable. Reduced Motion removes the settling animation. Removing a service also works when it has no separate saved identity, without deleting its login or history.
 - Account details have no tabs or duplicate global-setting links. View mode shows quota, history,
-  one action row for Edit Home Display, note and Remove Saved Key (when a key is saved),
+  an action area for Edit Home Display and note, with Remove Saved Key on a full-width row when a key is saved,
   plus API key status where a key is supported. Current Quota uses the account's effective
   Home usage style, so a per-subscription style change is reflected as soon as the editor closes.
   Edit mode replaces the view with metric placement,
@@ -269,3 +269,17 @@ using the same Home renderer; account edits apply immediately.
 
 Style variants and forecast, shape and cell-count options use aligned dropdowns.
 The sample preview is inset inside its settings group with the shared control radius.
+
+- Single-ring readings keep the percentage inside its own arc, with the period and reset time together beside it. Adjacent quota groups have a wider gutter in Home, account details and style previews.
+
+- Border Progress aligns its period and reset time against the right edge, matching Row Fill. Key removal has its own full-width control so localized labels and confirmation actions fit.
+
+### Statistics display settings
+
+Usage Statistics has its own Display Settings, shared by the macOS, Windows and Linux interface. Modules can be enabled and reordered by dragging (or the handle's arrow keys); style choices and order persist locally. Usage Activity switches between calendar, folded bands and daily bars. Source Composition switches between a token-weighted service treemap and a list. Quota Changes is optional and switches between remaining-quota samples and original observations; Daily Records retains its existing drill-down. Home styles remain independent.
+
+Activity and source charts use the same filtered, deduplicated local history as the totals. Missing dates remain unknown, and partial-history notices stay visible. Treemap area measures recorded tokens, never money or a subscription limit. Quota charts select one account/metric/unit series at a time: percentage observations become remaining quota (100 minus recorded usage), while balance observations retain their native value. Lines stop at missing samples, resets and gaps over 90 minutes; they do not predict future usage or reconstruct missing history. No quota series is derived from token logs.
+
+The shared interface also saves actual successful percentage samples locally while TokenPlan is running, retaining at most 30 days / 2,400 points per account (one latest reading per hour and metric). Samples keep the provider's fetch timestamp. They are cleared when an account is removed or its identity changes. This supplies future observations on macOS, whose helper does not expose older quota samples; it cannot recover time before collection began. Backend-provided observations remain available on Windows/Linux. Storage failures are reported on the statistics page.
+
+Display Settings and chart modules apply only to Last 30 Days. Today and Yesterday always show the summary and daily records, independently of the 30-day module switches. Fresh settings enable activity (daily bars), sources (list), quota (line) and daily records. Existing saved choices are retained. The toolbar is labelled Detailed Statistics. Activity charts expose each date's exact reading on hover or keyboard focus, including an explicit missing-data state, instead of duplicating the calendar in a separate readings table.

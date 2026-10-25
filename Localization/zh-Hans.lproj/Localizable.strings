@@ -63,6 +63,7 @@
 "Account Management" = "账号管理";
 "Account Note (Optional)" = "账号备注（可选）";
 "Account Settings" = "账号设置";
+"Account and Metric" = "账号与指标";
 "Account connected." = "账号已连接。";
 "Account identified. Enable it and refresh to load usage." = "账号已识别，启用并刷新后可读取用量。";
 "Account kept. Its login could not be identified. Check the configuration directory and access permissions, then detect again." = "账号已保留，但暂未识别到对应登录。请检查配置目录和访问权限后重新检测。";
@@ -71,6 +72,8 @@
 "Accounts follow the order in Service Configuration." = "账号顺序与服务配置保持一致。";
 "Accounts in the Menu Bar" = "显示在菜单栏的账号";
 "Activity" = "活动";
+"Activity Calendar" = "活动热力日历";
+"Actual samples only; gaps and resets are not connected." = "仅显示实际采样；缺口与重置之间不连线。";
 "Add" = "添加";
 "Add Account" = "添加账号";
 "Add Note" = "添加备注";
@@ -160,6 +163,7 @@
 "Choose Which Metrics Appear on Home" = "调整首页显示哪些指标";
 "Choose a service to see how to connect an account." = "先选择服务，再连接账号。";
 "Choose at most two tray metrics per account." = "每个账号最多选择两项托盘指标。";
+"Choose modules in Display Settings." = "请在显示设置中开启模块。";
 "Choose services and accounts to show. Hiding them keeps stars, overview and refresh unchanged." = "选择显示的服务和账号。隐藏不会改变星标、总览或刷新。";
 "Choose the service's local folder, such as .claude or .codex, to read its login and usage history." = "选择服务的本地文件夹（如 .claude 或 .codex），以读取登录和用量历史。";
 "Choose up to three menu bar metrics per account." = "每个账号最多选择三项菜单栏指标。";
@@ -229,10 +233,13 @@
 "Could not check or install the update. Try again later." = "无法检查或安装更新，请稍后重试。";
 "Could not complete this step. Check the directory or login and try again." = "操作未完成，请检查目录或登录状态后重试。";
 "Could not install the update. Try again later." = "无法安装更新，请稍后重试。";
+"Could not load display settings." = "无法读取显示设置。";
 "Could not load pending accounts. Try again." = "无法读取待连接账号，请重试。";
+"Could not load quota samples." = "无法读取额度采样。";
 "Could not load the Home usage style. Choose a style to save it again." = "无法读取主页用量样式，请重新选择样式以保存。";
 "Could not open a terminal. Copy this command and run it in your terminal." = "无法打开终端，请复制此命令到终端运行。";
 "Could not refresh accounts. Check their status." = "账号刷新失败，请查看账号状态。";
+"Could not save quota samples." = "无法保存额度采样。";
 "Could not save. Try again." = "保存失败，请重试。";
 "Couldn't %@ the terminal helper: %@" = "无法%1$@终端助手：%2$@";
 "Couldn't copy the log path to the clipboard." = "无法将日志路径复制到剪贴板。";
@@ -271,6 +278,7 @@
 "Customize…" = "自定义…";
 "Cutting It Close" = "接近上限";
 "Daily" = "每日";
+"Daily Bars" = "每日柱形";
 "Daily Details" = "每日明细";
 "Daily Records" = "每日记录";
 "Daily Token Usage" = "每日 token 用量";
@@ -286,6 +294,7 @@
 "Default" = "默认";
 "Density" = "密度";
 "Design Preview" = "设计预览";
+"Detailed Statistics" = "详细统计";
 "Details" = "详情";
 "Details Only" = "仅详情";
 "Details only" = "仅详情";
@@ -307,6 +316,7 @@
 "Display Location" = "显示位置";
 "Display Location: %@" = "显示位置：%@";
 "Display Metrics" = "显示指标";
+"Display Settings" = "显示设置";
 "Done" = "完成";
 "Done." = "完成。";
 "Double Ring" = "双环";
@@ -316,8 +326,10 @@
 "Drag to Reorder" = "拖动排序";
 "Drunk Mode" = "微醺模式";
 "Each cell is 1%." = "每格 1 个百分点。";
+"Each darker band adds" = "每深一层代表增加";
 "Edit" = "编辑";
 "Edit Home Display" = "编辑首页显示";
+"Empty cells have no recorded data, not zero usage." = "空格表示没有记录，不代表用量为零。";
 "Enable Claude or Codex in Providers to read local token logs." = "在提供方中启用 Claude 或 Codex，即可读取本机 Token 日志。";
 "Enable Codex in Providers to read its local token logs." = "在提供方中启用 Codex，即可读取本机 Token 日志。";
 "Enable Notifications" = "开启通知";
@@ -359,6 +371,7 @@
 "Filter by Service" = "按服务筛选";
 "Find accounts" = "查找账号";
 "Finish signing in inside the terminal window that opened." = "请在打开的终端窗口中完成登录。";
+"Folded Bands" = "折叠色带";
 "Folder authorization failed. Select the folder again." = "文件夹授权失败，请重新选择。";
 "Folder authorized. Enable the service and refresh its usage." = "文件夹已授权，请启用服务并刷新用量。";
 "Follow System" = "跟随系统";
@@ -527,6 +540,7 @@
 "No Ollama key found. Install Ollama and run `ollama signin` to track cloud usage." = "没有找到 Ollama 密钥。请安装 Ollama 并运行 `ollama signin` 以追踪云端用量。";
 "No OpenCode Go subscription on this key." = "该密钥下没有 OpenCode Go 订阅。";
 "No OpenRouter API key. Set OPENROUTER_API_KEY or add it to ~/.config/tokenplan/openrouter.json." = "没有 OpenRouter 的 API 密钥。请设置 OPENROUTER_API_KEY，或将其添加到 ~/.config/tokenplan/openrouter.json。";
+"No Recorded Data" = "暂无记录数据";
 "No Z.ai API key. Set ZAI_API_KEY or add it to ~/.config/tokenplan/zai.json." = "没有 Z.ai 的 API 密钥。请设置 ZAI_API_KEY，或将其添加到 ~/.config/tokenplan/zai.json。";
 "No accounts are shown in the menu bar yet." = "还没有账号显示在菜单栏。";
 "No accounts yet. Add one to start tracking your usage." = "还没有账号。添加一个，开始追踪用量。";
@@ -582,6 +596,7 @@
 "Notifications, appearance and more" = "通知、外观等";
 "Notify When Usage Reaches" = "用量达到以下比例时提醒";
 "Numbers" = "醒目数字";
+"Observation List" = "采样记录";
 "Off" = "关闭";
 "On Demand" = "按需展开";
 "One ring per selected account: Claude 5h, Codex Pro 1w, Plus 5h. Other plans use the quota with least remaining." = "每个所选账号显示一个环：Claude 5h、Codex Pro 1w、Plus 5h。其他计划显示剩余额度最少的一项限制。";
@@ -647,7 +662,9 @@
 "Providers" = "订阅与服务";
 "Quit" = "退出";
 "Quit TokenPlan" = "退出 TokenPlan";
+"Quota Changes" = "额度变化";
 "Quota History" = "额度记录";
+"Quota Line" = "额度燃尽线";
 "Quota Readings" = "配额记录";
 "Quota Ruler" = "额度刻度尺";
 "Quota Style" = "图形样式";
@@ -668,7 +685,9 @@
 "Receive pre-release builds before they ship to everyone" = "在正式发布前抢先收到预发布版本";
 "Record Shortcut" = "录制快捷键";
 "Recorded Daily Tokens · 14 Days" = "每日 token 记录 · 14 天";
+"Recorded Remaining Quota" = "采样时剩余额度";
 "Recorded Tokens" = "已记录 token";
+"Recorded Value" = "采样值";
 "Recorded token counts are invalid. Showing the original model list." = "记录的 token 总数无效，改为显示原始模型列表。";
 "Reduce Animations" = "减少动画";
 "Refresh" = "刷新";
@@ -820,7 +839,10 @@
 "Some models could not be priced. This estimate is incomplete." = "部分模型无法计价，此估算不完整。";
 "Some usage data is unavailable. Available readings are shown below." = "部分用量暂时无法获取，下方显示已获取的数据。";
 "Sonnet" = "Sonnet";
+"Source Composition" = "来源构成";
+"Source List" = "来源列表";
 "Source Split" = "来源分段条";
+"Source Treemap" = "来源树图";
 "Spark" = "Spark";
 "Spark Weekly" = "Spark 每周";
 "Special Designs" = "特殊设计";
@@ -836,6 +858,7 @@
 "Status Lights" = "状态信号灯";
 "Status: %@" = "状态：%@";
 "Stop" = "停止";
+"Style" = "样式";
 "Style Preview" = "样式预览";
 "Subscription" = "订阅";
 "Subscription Details" = "订阅详情";
@@ -962,6 +985,7 @@
 "Updates are disabled in the design preview." = "独立测试版不执行更新。";
 "Updates blocked by Anthropic. Be patient — manual refreshes will make it worse." = "Anthropic 暂时限制了更新。请耐心等待——手动刷新只会让情况更糟。";
 "Usage" = "用量";
+"Usage Activity" = "使用活动";
 "Usage Display" = "用量显示";
 "Usage History" = "用量历史";
 "Usage Needs Attention" = "请留意用量";

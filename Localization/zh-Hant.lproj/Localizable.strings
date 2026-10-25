@@ -63,6 +63,7 @@
 "Account Management" = "帳號管理";
 "Account Note (Optional)" = "帳號備註（選填）";
 "Account Settings" = "帳號設定";
+"Account and Metric" = "帳號與指標";
 "Account connected." = "帳號已連線。";
 "Account identified. Enable it and refresh to load usage." = "帳號已辨識，啟用並重新整理後可讀取用量。";
 "Account kept. Its login could not be identified. Check the configuration directory and access permissions, then detect again." = "帳號已保留，但尚未辨識對應登入。請檢查設定目錄及存取權限後重新偵測。";
@@ -71,6 +72,8 @@
 "Accounts follow the order in Service Configuration." = "帳號順序與服務設定保持一致。";
 "Accounts in the Menu Bar" = "顯示在選單列的帳號";
 "Activity" = "活動";
+"Activity Calendar" = "活動熱力日曆";
+"Actual samples only; gaps and resets are not connected." = "僅顯示實際採樣；缺口與重置之間不連線。";
 "Add" = "加入";
 "Add Account" = "新增帳號";
 "Add Note" = "新增備註";
@@ -160,6 +163,7 @@
 "Choose Which Metrics Appear on Home" = "調整首頁顯示哪些指標";
 "Choose a service to see how to connect an account." = "先選擇服務，再連接帳號。";
 "Choose at most two tray metrics per account." = "每個帳號最多選擇兩項系統匣指標。";
+"Choose modules in Display Settings." = "請在顯示設定中開啟模組。";
 "Choose services and accounts to show. Hiding them keeps stars, overview and refresh unchanged." = "選擇顯示的服務和帳號。隱藏不會改變星號、總覽或重新整理。";
 "Choose the service's local folder, such as .claude or .codex, to read its login and usage history." = "選擇服務的本機資料夾（如 .claude 或 .codex），以讀取登入和用量記錄。";
 "Choose up to three menu bar metrics per account." = "每個帳號最多選擇三項選單列指標。";
@@ -229,10 +233,13 @@
 "Could not check or install the update. Try again later." = "無法檢查或安裝更新，請稍後重試。";
 "Could not complete this step. Check the directory or login and try again." = "操作未完成，請檢查目錄或登入狀態後重試。";
 "Could not install the update. Try again later." = "無法安裝更新，請稍後重試。";
+"Could not load display settings." = "無法讀取顯示設定。";
 "Could not load pending accounts. Try again." = "無法讀取待連線帳號，請重試。";
+"Could not load quota samples." = "無法讀取額度採樣。";
 "Could not load the Home usage style. Choose a style to save it again." = "無法讀取首頁用量樣式，請重新選擇樣式以儲存。";
 "Could not open a terminal. Copy this command and run it in your terminal." = "無法開啟終端機，請複製此命令到終端機執行。";
 "Could not refresh accounts. Check their status." = "帳號重新整理失敗，請查看帳號狀態。";
+"Could not save quota samples." = "無法儲存額度採樣。";
 "Could not save. Try again." = "儲存失敗，請重試。";
 "Couldn't %@ the terminal helper: %@" = "無法%1$@終端機輔助工具：%2$@";
 "Couldn't copy the log path to the clipboard." = "無法將記錄檔路徑拷貝到剪貼簿。";
@@ -271,6 +278,7 @@
 "Customize…" = "自訂…";
 "Cutting It Close" = "接近上限";
 "Daily" = "每日";
+"Daily Bars" = "每日柱形";
 "Daily Details" = "每日明細";
 "Daily Records" = "每日記錄";
 "Daily Token Usage" = "每日 token 用量";
@@ -286,6 +294,7 @@
 "Default" = "預設";
 "Density" = "密度";
 "Design Preview" = "設計預覽";
+"Detailed Statistics" = "詳細統計";
 "Details" = "詳情";
 "Details Only" = "僅詳情";
 "Details only" = "僅詳細資料";
@@ -307,6 +316,7 @@
 "Display Location" = "顯示位置";
 "Display Location: %@" = "顯示位置：%@";
 "Display Metrics" = "顯示指標";
+"Display Settings" = "顯示設定";
 "Done" = "完成";
 "Done." = "完成。";
 "Double Ring" = "雙環";
@@ -316,8 +326,10 @@
 "Drag to Reorder" = "拖曳排序";
 "Drunk Mode" = "微醺模式";
 "Each cell is 1%." = "每格 1 個百分點。";
+"Each darker band adds" = "每深一層代表增加";
 "Edit" = "編輯";
 "Edit Home Display" = "編輯首頁顯示";
+"Empty cells have no recorded data, not zero usage." = "空格表示沒有記錄，不代表用量為零。";
 "Enable Claude or Codex in Providers to read local token logs." = "在提供方中啟用 Claude 或 Codex，即可讀取本機 Token 日誌。";
 "Enable Codex in Providers to read its local token logs." = "在提供方中啟用 Codex，即可讀取本機 Token 日誌。";
 "Enable Notifications" = "開啟通知";
@@ -359,6 +371,7 @@
 "Filter by Service" = "依服務篩選";
 "Find accounts" = "尋找帳號";
 "Finish signing in inside the terminal window that opened." = "請在開啟的終端機視窗中完成登入。";
+"Folded Bands" = "摺疊色帶";
 "Folder authorization failed. Select the folder again." = "資料夾授權失敗，請重新選擇。";
 "Folder authorized. Enable the service and refresh its usage." = "資料夾已授權，請啟用服務並重新整理用量。";
 "Follow System" = "跟隨系統";
@@ -527,6 +540,7 @@
 "No Ollama key found. Install Ollama and run `ollama signin` to track cloud usage." = "找不到 Ollama 金鑰。請安裝 Ollama 並執行 `ollama signin` 以追蹤雲端用量。";
 "No OpenCode Go subscription on this key." = "此金鑰下沒有 OpenCode Go 訂閱。";
 "No OpenRouter API key. Set OPENROUTER_API_KEY or add it to ~/.config/tokenplan/openrouter.json." = "沒有 OpenRouter 的 API 金鑰。請設定 OPENROUTER_API_KEY，或將其加入 ~/.config/tokenplan/openrouter.json。";
+"No Recorded Data" = "暫無記錄資料";
 "No Z.ai API key. Set ZAI_API_KEY or add it to ~/.config/tokenplan/zai.json." = "沒有 Z.ai 的 API 金鑰。請設定 ZAI_API_KEY，或將其加入 ~/.config/tokenplan/zai.json。";
 "No accounts are shown in the menu bar yet." = "還沒有帳號顯示在選單列。";
 "No accounts yet. Add one to start tracking your usage." = "尚無帳號。新增一個，開始追蹤用量。";
@@ -582,6 +596,7 @@
 "Notifications, appearance and more" = "通知、外觀等";
 "Notify When Usage Reaches" = "用量達到以下比例時提醒";
 "Numbers" = "醒目數字";
+"Observation List" = "採樣記錄";
 "Off" = "關閉";
 "On Demand" = "按需展開";
 "One ring per selected account: Claude 5h, Codex Pro 1w, Plus 5h. Other plans use the quota with least remaining." = "每個所選帳號顯示一個環：Claude 5h、Codex Pro 1w、Plus 5h。其他方案顯示剩餘額度最少的一項限制。";
@@ -647,7 +662,9 @@
 "Providers" = "訂閱與服務";
 "Quit" = "結束";
 "Quit TokenPlan" = "結束 TokenPlan";
+"Quota Changes" = "額度變化";
 "Quota History" = "額度記錄";
+"Quota Line" = "額度燃盡線";
 "Quota Readings" = "配額記錄";
 "Quota Ruler" = "額度刻度尺";
 "Quota Style" = "圖形樣式";
@@ -668,7 +685,9 @@
 "Receive pre-release builds before they ship to everyone" = "在正式發布前搶先收到預發布版本";
 "Record Shortcut" = "錄製快速鍵";
 "Recorded Daily Tokens · 14 Days" = "每日 token 記錄 · 14 天";
+"Recorded Remaining Quota" = "採樣時剩餘額度";
 "Recorded Tokens" = "已記錄 token";
+"Recorded Value" = "採樣值";
 "Recorded token counts are invalid. Showing the original model list." = "記錄的 token 總數無效，改為顯示原始模型清單。";
 "Reduce Animations" = "減少動畫";
 "Refresh" = "重新整理";
@@ -820,7 +839,10 @@
 "Some models could not be priced. This estimate is incomplete." = "部分模型無法計價，此估算不完整。";
 "Some usage data is unavailable. Available readings are shown below." = "部分用量暫時無法取得，下方顯示已取得的資料。";
 "Sonnet" = "Sonnet";
+"Source Composition" = "來源構成";
+"Source List" = "來源列表";
 "Source Split" = "來源分段條";
+"Source Treemap" = "來源樹圖";
 "Spark" = "Spark";
 "Spark Weekly" = "Spark 每週";
 "Special Designs" = "特殊設計";
@@ -836,6 +858,7 @@
 "Status Lights" = "狀態信號燈";
 "Status: %@" = "狀態：%@";
 "Stop" = "停止";
+"Style" = "樣式";
 "Style Preview" = "樣式預覽";
 "Subscription" = "訂閱";
 "Subscription Details" = "訂閱詳情";
@@ -962,6 +985,7 @@
 "Updates are disabled in the design preview." = "獨立測試版不執行更新。";
 "Updates blocked by Anthropic. Be patient — manual refreshes will make it worse." = "Anthropic 暫時限制了更新。請耐心等待——手動重新整理只會讓情況更糟。";
 "Usage" = "用量";
+"Usage Activity" = "使用活動";
 "Usage Display" = "用量顯示";
 "Usage History" = "用量記錄";
 "Usage Needs Attention" = "請留意用量";

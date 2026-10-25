@@ -5,6 +5,8 @@ import {Select} from '../components/arc/select/select';
 import {providerText} from '../providerText';
 import {historyRange,historyBounds,summarizeHistory,dateKey} from '../historyModel';
 import {MetricRow} from '../Metrics';
+import {StatisticsModules} from './StatisticsModules';
+import {ActivityChart,SourcesChart,QuotaChart} from './StatisticsCharts';
 import {HistoryModelBreakdown} from './HistoryModelBreakdown';
 import type {Account} from '../desktop';
 import type {Copy} from '../copy';
@@ -14,7 +16,7 @@ const money=(value:number|null,language:string)=>value==null?'—':new Intl.Numb
 const number=(value:number,language:string)=>new Intl.NumberFormat(language,{notation:'compact',maximumFractionDigits:1}).format(value);
 type HistoryProps={accounts:Account[];t:Copy;language:string};
 
-export function HistorySummary({accounts,t,language,range,onRange}:{range:string;onRange:(range:string)=>void}&HistoryProps) {
+export function HistorySummary({accounts,t,language,range,onRange,showTrend=true}:{showTrend?:boolean;range:string;onRange:(range:string)=>void}&HistoryProps) {
  const tr=(s:string)=>providerText(s,language),rows=historyRange(accounts,'all',range),total=summarizeHistory(rows);
  const bounds=historyBounds(range);
  const days=Array.from({length:range==='30'?30:1},(_,i)=>{
@@ -31,7 +33,7 @@ export function HistorySummary({accounts,t,language,range,onRange}:{range:string
   </nav>
   {rows.length?<>
    <dl className="history-totals"><div><dt>{t.cost}</dt><dd>{money(total.cost,language)}</dd></div><div><dt>{t.tokens}</dt><dd>{number(total.tokens,language)}</dd></div></dl>
-   {range==='30'&&<div className="daily-trend"><div className="trend-bars" role="img" aria-label={tr('Daily Token Usage')}>{days.map(d=><span key={d.key} data-missing={d.tokens==null} style={{height:d.tokens==null?'0':`${Math.max(2,(d.tokens/maximum)*100)}%`}}/>)}</div><div className="trend-caption"><span>{tr('Daily Token Usage')}</span><span>{bounds.start.slice(5)} — {bounds.end.slice(5)}</span></div></div>}
+   {showTrend&&range==='30'&&<div className="daily-trend"><div className="trend-bars" role="img" aria-label={tr('Daily Token Usage')}>{days.map(d=><span key={d.key} data-missing={d.tokens==null} style={{height:d.tokens==null?'0':`${Math.max(2,(d.tokens/maximum)*100)}%`}}/>)}</div><div className="trend-caption"><span>{tr('Daily Token Usage')}</span><span>{bounds.start.slice(5)} — {bounds.end.slice(5)}</span></div></div>}
   </>:fallback?.hasData||trend?<div className="history-fallback">{fallback?.hasData&&<MetricRow metric={fallback} now={Date.now()} missing={t.noHistory} language={language}/>} {trend&&<MetricRow metric={trend} now={Date.now()} missing={t.noHistory} language={language}/>}</div>:<p className="empty-state">{t.noHistory}</p>}
   {(accounts.some(a=>a.historyPartial)||rows.some(r=>r.cost==null)&&total.cost!=null)&&<p className="notice" role="status">{t.historyWarning}</p>}
  </div>;
@@ -41,18 +43,18 @@ export function HistoryPage({accounts,t,language,initialRange='30'}:HistoryProps
  const tr=(s:string)=>providerText(s,language);
  const [scope,setScope]=useState('all'),[range,setRange]=useState(initialRange),[page,setPage]=useState(0);
  const [expanded,setExpanded]=useState<string|null>(null),[modelRow,setModelRow]=useState<string|null>(null);
- const [showQuota,setShowQuota]=useState(false),[quotaPage,setQuotaPage]=useState(0);
  const scoped=scope==='all'?accounts:accounts.filter(a=>a.id===scope),rows=historyRange(scoped,'all',range);
  const days=[...new Set(rows.map(r=>r.date))],pages=Math.max(1,Math.ceil(days.length/7)),current=Math.min(page,pages-1);
- const bounds=historyBounds(range);
- const observations=scoped.flatMap(a=>a.observations.map(o=>({...o,account:a}))).filter(o=>{const d=dateKey(new Date(o.date));return d>=bounds.start&&d<=bounds.end;}).sort((a,b)=>b.date.localeCompare(a.date));
- const lastQuota=Math.max(0,Math.ceil(observations.length/10)-1),currentQuota=Math.min(quotaPage,lastQuota);
- const reset=()=>{setPage(0);setExpanded(null);setModelRow(null);setQuotaPage(0);};
+ const reset=()=>{setPage(0);setExpanded(null);setModelRow(null);};
  return <div className="history-page">
   {accounts.length>1&&<div className="history-filter"><Select label={tr('Account')} value={scope} onValueChange={v=>{setScope(v);reset();}} options={[{value:'all',label:t.all},...accounts.map(a=>({value:a.id,label:a.email?`${a.name} · ${a.email}`:a.name}))]}/></div>}
-  <HistorySummary accounts={scoped} t={t} language={language} range={range} onRange={v=>{setRange(v);reset();}}/>
+  <HistorySummary showTrend={false} accounts={scoped} t={t} language={language} range={range} onRange={v=>{setRange(v);reset();}}/>
   <p className="group-description">{t.deviceHistory}</p>
-  {days.length>0&&<section className="history-records"><h2>{tr('Daily Records')}</h2>
+  <StatisticsModules key={range} language={language} range={range}>{(id,style)=>{
+   if(id==='activity')return <ActivityChart rows={rows} range={range} language={language} style={style}/>;
+   if(id==='sources')return <SourcesChart rows={rows} range={range} language={language} style={style}/>;
+   if(id==='quota')return <QuotaChart accounts={scoped} range={range} language={language} style={style}/>;
+   return days.length>0?<section className="history-records"><h2>{tr('Daily Records')}</h2>
    {days.slice(current*7,current*7+7).map(date=>{
     const entries=rows.filter(r=>r.date===date),sum=summarizeHistory(entries);
     return <div className="day-record" key={date}>
@@ -68,10 +70,7 @@ export function HistoryPage({accounts,t,language,initialRange='30'}:HistoryProps
     </div>;
    })}
    {pages>1&&<div className="pagination"><Button size="sm" variant="ghost" disabled={!current} aria-label={tr('Previous Page')} onClick={()=>{setPage(current-1);setExpanded(null);}}><ChevronLeft size={16}/></Button><span>{current+1} / {pages}</span><Button size="sm" variant="ghost" disabled={current===pages-1} aria-label={tr('Next Page')} onClick={()=>{setPage(current+1);setExpanded(null);}}><ChevronRight size={16}/></Button></div>}
-  </section>}
-  {observations.length>0&&<section className="observations"><Button variant="ghost" size="sm" aria-expanded={showQuota} onClick={()=>setShowQuota(!showQuota)}>{t.quotaHistory}{showQuota?<ChevronDown size={15}/>:<ChevronRight size={15}/>}</Button>{showQuota&&<>
-   {observations.slice(currentQuota*10,currentQuota*10+10).map((o,i)=><div className="observation-row" key={`${o.account.id}-${o.date}-${i}`}><span>{o.account.name} · {tr(o.label)}<small>{o.account.email}</small><small>{new Date(o.date).toLocaleString(language,{dateStyle:'short',timeStyle:'short'})}</small></span><span>{o.value==null?'—':`${number(o.value,language)} ${o.unit??''}`}</span></div>)}
-   {lastQuota>0&&<div className="pagination"><Button size="sm" variant="ghost" disabled={!currentQuota} aria-label={tr('Previous Page')} onClick={()=>setQuotaPage(currentQuota-1)}><ChevronLeft size={16}/></Button><span>{currentQuota+1} / {lastQuota+1}</span><Button size="sm" variant="ghost" disabled={currentQuota===lastQuota} aria-label={tr('Next Page')} onClick={()=>setQuotaPage(currentQuota+1)}><ChevronRight size={16}/></Button></div>}
-  </>}</section>}
+  </section>:<p>{t.noHistory}</p>;
+  }}</StatisticsModules>
  </div>;
 }

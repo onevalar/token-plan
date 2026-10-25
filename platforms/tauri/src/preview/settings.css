@@ -78,7 +78,7 @@
 .mac-preview .service-configuration .record-label small { display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
 .mac-preview .add-account .section-heading h2 { display:flex;align-items:center;gap:8px; }
 
-/* Compact action stack: key status above one row of equally weighted account actions. */
+/* Keep editing actions compact; destructive key removal gets room for its confirmation. */
 .mac-preview .account-configuration { margin-top:0;display:grid;gap:10px; }
 .mac-preview .account-configuration .danger-zone { margin:0;padding:0; }
 .mac-preview .account-action-fields:empty { display:none; }
@@ -97,7 +97,9 @@
 .mac-preview .key-editor-actions .save-status { grid-column:auto;flex:1;margin:0;min-height:0; }
 .mac-preview .account-action-row { display:flex;flex-wrap:wrap;gap:8px;align-items:stretch; }
 .mac-preview .account-action-row > * { flex:1 1 0;min-width:0; }
-.mac-preview .account-action-row button { width:100%;min-height:38px;padding-inline:10px;font-size:12px; }
+.mac-preview .account-action-row > button { flex:1 0 auto;width:auto;min-width:max-content; }
+.mac-preview .account-action-row > .remove-key-action { flex:1 0 100%; }
+.mac-preview .account-action-row button { min-height:38px;padding-inline:10px;font-size:12px; }
 .mac-preview .account-action-row .edit-home-button { min-height:38px;margin:0; }
 .mac-preview .account-action-row .note-action,.mac-preview .account-action-row .add-note { display:flex;justify-content:center;margin:0;color:var(--foreground); }
 .mac-preview .sort-handle { cursor:grab;touch-action:none;user-select:none;min-width:30px;min-height:36px;padding:4px;color:var(--text-secondary); }

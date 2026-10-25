@@ -54,9 +54,11 @@
 .home-segment-track > span > span { position:absolute;inset:0;background:var(--quota-color);transform-origin:0; }
 @media(max-width:359px) { .home-concentric { grid-template-columns:80px minmax(0,1fr);gap:12px; } }
 
-/* Single rings share the available width instead of stretching each reading across it. */
-.home-metrics[data-style="rings"] { grid-template-columns:repeat(2,minmax(0,1fr));gap:12px; }
-.home-metrics[data-style="rings"] .home-compact { display:grid;grid-template-columns:32px minmax(0,1fr);gap:8px;align-items:start; }
-.home-metrics[data-style="rings"] .home-quota-heading { gap:4px;flex-wrap:wrap; }
+/* Keep every percentage inside its own ring; labels form a compact adjacent group. */
+.home-metrics[data-style="rings"] { grid-template-columns:repeat(2,minmax(0,1fr));column-gap:24px;row-gap:16px; }
+.home-metrics[data-style="rings"] .home-compact { display:grid;grid-template-columns:44px minmax(0,1fr);gap:10px;align-items:center; }
+.home-metrics[data-style="rings"] .home-small-meter { position:relative;width:44px; }
+.home-ring-value { position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;line-height:1;white-space:nowrap; }
+.home-metrics[data-style="rings"] .home-quota-heading { justify-content:flex-start;font-size:var(--text-sm); }
 .home-metrics[data-style="rings"] .home-quota-meta { display:grid;gap:3px; }
-.home-metrics[data-style="rings"] .home-quota-meta .reset { font-size:var(--text-xs); }
+.home-metrics[data-style="rings"] .home-quota-meta .reset { margin-left:0;font-size:var(--text-xs);justify-content:flex-start;text-align:left; }

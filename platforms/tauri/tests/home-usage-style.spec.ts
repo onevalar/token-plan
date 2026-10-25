@@ -278,6 +278,8 @@ for(const dark of [false,true])test(`border preview has a separate value and com
  await expect(frame.locator('.home-frame-value')).toHaveText('46%');await expect(frame.locator('.home-frame-details')).toContainText('5h');
  await expect(preview).not.toContainText('Used');await expect(preview).not.toContainText('Near quota limit');await expect(page.getByRole('combobox',{name:'Variant',exact:true})).toHaveCount(0);
  const value=await frame.locator('.home-frame-value').boundingBox(),details=await frame.locator('.home-frame-details').boundingBox();expect(value!.x+value!.width).toBeLessThan(details!.x);
+ const frameBox=await frame.boundingBox();expect(Math.abs(details!.x+details!.width-(frameBox!.x+frameBox!.width-14))).toBeLessThan(2);
+ await expect(frame.locator('.home-frame-details')).toHaveCSS('text-align','right');
  await preview.scrollIntoViewIfNeeded();await preview.screenshot({path:info.outputPath(`border-${dark}.png`)});
 });
 
@@ -292,5 +294,26 @@ test('style dropdowns update previews and preserve rounded inset layout',async({
   const layout=await preview.evaluate(e=>{const surface=e.closest('.preference-surface')!,a=e.getBoundingClientRect(),b=surface.getBoundingClientRect();return {radius:parseFloat(getComputedStyle(e).borderRadius),inset:b.bottom-a.bottom,overflow:e.scrollWidth>e.clientWidth};});
   expect(layout.radius).toBeGreaterThan(0);expect(layout.inset).toBeGreaterThanOrEqual(10);expect(layout.overflow).toBe(false);
   await preview.screenshot({path:info.outputPath(`rounded-preview-${theme}.png`)});
+ }
+});
+
+for(const theme of ['light','dark'] as const)test(`single rings bind percentages to their own arc in ${theme}`,async({page},info)=>{
+ const data=largeDesktop(),account=data.accounts[0],base=account.metrics[0];data.accounts=[account];
+ account.metrics=[{...base,id:'session',label:'Session',periodSeconds:18000,percent:0},{...base,id:'weekly',label:'Weekly',periodSeconds:604800,percent:46}];
+ await page.addInitScript(()=>localStorage.setItem('tokenplan.homeUsageStyle','rings'));
+ await mockDesktop(page,'en',false,data);await page.emulateMedia({colorScheme:theme});await page.goto('/');
+ const tiles=home(page).locator('.home-compact');
+ await expect(tiles.locator('.home-ring-value')).toHaveText(['0%','46%']);
+ await expect(tiles.locator('.home-quota-heading')).toHaveText(['5h','1w']);
+ for(const width of [350,390]){
+  await page.setViewportSize({width,height:680});
+  const boxes=await tiles.evaluateAll(es=>es.map(e=>{
+   const rect=(selector:string)=>{const r=e.querySelector(selector)!.getBoundingClientRect();return {left:r.left,right:r.right,top:r.top,bottom:r.bottom};};
+   const r=e.getBoundingClientRect();return {left:r.left,right:r.right,meter:rect('.home-small-meter'),value:rect('.home-ring-value'),text:rect('.home-readout')};
+  }));
+  expect(boxes[1].left-boxes[0].right).toBeGreaterThanOrEqual(24);
+  for(const b of boxes){expect(b.value.left).toBeGreaterThanOrEqual(b.meter.left);expect(b.value.right).toBeLessThanOrEqual(b.meter.right);expect(b.text.left-b.meter.right).toBeGreaterThanOrEqual(10);}
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+  await page.screenshot({path:info.outputPath(`single-ring-${theme}-${width}.png`)});
  }
 });

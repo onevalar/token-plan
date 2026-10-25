@@ -36,10 +36,10 @@ export function HomeQuotaStyles({metrics,spec,...props}:Props) {
  })}</div>;
 }
 
-function Readout(props:MetricRowProps&{position?:string}) {
+function Readout(props:MetricRowProps&{position?:string;hideValue?:boolean}) {
  const r=quotaReading(props);
  return <div className="home-readout">
-  <div className="home-quota-heading"><span>{props.position&&<small className="home-ring-position">{props.position}</small>}{r.name}</span><strong>{r.value===null?'—':r.valueText}</strong></div>
+  <div className="home-quota-heading"><span>{props.position&&<small className="home-ring-position">{props.position}</small>}{r.name}</span>{!props.hideValue&&<strong>{r.value===null?'—':r.valueText}</strong>}</div>
   {r.value===null&&<p className="home-quota-unknown quota-missing">{props.missing}</p>}
   {props.metric.hasData&&<div className="home-quota-meta"><MetricReset {...props}/></div>}
   <MetricExpiries {...props}/>
@@ -87,7 +87,7 @@ function Quota({spec,...props}:MetricRowProps&{spec:StyleSpec}) {
   <MetricExpiries {...props}/>
  </div>;
  return <div className="home-reading home-compact" {...attributes}>
-  <div className="home-small-meter" {...quotaMeter(r)}><svg viewBox="0 0 100 90" aria-hidden="true" focusable="false"><GaugeArc value={r.value} tone={r.tone==='critical'?'danger':'accent'}/></svg></div>
-  <Readout {...props}/>
+  <div className="home-small-meter" {...quotaMeter(r)}><svg viewBox="0 0 100 90" aria-hidden="true" focusable="false"><GaugeArc value={r.value} tone={r.tone==='critical'?'danger':'accent'}/></svg><strong className="home-ring-value" aria-hidden="true">{r.value===null?'—':r.valueText}</strong></div>
+  <Readout {...props} hideValue/>
  </div>;
 }
