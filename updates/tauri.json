@@ -1,23 +1,23 @@
 {
-  "version": "2.3.3",
-  "notes": "# TokenPlan 2.3.3\n\n- 订阅的首页显示、指标顺序和用量样式现在修改后立即保存，无需再次确认；账号详情中的当前额度同步使用所选样式。\n- 优化首页用量样式的布局与读数展示，整理订阅详情中的备注、API Key 状态及相关操作。\n- 新版本提醒改为首页刷新按钮旁的紧凑入口，支持跳过当前版本；仍可在更新页面手动安装，后续新版本会再次提醒。\n- 同步五种语言，并优化三平台发布检查与构建缓存；安装包仍须通过回归检查及各平台发布验证后才会公开。\n\n## 更新说明\n\n2.x 用户可在应用内检查更新，或下载安装新版。Linux DEB 用户请下载安装新版安装包。\nmacOS 1.0.12 经典版继续保留下载，不再增加功能或发布更新。\n",
-  "pub_date": "2026-10-24T16:42:26.953Z",
+  "version": "2.3.4",
+  "notes": "# TokenPlan 2.3.4\n\n- 用量统计新增显示设置，支持模块开关、拖动排序和样式切换；使用活动可选每日柱形、热力日历或折叠色带，来源构成可选列表或树图，额度变化可选燃尽线或采样记录。\n- 图表与显示设置仅用于最近 30 天；今天、昨天保留汇总和每日明细。日历支持悬停或键盘聚焦查看精确读数，统计区域增加清晰标题。\n- 额度曲线按账号和指标展示实际采样，缺失数据不补造；三平台在本机保存成功刷新的额度采样，无法恢复此前未记录的历史。\n- 优化单环的读数分组与间距、环绕边框的周期及倒计时对齐，修复 API 密钥删除按钮文字溢出。\n- 同步 macOS、Windows、Linux 界面及五种语言，重新构建安装包和签名更新文件。\n\n## 更新说明\n\n2.x 用户可在应用内检查更新，或下载安装新版。Linux DEB 用户请下载安装新版安装包。\nmacOS 1.0.12 经典版继续保留下载。本机正式版不自动安装本次更新。\n",
+  "pub_date": "2026-10-25T03:35:42.569Z",
   "platforms": {
     "darwin-aarch64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUZDAvZHhCYm02S0lsYVRQYzMycXB5U0hiRU91TmFEdm16K1A5d1BYNW50NVl4OFRITUE5KzltNTMvSG9sS3JuSSsvR0JPMUY5RVd5QjlDVFhzaGhtcFJuamdIcnZOeUEwPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkyODYwMTAzCWZpbGU6VG9rZW5QbGFuLmFwcC50YXIuZ3oJdmVyc2lvbjoyLjMuMwpLSjhEZjlRQ2JiRHRFb2lHWk1mUlY5REpSSnEyNGlocmdybnp3YUN6T3ZnU0VSVi83OVlUMDBDVzNlcVY3UnBRUVVaNkFvM042RDJDL0dibllFZCtCZz09Cg==",
-      "url": "https://github.com/onevalar/token-plan/releases/download/v2.3.3/TokenPlan.app.tar.gz"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUZDAvZHhCYm02S0ZYRHFYdm8vSnJCb1RzUmJJVWhQanhpWXdTMW9hQlBlNlpreTQwYi9yZThrb0NuOFpMdXBCV3VhQ1JxcnBYTWdXY3l3eEFIRnIzcG4xWUU0WmNHa1FVPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkyODk5MzA5CWZpbGU6VG9rZW5QbGFuLmFwcC50YXIuZ3oJdmVyc2lvbjoyLjMuNAppMFJTZG1MaVZoOGw0dGFQcGl1aWsvdWg1Zjl1b05ZUXFXdlh1a2Vrb2YvTGVHMUZzSk10MVYyMXZDK3RnOFA2Z0pFUkdCTmdqSVdhSjRUTW54YnJEUT09Cg==",
+      "url": "https://github.com/onevalar/token-plan/releases/download/v2.3.4/TokenPlan.app.tar.gz"
     },
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUZDAvZHhCYm02S0Frejh0bEkxS2g0TGNrSDFVaXZMTjlSajlueVJLZ3lXd3NJamFtMXViQ2s2UzBVK1RSeTFTRGwzYWpxeDl2aFhsYUZkOGl5d1dOZ0U2dHdzUDhzb0F3PQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkyODU5NTQ0CWZpbGU6VG9rZW5QbGFuXzIuMy4zX3g2NC1zZXR1cC5leGUJdmVyc2lvbjoyLjMuMwoyRnQvdks2THh0N3pHeEYxN0h2NElJa1B5K3FwdDBUaHFUTWM5cDZXMzFrUWJCSTExVFFvVysrZFY5UWRlTHJnZDE3UUJ4dHRoZkpQSzdyVUNXZXlEZz09Cg==",
-      "url": "https://github.com/onevalar/token-plan/releases/download/v2.3.3/TokenPlan_2.3.3_x64-setup.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUZDAvZHhCYm02S1BMUm1uV1g4ZktOSUo3bzJUdXFDUEZQU0hMUHM1a0hOeG1KeU51bHM3TDhXc2YvNlphTlVNRVdwNkhDZFVWUXFaUkxScGh6bStYVXJxMlFaWFQrZHdjPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkyODk5MDYxCWZpbGU6VG9rZW5QbGFuXzIuMy40X3g2NC1zZXR1cC5leGUJdmVyc2lvbjoyLjMuNApmcFNYOW42c2dGSDBjTlhRYnpjUmgzdmtjMzArblJxSGhvd2s5ZCtJeTRGSDJ4RDhjUkxxUWxXVFVSNHFsNmNod3NXQlFFbzBlRVhwcjZndVQ1RVBDdz09Cg==",
+      "url": "https://github.com/onevalar/token-plan/releases/download/v2.3.4/TokenPlan_2.3.4_x64-setup.exe"
     },
     "linux-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUZDAvZHhCYm02S0FxV0tKWXl2bm9jZEM0Nlp6QVZIS3YyUjBhOFFhaEtrWnkzQlNyUXJDaHdRQTUzUmcrYlFjZFRrR3NVTU5ndDdiZ3NSWXJvdVhCd2p6TmZMN3Z1L1FrPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkyODU5Njc2CWZpbGU6VG9rZW5QbGFuXzIuMy4zX2FtZDY0LkFwcEltYWdlCXZlcnNpb246Mi4zLjMKZFdOelQ5Z1U5ajg0YzhOU2MyR2dKb0h6dW1ucUlZaFV5cFBNdGFDSjZ0WDBSYWJDRUFtbklqNGtocGh2VzZ6NXFXa3lDUWdvc0NLK2VDQlpITm45Qmc9PQo=",
-      "url": "https://github.com/onevalar/token-plan/releases/download/v2.3.3/TokenPlan_2.3.3_amd64.AppImage"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUZDAvZHhCYm02S0V0MGtMMjFUZ3VhYndGcmhmaDhBZEs0RHVtT1FmTENQNmIvcGpKdWQ1SlcwTlI1Ty83Z2J0SnZENGtyNnpsR1dZaE9sZ0FjYjNJd2hJOGhhVktlNVFFPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkyODk4ODAyCWZpbGU6VG9rZW5QbGFuXzIuMy40X2FtZDY0LkFwcEltYWdlCXZlcnNpb246Mi4zLjQKVHFZUVVKVW9UbVJPR2xBS1BSaGpOeldlaUhpVXVudDZueWVNb2tON2F3UVNPV3V5NGw5b2ZhNWtYbGlGWmZNcHBGZXJqUlcvV3BnczNGZG1lNzFRQUE9PQo=",
+      "url": "https://github.com/onevalar/token-plan/releases/download/v2.3.4/TokenPlan_2.3.4_amd64.AppImage"
     },
     "darwin-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUZDAvZHhCYm02S0lsYVRQYzMycXB5U0hiRU91TmFEdm16K1A5d1BYNW50NVl4OFRITUE5KzltNTMvSG9sS3JuSSsvR0JPMUY5RVd5QjlDVFhzaGhtcFJuamdIcnZOeUEwPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkyODYwMTAzCWZpbGU6VG9rZW5QbGFuLmFwcC50YXIuZ3oJdmVyc2lvbjoyLjMuMwpLSjhEZjlRQ2JiRHRFb2lHWk1mUlY5REpSSnEyNGlocmdybnp3YUN6T3ZnU0VSVi83OVlUMDBDVzNlcVY3UnBRUVVaNkFvM042RDJDL0dibllFZCtCZz09Cg==",
-      "url": "https://github.com/onevalar/token-plan/releases/download/v2.3.3/TokenPlan.app.tar.gz"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUZDAvZHhCYm02S0ZYRHFYdm8vSnJCb1RzUmJJVWhQanhpWXdTMW9hQlBlNlpreTQwYi9yZThrb0NuOFpMdXBCV3VhQ1JxcnBYTWdXY3l3eEFIRnIzcG4xWUU0WmNHa1FVPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkyODk5MzA5CWZpbGU6VG9rZW5QbGFuLmFwcC50YXIuZ3oJdmVyc2lvbjoyLjMuNAppMFJTZG1MaVZoOGw0dGFQcGl1aWsvdWg1Zjl1b05ZUXFXdlh1a2Vrb2YvTGVHMUZzSk10MVYyMXZDK3RnOFA2Z0pFUkdCTmdqSVdhSjRUTW54YnJEUT09Cg==",
+      "url": "https://github.com/onevalar/token-plan/releases/download/v2.3.4/TokenPlan.app.tar.gz"
     }
   }
 }
