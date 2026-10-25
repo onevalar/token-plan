@@ -45,7 +45,8 @@ test('contextual navigation scopes refresh and restores origin, range and scroll
  const scroll=await visible(page).evaluate(e=>e.scrollTop);
  await visible(page).locator('.dashboard').getByRole('button',{name:'Codex',exact:true}).click();
  await back(page);
- expect(await visible(page).evaluate(e=>e.scrollTop)).toBe(scroll);
+ // Native Windows Chromium may round the restored layout anchor by one CSS pixel.
+ expect(Math.abs(await visible(page).evaluate(e=>e.scrollTop)-scroll)).toBeLessThanOrEqual(1);
 });
 
 test('settings have compact labels, conditional interval, immediate saves and local failures',async({page})=>{
