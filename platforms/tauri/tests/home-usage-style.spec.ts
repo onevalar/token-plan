@@ -214,6 +214,15 @@ test('textured bar fills in when shown and glides, not jumps, to a refreshed rea
  const glide=await sample(900);
  expect(glide.some(v=>v>.5&&v<.84)).toBe(true);expect(glide.at(-1)!).toBeCloseTo(.88,1);
 });
+test('a full textured bar is painted solid to its end, in every layout',async({page})=>{
+ const data=largeDesktop();data.accounts=[data.accounts[0]];data.accounts[0].metrics[0].percent=100;
+ await page.addInitScript(()=>localStorage.setItem('tokenplan.homeUsageStyle','texturebar:row:hatch'));
+ await mockDesktop(page,'en',false,data);await page.goto('/');
+ const canvas=home(page).locator('.metric-texture canvas').first();
+ await expect(canvas).toBeVisible();
+ // Every pixel of the middle row is opaque: no texture gaps remain at 100%.
+ await expect.poll(()=>canvas.evaluate((c:HTMLCanvasElement)=>{const d=c.getContext('2d')!.getImageData(0,c.height>>1,c.width,1).data;let n=0;for(let i=3;i<d.length;i+=4)if(d[i]===255)n++;return n/c.width;})).toBe(1);
+});
 test('half-width textured bar puts a large reading left, period over countdown right, and no mode copy',async({page})=>{
  const data=largeDesktop();data.accounts=[data.accounts[0]];
  await page.addInitScript(()=>localStorage.setItem('tokenplan.homeUsageStyle','texturebar:half'));

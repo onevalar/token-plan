@@ -75,8 +75,8 @@ export function styleOptions(id:string):StyleOptionGroup[] {
  if(family==='bars'||family==='ruler')return [{name:'Forecast',choices:[{label:'Off',id:family},{label:'Show Forecast',id:`${family}:forecast`}]}];
  if(family==='rings')return [{name:'Rings',choices:[{label:'Single Ring',id:'rings'},{label:'Double Ring',id:'concentric'},{label:'Ticks',id:'ticks'}]}];
  if(family==='texturebar')return [
-  // A new layout starts from its own default texture but keeps the chosen colour.
-  {name:'Bar Layout',choices:layouts.map(l=>({label:layoutLabels[l],id:textured(l,defaultTexture[l],spec.tint)}))},
+  // Switching layout keeps the chosen texture and colour, so the current layout always matches one choice.
+  {name:'Bar Layout',choices:layouts.map(l=>({label:layoutLabels[l],id:textured(l,spec.texture,spec.tint)}))},
   {name:'Texture Type',choices:textureChoices.map(t=>({label:textureLabels[t],id:textured(spec.layout,t,spec.tint)}))},
   {name:'Texture Color',choices:tints.map(t=>({label:tintLabels[t],id:textured(spec.layout,spec.texture,t)}))},
  ];

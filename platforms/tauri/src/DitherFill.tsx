@@ -55,8 +55,8 @@ export function DitherFill({value,texture,className,intro=false}:{value:number;t
    if(!img)return;
    const color=getComputedStyle(el).color;if(color!==s.color){s.color=color;s.rgb=rgb(color);}
    const W=img.width,H=img.height,data=img.data,px=1/s.dpr,edge=s.pos*s.w;
-   // Near 0% the band narrows so an empty quota never looks partly used.
-   const width=Math.min(BAND,edge*2)+s.spread,center=edge-Math.sign(s.vel)*s.spread*.18;
+   // Near 0% and 100% the band narrows, so an empty quota never looks partly used and a full one is solid to the end.
+   const width=Math.min(BAND,edge*2,(s.w-edge)*2)+s.spread,center=edge-Math.sign(s.vel)*s.spread*.18;
    const lo=Math.max(center-width/2,edge*.45),hi=Math.max(lo+1e-3,center+width/2);
    const fill=new Float32Array(W),alpha=new Float32Array(W);
    for(let i=0;i<W;i++){const c=edge<=0?0:1-smooth(lo,hi,(i+.5)*px);fill[i]=c;alpha[i]=lerp(TRACK,1,smooth(.15,.85,c))*255;}

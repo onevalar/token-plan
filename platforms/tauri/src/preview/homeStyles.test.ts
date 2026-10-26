@@ -18,7 +18,9 @@ describe('account style preferences',()=>{
   for(const bad of ['texturebar:wide','texturebar:row:waves','texturebar:row:dither:provider','texturebar:row:dither:red','texturebar:row:dither:blue:x'])expect(parseStyle(bad)).toBeNull();
   expect(canonicalStyle('texturebar')).toBe(canonicalStyle('texturebar:row:lines'));
   const [layout,type,tint]=styleOptions('texturebar:half:halftone:green');
-  expect(layout.choices.map(c=>c.id)).toEqual(['texturebar:card:dither:green','texturebar:half:dither:green','texturebar:row:lines:green']);
+  expect(layout.choices.map(c=>c.id)).toEqual(['texturebar:card:halftone:green','texturebar:half:halftone:green','texturebar:row:halftone:green']);
+  // Every saved look is one of its own layout choices, so the picker never falls back to the first layout.
+  for(const id of ['texturebar','texturebar:row:hatch','texturebar:half:solid:blue','texturebar:card:mixed'])expect(styleOptions(id)[0].choices.filter(c=>sameLook(c.id,id))).toHaveLength(1);
   expect(type.choices.map(c=>c.id)).toEqual(['texturebar:half:dither:green','texturebar:half:lines:green','texturebar:half:halftone:green','texturebar:half:hatch:green','texturebar:half:solid:green','texturebar:half:mixed:green']);
   expect(tint.choices.map(c=>c.id)).toEqual(['texturebar:half:halftone','texturebar:half:halftone:blue','texturebar:half:halftone:green','texturebar:half:halftone:orange','texturebar:half:halftone:purple']);
  });
