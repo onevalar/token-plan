@@ -1,7 +1,19 @@
 <?xml version='1.0' encoding='utf-8'?>
 <rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
     <channel>
-        <item><title>TokenPlan 2.3.4</title><sparkle:version>1792898789</sparkle:version><sparkle:shortVersionString>2.3.4</sparkle:shortVersionString><sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion><description>&lt;pre&gt;# TokenPlan 2.3.4
+        <item><title>TokenPlan 2.3.5</title><sparkle:version>1792997652</sparkle:version><sparkle:shortVersionString>2.3.5</sparkle:shortVersionString><sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion><description>&lt;pre&gt;# TokenPlan 2.3.5
+
+- 用量样式「横条」新增「底纹横条」：已用部分为实心色，未用部分为底纹，交界处底纹逐渐变密、融入实心色。
+- 底纹横条提供三种版式：全幅卡片、半幅横条、横条；底纹类别可选像素点阵、竖线、圆点网点、斜线、纯色或每项不同；底纹颜色可跟随服务商颜色，或选择蓝、绿、橙、紫。
+- 打开首页时用量条从零填充到当前读数；刷新后读数变化时平滑过渡到新位置，不再突变。系统开启“减少动态效果”时直接显示读数。
+- 原「整行底色」并入底纹横条的全幅卡片，已保存的选择保持原有外观；全幅卡片高度更紧凑，用量样式中不再显示“已用 / 剩余”文字。
+- 同步 macOS、Windows、Linux 界面及五种语言，重新构建安装包和签名更新文件。
+
+## 更新说明
+
+2.x 用户可在应用内检查更新，或下载安装新版。Linux DEB 用户请下载安装新版安装包。
+macOS 1.0.12 经典版继续保留下载。本机正式版不自动安装本次更新。
+&lt;/pre&gt;</description><enclosure url="https://github.com/onevalar/token-plan/releases/download/v2.3.5/TokenPlan_2.3.5_universal.dmg" length="30776506" type="application/octet-stream" sparkle:edSignature="ui9/I5D19YOyOFKOrM0snF7VPUJlrI4gBRO3F3F7I83JxmwpRGdO9rUV5T9qoOYQYQKdpJtuG1sTdvz62v9YDQ==" /></item><item><title>TokenPlan 2.3.4</title><sparkle:version>1792898789</sparkle:version><sparkle:shortVersionString>2.3.4</sparkle:shortVersionString><sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion><description>&lt;pre&gt;# TokenPlan 2.3.4
 
 - 用量统计新增显示设置，支持模块开关、拖动排序和样式切换；使用活动可选每日柱形、热力日历或折叠色带，来源构成可选列表或树图，额度变化可选燃尽线或采样记录。
 - 图表与显示设置仅用于最近 30 天；今天、昨天保留汇总和每日明细。日历支持悬停或键盘聚焦查看精确读数，统计区域增加清晰标题。
