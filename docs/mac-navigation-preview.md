@@ -264,7 +264,7 @@ unverified. App-theme screenshots and composited raster images do not replace th
 Home style selection has eight entries arranged four per row: Bars, Cells, Rings,
 Containers, Numbers, Side-by-Side Columns, Status Lights and Border Progress. Bars includes the ruler, source split and row fill;
 Rings includes the dashboard gauge. The first four entries expose variants; the last four select their design directly. Saved style IDs
-remain unchanged. Border Progress places the value on the left and the period and countdown on the right; Row Fill uses the same split over a filled row. Styles show no visible warning sentence; color carries a near-limit or exhausted state. Both global and account style selectors show an immediate sample
+remain unchanged. Border Progress places the value on the left and the period and countdown on the right; Textured Bar's Full-Width Card (which replaced Row Fill) uses the same split over a filled row. Styles show no visible warning sentence; color carries a near-limit or exhausted state. Both global and account style selectors show an immediate sample
 using the same Home renderer; account edits apply immediately.
 
 Style variants and forecast, shape and cell-count options use aligned dropdowns.
@@ -272,7 +272,7 @@ The sample preview is inset inside its settings group with the shared control ra
 
 - Single-ring readings keep the percentage inside its own arc, with the period and reset time together beside it. Adjacent quota groups have a wider gutter in Home, account details and style previews.
 
-- Border Progress aligns its period and reset time against the right edge, matching Row Fill. Key removal has its own full-width control so localized labels and confirmation actions fit.
+- Border Progress aligns its period and reset time against the right edge, matching the Full-Width Card. Key removal has its own full-width control so localized labels and confirmation actions fit.
 
 ### Statistics display settings
 

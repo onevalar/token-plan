@@ -3,6 +3,7 @@ import type {Metric} from './desktop';
 import {countdown,period} from './usage';
 import {providerText} from './providerText';
 import {textFor} from './copy';
+import {DitherFill,tintStyle,type Texture,type Tint} from './DitherFill';
 
 /** "5h" → "5-hour window": the plain-language meaning of the short window label, shown as a tooltip. */
 export function windowDescription(seconds:number|null|undefined,language:string) {
@@ -43,7 +44,11 @@ export function metricAmount(m:Metric,language:string,missing:string) {
  const format=(v:number,unit:string)=>unit==='dollars'?`$${v.toFixed(2)}`:unit==='yuan'?`¥${v.toFixed(2)}`:new Intl.NumberFormat(language,{notation:'compact',maximumFractionDigits:1}).format(v);
  return m.values.length?m.values.map(v=>`${format(v.amount,v.unit)}${v.label?` ${providerText(v.label,language)}`:''}`).join(' · '):m.amount==null?missing:format(m.amount,m.unit);
 }
-export function MetricRow({metric:m,now,missing,language,remaining=false}:MetricRowProps) {
+/**
+ * `texture` swaps the plain progress bar for the Textured Bar style's canvas, which fills from empty when shown and glides
+ * to each new reading; readings without data keep the plain bar.
+ */
+export function MetricRow({metric:m,now,missing,language,remaining=false,texture,tint='provider'}:MetricRowProps&{texture?:Texture|'solid';tint?:Tint}) {
  const name=metricName(m,language);
  if(m.chart.length){
   const max=Math.max(1,...m.chart.map(p=>p.value));
@@ -54,9 +59,9 @@ export function MetricRow({metric:m,now,missing,language,remaining=false}:Metric
  // Amp's non-periodic Orb allowance fits the short label column on both helpers.
  const orb=m.label==='Orb Usage'&&!period(m.periodSeconds);
  const scope=bounded&&!orb?providerText(metricScope(m),language):'';
- return <div className="metric-block"><div className={`metric ${bounded?'':'text-metric'}`} data-tone={!m.hasData||m.percent==null?'normal':usageTone(m.percent,remaining)}>
+ return <div className="metric-block"><div className={`metric ${bounded?'':'text-metric'}`} data-tone={!m.hasData||m.percent==null?'normal':usageTone(m.percent,remaining)} style={texture?tintStyle(tint):undefined}>
   <span className="metric-name" title={windowDescription(m.periodSeconds,language)}>{orb?'Orb':bounded?period(m.periodSeconds)||'—':name}</span>
-  {bounded?<><div className="metric-meter">{scope&&<span className="metric-scope">{scope}</span>}<progress aria-label={`${name} · ${providerText(remaining?'Remaining':'Used',language)}`} aria-valuetext={!m.hasData||m.percent==null?missing:undefined} max={100} value={m.hasData?Math.max(0,Math.min(100,m.percent??0)):0}/></div><span className="value">{m.hasData&&m.percent!=null?`${Math.round(m.percent)}%`:'—'}</span></>:<span className="amount">{metricAmount(m,language,missing)}</span>}
+  {bounded?<><div className="metric-meter">{scope&&<span className="metric-scope">{scope}</span>}{texture&&m.hasData&&m.percent!=null?<span className="metric-texture" role="meter" aria-label={`${name} · ${providerText(remaining?'Remaining':'Used',language)}`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.max(0,Math.min(100,m.percent))} aria-valuetext={`${Math.round(m.percent)}%`}><DitherFill className="metric-texture-fill" value={Math.max(0,Math.min(100,m.percent))} texture={texture} intro/></span>:<progress aria-label={`${name} · ${providerText(remaining?'Remaining':'Used',language)}`} aria-valuetext={!m.hasData||m.percent==null?missing:undefined} max={100} value={m.hasData?Math.max(0,Math.min(100,m.percent??0)):0}/>}</div><span className="value">{m.hasData&&m.percent!=null?`${Math.round(m.percent)}%`:'—'}</span></>:<span className="amount">{metricAmount(m,language,missing)}</span>}
   {bounded&&<MetricReset metric={m} now={now} missing={missing} language={language}/>}
  </div><MetricExpiries metric={m} language={language}/></div>;
 }

@@ -37,7 +37,7 @@ p { margin:8px 0; }
 .email { display:block;font-size:var(--text-xs);overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
 .provider-logo { display:block;width:22px;height:22px;flex:none;background:currentColor;color:var(--provider-color);mask-size:contain;mask-repeat:no-repeat;mask-position:center;-webkit-mask-size:contain;-webkit-mask-repeat:no-repeat;-webkit-mask-position:center; }
 .family-heading + .account-block .identity-line h2,.family-heading ~ .account-block .identity-line h2 { font-size:var(--text-sm); }
-.metric { display:grid;grid-template-columns:32px minmax(40px,1fr) 42px 84px;align-items:center;column-gap:10px;min-height:32px;font-variant-numeric:tabular-nums;--meter-fill:var(--provider-color,var(--usage-normal)); }
+.metric { display:grid;grid-template-columns:32px minmax(40px,1fr) 42px 84px;align-items:center;column-gap:10px;min-height:32px;font-variant-numeric:tabular-nums;--meter-fill:var(--texture-tint,var(--provider-color,var(--usage-normal))); }
 .metric[data-tone="critical"] { --meter-fill:var(--danger); }
 .metric[data-tone="critical"] .value { color:color-mix(in oklab,var(--danger) 90%,var(--background)); }
 .metric-name { overflow-wrap:anywhere; }
@@ -140,3 +140,6 @@ progress::-moz-progress-bar { background:var(--meter-fill); }
 :root[data-theme="dark"] [data-provider] { --provider-color:var(--provider-dark); }
 /* Tray previews mirror the native monochrome template icons. */
 .tray-mark-cell .provider-logo { color:var(--foreground); }
+/* Textured Bar: same row, a taller rounded rectangle in place of the 6px progress bar. */
+.metric-texture { display:block;width:100%; }
+.metric-texture-fill { position:relative;display:block;height:10px;overflow:hidden;border-radius:4px;color:var(--meter-fill);background:color-mix(in oklab,var(--meter-fill) 9%,transparent); }

@@ -180,7 +180,7 @@ for(const style of ['gauges','cells','rings','ruler','concentric','numbers','seg
  if(style==='ticks')await expect(home(page).locator('[data-metric="quota-0"] .quota-ticks mask circle')).toHaveAttribute('stroke-dasharray','0.07 1');
 });
 
-test('row fill puts the percentage left and stacks the period over the countdown without warning copy',async({page})=>{
+test('a saved row fill opens as the full-width textured card: percentage left and stacks the period over the countdown without warning copy',async({page})=>{
  const data=largeDesktop();data.accounts=[data.accounts[0]];
  await page.addInitScript(()=>localStorage.setItem('tokenplan.homeUsageStyle','rowfill'));
  await mockDesktop(page,'en',false,data);await page.goto('/');
@@ -194,6 +194,38 @@ test('row fill puts the percentage left and stacks the period over the countdown
  expect(valueBox.x+valueBox.width).toBeLessThanOrEqual(metaBox.x);
  const periodBox=(await meta.locator(':scope > span').first().boundingBox())!,resetBox=(await meta.locator('.reset').boundingBox())!;
  expect(periodBox.y+periodBox.height).toBeLessThanOrEqual(resetBox.y);
+});
+test('textured bar fills in when shown and glides, not jumps, to a refreshed reading',async({page})=>{
+ const data=largeDesktop();data.accounts=[data.accounts[0]];
+ await page.emulateMedia({reducedMotion:'no-preference'});
+ await page.addInitScript(()=>localStorage.setItem('tokenplan.homeUsageStyle','texturebar:row:solid'));
+ await mockDesktop(page,'en',false,data);await page.goto('/');
+ const meter=home(page).locator('.metric-texture').first();await expect(meter).toHaveAttribute('aria-valuenow','46');
+ // Share of canvas columns painted on the middle row: the solid fill's visible length.
+ const filled=()=>meter.locator('canvas').evaluate((c:HTMLCanvasElement)=>{
+  const d=c.getContext('2d')!.getImageData(0,c.height>>1,c.width,1).data;let n=0;for(let i=3;i<d.length;i+=4)if(d[i])n++;return n/c.width;
+ });
+ const sample=async(ms:number)=>{const seen:number[]=[];const end=Date.now()+ms;while(Date.now()<end){seen.push(await filled());await page.waitForTimeout(16);}return seen;};
+ const intro=await sample(900);
+ expect(intro.some(v=>v>.03&&v<.42)).toBe(true);expect(intro.at(-1)!).toBeCloseTo(.46,1);
+ await page.evaluate(()=>{(window as any).__beforeRefresh=(state:any)=>{state.accounts[0].metrics[0].percent=88;};});
+ await page.getByRole('button',{name:messages('en').refresh,exact:true}).click();
+ await expect(meter).toHaveAttribute('aria-valuenow','88');
+ const glide=await sample(900);
+ expect(glide.some(v=>v>.5&&v<.84)).toBe(true);expect(glide.at(-1)!).toBeCloseTo(.88,1);
+});
+test('half-width textured bar puts a large reading left, period over countdown right, and no mode copy',async({page})=>{
+ const data=largeDesktop();data.accounts=[data.accounts[0]];
+ await page.addInitScript(()=>localStorage.setItem('tokenplan.homeUsageStyle','texturebar:half'));
+ await mockDesktop(page,'en',false,data);await page.goto('/');
+ const first=home(page).locator('.home-texture-half').first(),meta=first.locator('.home-rowfill-meta');
+ await expect(first.locator('.home-rowfill-value')).toHaveText('46%');
+ await expect(home(page)).not.toContainText(/\b(Used|Remaining)\b/);
+ const valueBox=(await first.locator('.home-rowfill-value').boundingBox())!,metaBox=(await meta.boundingBox())!;
+ expect(valueBox.x+valueBox.width).toBeLessThanOrEqual(metaBox.x);
+ const periodBox=(await meta.locator(':scope > span').first().boundingBox())!,resetBox=(await meta.locator('.reset').boundingBox())!;
+ expect(periodBox.y+periodBox.height).toBeLessThanOrEqual(resetBox.y);
+ expect((await first.locator('.home-texture-meter').boundingBox())!.y).toBeGreaterThanOrEqual(resetBox.y+resetBox.height);
 });
 test('concentric rings keep independent readings and never pair unrelated quotas',async({page})=>{
  const data=largeDesktop(),base=data.accounts[0];

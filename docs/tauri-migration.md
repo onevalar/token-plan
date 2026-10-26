@@ -260,16 +260,24 @@ login takes precedence when the same identity is also in the default directory, 
 account switch does not disconnect that saved account. macOS and the .NET engines expose only
 matched directory paths to the UI, never credential contents.
 
-Home offers twelve style families: Bars, Quota Ruler, Cells, Rings, Gauges, Numbers, Containers
+Home offers twelve style families in eight categories: Bars, Quota Ruler, Cells, Rings, Gauges, Numbers, Containers
 (battery, tank, thermometer, hourglass), Border Progress, Source Split, Side-by-Side Columns,
-Status Lights and Row Fill. Choosing one reveals its options: Bars and Quota Ruler can show a
+Status Lights and Textured Bar. Choosing one reveals its options: Bars and Quota Ruler can show a
 striped forecast of where use will land by reset; Rings are single, double or tick; Cells are a
 grid or a single row of squares, capsules or rising bars with 5, 10 or 20 cells. Earlier saved
 choices keep their look. Source Split spreads the used part over each model's share of the last
 seven days (an estimate) and falls back to a plain bar for accounts without a model split; Side-by-Side
 Columns need two or more limits and fall back to rows otherwise. Status Lights are calm under 50%
-used, watch under 80%, critical from 80%. Row Fill puts the percentage on the left and stacks the
-period over the countdown on the right. No style shows a visible near-limit, exhausted or exceeded
+used, watch under 80%, critical from 80%. Textured Bar, under Bars, offers three options. Bar
+Layout: Full-Width Card (a compact filled row with the percentage on the left and the period over the
+countdown on the right; it replaces Row Fill, and a saved Row Fill opens as a solid full-width card), Half-Width Bar (a large
+percentage on the left, period over countdown on the right, and a textured bar below) or Bar (the
+standard row with a taller rounded textured bar). Texture Type: pixel grid, vertical lines,
+halftone dots, diagonal stripes, solid, or varied per metric. Texture Color: the provider's color
+or a fixed blue, green, orange or purple; near-limit readings still turn red. Textured fills grow
+from empty when Home appears and glide to each new reading after a refresh, with the texture
+thickening into the solid part at the moving edge; with reduced motion they show the reading at
+once. Usage styles show no visible Used/Remaining label. No style shows a visible near-limit, exhausted or exceeded
 sentence; color alone carries that state.
 
 Home usage styles are local UI preferences. Unified mode retains the existing global style;

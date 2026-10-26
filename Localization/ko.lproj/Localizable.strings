@@ -132,12 +132,15 @@
 "Background" = "백그라운드";
 "Balance" = "잔액";
 "Balance and Benefits" = "잔액 및 혜택";
+"Bar" = "막대";
+"Bar Layout" = "레이아웃";
 "Bars" = "막대";
 "Based on OpenUsage by Robin Ebers, released under the MIT License." = "Robin Ebers의 OpenUsage(MIT 라이선스)를 기반으로 합니다.";
 "Battery" = "배터리";
 "Beta Updates" = "베타 업데이트";
 "Billing" = "청구";
 "Blended cost per megatoken %@ across %lld providers" = "제공업체 %2$lld곳의 백만 토큰당 평균 비용 %1$@";
+"Blue" = "파랑";
 "Border Progress" = "테두리 진행";
 "Cache Read" = "캐시 읽기";
 "Cache Write" = "캐시 쓰기";
@@ -305,6 +308,7 @@
 "Detection complete. Choose an account below or return to its details." = "검색이 완료되었습니다. 아래에서 계정을 선택하거나 계정 상세로 돌아가세요.";
 "Detects provider logins again without resetting your display preferences." = "표시 설정을 초기화하지 않고 서비스 로그인을 다시 감지합니다.";
 "Devin quota data unavailable. Try again later." = "Devin 한도 데이터를 사용할 수 없습니다. 나중에 다시 시도하세요.";
+"Diagonal Stripes" = "사선";
 "Directory not found or inaccessible. Check the full path and permissions." = "디렉터리가 없거나 접근할 수 없습니다. 전체 경로와 권한을 확인하세요.";
 "Disabled" = "사용 안 함";
 "Disabling a provider stops its requests. Its existing login remains unchanged." = "제공업체를 사용하지 않으면 요청이 중지됩니다. 기존 로그인은 변경되지 않습니다.";
@@ -391,6 +395,7 @@
 "From your Cursor usage history." = "Cursor 사용 기록에서 가져왔습니다.";
 "From your Grok logs (estimated)" = "Grok 로그에서 (추정)";
 "From your OpenCode logs" = "OpenCode 로그에서";
+"Full-Width Card" = "전체 너비 카드";
 "Gauges" = "개별 게이지";
 "Gemini Pro" = "Gemini Pro";
 "Gemini Weekly" = "Gemini 주간";
@@ -404,6 +409,7 @@
 "Global shortcuts are unavailable in this desktop session." = "현재 데스크톱 환경에서 전역 단축키를 사용할 수 없습니다.";
 "Got It" = "확인";
 "Granted" = "지급됨";
+"Green" = "초록";
 "Grid" = "그리드";
 "Grok Bot" = "Grok Bot";
 "Grok Bot usage" = "Grok Bot 사용량";
@@ -413,6 +419,8 @@
 "Grok billing request failed. Check your connection." = "Grok 청구 요청에 실패했습니다. 연결을 확인하세요.";
 "Grok billing response changed." = "Grok 청구 응답 형식이 바뀌었습니다.";
 "Grok not logged in. Run `grok login`." = "Grok에 로그인되어 있지 않습니다. `grok login`을 실행하세요.";
+"Half-Width Bar" = "하프 막대";
+"Halftone Dots" = "망점";
 "Hidden" = "숨김";
 "Hide" = "숨기기";
 "Hide %@" = "%@ 숨기기";
@@ -615,6 +623,7 @@
 "OpenRouter usage data unavailable. Try again later." = "OpenRouter 사용량 데이터를 사용할 수 없습니다. 나중에 다시 시도하세요.";
 "Optional, saved on this Mac. Use it for a renewal date or an account reminder." = "선택 사항이며 이 Mac에 저장됩니다. 갱신일이나 계정 메모를 적으세요.";
 "Options" = "옵션";
+"Orange" = "주황";
 "Orb Usage" = "Orb 사용량";
 "Orbs" = "Orb";
 "Org Credits" = "조직 크레딧";
@@ -641,6 +650,7 @@
 "Percentage Grid" = "백분율 격자";
 "Personal" = "개인";
 "Pin to tray" = "트레이에 고정";
+"Pixel Grid" = "픽셀 점";
 "Platform" = "플랫폼";
 "Plenty left" = "여유 있음";
 "Preferences could not be read. Changes can be saved again in Settings." = "환경설정을 읽을 수 없습니다. 설정에서 다시 저장할 수 있습니다.";
@@ -659,7 +669,9 @@
 "Projected to finish before the limit resets." = "한도가 초기화되기 전에 소진될 것으로 예상됩니다.";
 "Projected to finish close to your limit." = "한도에 가깝게 끝날 것으로 예상됩니다.";
 "Provider App / CLI" = "서비스 앱 / CLI";
+"Provider Color" = "서비스 색상";
 "Providers" = "구독 및 서비스";
+"Purple" = "보라";
 "Quit" = "종료";
 "Quit TokenPlan" = "TokenPlan 종료";
 "Quota Changes" = "한도 변화";
@@ -831,6 +843,7 @@
 "Single Ring" = "단일 링";
 "Single Ring Ticks" = "단일 링 눈금";
 "Single Row" = "한 줄";
+"Solid" = "단색";
 "Some Cursor export rows were invalid. Totals may be incomplete." = "일부 Cursor 내보내기 행이 잘못되어 집계가 불완전할 수 있습니다.";
 "Some accounts could not be refreshed. Check their status." = "일부 계정을 새로 고치지 못했습니다. 계정 상태를 확인하세요.";
 "Some failed" = "일부 실패";
@@ -876,6 +889,9 @@
 "Terminal Helper" = "터미널 도우미";
 "Terminal login and history are kept." = "터미널 로그인과 기록은 유지됩니다.";
 "TestFlight requires folder authorization to read existing service logins and usage history. API keys can be entered directly in service settings." = "TestFlight 버전은 기존 로그인 및 사용 기록을 읽으려면 폴더 권한이 필요합니다. API 키는 서비스 설정에 직접 입력할 수 있습니다.";
+"Texture Color" = "질감 색상";
+"Texture Type" = "질감 종류";
+"Textured Bar" = "질감 막대";
 "That reset is no longer available" = "해당 초기화는 더 이상 사용할 수 없습니다";
 "The API key could not be removed. Check local folder permissions." = "API 키를 제거할 수 없습니다. 폴더 권한을 확인하세요.";
 "The API key could not be saved. Check the key and local folder permissions." = "API 키를 저장할 수 없습니다. 키와 폴더 권한을 확인하세요.";
@@ -1021,8 +1037,10 @@
 "Uses your provider login. No TokenPlan sign-in is needed." = "서비스의 기존 로그인을 사용합니다. TokenPlan 로그인은 필요 없습니다.";
 "Using reset credit…" = "초기화 크레딧 사용 중…";
 "Variant" = "세부 스타일";
+"Varied per Metric" = "항목마다 다르게";
 "Version" = "버전";
 "Vertical Bar" = "세로 막대";
+"Vertical Lines" = "세로선";
 "View Details" = "자세히 보기";
 "View History" = "기록 보기";
 "Visible" = "표시";

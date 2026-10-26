@@ -1,15 +1,15 @@
-import type {CSSProperties} from 'react';
 import {TrendingUp} from 'lucide-react';
 import type {Metric} from './desktop';
 import {isQuotaMetric,MetricExpiries,MetricReset,MetricRow,type MetricRowProps} from './Metrics';
 import {forecastSpan,projectedUsed,quotaMeter,quotaReading,usageLevel,type StyleSpec,type VesselShape} from './homeUsage';
 import {providerText} from './providerText';
+import {DitherFill,textureAt,tintStyle} from './DitherFill';
 import './home-extra-styles.css';
 
 /** A model's share (0–1) of the account's recent tokens; the Source Split style spreads a limit's used part over these. */
 export type SourceShare={name:string;share:number};
 type Props={metrics:Metric[];spec:StyleSpec;sources:SourceShare[]}&Omit<MetricRowProps,'metric'>;
-type ItemProps=MetricRowProps&{spec:StyleSpec;sources:SourceShare[]};
+type ItemProps=MetricRowProps&{spec:StyleSpec;sources:SourceShare[];index:number};
 const clamp=(v:number)=>Math.max(0,Math.min(100,v));
 
 export function HomeExtraStyles({metrics,spec,sources,...props}:Props) {
@@ -19,16 +19,16 @@ export function HomeExtraStyles({metrics,spec,sources,...props}:Props) {
  if(spec.family==='columns'&&quotas.length>=2)return <div className="home-metrics home-variants home-extra" data-style="columns">
   <Columns metrics={quotas} {...props}/>{metrics.filter(m=>!isQuotaMetric(m)).map(row)}
  </div>;
- return <div className="home-metrics home-variants home-extra" data-style={spec.root}>{metrics.map(metric=>
-  !isQuotaMetric(metric)||spec.family==='columns'||spec.family==='sources'&&!sources.length?row(metric):<Item key={metric.id} metric={metric} spec={spec} sources={sources} {...props}/>
+ return <div className="home-metrics home-variants home-extra" data-style={spec.root}>{metrics.map((metric,index)=>
+  !isQuotaMetric(metric)||spec.family==='columns'||spec.family==='sources'&&!sources.length?row(metric):<Item key={metric.id} metric={metric} spec={spec} sources={sources} index={index} {...props}/>
  )}</div>;
 }
 
 function Missing({r,missing}:{r:ReturnType<typeof quotaReading>;missing:string}) {return r.value===null?<p className="home-quota-unknown quota-missing">{missing}</p>:null;}
 function Reset(props:MetricRowProps) {return props.metric.hasData?<MetricReset {...props}/>:null;}
 
-function Item({spec,sources,...props}:ItemProps) {
- const {metric:m}=props,r=quotaReading(props),attributes={'data-metric':m.id,'data-tone':r.tone};
+function Item({spec,sources,index,...props}:ItemProps) {
+ const {metric:m}=props,r=quotaReading(props),attributes={'data-metric':m.id,'data-tone':r.tone},texture=textureAt(spec.texture,index);
  const heading=<div className="home-quota-heading"><span>{r.name}</span><strong>{r.value===null?'—':r.valueText}</strong></div>;
  if(spec.family==='bars'){
   const forecast=projectedUsed(m,props.now,r.used);
@@ -64,10 +64,19 @@ function Item({spec,sources,...props}:ItemProps) {
    <MetricExpiries {...props}/>
   </div>;
  }
- if(spec.family==='rowfill')return <div className="home-reading home-rowfill" {...attributes} {...quotaMeter(r)} style={{'--fill':`${r.value===null?0:clamp(r.value)}%`} as CSSProperties}>
-  <strong className="home-rowfill-value" aria-hidden="true">{r.value===null?'—':r.valueText}</strong>
-  <span className="home-rowfill-meta"><span>{r.name}</span><MetricReset {...props}/></span>
- </div>;
+ // Textured Bar's card layouts: the full-width card textures the whole Row Fill shape; the half-width bar puts the
+ // same reading above a separate textured bar. Neither adds Used/Remaining copy.
+ if(spec.family==='texturebar'){
+  const fill=r.value!==null&&<DitherFill className={spec.layout==='card'?'home-rowfill-texture':'home-texture-meter'} value={clamp(r.value)} texture={texture} intro/>;
+  const reading=<><strong className="home-rowfill-value" aria-hidden="true">{r.value===null?'—':r.valueText}</strong>
+   <span className="home-rowfill-meta"><span>{r.name}</span><MetricReset {...props}/></span></>;
+  if(spec.layout==='card')return <div className="home-reading home-rowfill" data-texture={texture} {...attributes} {...quotaMeter(r)} style={tintStyle(spec.tint)}>{fill}{reading}</div>;
+  return <div className="home-reading home-texture-half" {...attributes} style={tintStyle(spec.tint)}>
+   <div className="home-texture-half-reading">{reading}</div>
+   {r.value===null?<Missing r={r} missing={props.missing}/>:<div {...quotaMeter(r)}>{fill}</div>}
+   <MetricExpiries {...props}/>
+  </div>;
+ }
  return <Sources {...props} sources={sources}/>;
 }
 

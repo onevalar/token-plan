@@ -1,6 +1,6 @@
 import {describe,it,expect} from 'vitest';
 import {homeStyleKey,readHomeStyles,homeStyleMode,homeStyleFor} from './useHomeUsageStyle';
-import {styleCategories,categoryOf,homeUsageFamilies,parseStyle,canonicalStyle,styleOptions} from '../homeUsage';
+import {sameLook,styleCategories,categoryOf,homeUsageFamilies,parseStyle,canonicalStyle,styleOptions} from '../homeUsage';
 import {sameLoginDirectory} from './AccountOnboarding';
 describe('account style preferences',()=>{
  it('offers twelve style families and keeps every earlier saved style valid',()=>{
@@ -11,6 +11,16 @@ describe('account style preferences',()=>{
   expect(parseStyle('segments:capsule:7')).toBeNull();expect(parseStyle('vessel:tank')?.vessel).toBe('tank');expect(parseStyle('nope')).toBeNull();
   expect(canonicalStyle('segments')).toBe(canonicalStyle('segments:square:20'));
   expect(styleOptions('rings')[0].choices.map(c=>c.id)).toEqual(['rings','concentric','ticks']);
+  // Textured Bar is one Bars variant; its layout, texture and colour are options with one spelling per look.
+  expect(parseStyle('rowfill:dither')).toBeNull();expect(sameLook('rowfill','texturebar:card:solid')).toBe(true);expect(categoryOf('rowfill').styles).not.toContain('rowfill');expect(categoryOf('texturebar:half:hatch').id).toBe('bars');
+  expect(parseStyle('texturebar')).toMatchObject({layout:'row',texture:'lines',tint:'provider'});
+  expect(parseStyle('texturebar:card')).toMatchObject({layout:'card',texture:'dither'});
+  for(const bad of ['texturebar:wide','texturebar:row:waves','texturebar:row:dither:provider','texturebar:row:dither:red','texturebar:row:dither:blue:x'])expect(parseStyle(bad)).toBeNull();
+  expect(canonicalStyle('texturebar')).toBe(canonicalStyle('texturebar:row:lines'));
+  const [layout,type,tint]=styleOptions('texturebar:half:halftone:green');
+  expect(layout.choices.map(c=>c.id)).toEqual(['texturebar:card:dither:green','texturebar:half:dither:green','texturebar:row:lines:green']);
+  expect(type.choices.map(c=>c.id)).toEqual(['texturebar:half:dither:green','texturebar:half:lines:green','texturebar:half:halftone:green','texturebar:half:hatch:green','texturebar:half:solid:green','texturebar:half:mixed:green']);
+  expect(tint.choices.map(c=>c.id)).toEqual(['texturebar:half:halftone','texturebar:half:halftone:blue','texturebar:half:halftone:green','texturebar:half:halftone:orange','texturebar:half:halftone:purple']);
  });
  it('groups all existing renderers without losing saved variants',()=>{
   expect(styleCategories).toHaveLength(8);

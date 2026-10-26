@@ -53,13 +53,20 @@
 .home-signal-lamps > span { width:14px;height:14px;border-radius:50%;background:var(--border-strong); }
 .home-signal-lamps > span[data-on="true"] { background:var(--lamp);box-shadow:0 0 0 3px color-mix(in srgb,var(--lamp) 25%,transparent); }
 .home-signal-line .reset { margin-left:auto; }
-/* Row fill */
-.home-rowfill { display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:64px;padding:10px 14px;border-radius:10px;background:linear-gradient(90deg,color-mix(in srgb,var(--quota-color) 26%,transparent) var(--fill),var(--border) var(--fill)); }
+/* Textured Bar, full-width card (formerly Row Fill): tight vertical padding around the reading. */
+.home-rowfill { display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:52px;padding:6px 14px;border-radius:10px; }
 .home-rowfill-value { min-width:0;font-size:26px;line-height:1.1;font-weight:600;letter-spacing:-.02em;font-variant-numeric:tabular-nums; }
 .home-rowfill-meta { display:flex;flex-direction:column;align-items:flex-end;gap:2px;min-width:0;font-size:var(--text-sm);color:var(--text-secondary);font-variant-numeric:tabular-nums;text-align:right; }
 .home-rowfill-meta .reset { justify-content:flex-end; }
+.home-rowfill[data-texture] { position:relative;isolation:isolate;overflow:hidden;background:var(--border); }
+.home-rowfill-texture { position:absolute;inset:0;z-index:-1;opacity:.3;color:var(--quota-color); }
+.home-rowfill-texture canvas { display:block;width:100%;height:100%; }
 .home-segment-track[data-shape="rising"] { height:26px;align-items:end; }
 .home-segment-track[data-shape="capsule"] > span { border-radius:999px; }
 
 .home-frame-details .home-reset,.home-frame-details .reset { justify-self:end;justify-content:flex-end; }
 .home-frame-details .reset > span { text-align:right; }
+/* Textured Bar, half-width layout: Row Fill's reading above a separate textured bar. */
+.home-texture-half-reading { display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:8px; }
+.home-texture-meter { position:relative;display:block;height:24px;overflow:hidden;border-radius:6px;color:var(--quota-color);background:color-mix(in oklab,var(--quota-color) 9%,transparent); }
+.home-texture-meter canvas,.metric-texture-fill canvas { position:absolute;inset:0;display:block;width:100%;height:100%; }

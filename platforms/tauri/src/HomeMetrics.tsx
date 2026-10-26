@@ -6,6 +6,7 @@ import {isQuotaMetric,MetricRow,MetricReset,MetricExpiries,type MetricRowProps} 
 import './home-metrics.css';
 import {HomeQuotaStyles} from './HomeQuotaStyles';
 import {HomeExtraStyles,type SourceShare} from './HomeExtraStyles';
+import {textureAt} from './DitherFill';
 import {parseStyle,quotaReading,quotaMeter,type HomeUsageStyle} from './homeUsage';
 
 export type {HomeUsageStyle} from './homeUsage';
@@ -18,6 +19,7 @@ export function HomeMetrics({metrics,style,sources=[],...reading}:{metrics:Metri
  )}</div>;
  if(['rings','concentric','ruler','numbers','segments'].includes(root))return <HomeQuotaStyles metrics={metrics} spec={spec} {...reading}/>;
  if(spec.family==='bars'&&!spec.forecast)return <>{metrics.map(metric=><MetricRow key={metric.id} metric={metric} {...reading}/>)}</>;
+ if(spec.family==='texturebar'&&spec.layout==='row')return <>{metrics.map((metric,i)=><MetricRow key={metric.id} metric={metric} texture={textureAt(spec.texture,i)} tint={spec.tint} {...reading}/>)}</>;
  return <HomeExtraStyles metrics={metrics} spec={spec} sources={sources} {...reading}/>;
 }
 

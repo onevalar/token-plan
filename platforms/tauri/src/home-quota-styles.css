@@ -1,5 +1,5 @@
 .home-variants { grid-template-columns:minmax(0,1fr);gap:16px;padding-block:8px 4px; }
-.home-reading { min-width:0;font-variant-numeric:tabular-nums;--quota-color:var(--provider-color,var(--usage-normal)); }
+.home-reading { min-width:0;font-variant-numeric:tabular-nums;--quota-color:var(--texture-tint,var(--provider-color,var(--usage-normal))); }
 .home-reading[data-tone="critical"] { --quota-color:var(--danger); }
 .home-reading[data-tone="critical"] strong,.home-reading[data-tone="critical"] .home-number-value { color:var(--danger); }
 .home-reading .quota-missing { align-items:flex-start;text-align:left; }

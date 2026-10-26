@@ -1,15 +1,17 @@
 import type {MetricRowProps} from './Metrics';
 import {metricName,usageTone} from './Metrics';
 import {providerText} from './providerText';
+import {textureChoices,tints,type TextureChoice,type Tint} from './DitherFill';
 
 /**
- * A Home style is a string: `family`, or `family:option:option`. Saved choices from before the options existed
+ * A Home style is a string: `family`, or `family:option:option`. Textured Bar is `texturebar:layout:texture:tint`,
+ * with the provider tint omitted. Saved choices from before the options existed
  * (bars, gauges, cells, rings, ruler, concentric, numbers, segments, ticks) stay valid and keep their look.
  */
-export const homeUsageFamilies={bars:'Bars',ruler:'Quota Ruler',cells:'Cells',rings:'Rings',gauges:'Gauges',numbers:'Numbers',vessel:'Containers',frame:'Border Progress',sources:'Source Split',columns:'Side-by-Side Columns',signal:'Status Lights',rowfill:'Row Fill'} as const;
+export const homeUsageFamilies={bars:'Bars',ruler:'Quota Ruler',cells:'Cells',rings:'Rings',gauges:'Gauges',numbers:'Numbers',vessel:'Containers',frame:'Border Progress',sources:'Source Split',columns:'Side-by-Side Columns',signal:'Status Lights',texturebar:'Textured Bar'} as const;
 // Presentation groups are independent of persisted renderer IDs.
 export const styleCategories=[
- {id:'bars',label:'Bars',styles:['bars','ruler','sources','rowfill']},
+ {id:'bars',label:'Bars',styles:['bars','ruler','sources','texturebar']},
  {id:'cells',label:'Cells',styles:['cells','segments']},
  {id:'rings',label:'Rings',styles:['rings','concentric','ticks','gauges']},
  {id:'vessel',label:'Containers',styles:['vessel','vessel:tank','vessel:thermometer','vessel:hourglass']},
@@ -24,22 +26,31 @@ export type HomeUsageFamily=keyof typeof homeUsageFamilies;
 export type HomeUsageStyle=string;
 export type CellShape='square'|'capsule'|'rising';
 export type VesselShape='battery'|'tank'|'thermometer'|'hourglass';
-export type StyleSpec={family:HomeUsageFamily;root:string;forecast:boolean;shape:CellShape;count:5|10|20;vessel:VesselShape};
+export type BarLayout='card'|'half'|'row';
+export type StyleSpec={family:HomeUsageFamily;root:string;forecast:boolean;shape:CellShape;count:5|10|20;vessel:VesselShape;layout:BarLayout;texture:TextureChoice;tint:Tint};
 
+const layouts:BarLayout[]=['card','half','row'],defaultTexture:Record<BarLayout,TextureChoice>={card:'dither',half:'dither',row:'lines'};
 const cellShapes:CellShape[]=['square','capsule','rising'],cellCounts=[5,10,20] as const,vessels:VesselShape[]=['battery','tank','thermometer','hourglass'];
 export function parseStyle(id:string):StyleSpec|null {
- const [root,a,b,...extra]=id.split(':');
- const spec=(family:HomeUsageFamily,patch:Partial<StyleSpec>={}):StyleSpec=>({family,root,forecast:false,shape:'square',count:20,vessel:'battery',...patch});
- if(extra.length)return null;
+ const [root,a,b,c,...extra]=id.split(':');
+ const spec=(family:HomeUsageFamily,patch:Partial<StyleSpec>={}):StyleSpec=>({family,root,forecast:false,shape:'square',count:20,vessel:'battery',layout:'row',texture:'lines',tint:'provider',...patch});
+ if(extra.length||c!==undefined&&root!=='texturebar')return null;
  switch(root){
   case 'bars':case 'ruler':return a===undefined?spec(root):a==='forecast'&&b===undefined?spec(root,{forecast:true}):null;
-  case 'cells':case 'gauges':case 'numbers':case 'rings':case 'concentric':case 'ticks':case 'frame':case 'sources':case 'columns':case 'signal':case 'rowfill':
+  case 'cells':case 'gauges':case 'numbers':case 'rings':case 'concentric':case 'ticks':case 'frame':case 'sources':case 'columns':case 'signal':
    if(a!==undefined)return null;
    return spec(root==='concentric'||root==='ticks'?'rings':root);
   case 'segments':{
    if(a===undefined)return spec('cells');
    const count=Number(b);
    return cellShapes.includes(a as CellShape)&&(b===undefined||cellCounts.includes(count as 5))?spec('cells',{shape:a as CellShape,count:(b===undefined?20:count) as 5|10|20}):null;
+  }
+  // Row Fill became Textured Bar's full-width card; a saved `rowfill` keeps its flat look there.
+  case 'rowfill':return a===undefined?spec('texturebar',{layout:'card',texture:'solid'}):null;
+  case 'texturebar':{
+   if(a===undefined)return spec(root);
+   if(!layouts.includes(a as BarLayout)||b!==undefined&&!textureChoices.includes(b as TextureChoice)||c!==undefined&&(c==='provider'||!tints.includes(c as Tint)))return null;
+   return spec(root,{layout:a as BarLayout,texture:(b??defaultTexture[a as BarLayout]) as TextureChoice,tint:(c??'provider') as Tint});
   }
   case 'vessel':return a===undefined?spec('vessel'):vessels.includes(a as VesselShape)&&b===undefined?spec('vessel',{vessel:a as VesselShape}):null;
   default:return null;
@@ -50,6 +61,11 @@ export function familyOf(id:string):HomeUsageFamily {return parseStyle(id)?.fami
 /** The style a family starts with when it is first picked. */
 export function defaultStyle(family:HomeUsageFamily):HomeUsageStyle {return family==='cells'?'cells':family;}
 
+const textureLabels:Record<TextureChoice,string>={dither:'Pixel Grid',lines:'Vertical Lines',halftone:'Halftone Dots',hatch:'Diagonal Stripes',solid:'Solid',mixed:'Varied per Metric'};
+const tintLabels:Record<Tint,string>={provider:'Provider Color',blue:'Blue',green:'Green',orange:'Orange',purple:'Purple'};
+const layoutLabels:Record<BarLayout,string>={card:'Full-Width Card',half:'Half-Width Bar',row:'Bar'};
+/** One spelling per textured look, so the bare `texturebar` equals its explicit default. */
+const textured=(layout:BarLayout,texture:TextureChoice,tint:Tint)=>`texturebar:${layout}:${texture}${tint==='provider'?'':`:${tint}`}`;
 export type StyleChoice={label:string;id:HomeUsageStyle};
 export type StyleOptionGroup={name:string;choices:StyleChoice[]};
 /** The options a style offers, each as the full style it would select. The choice matching `id` is marked by the caller. */
@@ -58,6 +74,12 @@ export function styleOptions(id:string):StyleOptionGroup[] {
  const {family,root}=spec;
  if(family==='bars'||family==='ruler')return [{name:'Forecast',choices:[{label:'Off',id:family},{label:'Show Forecast',id:`${family}:forecast`}]}];
  if(family==='rings')return [{name:'Rings',choices:[{label:'Single Ring',id:'rings'},{label:'Double Ring',id:'concentric'},{label:'Ticks',id:'ticks'}]}];
+ if(family==='texturebar')return [
+  // A new layout starts from its own default texture but keeps the chosen colour.
+  {name:'Bar Layout',choices:layouts.map(l=>({label:layoutLabels[l],id:textured(l,defaultTexture[l],spec.tint)}))},
+  {name:'Texture Type',choices:textureChoices.map(t=>({label:textureLabels[t],id:textured(spec.layout,t,spec.tint)}))},
+  {name:'Texture Color',choices:tints.map(t=>({label:tintLabels[t],id:textured(spec.layout,spec.texture,t)}))},
+ ];
  if(family==='vessel')return [{name:'Shape',choices:[{label:'Battery',id:'vessel'},{label:'Tank',id:'vessel:tank'},{label:'Thermometer',id:'vessel:thermometer'},{label:'Hourglass',id:'vessel:hourglass'}]}];
  if(family==='cells'){
   const single=root!=='cells',layout:StyleOptionGroup={name:'Layout',choices:[{label:'Grid',id:'cells'},{label:'Single Row',id:segs(spec.shape,spec.count)}]};
@@ -70,6 +92,7 @@ const segs=(shape:CellShape,count:number)=>shape==='square'&&count===20?'segment
 /** One spelling per look, so `segments` and `segments:square:20` compare equal. */
 export function canonicalStyle(id:string) {
  const spec=parseStyle(id);
+ if(spec?.family==='texturebar')return textured(spec.layout,spec.texture,spec.tint);
  return spec&&spec.family==='cells'&&spec.root!=='cells'?segs(spec.shape,spec.count):id;
 }
 export function styleLabel(id:string) {

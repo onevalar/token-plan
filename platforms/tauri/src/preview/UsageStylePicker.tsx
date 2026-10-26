@@ -21,14 +21,14 @@ function StyleGlyph({style}:{style:HomeUsageFamily}) {
   sources:<>{[0,1,2].map(i=><rect key={i} x={2+[0,16,25][i]} y="9" width={[15,8,6][i]} height="6" fill="currentColor" opacity={[1,.6,.35][i]}/>)}<rect x="33" y="9" width="5" height="6" fill="currentColor" opacity=".12"/></>,
   columns:<>{[14,8,18].map((h,i)=><g key={i}><rect x={6+i*11} y="3" width="7" height="18" rx="2" fill="currentColor" opacity=".2"/><rect x={6+i*11} y={21-h} width="7" height={h} rx="2" fill="currentColor"/></g>)}</>,
   signal:<>{[0,1,2].map(i=><circle key={i} cx={10+i*10} cy="12" r="4" fill="currentColor" opacity={i===0?1:.2}/>)}</>,
-  rowfill:<><rect x="2" y="5" width="36" height="14" rx="4" fill="currentColor" opacity=".2"/><rect x="2" y="5" width="25" height="14" rx="4" fill="currentColor"/></>,
+  texturebar:<><rect x="2" y="9" width="17" height="6" rx="2" fill="currentColor"/>{[21,24,27,30,33,36].map(x=><rect key={x} x={x} y="9" width="1.2" height="6" fill="currentColor" opacity=".45"/>)}</>,
  };
  return <svg width="40" height="24" viewBox="0 0 40 24" aria-hidden="true">{glyph[style]}</svg>;
 }
 
 /** Collapsed to one row showing the current style; expands into every style at once. */
 export function UsageStylePicker({value,onChange,tr,language,remaining=false,disabled=false}:{language:string;remaining?:boolean;disabled?:boolean;value:HomeUsageStyle;onChange:(style:HomeUsageStyle)=>void;tr:(s:string)=>string}) {
- const [open,setOpen]=useState(false),current=categoryOf(value),groups=styleOptions(value).filter(g=>['Forecast','Shape','Cell Count'].includes(g.name)&&current.id!=='vessel');
+ const [open,setOpen]=useState(false),current=categoryOf(value),groups=styleOptions(value).filter(g=>['Forecast','Shape','Cell Count','Bar Layout','Texture Type','Texture Color'].includes(g.name)&&current.id!=='vessel');
  return <div className="usage-style-picker">
   <button type="button" className="usage-style-toggle" disabled={disabled} aria-expanded={open} onClick={()=>setOpen(o=>!o)}>
    <span>{tr('Usage Style')}</span><span className="usage-style-trigger"><span className="usage-style-current">{tr(variantLabel(value))}</span><ChevronDown size={15} aria-hidden="true" data-open={open}/></span>

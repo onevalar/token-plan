@@ -132,12 +132,15 @@
 "Background" = "后台运行";
 "Balance" = "余额";
 "Balance and Benefits" = "余额与权益";
+"Bar" = "横条";
+"Bar Layout" = "版式";
 "Bars" = "横条";
 "Based on OpenUsage by Robin Ebers, released under the MIT License." = "基于 Robin Ebers 的 OpenUsage，遵循 MIT 许可证。";
 "Battery" = "电池";
 "Beta Updates" = "测试版更新";
 "Billing" = "账单";
 "Blended cost per megatoken %@ across %lld providers" = "%2$lld 个服务商的每百万 token 综合费用 %1$@";
+"Blue" = "蓝色";
 "Border Progress" = "环绕边框";
 "Cache Read" = "缓存读取";
 "Cache Write" = "缓存写入";
@@ -305,6 +308,7 @@
 "Detection complete. Choose an account below or return to its details." = "检测完成。可在下方选择账号，或返回账号详情。";
 "Detects provider logins again without resetting your display preferences." = "重新检测服务登录，不会重置显示设置。";
 "Devin quota data unavailable. Try again later." = "Devin 额度数据暂不可用，请稍后重试。";
+"Diagonal Stripes" = "斜线";
 "Directory not found or inaccessible. Check the full path and permissions." = "目录不存在或无法访问，请检查完整路径和权限。";
 "Disabled" = "已停用";
 "Disabling a provider stops its requests. Its existing login remains unchanged." = "停用提供方后将停止请求，已有登录不会受到影响。";
@@ -391,6 +395,7 @@
 "From your Cursor usage history." = "来自你的 Cursor 用量历史。";
 "From your Grok logs (estimated)" = "来自你的 Grok 日志（估算）";
 "From your OpenCode logs" = "来自你的 OpenCode 日志";
+"Full-Width Card" = "全幅卡片";
 "Gauges" = "独立仪表";
 "Gemini Pro" = "Gemini Pro";
 "Gemini Weekly" = "Gemini 每周";
@@ -404,6 +409,7 @@
 "Global shortcuts are unavailable in this desktop session." = "当前桌面环境不支持全局快捷键。";
 "Got It" = "知道了";
 "Granted" = "赠金";
+"Green" = "绿色";
 "Grid" = "多行";
 "Grok Bot" = "Grok Bot";
 "Grok Bot usage" = "Grok Bot 用量";
@@ -413,6 +419,8 @@
 "Grok billing request failed. Check your connection." = "Grok 账单请求失败，请检查网络。";
 "Grok billing response changed." = "Grok 账单响应格式已变化。";
 "Grok not logged in. Run `grok login`." = "Grok 未登录。请运行 `grok login`。";
+"Half-Width Bar" = "半幅横条";
+"Halftone Dots" = "圆点网点";
 "Hidden" = "隐藏";
 "Hide" = "隐藏";
 "Hide %@" = "隐藏 %@";
@@ -615,6 +623,7 @@
 "OpenRouter usage data unavailable. Try again later." = "OpenRouter 用量数据暂不可用，请稍后重试。";
 "Optional, saved on this Mac. Use it for a renewal date or an account reminder." = "选填，仅保存在本机。可记录续费日期或账号提醒。";
 "Options" = "选项";
+"Orange" = "橙色";
 "Orb Usage" = "Orb 用量";
 "Orbs" = "Orb";
 "Org Credits" = "组织额度";
@@ -641,6 +650,7 @@
 "Percentage Grid" = "百分格";
 "Personal" = "个人";
 "Pin to tray" = "固定到托盘";
+"Pixel Grid" = "像素点阵";
 "Platform" = "运行平台";
 "Plenty left" = "余量充足";
 "Preferences could not be read. Changes can be saved again in Settings." = "无法读取偏好设置，可在设置中重新保存。";
@@ -659,7 +669,9 @@
 "Projected to finish before the limit resets." = "预计会在额度重置前用完。";
 "Projected to finish close to your limit." = "预计将接近额度上限。";
 "Provider App / CLI" = "服务应用或命令行工具";
+"Provider Color" = "服务商颜色";
 "Providers" = "订阅与服务";
+"Purple" = "紫色";
 "Quit" = "退出";
 "Quit TokenPlan" = "退出 TokenPlan";
 "Quota Changes" = "额度变化";
@@ -831,6 +843,7 @@
 "Single Ring" = "单环";
 "Single Ring Ticks" = "单环刻度";
 "Single Row" = "单行";
+"Solid" = "纯色";
 "Some Cursor export rows were invalid. Totals may be incomplete." = "部分 Cursor 导出记录无效，统计可能不完整。";
 "Some accounts could not be refreshed. Check their status." = "部分账号刷新失败，请查看账号状态。";
 "Some failed" = "部分失败";
@@ -876,6 +889,9 @@
 "Terminal Helper" = "终端助手";
 "Terminal login and history are kept." = "终端登录与历史记录会保留。";
 "TestFlight requires folder authorization to read existing service logins and usage history. API keys can be entered directly in service settings." = "TestFlight 版需授权文件夹后才能读取现有服务登录和用量历史。API Key 可直接在服务设置中填写。";
+"Texture Color" = "底纹颜色";
+"Texture Type" = "底纹类别";
+"Textured Bar" = "底纹横条";
 "That reset is no longer available" = "该重置已不可用";
 "The API key could not be removed. Check local folder permissions." = "无法移除 API 密钥，请检查本地文件夹权限。";
 "The API key could not be saved. Check the key and local folder permissions." = "无法保存 API 密钥，请检查密钥和本地文件夹权限。";
@@ -1021,8 +1037,10 @@
 "Uses your provider login. No TokenPlan sign-in is needed." = "读取服务已有登录，无需登录 TokenPlan。";
 "Using reset credit…" = "正在使用重置额度…";
 "Variant" = "子样式";
+"Varied per Metric" = "每项不同";
 "Version" = "版本";
 "Vertical Bar" = "竖柱";
+"Vertical Lines" = "竖线";
 "View Details" = "查看详情";
 "View History" = "查看历史";
 "Visible" = "显示";

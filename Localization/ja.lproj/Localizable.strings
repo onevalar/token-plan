@@ -132,12 +132,15 @@
 "Background" = "バックグラウンド";
 "Balance" = "残高";
 "Balance and Benefits" = "残高と特典";
+"Bar" = "バー";
+"Bar Layout" = "レイアウト";
 "Bars" = "バー";
 "Based on OpenUsage by Robin Ebers, released under the MIT License." = "Robin Ebers 氏の OpenUsage（MIT ライセンス）をもとにしています。";
 "Battery" = "電池";
 "Beta Updates" = "ベータ版アップデート";
 "Billing" = "請求";
 "Blended cost per megatoken %@ across %lld providers" = "%2$lld 社のプロバイダーの百万トークンあたり平均コスト %1$@";
+"Blue" = "青";
 "Border Progress" = "枠線の進捗";
 "Cache Read" = "キャッシュ読み取り";
 "Cache Write" = "キャッシュ書き込み";
@@ -305,6 +308,7 @@
 "Detection complete. Choose an account below or return to its details." = "検出が完了しました。下から選択するか、アカウント詳細に戻ってください。";
 "Detects provider logins again without resetting your display preferences." = "表示設定をリセットせずにログインを再検出します。";
 "Devin quota data unavailable. Try again later." = "Devin の上限データを取得できません。後でもう一度お試しください。";
+"Diagonal Stripes" = "斜線";
 "Directory not found or inaccessible. Check the full path and permissions." = "ディレクトリが存在しないかアクセスできません。フルパスと権限を確認してください。";
 "Disabled" = "無効";
 "Disabling a provider stops its requests. Its existing login remains unchanged." = "プロバイダーを無効にするとリクエストが停止します。既存のログインは変更されません。";
@@ -391,6 +395,7 @@
 "From your Cursor usage history." = "Cursor の使用履歴から取得しています。";
 "From your Grok logs (estimated)" = "Grok のログから（推定）";
 "From your OpenCode logs" = "OpenCode のログから";
+"Full-Width Card" = "全幅カード";
 "Gauges" = "個別メーター";
 "Gemini Pro" = "Gemini Pro";
 "Gemini Weekly" = "Gemini 週間";
@@ -404,6 +409,7 @@
 "Global shortcuts are unavailable in this desktop session." = "このデスクトップ環境ではグローバルショートカットを利用できません。";
 "Got It" = "わかりました";
 "Granted" = "付与済み";
+"Green" = "緑";
 "Grid" = "グリッド";
 "Grok Bot" = "Grok Bot";
 "Grok Bot usage" = "Grok Bot の使用量";
@@ -413,6 +419,8 @@
 "Grok billing request failed. Check your connection." = "Grok の請求リクエストに失敗しました。接続を確認してください。";
 "Grok billing response changed." = "Grok の請求の応答形式が変わりました。";
 "Grok not logged in. Run `grok login`." = "Grok にログインしていません。`grok login` を実行してください。";
+"Half-Width Bar" = "ハーフバー";
+"Halftone Dots" = "網点";
 "Hidden" = "非表示";
 "Hide" = "非表示";
 "Hide %@" = "%@ を非表示";
@@ -615,6 +623,7 @@
 "OpenRouter usage data unavailable. Try again later." = "OpenRouter の使用量データを取得できません。後でもう一度お試しください。";
 "Optional, saved on this Mac. Use it for a renewal date or an account reminder." = "任意でこのMacに保存。更新日やアカウントのメモに使えます。";
 "Options" = "オプション";
+"Orange" = "オレンジ";
 "Orb Usage" = "Orb 使用量";
 "Orbs" = "Orb";
 "Org Credits" = "組織クレジット";
@@ -641,6 +650,7 @@
 "Percentage Grid" = "パーセントグリッド";
 "Personal" = "個人";
 "Pin to tray" = "トレイに固定";
+"Pixel Grid" = "ピクセルドット";
 "Platform" = "プラットフォーム";
 "Plenty left" = "余裕あり";
 "Preferences could not be read. Changes can be saved again in Settings." = "設定を読み込めませんでした。設定画面から保存し直せます。";
@@ -659,7 +669,9 @@
 "Projected to finish before the limit resets." = "上限がリセットされる前に使い切る見込みです。";
 "Projected to finish close to your limit." = "上限に近い状態で終わる見込みです。";
 "Provider App / CLI" = "サービスのアプリ／CLI";
+"Provider Color" = "サービスの色";
 "Providers" = "サブスクリプションとサービス";
+"Purple" = "紫";
 "Quit" = "終了";
 "Quit TokenPlan" = "TokenPlan を終了";
 "Quota Changes" = "利用枠の推移";
@@ -831,6 +843,7 @@
 "Single Ring" = "単一リング";
 "Single Ring Ticks" = "単一リングの目盛り";
 "Single Row" = "1行";
+"Solid" = "単色";
 "Some Cursor export rows were invalid. Totals may be incomplete." = "Cursor のエクスポートに無効な行があり、集計が不完全な可能性があります。";
 "Some accounts could not be refreshed. Check their status." = "一部のアカウントを更新できませんでした。状態を確認してください。";
 "Some failed" = "一部失敗";
@@ -876,6 +889,9 @@
 "Terminal Helper" = "ターミナルヘルパー";
 "Terminal login and history are kept." = "ターミナルのログインと履歴は保持されます。";
 "TestFlight requires folder authorization to read existing service logins and usage history. API keys can be entered directly in service settings." = "TestFlight 版では既存のログインと使用履歴を読むためフォルダの許可が必要です。API キーはサービス設定に直接入力できます。";
+"Texture Color" = "テクスチャの色";
+"Texture Type" = "テクスチャの種類";
+"Textured Bar" = "テクスチャバー";
 "That reset is no longer available" = "そのリセットはもう利用できません";
 "The API key could not be removed. Check local folder permissions." = "API キーを削除できません。フォルダーの権限を確認してください。";
 "The API key could not be saved. Check the key and local folder permissions." = "API キーを保存できません。キーとフォルダーの権限を確認してください。";
@@ -1021,8 +1037,10 @@
 "Uses your provider login. No TokenPlan sign-in is needed." = "サービスの既存ログインを利用します。TokenPlanへのログインは不要です。";
 "Using reset credit…" = "リセットクレジットを使用中…";
 "Variant" = "バリエーション";
+"Varied per Metric" = "項目ごとに変える";
 "Version" = "バージョン";
 "Vertical Bar" = "縦棒";
+"Vertical Lines" = "縦線";
 "View Details" = "詳細を見る";
 "View History" = "履歴を表示";
 "Visible" = "表示";

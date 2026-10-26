@@ -132,12 +132,15 @@
 "Background" = "背景執行";
 "Balance" = "餘額";
 "Balance and Benefits" = "餘額與權益";
+"Bar" = "橫條";
+"Bar Layout" = "版式";
 "Bars" = "橫條";
 "Based on OpenUsage by Robin Ebers, released under the MIT License." = "基於 Robin Ebers 的 OpenUsage，遵循 MIT 授權。";
 "Battery" = "電池";
 "Beta Updates" = "測試版更新";
 "Billing" = "帳單";
 "Blended cost per megatoken %@ across %lld providers" = "%2$lld 個服務商的每百萬 token 綜合費用 %1$@";
+"Blue" = "藍色";
 "Border Progress" = "環繞邊框";
 "Cache Read" = "快取讀取";
 "Cache Write" = "快取寫入";
@@ -305,6 +308,7 @@
 "Detection complete. Choose an account below or return to its details." = "偵測完成。可在下方選取帳號，或返回帳號詳情。";
 "Detects provider logins again without resetting your display preferences." = "重新偵測服務登入，不會重置顯示設定。";
 "Devin quota data unavailable. Try again later." = "Devin 額度資料暫時無法使用，請稍後再試。";
+"Diagonal Stripes" = "斜線";
 "Directory not found or inaccessible. Check the full path and permissions." = "目錄不存在或無法存取，請檢查完整路徑及權限。";
 "Disabled" = "已停用";
 "Disabling a provider stops its requests. Its existing login remains unchanged." = "停用提供方後將停止請求，既有登入不受影響。";
@@ -391,6 +395,7 @@
 "From your Cursor usage history." = "來自你的 Cursor 用量記錄。";
 "From your Grok logs (estimated)" = "來自你的 Grok 記錄檔（估算）";
 "From your OpenCode logs" = "來自你的 OpenCode 記錄檔";
+"Full-Width Card" = "全幅卡片";
 "Gauges" = "獨立儀表";
 "Gemini Pro" = "Gemini Pro";
 "Gemini Weekly" = "Gemini 每週";
@@ -404,6 +409,7 @@
 "Global shortcuts are unavailable in this desktop session." = "目前桌面環境不支援全域快捷鍵。";
 "Got It" = "知道了";
 "Granted" = "贈金";
+"Green" = "綠色";
 "Grid" = "多行";
 "Grok Bot" = "Grok Bot";
 "Grok Bot usage" = "Grok Bot 用量";
@@ -413,6 +419,8 @@
 "Grok billing request failed. Check your connection." = "Grok 帳單請求失敗，請檢查網路。";
 "Grok billing response changed." = "Grok 帳單回應格式已變更。";
 "Grok not logged in. Run `grok login`." = "Grok 尚未登入。請執行 `grok login`。";
+"Half-Width Bar" = "半幅橫條";
+"Halftone Dots" = "圓點網點";
 "Hidden" = "隱藏";
 "Hide" = "隱藏";
 "Hide %@" = "隱藏 %@";
@@ -615,6 +623,7 @@
 "OpenRouter usage data unavailable. Try again later." = "OpenRouter 用量資料暫時無法使用，請稍後再試。";
 "Optional, saved on this Mac. Use it for a renewal date or an account reminder." = "選填，僅儲存在此 Mac。可記錄續費日期或帳號提醒。";
 "Options" = "選項";
+"Orange" = "橙色";
 "Orb Usage" = "Orb 用量";
 "Orbs" = "Orb";
 "Org Credits" = "組織額度";
@@ -641,6 +650,7 @@
 "Percentage Grid" = "百分格";
 "Personal" = "個人";
 "Pin to tray" = "固定至系統匣";
+"Pixel Grid" = "像素點陣";
 "Platform" = "執行平台";
 "Plenty left" = "餘量充足";
 "Preferences could not be read. Changes can be saved again in Settings." = "無法讀取偏好設定，可在設定中重新儲存。";
@@ -659,7 +669,9 @@
 "Projected to finish before the limit resets." = "預計會在額度重置前用完。";
 "Projected to finish close to your limit." = "預計將接近額度上限。";
 "Provider App / CLI" = "服務應用或命令列工具";
+"Provider Color" = "服務商顏色";
 "Providers" = "訂閱與服務";
+"Purple" = "紫色";
 "Quit" = "結束";
 "Quit TokenPlan" = "結束 TokenPlan";
 "Quota Changes" = "額度變化";
@@ -831,6 +843,7 @@
 "Single Ring" = "單環";
 "Single Ring Ticks" = "單環刻度";
 "Single Row" = "單行";
+"Solid" = "純色";
 "Some Cursor export rows were invalid. Totals may be incomplete." = "部分 Cursor 匯出記錄無效，統計可能不完整。";
 "Some accounts could not be refreshed. Check their status." = "部分帳號重新整理失敗，請查看帳號狀態。";
 "Some failed" = "部分失敗";
@@ -876,6 +889,9 @@
 "Terminal Helper" = "終端機輔助工具";
 "Terminal login and history are kept." = "終端機登入與歷史記錄會保留。";
 "TestFlight requires folder authorization to read existing service logins and usage history. API keys can be entered directly in service settings." = "TestFlight 版需授權資料夾後才能讀取現有服務登入和用量記錄。API Key 可直接在服務設定中填寫。";
+"Texture Color" = "底紋顏色";
+"Texture Type" = "底紋類別";
+"Textured Bar" = "底紋橫條";
 "That reset is no longer available" = "該重置已無法使用";
 "The API key could not be removed. Check local folder permissions." = "無法移除 API 金鑰，請檢查本機資料夾權限。";
 "The API key could not be saved. Check the key and local folder permissions." = "無法儲存 API 金鑰，請檢查金鑰和本機資料夾權限。";
@@ -1021,8 +1037,10 @@
 "Uses your provider login. No TokenPlan sign-in is needed." = "讀取服務已有登入，無需登入 TokenPlan。";
 "Using reset credit…" = "正在使用重置額度…";
 "Variant" = "子樣式";
+"Varied per Metric" = "每項不同";
 "Version" = "版本";
 "Vertical Bar" = "直柱";
+"Vertical Lines" = "直線";
 "View Details" = "查看詳情";
 "View History" = "查看歷史";
 "Visible" = "顯示";
