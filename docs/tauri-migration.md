@@ -364,3 +364,15 @@ is used; arbitrary desktop-click detection is not claimed.
 The GNOME interaction check accepts the system's left-click route, opens Home using
 the actual tray menu, and checks desktop clicks, another application's clicks and
 tray-host disappearance/recovery. It still fails if any required dismissal fails.
+
+Verified on 2026-10-27 with Ubuntu's packaged GNOME Shell and
+`ubuntu-appindicators@ubuntu.com` (X11 on a virtual display):
+
+- [Ubuntu 24.04 job](https://github.com/onevalar/token-plan/actions/runs/40463640482/job/122053800469): all seven interaction checks passed at `e978be0`. The redundant 22.04 job in that run was canceled due to slow mirror downloads; this 24.04 job completed successfully.
+- [Ubuntu 22.04 run](https://github.com/onevalar/token-plan/actions/runs/40464160254): all seven interaction checks passed at `200175a` (same application code, corrected test-runner mirror list).
+- Both verified the system left-click menu, right-click menu, Show Home menu action,
+  desktop-click dismissal, other-app-click dismissal, non-topmost no-tray fallback,
+  and restored dismissal after the tray host returned. Artifacts include screenshots
+  and machine-readable results. No installers were built or published.
+- Local Rust tests: 40 passed, one pre-existing ignored test. Physical desktops,
+  native Wayland and real account access were not certified by these checks.
