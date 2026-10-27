@@ -93,9 +93,10 @@ def main(executable):
             wait_for(visible)
             coords=wait_for(lambda: evaluate(f"(()=>{{let a={actor};if(!a)return null;let [x,y]=a.get_transformed_position();let [w,h]=a.get_transformed_size();return Number.isFinite(x+w/2) && Number.isFinite(y+h/2) && w>0 && h>0 ? [x+w/2,y+h/2] : null;}})()"))
             time.sleep(3)
-            # Escape hides the application's initial window.
-            subprocess.run(['xdotool','search','--onlyvisible','--name','^TokenPlan Preview$',
-                            'windowactivate','--sync','key','Escape'],check=True)
+            # Close through the window manager: Tauri handles CloseRequested by
+            # hiding the popup. The initial window may already have lost focus.
+            if visible():
+                evaluate("global.get_window_actors().find(a=>a.meta_window.get_title()==='TokenPlan Preview')?.meta_window.delete(global.get_current_time()); true")
             wait_for(lambda: not visible())
             subprocess.run(['xdotool','mousemove',str(int(coords[0])),str(int(coords[1])), 'click','1'],check=True)
             time.sleep(2)
