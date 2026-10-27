@@ -2,6 +2,7 @@ using System.Text.Json;
 using TokenPlan.Core;
 using TokenPlan.Bridge;
 if (!args.SequenceEqual(new[] { "--desktop-bridge" })) return;
+DesktopProxy.Configure();
 using var session = new DesktopSession();
 while (await Console.In.ReadLineAsync() is { } line)
 {

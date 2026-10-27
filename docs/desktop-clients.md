@@ -201,9 +201,10 @@ Each network request, including its response body, is bounded; OAuth workflows a
 additional time for renewal and retry. Codex's optional reset-credit request has a
 shorter deadline and its failure retains the primary quota result.
 
-The app uses .NET's default proxy selection (environment/system configuration supported
-by that platform). It does not import shell configuration or change a proxy/VPN. A Linux
-desktop launcher may not inherit a terminal's proxy variables. In General Settings →
+Windows uses .NET's default environment/system proxy selection. Linux honors inherited
+proxy variables first, then reads the desktop system proxy via GIO in the shared backend,
+so application-list and terminal launchers follow the same policy. It does not import shell
+configuration or change a proxy/VPN. See [proxy behavior](proxy.md). In General Settings →
 Advanced, open the log folder: network entries include destination host, HTTP status,
 stage, elapsed time, and whether a proxy is selected. They exclude credentials, account
 identities, headers, response bodies, proxy addresses and raw exception messages.

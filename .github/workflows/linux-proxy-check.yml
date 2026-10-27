@@ -1,0 +1,27 @@
+name: Linux system proxy checks
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  proxy:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-22.04, ubuntu-24.04]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-dotnet@v5
+        with:
+          global-json-file: platforms/desktop/global.json
+      - name: Install system proxy resolver
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y glib-networking libglib2.0-bin gsettings-desktop-schemas dbus-x11
+      - name: Core regression checks
+        run: dotnet run --project platforms/desktop/TokenPlan.Core.Tests -c Release
+      - name: Test desktop system proxy without shell proxy variables
+        run: python3 script/ci/check_linux_proxy.py platforms/desktop/TokenPlan.Core.Tests/bin/Release/net10.0/TokenPlan.Core.Tests.dll

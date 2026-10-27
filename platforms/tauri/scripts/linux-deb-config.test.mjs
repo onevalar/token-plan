@@ -66,5 +66,5 @@ test('desktop caches refresh on install/removal, and optional helper failures do
 
 test('Linux packages explicitly declare the Ubuntu 22.04 glibc and helper prerequisites',()=>{
  const dependencies=linuxDebConfig('2.3.5').depends;
- for(const expected of ['libc6 (>= 2.35)','libwebkit2gtk-4.1-0','libayatana-appindicator3-1','libssl3','libicu70 | libicu74'])assert.ok(dependencies.includes(expected));
+ for(const expected of ['glib-networking','libc6 (>= 2.35)','libwebkit2gtk-4.1-0','libayatana-appindicator3-1','libssl3','libicu70 | libicu74'])assert.ok(dependencies.includes(expected));
 });

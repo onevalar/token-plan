@@ -7,6 +7,15 @@ if (args.SequenceEqual(new[] { "usage" }) && Environment.GetEnvironmentVariable(
     if (ampFixture == "error") { Console.Error.WriteLine("not logged in"); Environment.ExitCode = 1; return; }
     Console.WriteLine("Subscription Megawatt: 75% agent usage and 50% orb usage remaining\nIndividual credits: $12.50 USD remaining"); return;
 }
+if (args.Length == 2 && args[0] == "--proxy-probe")
+{
+    DesktopProxy.Configure();
+    using var probe = new HttpClient { Timeout = TimeSpan.FromSeconds(8) };
+    try { Console.WriteLine(await probe.GetStringAsync(args[1])); }
+    catch (HttpRequestException e) when (e.HttpRequestError == HttpRequestError.ProxyTunnelError)
+    { Console.WriteLine("proxy-tunnel-reached"); }
+    return;
+}
 var checks = 0;
 void Check(bool condition, string message) { if (!condition) throw new Exception(message); checks++; }
 void Throws(Action action, string message) { try { action(); } catch (InvalidDataException) { checks++; return; } throw new Exception(message); }
@@ -28,6 +37,7 @@ Throws(() => UsageParser.Parse("claude", """{"five_hour":{"utilization":-1}}""",
 var claude = UsageParser.Parse("claude", """{"five_hour":{"utilization":101,"resets_at":"2026-10-07T05:00:00Z"},"seven_day":{"utilization":null}}""", now);
 Check(claude.Windows.Count == 1 && claude.Windows[0].RemainingPercent == 0, "Over-limit usage retains its actual value; missing windows stay absent");
 SettingsChecks.Run(now, Check);
+ProxyChecks.Run(Check);
 DesktopUpdateChecks.Run(Check, Throws);
 var trayAccount = new ProviderResult("claude", "Claude", new("claude", "Claude", "Pro", [new("Weekly", 99, null), new("Session", 12, null)], now), null);
 Check(TrayReadings.Select(trayAccount, []).Single().Label == "Session", "Unpinned Claude falls back to its primary session");
