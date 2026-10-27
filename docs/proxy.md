@@ -15,6 +15,9 @@ not the separate Tauri update downloader. No proxy addresses or passwords are lo
 
 Linux regression checks use isolated GNOME settings and local mock proxies on Ubuntu
 22.04 and 24.04; they do not access real provider accounts.
+[Run 40469324922](https://github.com/onevalar/token-plan/actions/runs/40469324922)
+passed on both versions: 540 core checks plus native HTTP/HTTPS proxy routing,
+environment override and localhost bypass (2026-10-27).
 See [desktop network diagnostics](desktop-clients.md#claude--codex-renewal-and-connection-diagnostics).
 
 On macOS, TokenPlan can route provider requests through an optional proxy.
