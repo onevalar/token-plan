@@ -7,11 +7,6 @@ on:
         description: 'Completed packaging run containing tauri-Linux'
         type: string
         required: true
-  workflow_call:
-    inputs:
-      artifact_run_id:
-        type: string
-        required: true
 permissions:
   contents: read
   actions: read

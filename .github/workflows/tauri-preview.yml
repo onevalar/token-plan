@@ -252,6 +252,33 @@ jobs:
   linux-install:
     needs: build
     if: ${{ !inputs.checks_only && inputs.production }}
-    uses: ./.github/workflows/linux-package-check.yml
-    with:
-      artifact_run_id: ${{ github.run_id }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-22.04, ubuntu-24.04]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.source_ref || github.sha }}
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: tauri-Linux
+          path: linux-packages
+      - name: Install graphical smoke-test tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb x11-utils imagemagick dbus-x11 binutils
+      - name: Verify ABI, install, migrate and launch on target OS
+        run: |
+          python3 script/ci/check_linux_abi.py linux-packages
+          package=$(find linux-packages -name '*.deb' -print -quit)
+          python3 script/ci/check_linux_deb.py "$package"
+          python3 script/ci/check_linux_launch.py linux-packages
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: linux-launch-${{ matrix.os }}
+          path: linux-smoke/
+          if-no-files-found: warn
