@@ -12,8 +12,8 @@
       "url": "https://github.com/onevalar/token-plan/releases/download/v2.3.5/TokenPlan_2.3.5_x64-setup.exe"
     },
     "linux-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUZDAvZHhCYm02S0R2MFd6UU9JNlBucURiY2h1NVk1NjBycDBxUTVoQ3dYWmZLSHFDc0xGNzFCU2FIUkJ1SnBFdUxTcUxJYThqaUJlQmRURXNNQmx3OTlVUThCWGYvS1FRPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkyOTk3Nzg1CWZpbGU6VG9rZW5QbGFuXzIuMy41X2FtZDY0LkFwcEltYWdlCXZlcnNpb246Mi4zLjUKcUFjc21LaFVmZWcvMTZnTlZzNTVkOG5sWkk4WkUwUTNqcFlrQ25tU1MycCtpS2daQjBYN1RzTG5tcnhsek9MM05VNzUyc0pEa3BvNVlQcmtCSjZIQXc9PQo=",
-      "url": "https://github.com/onevalar/token-plan/releases/download/v2.3.5/TokenPlan_2.3.5_amd64.AppImage"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUZDAvZHhCYm02S0xGQ3lBQ1ZaeURyN1V1bm9Vb1JzaHQ5ajd1eHpLbS80K2xLbU16bkd1cVU5WkIvdm9iZ3ZQM0N0S3JhcFhUMFlMOGpKRnBZZU5Pb3VvWGpOVHdiMEFzPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkzMDg5NDk1CWZpbGU6VG9rZW5QbGFuXzIuMy41X2FtZDY0LkFwcEltYWdlCXZlcnNpb246Mi4zLjUKbFVwRWpaTVJ3bEx4bGwvK3ZML2ZWTUd2WTJ2RHhQaUs2TGJXaWZ2b0JkYzFkWUtENHVwS3ZkS3RqTjA4WDlyOGQ4dG9FQ1VvSUFiaXBFdmFTOHBRQVE9PQo=",
+      "url": "https://github.com/onevalar/token-plan/releases/download/v2.3.5/TokenPlan_2.3.5_linux2_amd64.AppImage"
     },
     "darwin-x86_64": {
       "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUZDAvZHhCYm02S0tsRW13RDN3ZG1SUTlxZHk5SXpTSit4NlpGZDNhZmN0OE1DVXE3SEwzWjlpeXQ5Zmg3aFc0N1NJUmQvaWNGY2dSelUxSEs1ZTdvRzg3ZXJNZndGdndrPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkyOTk4MjQ0CWZpbGU6VG9rZW5QbGFuLmFwcC50YXIuZ3oJdmVyc2lvbjoyLjMuNQpmUFZ6RzlGelJLRTlMaENHUGhlcGhlRDBlV2dBbk5HcGlyMjBqL1p4RXJZMjZSbCtxK0hnczU0QjFOK3docVdFaFN4V09ZZUdnM0NYT1EzZGRpcm9Bdz09Cg==",

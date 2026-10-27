@@ -16,9 +16,9 @@
 | --- | --- | --- |
 | **macOS** | [下载 DMG](https://github.com/onevalar/token-plan/releases/download/v2.3.5/TokenPlan_2.3.5_universal.dmg) | macOS 15 及以上；Apple Silicon / Intel 通用版 |
 | **Windows** | [下载 EXE](https://github.com/onevalar/token-plan/releases/download/v2.3.5/TokenPlan_2.3.5_x64-setup.exe) | Windows x64；需要 WebView2 |
-| **Linux** | [下载 AppImage](https://github.com/onevalar/token-plan/releases/download/v2.3.5/TokenPlan_2.3.5_amd64.AppImage) · [下载 DEB](https://github.com/onevalar/token-plan/releases/download/v2.3.5/TokenPlan_2.3.5_amd64.deb) | Ubuntu 24.04 x64 验证；需要图形桌面 |
+| **Linux** | [下载 AppImage](https://github.com/onevalar/token-plan/releases/download/v2.3.5/TokenPlan_2.3.5_linux2_amd64.AppImage) · [下载 DEB](https://github.com/onevalar/token-plan/releases/download/v2.3.5/TokenPlan_2.3.5_linux2_amd64.deb) | Ubuntu 22.04 / 24.04 x64 验证；需要图形桌面 |
 
-[SHA-256 校验文件](https://github.com/onevalar/token-plan/releases/download/v2.3.5/SHA256SUMS.txt) · [全部版本](https://github.com/onevalar/token-plan/releases)
+[macOS / Windows 校验文件](https://github.com/onevalar/token-plan/releases/download/v2.3.5/SHA256SUMS.txt) · [Linux 校验文件](https://github.com/onevalar/token-plan/releases/download/v2.3.5/SHA256SUMS-linux2.txt) · [全部版本](https://github.com/onevalar/token-plan/releases)
 <!-- download-links:end -->
 
 ### macOS 经典版

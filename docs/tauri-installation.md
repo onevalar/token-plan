@@ -23,3 +23,9 @@ The corrected build pipeline targets Ubuntu 22.04 / glibc 2.35 and checks the sa
 - ABI audit: both DEB ELF files, the AppImage launcher and 180 extracted ELF objects require no GLIBC symbol newer than 2.35.
 - Launch checks use Xvfb and isolated empty user directories. They do not verify physical desktop tray integration, Wayland or live account access. Missing tray warnings are expected in this environment.
 - These are verification artifacts, not replacement release assets. Same-version Linux publication must use distinct asset names; existing 2.3.5 clients will not see an automatic version upgrade.
+
+## Published Ubuntu repair build (linux2)
+
+The GitHub README and Linux updater entry now select the distinct `TokenPlan_2.3.5_linux2_amd64` assets in release v2.3.5. Original assets remain archived; macOS and Windows downloads are unchanged. The application version remains 2.3.5, so existing 2.3.5 installations need a manual reinstall and restart.
+
+Build [40472212811](https://github.com/onevalar/token-plan/actions/runs/40472212811), source `0d237808f439d5f84620200e647d8e93bf0fc672`, passed interface, signature, ABI, migration and startup checks on Ubuntu 22.04 and 24.04. It includes the GNOME system proxy fix and previous Linux tray/window repairs. `SHA256SUMS-linux2.txt` covers these new assets.
