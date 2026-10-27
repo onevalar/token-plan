@@ -17,7 +17,6 @@ def update_readme(text, version, names):
 | **Windows** | [下载 EXE]({asset('-setup.exe')}) | Windows x64；需要 WebView2 |
 | **Linux** | [下载 AppImage]({asset('.AppImage')}) · [下载 DEB]({asset('.deb')}) | Ubuntu 24.04 x64 验证；需要图形桌面 |
 
-[SHA-256 校验文件](https://github.com/onevalar/token-plan/releases/download/v{version}/SHA256SUMS.txt) · [全部版本](https://github.com/onevalar/token-plan/releases)
 '''
     pattern = r'(<!-- download-links:start -->).*?(<!-- download-links:end -->)'
     if len(re.findall(pattern, text, re.S)) != 1:

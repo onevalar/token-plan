@@ -11,7 +11,8 @@ class ReleaseReadmeTests(unittest.TestCase):
         result = update_readme(self.text, '2.0.0', self.names)
         current = result.split('<!-- download-links:start -->')[1].split('<!-- download-links:end -->')[0]
         self.assertNotIn('/v1.0.12/', current)
-        self.assertIn('SHA256SUMS.txt', result)
+        self.assertNotIn('SHA256SUMS', current)
+        self.assertNotIn('全部版本', current)
         for name in self.names:
             self.assertIn('/v2.0.0/' + name, result)
         self.assertEqual(result, update_readme(result, '2.0.0', self.names))
