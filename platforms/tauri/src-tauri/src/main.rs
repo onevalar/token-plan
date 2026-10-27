@@ -73,7 +73,10 @@ fn main() {
             }).build()).is_err(){eprintln!("Global shortcuts unavailable in this desktop session");}
 
             #[cfg(target_os="linux")]
-            app.manage(linux_tray::LinuxTrays::default());
+            {
+                app.manage(linux_tray::LinuxTrays::default());
+                panel::observe_linux_focus(app.handle());
+            }
             #[cfg(target_os="macos")]
             {
                 app.set_activation_policy(tauri::ActivationPolicy::Accessory);

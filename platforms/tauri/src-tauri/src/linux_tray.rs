@@ -24,8 +24,11 @@ impl Tray for Item {
    ksni::menu::StandardItem{label:self.quit.clone(),activate:Box::new(|item:&mut Self|item.app.exit(0)),..Default::default()}.into(),
   ]
  }
+ fn watcher_online(&self) {
+  crate::panel::linux_tray_available(&self.app,true);
+ }
  fn watcher_offline(&self,_:ksni::OfflineReason)->bool {
-  crate::panel::retain_window_without_tray(&self.app);let _=self.app.emit("desktop-error","tray_failed");true
+  crate::panel::linux_tray_available(&self.app,false);let _=self.app.emit("desktop-error","tray_failed");true
  }
 }
 pub async fn update(app:&tauri::AppHandle,state:&DesktopState)->Result<(),()> {
@@ -39,7 +42,17 @@ pub async fn update(app:&tauri::AppHandle,state:&DesktopState)->Result<(),()> {
   // SNI pixmaps use straight ARGB, preserving the original icon's transparency.
   let icon=ksni::Icon{width:image.width() as i32,height:image.height() as i32,data:image.rgba().chunks_exact(4).flat_map(|p|[p[3],p[0],p[1],p[2]]).collect()};
   let item=Item{app:app.clone(),open,quit,icon,anchor:None};
-  *handle=Some(item.spawn().await.map_err(|error|eprintln!("Linux tray registration failed: {error}"))?);
+  match item.spawn().await {
+   Ok(service)=>{
+    *handle=Some(service);
+    crate::panel::linux_tray_available(app,true);
+   },
+   Err(error)=>{
+    eprintln!("Linux tray registration failed: {error}");
+    crate::panel::linux_tray_available(app,false);
+    return Err(());
+   }
+  }
  }
  Ok(())
 }

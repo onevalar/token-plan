@@ -26,7 +26,10 @@ full-screen Space, leaves that app in front, and still takes keyboard input.
 Its corners are rounded on macOS and on Linux desktops with a compositor; without one,
 Linux keeps square corners instead of black ones. The scrollbar
 stays hidden until the pointer is over the panel. On Linux without a compatible tray host,
-a decorated taskbar-accessible window remains available instead.
+a decorated taskbar-accessible window remains available instead. It is not forced on top.
+When the tray host returns, the window returns to popup mode and focus-loss dismissal
+is re-enabled. Linux also observes GTK toplevel activation changes; a temporary tray
+outage must not permanently disable dismissal.
 Production packaging inherits the preview's window configuration.
 
 The dashboard groups adjacent accounts of the same service without changing the saved
@@ -330,3 +333,18 @@ array. No metrics are seeded from an unauthenticated heading.
 The menu bar settings show an icon-only account as switched on with no metric chip selected;
 the native tray summaries distinguish no selected metric from missing quota data.
 This also lets legacy accounts recover without overwriting deliberate preferences.
+
+### Ubuntu desktop interaction verification
+
+`linux-desktop-check.yml` compiles a development executable without bundling installers
+or signing. It runs the distribution's GNOME Shell and AppIndicator extension on Ubuntu
+22.04 and 24.04 under an isolated X11 virtual display. It exercises real pointer clicks
+on the extension's tray button, records screenshots and reports left activation, right
+menu and outside-click dismissal separately. Failures are not treated as passing tests.
+This is not a Wayland or physical desktop certification.
+
+Some GNOME AppIndicator versions open the menu on a left click and invoke Activate only
+on a double click. SNI's `ItemIsMenu=false` cannot override this host policy. The app must
+not silently patch, disable or replace the user's system extension. Exact single-click
+behavior on such hosts remains a desktop integration limitation pending a supported
+integration; an activation callback test alone does not prove mouse behavior.

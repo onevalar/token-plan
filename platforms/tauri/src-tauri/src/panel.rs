@@ -13,6 +13,11 @@ pub struct Panel {
 }
 impl Panel {
     fn changed(&self) -> u64 { self.revision.fetch_add(1,Ordering::SeqCst)+1 }
+    fn set_persistent(&self, persistent:bool) -> bool {
+        let changed=self.persistent.swap(persistent,Ordering::SeqCst)!=persistent;
+        if changed {self.changed();}
+        changed
+    }
     fn can_dismiss(&self, revision:u64, focused:bool) -> bool {
         !focused && !self.persistent.load(Ordering::SeqCst) && self.revision.load(Ordering::SeqCst)==revision
     }
@@ -63,7 +68,7 @@ pub fn show(app:&tauri::AppHandle) {
     }
     #[cfg(not(target_os="macos"))]
     if let Some(window)=app.get_webview_window("main") {
-        checked(app,window.set_always_on_top(true));
+        checked(app,window.set_always_on_top(!app.state::<Panel>().persistent.load(Ordering::SeqCst)));
         checked(app,window.show());
         checked(app,window.unminimize());
         checked(app,window.set_focus());
@@ -204,18 +209,43 @@ fn frame(app:&tauri::AppHandle)->Frame {
     Frame{platform,rounded}
 }
 
+/// GTK reports activation at the toplevel, including desktop/shell focus changes.
+/// Keep all GTK access on its main thread (SNI callbacks run on the async runtime).
 #[cfg(target_os="linux")]
-pub fn retain_window_without_tray(app:&tauri::AppHandle) {
-    app.state::<Panel>().persistent.store(true,Ordering::SeqCst);
-    let _=app.emit("panel-frame",frame(app));
+pub fn observe_linux_focus(app:&tauri::AppHandle) {
+    use gtk::prelude::*;
     if let Some(window)=app.get_webview_window("main") {
-        checked(app,window.set_decorations(true));
-        checked(app,window.set_resizable(true));
-        checked(app,window.set_minimizable(true));
-        checked(app,window.set_skip_taskbar(false));
-        checked(app,window.set_always_on_top(false));
+        if let Ok(native)=window.gtk_window() {
+            let handle=app.clone();
+            native.connect_is_active_notify(move|window|focus_changed(&handle,window.is_active()));
+        }
     }
-    show(app);
+}
+
+#[cfg(target_os="linux")]
+pub fn linux_tray_available(app:&tauri::AppHandle,available:bool) {
+    let handle=app.clone();
+    checked(app,app.run_on_main_thread(move||{
+        let panel=handle.state::<Panel>();
+        if !panel.set_persistent(!available) {return;}
+        if let Some(window)=handle.get_webview_window("main") {
+            checked(&handle,window.set_decorations(!available));
+            checked(&handle,window.set_resizable(!available));
+            checked(&handle,window.set_minimizable(!available));
+            checked(&handle,window.set_skip_taskbar(available));
+            checked(&handle,window.set_always_on_top(available));
+            let _=handle.emit("panel-frame",frame(&handle));
+            if available {
+                // Recover popup semantics without stealing focus or opening Home.
+                if window.is_visible().unwrap_or(false) {
+                    focus_changed(&handle,window.is_focused().unwrap_or(true));
+                }
+            } else {
+                // Keep an accessible window if the desktop removes the tray host.
+                show(&handle);
+            }
+        }
+    }));
 }
 
 #[cfg(test)]
@@ -237,6 +267,19 @@ mod tests {
         let blur=state.changed();
         state.persistent.store(true,Ordering::SeqCst);
         assert!(!state.can_dismiss(blur,false));
+    }
+    #[test] fn tray_recovery_restores_dismissal_and_invalidates_pending_blur() {
+        let state=Panel::default();
+        let before=state.changed();
+        assert!(state.set_persistent(true));
+        assert!(!state.can_dismiss(before,false));
+        assert!(!state.set_persistent(true));
+        assert!(state.set_persistent(false));
+        assert!(!state.can_dismiss(before,false));
+        let after=state.changed();
+        assert!(state.can_dismiss(after,false));
+        assert!(!state.set_persistent(false));
+        assert!(state.can_dismiss(after,false));
     }
     #[test] fn explicit_show_uses_monitor_center_without_a_tray_location() {
         assert_eq!(show_placement(None,(-1920,24),(1920,1056),(390,280),6),(-1155,412));
