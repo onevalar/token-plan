@@ -37,9 +37,19 @@
 
 ### 用量样式
 
-选择适合自己的展示方式，调整用量即可预览变化。
+按类别查看各个子样式；以下均为示例数据。[交互体验：切换样式、调节用量](https://onevalar.github.io/token-plan/#styles)。
 
-![TokenPlan 用量样式](assets/showcase/styles.png)
+![横条：标准横条、额度刻度尺、来源分段条、底纹横条](assets/showcase/styles-bars.png)
+
+![分格：多行网格与单行](assets/showcase/styles-cells.png)
+
+![环形：单环、双环、单环刻度、仪表环](assets/showcase/styles-rings.png)
+
+![容器：电池、水箱、温度计、沙漏](assets/showcase/styles-vessel.png)
+
+![醒目数字、并排竖柱、状态信号灯、环绕边框](assets/showcase/styles-more.png)
+
+![底纹横条的版式与底纹示例；颜色可在交互演示中切换](assets/showcase/styles-textures.png)
 
 ### 用量统计
 

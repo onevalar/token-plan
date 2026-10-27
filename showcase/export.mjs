@@ -8,11 +8,14 @@ const page=await browser.newPage({viewport:{width:1120,height:900},deviceScaleFa
 const base=process.env.SHOWCASE_URL||'http://127.0.0.1:1432/';
 const errors=[];page.on('pageerror',e=>errors.push(e.message));page.on('response',r=>{if(r.status()>=400)errors.push(`${r.status()} ${r.url()}`);});
 await page.goto(base,{waitUntil:'networkidle'});
-if(!process.env.CHECK_ONLY) await page.locator('#styles-capture').screenshot({path:out+'styles.png'});
+for(const id of ['bars','cells','rings','vessel','more','textures']){
+ if(!process.env.CHECK_ONLY) await page.locator('#gallery-'+id).screenshot({path:out+'styles-'+id+'.png'});
+}
+if(await page.locator('[data-gallery-style]').count()!==24)throw Error('Missing gallery styles');
 if(!process.env.CHECK_ONLY) await page.locator('#history-capture').screenshot({path:out+'statistics.png'});
 const styles=page.locator('#styles-capture');
 if(await page.locator('.tp-history-window').count()!==1||await page.locator('.detail-example').count())throw Error('History must use the original single window');
-if(await page.locator('.history-model-breakdown').count())throw Error('Model details must start collapsed');
+if(await page.locator('#history-capture .history-model-breakdown').count())throw Error('Model details must start collapsed');
 const historyWidth=await page.locator('.tp-history-window').evaluate(el=>el.getBoundingClientRect().width);
 if(Math.abs(historyWidth-430)>1)throw Error('Original history window width changed');
 for(const b of await styles.locator('.tp-style-option').all()){

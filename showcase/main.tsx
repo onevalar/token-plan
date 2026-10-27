@@ -4,6 +4,7 @@ import TokenPlanCover from '@portfolio/v3/personal-projects/covers/token-plan';
 import {figures} from '@portfolio/v3/personal-projects/stories/token-plan-components';
 import {TokenPlanHistory} from '@portfolio/v3/personal-projects/stories/token-plan-history';
 import './showcase.css';
+import {StyleGallery} from './StyleGallery';
 const Components=figures['token-plan-components'];
 const repo='https://github.com/onevalar/token-plan';
 function App(){return <div className="showcase tp-native-theme">
@@ -13,6 +14,7 @@ function App(){return <div className="showcase tp-native-theme">
   <section className="hero-demo" aria-label="用量样式动画"><div id="cover-capture" data-cover-card><TokenPlanCover/></div><p>将鼠标移入画面，或点击画面中的 TokenPlan 图标播放。<br/>开启“减少动态效果”时显示静态画面。</p></section>
   <section id="styles"><div className="section-heading"><div><p className="eyebrow">用量样式</p><h2>同一份用量，多种展示方式。</h2></div><p>选择样式，再拖动用量滑块查看变化。</p></div>
    <div id="styles-capture"><Components/></div>
+   <StyleGallery/>
   </section>
   <section id="history"><div className="section-heading"><div><p className="eyebrow">用量统计</p><h2>从每日记录，查看模型构成。</h2></div><p>切换时间范围，展开日期和服务查看明细。</p></div>
    <div id="history-capture"><TokenPlanHistory/></div>
