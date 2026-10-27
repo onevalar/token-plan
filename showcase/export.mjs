@@ -11,12 +11,16 @@ await page.goto(base,{waitUntil:'networkidle'});
 if(!process.env.CHECK_ONLY) await page.locator('#styles-capture').screenshot({path:out+'styles.png'});
 if(!process.env.CHECK_ONLY) await page.locator('#history-capture').screenshot({path:out+'statistics.png'});
 const styles=page.locator('#styles-capture');
+if(await page.locator('.tp-history-window').count()!==1||await page.locator('.detail-example').count())throw Error('History must use the original single window');
+if(await page.locator('.history-model-breakdown').count())throw Error('Model details must start collapsed');
+const historyWidth=await page.locator('.tp-history-window').evaluate(el=>el.getBoundingClientRect().width);
+if(Math.abs(historyWidth-430)>1)throw Error('Original history window width changed');
 for(const b of await styles.locator('.tp-style-option').all()){
  await b.click();if(await b.getAttribute('aria-pressed')!=='true')throw Error('Style selection failed');
 }
 const slider=styles.getByRole('slider');await slider.focus();await page.keyboard.press('End');
 if(await slider.getAttribute('aria-valuenow')!=='100')throw Error('Slider failed');
-const history=page.locator('.history-pane').first();
+const history=page.locator('#history-capture');
 await history.getByRole('button',{name:'今天',exact:true}).click();
 if(await history.locator('.tpc-daily').count())throw Error('Single-day graph should be hidden');
 await history.getByRole('button',{name:'最近 30 天',exact:true}).click();
@@ -32,7 +36,7 @@ if(await page.locator('.tpb-scene').getAttribute('data-phase')!=='idle')throw Er
 await page.close();
 if(errors.length)throw Error(errors.join('\n'));
 console.log('PASS: eight styles, slider, ranges, model detail, mobile layout, reduced motion, no page errors');
-if(process.env.CHECK_ONLY){await browser.close();process.exit(0);}
+if(process.env.CHECK_ONLY||process.env.STILLS_ONLY){await browser.close();process.exit(0);}
 const film=await browser.newPage({viewport:{width:1000,height:900},deviceScaleFactor:1});
 await film.clock.install();await film.goto(new URL('?cover-mode=mouse',base).href,{waitUntil:'networkidle'});
 await film.locator('#cover-capture').scrollIntoViewIfNeeded();await film.clock.pauseAt(new Date());

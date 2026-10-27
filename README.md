@@ -45,7 +45,7 @@
 
 查看每日记录与模型构成；费用为估算。
 
-![TokenPlan 用量统计](assets/showcase/statistics.png)
+<p align="center"><img src="assets/showcase/statistics.png" width="430" alt="TokenPlan 用量统计（示例数据）"></p>
 
 ## 开始使用
 

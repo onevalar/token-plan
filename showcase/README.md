@@ -2,7 +2,7 @@
 
 README 使用一张循环 GIF 和两张 PNG；`docs/demo/` 是可独立部署的静态交互演示。所有账号、读数和费用均为示例数据，不请求真实账号或服务。保留组件许可于 `public/NOTICE.txt`。
 
-演示复用 portfolio 的 TokenPlan 封面、用量样式和历史组件，没有复制项目介绍正文。portfolio 是构建输入，原文件不修改；发布产物不依赖访问 portfolio 仓库。
+演示复用 portfolio 的 TokenPlan 封面、用量样式和历史组件，没有复制项目介绍正文。保持原组件的布局、尺寸和展开层级；不单独拆出模型图表、不拼接多窗口，也不覆盖组件内部排版。portfolio 是构建输入，原文件不修改；发布产物不依赖访问 portfolio 仓库。
 
 ## 更新
 
@@ -23,3 +23,5 @@ ffmpeg -y -framerate 15 -i dist/showcase-frames/frame-%03d.png -filter_complex '
 脚本检查样式切换、用量滑块、统计展开、手机溢出和减少动态效果；导出后仍需检查截图和动画。`CHECK_ONLY=1 SHOWCASE_URL=https://onevalar.github.io/token-plan/ node showcase/export.mjs` 只检查在线演示，不覆盖发布图片。
 
 提交 `docs/demo/` 的已构建文件及 `assets/showcase/` 展示素材。Pages 工作流仅发布 `docs/demo/`，不构建应用、不发布安装包，也不暴露整个文档目录。
+
+仅更新静态图片及检查交互可运行 `STILLS_ONLY=1 node showcase/export.mjs`，不会重新导出封面动画。
