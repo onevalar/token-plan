@@ -7,6 +7,10 @@
 
 支持 **macOS、Windows、Linux**，提供简体中文、繁體中文、English、日本語和 한국어。
 
+[![TokenPlan 动态展示](assets/showcase/cover.gif)](https://onevalar.github.io/token-plan/)
+
+[体验交互演示](https://onevalar.github.io/token-plan/) · 展示使用示例数据。
+
 ## 下载
 
 <!-- download-links:start -->
@@ -30,6 +34,18 @@
 - 多账号管理、拖动排序、按订阅服务自定义用量样式与即时预览。
 - 本地用量统计、token 记录和费用估算。
 - macOS 菜单栏支持环形、百分比及 token 趋势；Windows/Linux 提供系统托盘入口。
+
+### 用量样式
+
+选择适合自己的展示方式，调整用量即可预览变化。
+
+![TokenPlan 用量样式](assets/showcase/styles.png)
+
+### 用量统计
+
+查看每日记录与模型构成；费用为估算。
+
+![TokenPlan 用量统计](assets/showcase/statistics.png)
 
 ## 开始使用
 

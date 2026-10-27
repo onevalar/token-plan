@@ -7,6 +7,9 @@ on:
       - 'updates/**'
       - 'README.md'
       - 'docs/**'
+      - 'showcase/**'
+      - 'assets/showcase/**'
+      - '.github/workflows/showcase-pages.yml'
       - 'release/*.md'
   pull_request:
     branches: [main]
