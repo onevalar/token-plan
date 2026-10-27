@@ -21,7 +21,7 @@ class ReleaseReadmeTests(unittest.TestCase):
         result = update_readme(self.text, '2.0.0', self.names)
         classic = result.split('### macOS 经典版')[1].split('## 功能')[0]
         self.assertIn('/v1.0.12/TokenPlan-1.0.12.dmg', classic)
-        self.assertIn('/v1.0.12/SHA256SUMS.txt', classic)
+        self.assertNotIn('SHA256SUMS', classic)
         self.assertEqual(classic, self.text.split('### macOS 经典版')[1].split('## 功能')[0])
     def test_publication_changes_only_the_download_block(self):
         result = update_readme(self.text, '2.0.0', self.names)

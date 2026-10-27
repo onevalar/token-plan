@@ -22,7 +22,7 @@
 
 ### macOS 经典版
 
-[下载 1.0.12](https://github.com/onevalar/token-plan/releases/download/v1.0.12/TokenPlan-1.0.12.dmg) · [校验文件](https://github.com/onevalar/token-plan/releases/download/v1.0.12/SHA256SUMS.txt)。经典版仅保留下载，不再更新；请勿与新版同时运行。
+[下载 1.0.12](https://github.com/onevalar/token-plan/releases/download/v1.0.12/TokenPlan-1.0.12.dmg)。经典版仅保留下载，不再更新；请勿与新版同时运行。
 
 ## 功能
 
