@@ -4,7 +4,7 @@
 
 - **Mac**：macOS 15 及以上，Apple Silicon / Intel 通用 DMG，完成 Developer ID 签名及公证。1.x 可通过“检查更新”迁移，也可退出旧版后将新应用拖入 Applications。沿用原有配置与本地历史记录。
 - **Windows**：x64 EXE 安装向导，需要 Microsoft WebView2（安装器可协助安装）。从 1.x 升级时先退出旧客户端，手动安装一次 2.0；如出现两个开始菜单入口，卸载旧应用程序但保留用户配置。之后使用应用内更新。
-- **Linux**：本轮构建、测试基线为 Ubuntu 24.04 x64，需要图形桌面。DEB 可用 `sudo apt install ./实际文件名.deb` 安装，由包管理器升级。AppImage 下载后执行 `chmod +x ./实际文件名.AppImage`，再直接运行；应用内更新仅用于可写目录中的 AppImage。不要使用 sudo 运行应用，也不要同时运行 DEB 与 AppImage 两份客户端。
+- **Linux**：修复后的构建基线为 Ubuntu 22.04 x64（同时测试 24.04），需要图形桌面。DEB 可用 `sudo apt install ./实际文件名.deb` 安装，由包管理器升级。AppImage 下载后执行 `chmod +x ./实际文件名.AppImage`，再直接运行；应用内更新仅用于可写目录中的 AppImage。不要使用 sudo 运行应用，也不要同时运行 DEB 与 AppImage 两份客户端。
 
 退出旧版本后再运行新版本。已有账号、备注及可读取的历史记录会继续使用；TokenPlan 不会切换 CLI 登录。不同平台读取凭据的系统位置仍有差异。
 

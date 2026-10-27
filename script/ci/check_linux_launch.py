@@ -36,7 +36,19 @@ def inner(command, report):
                     raise RuntimeError('WebKit renderer did not start')
                 if 'tokenplan-bridge --desktop-bridge' not in processes:
                     raise RuntimeError('Bundled backend did not start')
-                subprocess.run(['import','-window','root',str(report/'desktop.png')], check=True)
+                # A live renderer alone does not prove a visible page. Allow slow
+                # first paints, but reject an empty desktop or blank webview.
+                for _ in range(20):
+                    subprocess.run(['import','-window','root',str(report/'desktop.png')], check=True)
+                    colors = int(subprocess.check_output(
+                        ['identify','-format','%k',str(report/'desktop.png')], text=True))
+                    if colors > 100:
+                        break
+                    time.sleep(1)
+                else:
+                    raise RuntimeError('Window did not paint visible content (blank screenshot)')
+                (report/'windows.txt').write_text(subprocess.check_output(
+                    ['xwininfo','-root','-tree'], text=True))
             finally:
                 try:
                     os.killpg(app.pid, signal.SIGTERM)

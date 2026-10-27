@@ -1,0 +1,50 @@
+name: Linux package compatibility
+
+on:
+  workflow_dispatch:
+    inputs:
+      artifact_run_id:
+        description: 'Completed packaging run containing tauri-Linux'
+        type: string
+        required: true
+  workflow_call:
+    inputs:
+      artifact_run_id:
+        type: string
+        required: true
+permissions:
+  contents: read
+  actions: read
+jobs:
+  linux-install:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-22.04, ubuntu-24.04]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: tauri-Linux
+          run-id: ${{ inputs.artifact_run_id }}
+          github-token: ${{ github.token }}
+          path: linux-packages
+      - name: Install graphical smoke-test tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb x11-utils imagemagick dbus-x11 binutils
+      - name: Verify ABI, install, migrate and launch on target OS
+        run: |
+          python3 script/ci/check_linux_abi.py linux-packages
+          package=$(find linux-packages -name '*.deb' -print -quit)
+          python3 script/ci/check_linux_deb.py "$package"
+          python3 script/ci/check_linux_launch.py linux-packages
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: linux-launch-${{ matrix.os }}
+          path: linux-smoke/
+          if-no-files-found: warn
