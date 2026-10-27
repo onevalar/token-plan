@@ -101,6 +101,18 @@ pub fn focus_changed(app:&tauri::AppHandle,focused:bool) {
     // Let that event toggle/cancel this dismissal rather than immediately reopening.
     tauri::async_runtime::spawn(async move {
         tokio::time::sleep(std::time::Duration::from_millis(150)).await;
+        #[cfg(target_os="linux")]
+        {
+            let ui=handle.clone();
+            checked(&handle,handle.run_on_main_thread(move||{
+                use gtk::prelude::*;
+                if let Some(window)=ui.get_webview_window("main") {
+                    let focused=window.gtk_window().map(|native|native.is_active()).unwrap_or(true);
+                    if ui.state::<Panel>().can_dismiss(revision,focused) {hide(&ui);}
+                }
+            }));
+        }
+        #[cfg(not(target_os="linux"))]
         if let Some(window)=handle.get_webview_window("main") {
             if handle.state::<Panel>().can_dismiss(revision,window.is_focused().unwrap_or(true)) {
                 hide(&handle);

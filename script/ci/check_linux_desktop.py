@@ -81,7 +81,6 @@ def main(executable):
             shell=launch(['gnome-shell','--x11','--replace','--unsafe-mode'],'gnome-shell')
             wait_for(lambda: bus.name_has_owner('org.gnome.Shell'))
             wait_for(lambda: evaluate('1')==1)
-            evaluate('global.context.unsafe_mode = true; true')
             # GNOME can start in overview; test against the ordinary desktop.
             try:
                 evaluate("imports.ui.main.overview.hide(); true")
