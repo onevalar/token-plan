@@ -27,6 +27,9 @@ def main(executable):
                           LIBGL_ALWAYS_SOFTWARE='1', GSETTINGS_BACKEND='memory')
         # Memory settings do not cross processes, so use an isolated on-disk dconf DB.
         os.environ.pop('GSETTINGS_BACKEND')
+        subprocess.run(['dbus-update-activation-environment','HOME','XDG_CONFIG_HOME',
+                        'XDG_DATA_HOME','XDG_CACHE_HOME','XDG_CURRENT_DESKTOP',
+                        'XDG_SESSION_TYPE'],check=True)
         extensions = [json.loads(p.read_text())['uuid'] for p in
                       Path('/usr/share/gnome-shell/extensions').glob('*/metadata.json')
                       if 'indicator' in p.parent.name.lower()]
@@ -81,6 +84,10 @@ def main(executable):
             shell=launch(['gnome-shell','--x11','--replace','--unsafe-mode'],'gnome-shell')
             wait_for(lambda: bus.name_has_owner('org.gnome.Shell'))
             wait_for(lambda: evaluate('1')==1)
+            extension_proxy=bus.get_object('org.gnome.Shell','/org/gnome/Shell')
+            for uuid in extensions:
+                extension_proxy.EnableExtension(uuid,dbus_interface='org.gnome.Shell.Extensions')
+            wait_for(lambda: bus.name_has_owner('org.kde.StatusNotifierWatcher'))
             # GNOME can start in overview; test against the ordinary desktop.
             try:
                 evaluate("imports.ui.main.overview.hide(); true")
@@ -117,6 +124,7 @@ def main(executable):
             capture('outside-click')
             results['shell_alive']=shell.poll() is None
         finally:
+            subprocess.run(['import','-window','root',str(report/'final-desktop.png')],check=False)
             (report/'results.json').write_text(json.dumps(results,indent=2)+'\n')
             for proc in reversed(processes):
                 proc.terminate()

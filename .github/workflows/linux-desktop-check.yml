@@ -32,6 +32,7 @@ jobs:
       - run: rustup toolchain install 1.90.0 --profile minimal
       - uses: Swatinem/rust-cache@v2
         with:
+          cache-on-failure: true
           workspaces: platforms/tauri/src-tauri
           key: desktop-${{ matrix.os }}
       - name: Compile test executable (no installers or release signing)
