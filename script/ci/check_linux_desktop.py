@@ -98,28 +98,64 @@ def main(executable):
             if visible():
                 evaluate("global.get_window_actors().find(a=>a.meta_window.get_title()==='TokenPlan Preview')?.meta_window.delete(global.get_current_time()); true")
             wait_for(lambda: not visible())
-            subprocess.run(['xdotool','mousemove',str(int(coords[0])),str(int(coords[1])), 'click','1'],check=True)
-            time.sleep(2)
-            results['checks']['left_click_shows_home']=visible() and not evaluate(f'Boolean(({actor})?.menu?.isOpen)')
+            def click(x,y,button=1):
+                subprocess.run(['xdotool','mousemove',str(int(x)),str(int(y)),'click',str(button)],check=True)
+
+            def menu_open():
+                return evaluate(f'Boolean(({actor})?.menu?.isOpen)')
+
+            def home_from_menu():
+                if not menu_open():
+                    click(*coords,button=3)
+                wait_for(menu_open)
+                point=evaluate(f"(()=>{{let a=({actor}).menu._getMenuItems()[0];a=a.actor || a;let [x,y]=a.get_transformed_position();return [x+a.width/2,y+a.height/2];}})()")
+                click(*point)
+                wait_for(visible)
+                time.sleep(.5)
+
+            # GNOME owns left-click routing. A menu OR direct Home is valid.
+            click(*coords)
+            time.sleep(1)
+            results['left_click_route']='menu' if menu_open() else 'home' if visible() else 'none'
+            results['checks']['system_left_click_works']=results['left_click_route']!='none'
             capture('left-click')
-            subprocess.run(['xdotool','key','Escape'],check=True)
-            subprocess.run(['xdotool','mousemove',str(int(coords[0])),str(int(coords[1])), 'click','3'],check=True)
-            time.sleep(1)
-            results['checks']['right_click_shows_menu']=evaluate(f'Boolean(({actor})?.menu?.isOpen)')
+            if menu_open():
+                subprocess.run(['xdotool','key','Escape'],check=True)
+            click(*coords,button=3)
+            wait_for(menu_open)
+            results['checks']['right_click_shows_menu']=True
             capture('right-click')
-            subprocess.run(['xdotool','key','Escape'],check=True)
-            # Separate activation/focus checks from host-specific mouse routing.
-            names=[str(n) for n in bus.list_names() if str(n).startswith('org.kde.StatusNotifierItem')]
-            if not names:
-                raise RuntimeError('SNI service missing')
-            item=bus.get_object(names[0],'/StatusNotifierItem')
-            item.Activate(int(coords[0]),int(coords[1]), dbus_interface='org.kde.StatusNotifierItem')
-            wait_for(visible)
-            time.sleep(1)
-            subprocess.run(['xdotool','mousemove','100','800','click','1'],check=True)
-            time.sleep(1)
+            home_from_menu()
+            results['checks']['menu_shows_home']=visible()
+            capture('home')
+            click(100,800)
+            time.sleep(.5)
             results['checks']['desktop_click_hides_home']=not visible()
             capture('outside-click')
+
+            other=launch(['xmessage','-title','Other App','-geometry','220x120+1000+400','Outside click target'],'other-app')
+            time.sleep(1)
+            home_from_menu()
+            click(1100,460)
+            time.sleep(.5)
+            results['checks']['other_app_click_hides_home']=not visible()
+            capture('other-app-click')
+
+            # A tray host restart must not leave the popup permanently persistent.
+            for uuid in extensions:
+                extension_proxy.DisableExtension(uuid,dbus_interface='org.gnome.Shell.Extensions')
+            wait_for(visible)
+            time.sleep(.5)
+            properties=subprocess.check_output(['xprop','-name','TokenPlan Preview','_NET_WM_STATE'],text=True)
+            results['checks']['missing_tray_not_always_on_top']='_NET_WM_STATE_ABOVE' not in properties
+            for uuid in extensions:
+                extension_proxy.EnableExtension(uuid,dbus_interface='org.gnome.Shell.Extensions')
+            wait_for(lambda: evaluate(f'Boolean({actor})'))
+            time.sleep(1)
+            home_from_menu()
+            click(100,800)
+            time.sleep(.5)
+            results['checks']['tray_recovery_restores_hiding']=not visible()
             results['shell_alive']=shell.poll() is None
         finally:
             subprocess.run(['import','-window','root',str(report/'final-desktop.png')],check=False)

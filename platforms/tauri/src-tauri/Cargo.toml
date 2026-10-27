@@ -39,6 +39,8 @@ strip = "none"
 ksni = "0.3.6"
 # Detects a compositor before drawing transparent rounded corners (already a Tauri dependency).
 gtk = "0.18"
+# Already transitive; directly observe X11 button events without grabbing user input.
+x11-dl = "2.21"
 
 [target.'cfg(target_os = "macos")'.dependencies]
 # A plain NSWindow cannot appear over another app's full-screen Space, so the menu-bar

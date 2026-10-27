@@ -18,6 +18,8 @@ mod panel;
 mod mac_panel;
 #[cfg(target_os="linux")]
 mod linux_tray;
+#[cfg(any(target_os="linux",test))]
+mod linux_outside;
 use tauri::Manager;
 #[cfg(not(target_os="linux"))]
 use tauri::{
@@ -75,6 +77,8 @@ fn main() {
             #[cfg(target_os="linux")]
             {
                 app.manage(linux_tray::LinuxTrays::default());
+                app.manage(linux_outside::Observer::default());
+                linux_outside::install(app.handle());
                 panel::observe_linux_focus(app.handle());
             }
             #[cfg(target_os="macos")]

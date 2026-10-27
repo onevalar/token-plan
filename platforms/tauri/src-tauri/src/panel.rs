@@ -12,6 +12,10 @@ pub struct Panel {
     anchor: std::sync::Mutex<Option<(i32,i32,i32)>>,
 }
 impl Panel {
+    #[cfg(any(target_os="linux",test))]
+    pub(super) fn outside_revision(&self)->u64 {self.revision.load(Ordering::SeqCst)}
+    #[cfg(any(target_os="linux",test))]
+    pub(super) fn allows_outside_dismissal(&self,revision:u64)->bool {self.can_dismiss(revision,false)}
     fn changed(&self) -> u64 { self.revision.fetch_add(1,Ordering::SeqCst)+1 }
     fn set_persistent(&self, persistent:bool) -> bool {
         let changed=self.persistent.swap(persistent,Ordering::SeqCst)!=persistent;
@@ -72,9 +76,13 @@ pub fn show(app:&tauri::AppHandle) {
         checked(app,window.show());
         checked(app,window.unminimize());
         checked(app,window.set_focus());
+        #[cfg(target_os="linux")]
+        crate::linux_outside::watch(app,!app.state::<Panel>().persistent.load(Ordering::SeqCst));
     }
 }
 pub fn hide(app:&tauri::AppHandle) {
+    #[cfg(target_os="linux")]
+    crate::linux_outside::watch(app,false);
     app.state::<Panel>().changed();
     #[cfg(target_os="macos")]
     {
@@ -230,6 +238,7 @@ pub fn observe_linux_focus(app:&tauri::AppHandle) {
         if let Ok(native)=window.gtk_window() {
             let handle=app.clone();
             native.connect_is_active_notify(move|window|focus_changed(&handle,window.is_active()));
+            crate::linux_outside::watch(app,native.is_visible());
         }
     }
 }
@@ -247,6 +256,7 @@ pub fn linux_tray_available(app:&tauri::AppHandle,available:bool) {
             checked(&handle,window.set_skip_taskbar(available));
             checked(&handle,window.set_always_on_top(available));
             let _=handle.emit("panel-frame",frame(&handle));
+            crate::linux_outside::watch(&handle,available && window.is_visible().unwrap_or(false));
             if available {
                 // Recover popup semantics without stealing focus or opening Home.
                 if window.is_visible().unwrap_or(false) {
@@ -279,6 +289,15 @@ mod tests {
         let blur=state.changed();
         state.persistent.store(true,Ordering::SeqCst);
         assert!(!state.can_dismiss(blur,false));
+    }
+    #[test] fn outside_press_cannot_close_a_newly_reopened_or_persistent_window() {
+        let state=Panel::default();
+        let press=state.outside_revision();
+        assert!(state.allows_outside_dismissal(press));
+        state.changed();
+        assert!(!state.allows_outside_dismissal(press));
+        state.set_persistent(true);
+        assert!(!state.allows_outside_dismissal(state.outside_revision()));
     }
     #[test] fn tray_recovery_restores_dismissal_and_invalidates_pending_blur() {
         let state=Panel::default();

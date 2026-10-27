@@ -348,3 +348,19 @@ on a double click. SNI's `ItemIsMenu=false` cannot override this host policy. Th
 not silently patch, disable or replace the user's system extension. Exact single-click
 behavior on such hosts remains a desktop integration limitation pending a supported
 integration; an activation callback test alone does not prove mouse behavior.
+
+### Ubuntu popup dismissal (2026-10-27)
+
+Ubuntu keeps its system tray extension's default mouse behavior. Use Show Home in
+that menu; TokenPlan does not install an additional GNOME extension or patch one.
+On X11, the visible popup also observes XInput2 pointer-button presses to dismiss
+when the desktop keeps keyboard focus on the app. This does not grab or replay
+input: the destination app still receives the click. Observation stops when the
+popup is hidden or in the no-tray fallback; coordinates are never logged or saved.
+The direct `x11-dl` dependency reuses the already locked transitive library.
+On native Wayland (including XWayland apps), only normal toplevel focus dismissal
+is used; arbitrary desktop-click detection is not claimed.
+
+The GNOME interaction check accepts the system's left-click route, opens Home using
+the actual tray menu, and checks desktop clicks, another application's clicks and
+tray-host disappearance/recovery. It still fails if any required dismissal fails.

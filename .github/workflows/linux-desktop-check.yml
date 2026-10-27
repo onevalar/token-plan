@@ -41,7 +41,7 @@ jobs:
           npm ci
           npm run build
           npm run prepare:bridge
-          cargo +1.90.0 test --locked --manifest-path src-tauri/Cargo.toml panel::tests
+          cargo +1.90.0 test --locked --manifest-path src-tauri/Cargo.toml
           cargo +1.90.0 build --locked --manifest-path src-tauri/Cargo.toml --features tauri/custom-protocol
       - name: Exercise installed GNOME Shell and Ubuntu tray extension
         run: |
