@@ -15,3 +15,11 @@ Windows 安装器暂未进行 Windows 代码签名。所有 Tauri 更新包另�
 ### Linux runtime baseline
 
 The corrected build pipeline targets Ubuntu 22.04 / glibc 2.35 and checks the same packages on Ubuntu 22.04 and 24.04. The DEB explicitly requires glibc, GTK/WebKitGTK and the bundled .NET helper's runtime libraries. The originally published 2.3.5 Linux packages were built on Ubuntu 24.04 and require GLIBC_2.39; they cannot launch on a stock Ubuntu 22.04 system. Do not replace the operating system's glibc to work around that package. AppImage is also checked because it does not eliminate the host glibc requirement.
+
+### Linux compatibility verification — 2026-10-27
+
+- Build: [40457198594](https://github.com/onevalar/token-plan/actions/runs/40457198594), source `cee4e496fd38895b341b51e06f6ee5551c166a87`, application version 2.3.5. Linux only; no Windows or macOS packages rebuilt.
+- Repeat package checks: [40458743438](https://github.com/onevalar/token-plan/actions/runs/40458743438). The same DEB and AppImage passed on Ubuntu 22.04 and 24.04, including DEB dependency installation and legacy migration, visible window content, WebKit renderer and bundled backend startup.
+- ABI audit: both DEB ELF files, the AppImage launcher and 180 extracted ELF objects require no GLIBC symbol newer than 2.35.
+- Launch checks use Xvfb and isolated empty user directories. They do not verify physical desktop tray integration, Wayland or live account access. Missing tray warnings are expected in this environment.
+- These are verification artifacts, not replacement release assets. Same-version Linux publication must use distinct asset names; existing 2.3.5 clients will not see an automatic version upgrade.
