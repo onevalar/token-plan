@@ -77,9 +77,7 @@ def main(executable):
             subprocess.run(['import','-window','root',str(report/(name+'.png'))],check=True)
 
         # Find the real extension's button, not a fake StatusNotifier host.
-        actor = """(()=>{let queue=[global.stage];while(queue.length){let a=queue.shift();
-            if(a._indicator && String(a._indicator.id).includes('tokenplan'))return a;
-            if(a.get_children)queue.push(...a.get_children());}return null;})()"""
+        actor = "Object.values(Main.panel.statusArea).find(a=>a._indicator && String(a._indicator.id).includes('tokenplan'))"
         try:
             shell=launch(['gnome-shell','--x11','--replace','--unsafe-mode'],'gnome-shell')
             wait_for(lambda: bus.name_has_owner('org.gnome.Shell'))
@@ -89,20 +87,19 @@ def main(executable):
                 extension_proxy.EnableExtension(uuid,dbus_interface='org.gnome.Shell.Extensions')
             wait_for(lambda: bus.name_has_owner('org.kde.StatusNotifierWatcher'))
             # GNOME can start in overview; test against the ordinary desktop.
-            try:
-                evaluate("imports.ui.main.overview.hide(); true")
-            except RuntimeError:
-                subprocess.run(['xdotool','key','Escape'],check=True)
+            evaluate('Main.overview.hide(); true')
+            wait_for(lambda: not evaluate('Main.overview.visible'))
             launch([executable],'tokenplan')
             wait_for(visible)
-            coords=wait_for(lambda: evaluate(f"(()=>{{let a={actor};if(!a)return null;let [x,y]=a.get_transformed_position();let [w,h]=a.get_transformed_size();return [x+w/2,y+h/2];}})()"))
+            coords=wait_for(lambda: evaluate(f"(()=>{{let a={actor};if(!a)return null;let [x,y]=a.get_transformed_position();let [w,h]=a.get_transformed_size();return Number.isFinite(x+w/2) && Number.isFinite(y+h/2) && w>0 && h>0 ? [x+w/2,y+h/2] : null;}})()"))
+            time.sleep(3)
             # Escape hides the application's initial window.
             subprocess.run(['xdotool','search','--onlyvisible','--name','^TokenPlan Preview$',
                             'windowactivate','--sync','key','Escape'],check=True)
-            time.sleep(1)
+            wait_for(lambda: not visible())
             subprocess.run(['xdotool','mousemove',str(int(coords[0])),str(int(coords[1])), 'click','1'],check=True)
             time.sleep(2)
-            results['checks']['left_click_shows_home']=visible()
+            results['checks']['left_click_shows_home']=visible() and not evaluate(f'Boolean(({actor})?.menu?.isOpen)')
             capture('left-click')
             subprocess.run(['xdotool','key','Escape'],check=True)
             subprocess.run(['xdotool','mousemove',str(int(coords[0])),str(int(coords[1])), 'click','3'],check=True)
