@@ -40,3 +40,9 @@ NSIS installer are for first installs, see `docs/desktop-clients.md#installers`.
   cloud runners. Signatures, macOS notarization, signed helper startup and Ubuntu package migration checks remain required.
 - The first run is a cold cache baseline. Compare later warm-cache runs of the same workflow before claiming a speedup. Browser system
   dependencies remain installed until a native Windows run proves they can safely be omitted.
+
+## Linux compatibility and repair builds
+
+Linux packages are built on Ubuntu 22.04 (glibc 2.35). Packaging rejects newer glibc requirements in the shell, bundled helper and shared libraries. Production packages must pass installation/migration and graphical startup checks on both Ubuntu 22.04 and 24.04; the same DEB and AppImage are tested on both systems, with empty user profiles.
+
+The Tauri migration workflow supports `platforms: linux` for Linux-only signed verification artifacts, without rebuilding macOS/Windows or publishing a release. Existing published binaries remain immutable. A same-app-version Linux repair can be added under new asset names (for example `linux1`) with a Debian package revision (`2.3.5-1`), a separate checksum manifest and matching AppImage signature. Existing 2.3.5 installations will not automatically discover an equal-version repair: manual download/reinstallation is required unless a new app version is published. Do not overwrite the original release assets or silently repoint their signatures.

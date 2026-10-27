@@ -11,3 +11,7 @@
 所有平台仅保存本地历史记录，不进行跨设备同步。通知需操作系统允许，免打扰模式可能抑制横幅。Linux 全局快捷键目前使用 X11，Wayland 下会明确显示不可用；托盘行为也取决于桌面支持。快捷键注册失败会保留原组合并提示原因，不影响应用启动。
 
 Windows 安装器暂未进行 Windows 代码签名。所有 Tauri 更新包另有更新签名；发布页提供 SHA256SUMS.txt 供手动下载校验。
+
+### Linux runtime baseline
+
+The corrected build pipeline targets Ubuntu 22.04 / glibc 2.35 and checks the same packages on Ubuntu 22.04 and 24.04. The DEB explicitly requires glibc, GTK/WebKitGTK and the bundled .NET helper's runtime libraries. The originally published 2.3.5 Linux packages were built on Ubuntu 24.04 and require GLIBC_2.39; they cannot launch on a stock Ubuntu 22.04 system. Do not replace the operating system's glibc to work around that package. AppImage is also checked because it does not eliminate the host glibc requirement.

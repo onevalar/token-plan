@@ -18,7 +18,7 @@ on:
       platforms:
         description: 'Platforms to verify (release workflows always default to all)'
         type: choice
-        options: [all, windows-linux]
+        options: [all, windows-linux, linux]
         default: all
   workflow_call:
     inputs:
@@ -46,7 +46,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include: ${{ fromJSON(inputs.platforms == 'windows-linux' && '[{"os":"windows-latest","platform":"windows","browser":"chromium"},{"os":"ubuntu-24.04","platform":"linux","browser":"webkit"}]' || '[{"os":"macos-26","platform":"macos","browser":"webkit"},{"os":"windows-latest","platform":"windows","browser":"chromium"},{"os":"ubuntu-24.04","platform":"linux","browser":"webkit"}]') }}
+        include: ${{ fromJSON(inputs.platforms == 'linux' && '[{"os":"ubuntu-22.04","platform":"linux","browser":"webkit"}]' || inputs.platforms == 'windows-linux' && '[{"os":"windows-latest","platform":"windows","browser":"chromium"},{"os":"ubuntu-22.04","platform":"linux","browser":"webkit"}]' || '[{"os":"macos-26","platform":"macos","browser":"webkit"},{"os":"windows-latest","platform":"windows","browser":"chromium"},{"os":"ubuntu-22.04","platform":"linux","browser":"webkit"}]') }}
     runs-on: ${{ matrix.os }}
     defaults:
       run:
@@ -82,7 +82,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ${{ fromJSON(inputs.platforms == 'windows-linux' && '["windows-latest","ubuntu-24.04"]' || '["macos-26","windows-latest","ubuntu-24.04"]') }}
+        os: ${{ fromJSON(inputs.platforms == 'linux' && '["ubuntu-22.04"]' || inputs.platforms == 'windows-linux' && '["windows-latest","ubuntu-22.04"]' || '["macos-26","windows-latest","ubuntu-22.04"]') }}
     runs-on: ${{ matrix.os }}
     defaults:
       run:
@@ -214,6 +214,9 @@ jobs:
       - name: Verify packaged updater signature
         if: ${{ !inputs.checks_only }}
         run: node scripts/verify-artifacts.mjs
+      - name: Check Linux ABI baseline
+        if: runner.os == 'Linux' && !inputs.checks_only
+        run: python3 ../../script/ci/check_linux_abi.py src-tauri/target/release/bundle
       - name: Verify Linux DEB migration from legacy and 2.0.4 packages
         if: runner.os == 'Linux' && !inputs.checks_only && inputs.production
         shell: bash
@@ -245,3 +248,37 @@ jobs:
             platforms/tauri/src-tauri/tray-native-review.png
           if-no-files-found: warn
       # Verification artifacts only. Published feeds require an approved stable version.
+
+  linux-install:
+    needs: build
+    if: ${{ !inputs.checks_only && inputs.production }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-22.04, ubuntu-24.04]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.source_ref || github.sha }}
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: tauri-Linux
+          path: linux-packages
+      - name: Install graphical smoke-test tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb x11-utils imagemagick dbus-x11 binutils
+      - name: Verify ABI, install, migrate and launch on target OS
+        run: |
+          python3 script/ci/check_linux_abi.py linux-packages
+          package=$(find linux-packages -name '*.deb' -print -quit)
+          python3 script/ci/check_linux_deb.py "$package"
+          python3 script/ci/check_linux_launch.py linux-packages
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: linux-launch-${{ matrix.os }}
+          path: linux-smoke/
+          if-no-files-found: warn
