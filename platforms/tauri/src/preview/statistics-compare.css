@@ -1,0 +1,174 @@
+.statistics-design .tp-compare {
+ --compare-number-width: 16ch;
+ min-width: 0;
+ color: var(--foreground);
+ font-variant-numeric: tabular-nums;
+}
+.statistics-design .tp-compare .tp-compare-sr-only {
+ position: absolute;
+ width: 1px;
+ height: 1px;
+ padding: 0;
+ margin: -1px;
+ overflow: hidden;
+ clip-path: inset(50%);
+ white-space: nowrap;
+ border: 0;
+}
+.statistics-design .tp-compare .tp-compare-source-button {
+ --point-surface: var(--surface);
+ min-width: 0;
+ width: 100%;
+ border: 1px solid transparent;
+ background: var(--surface);
+ color: var(--foreground);
+ font: inherit;
+ text-align: start;
+ cursor: pointer;
+ touch-action: manipulation;
+}
+.statistics-design .tp-compare .tp-compare-source-button[aria-pressed="true"] {
+ --point-surface: var(--surface-muted);
+ border-color: var(--border);
+ background: var(--surface-muted);
+ box-shadow: inset 3px 0 var(--source-color);
+}
+.statistics-design .tp-compare .tp-compare-source-button:active { background: var(--surface-muted); }
+.statistics-design .tp-compare .tp-compare-dot { display: inline-block; flex: none; width: 8px; height: 8px; border: 1.5px solid currentColor; border-radius: 50%; }
+.statistics-design .tp-compare .tp-compare-dot.is-current { background: currentColor; }
+.statistics-design .tp-compare .tp-compare-dot.is-prior { background: transparent; }
+.statistics-design .tp-compare .tp-compare-totals {
+ display: grid;
+ grid-template-columns: repeat(2, minmax(0, 1fr));
+ gap: 14px;
+ margin: 14px 0 12px;
+ padding-block: 12px;
+ border-block: 1px solid var(--border);
+}
+.statistics-design .tp-compare .tp-compare-totals > div { min-width: 0; }
+.statistics-design .tp-compare .tp-compare-totals > div + div { padding-inline-start: 14px; border-inline-start: 1px solid var(--border); }
+.statistics-design .tp-compare .tp-compare-totals dt { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; color: var(--text-secondary); font-size: 11px; line-height: 1.6; }
+.statistics-design .tp-compare .tp-compare-totals dt > span { flex-basis: 100%; margin-inline-start: 13px; white-space: nowrap; }
+.statistics-design .tp-compare .tp-compare-totals dd { margin: 7px 0 0; font-size: clamp(14px, 3.8cqi, 18px); line-height: 1.4; font-weight: 500; overflow-wrap: anywhere; letter-spacing: -.02em; }
+.statistics-design .tp-compare .tp-compare-totals dd small { display: block; margin-top: 4px; color: var(--text-secondary); font-size: 10px; font-weight: 400; letter-spacing: 0; }
+.statistics-design .tp-compare .tp-compare-context, .statistics-design .tp-compare .tp-compare-scale-note { margin: 12px 0 16px; color: var(--text-secondary); font-size: 12px; line-height: 1.7; text-wrap: pretty; }
+.statistics-design .tp-compare .tp-compare-source-name { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.statistics-design .tp-compare .tp-compare-source-name strong { min-width: 0; overflow-wrap: anywhere; font-size: 13px; font-weight: 500; }
+.statistics-design .tp-compare .tp-provider-mark, .statistics-design .tp-compare .tp-provider-mark .provider-logo { width: 16px; height: 16px; flex: none; }
+.statistics-design .tp-compare .tp-compare-values { display: grid; align-content: center; gap: 5px; min-width: 0; }
+.statistics-design .tp-compare .tp-compare-value { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-width: 0; }
+.statistics-design .tp-compare .tp-compare-value > span:last-child { min-width: 0; text-align: end; }
+.statistics-design .tp-compare .tp-compare-value b { font-size: 12px; font-weight: 500; overflow-wrap: anywhere; }
+.statistics-design .tp-compare .tp-compare-value + .tp-compare-value { color: var(--text-secondary); }
+.statistics-design .tp-compare .tp-compare-value small { display: block; color: var(--text-secondary); font-size: 10px; line-height: 1.5; }
+.statistics-design .tp-compare .tp-compare-grid-line { fill: none; stroke: var(--border); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.statistics-design .tp-compare .tp-compare-prior-point { fill: var(--point-surface, var(--surface)); stroke: var(--source-color); stroke-width: 1.5; vector-effect: non-scaling-stroke; }
+.statistics-design .tp-compare .tp-compare-current-point { fill: var(--source-color); }
+
+/* An aligned paired ledger; exact values keep a dedicated column. */
+.statistics-design .tp-compare .tp-compare-dumbbell-head, .statistics-design .tp-compare .tp-compare-dumbbell-row {
+ display: grid;
+ grid-template-columns: minmax(0, 1fr) var(--compare-number-width);
+ column-gap: 16px;
+}
+.statistics-design .tp-compare .tp-compare-dumbbell-head { padding: 0 11px 7px; color: var(--text-secondary); }
+.statistics-design .tp-compare .tp-compare-dumbbell-head > span { font-size: 11px; }
+.statistics-design .tp-compare .tp-compare-dumbbell-head > span:last-child { text-align: end; }
+.statistics-design .tp-compare .tp-compare-ruler { display: flex; justify-content: space-between; gap: 8px; padding-inline: 3.33%; }
+.statistics-design .tp-compare .tp-compare-dumbbell-row { align-items: center; row-gap: 12px; padding: 13px 10px; border-radius: 10px; }
+.statistics-design .tp-compare .tp-compare-dumbbell-row + .tp-compare-dumbbell-row { border-top-color: var(--border); }
+.statistics-design .tp-compare .tp-compare-difference { text-align: end; font-size: 11px; color: var(--text-secondary); overflow-wrap: anywhere; }
+.statistics-design .tp-compare .tp-compare-dumbbell { display: block; width: 100%; height: auto; overflow: visible; }
+.statistics-design .tp-compare .tp-compare-join { stroke: var(--source-color); stroke-width: 2; vector-effect: non-scaling-stroke; }
+
+/* Individual plotting surfaces, with an explicit shared/independent scale. */
+.statistics-design .tp-compare .tp-compare-scale-control { --control-height-sm: 38px; --focus-outline-offset: -2px; min-width: 0; }
+.statistics-design .tp-compare .tp-compare-scale-control button { min-height: 38px; }
+.statistics-design .tp-compare .tp-compare-scale-note { min-height: 3.4em; margin-block: 8px 12px; }
+.statistics-design .tp-compare .tp-compare-trends { display: grid; gap: 10px; }
+.statistics-design .tp-compare .tp-compare-trend-card {
+ display: grid;
+ grid-template-columns: minmax(0, 1fr) var(--compare-number-width);
+ align-items: center;
+ gap: 13px 12px;
+ padding: 12px;
+ border-color: var(--border);
+ border-radius: 14px;
+}
+.statistics-design .tp-compare .tp-compare-domain { justify-self: end; color: var(--text-secondary); font-size: 10px; overflow-wrap: anywhere; }
+.statistics-design .tp-compare .tp-compare-trend-frame { display: block; min-width: 0; }
+.statistics-design .tp-compare .tp-compare-trend { display: block; width: 100%; height: auto; overflow: visible; }
+.statistics-design .tp-compare .tp-compare-prior-line, .statistics-design .tp-compare .tp-compare-current-line { fill: none; stroke: var(--source-color); stroke-width: 1.7; vector-effect: non-scaling-stroke; }
+.statistics-design .tp-compare .tp-compare-prior-line { stroke-dasharray: 4 4; stroke-width: 1.3; }
+.statistics-design .tp-compare .tp-compare-time-axis { display: flex; justify-content: space-between; gap: 6px; margin-top: 5px; color: var(--text-secondary); font-size: 10px; }
+.statistics-design .tp-compare .tp-compare-time-axis > :only-child { margin-inline: auto; }
+
+/* A raw-precision cumulative bridge, followed by its signed source ledger. */
+.statistics-design .tp-compare .tp-compare-net { display: grid; gap: 6px; padding: 18px 0 5px; }
+.statistics-design .tp-compare .tp-compare-net > strong { font-size: clamp(24px, 7.5cqi, 32px); line-height: 1.3; font-weight: 500; letter-spacing: -.03em; overflow-wrap: anywhere; }
+.statistics-design .tp-compare .tp-compare-net > .tp-caption { line-height: 1.6; }
+.statistics-design .tp-compare .tp-compare-waterfall {
+ --plot-height: 190px;
+ display: grid;
+ grid-template-columns: minmax(9ch, max-content) minmax(0, 1fr);
+ gap: 8px;
+ margin-block: 22px 16px;
+ font-size: 10px;
+}
+.statistics-design .tp-compare .tp-compare-water-axis { display: flex; flex-direction: column; justify-content: space-between; height: var(--plot-height); color: var(--text-secondary); text-align: end; white-space: nowrap; }
+.statistics-design .tp-compare .tp-compare-water-axis > span:first-child { translate: 0 -50%; }
+.statistics-design .tp-compare .tp-compare-water-axis > span:last-child { translate: 0 50%; }
+.statistics-design .tp-compare .tp-compare-water-scroll { min-width: 0; overflow-x: auto; padding: 7px 3px 5px; margin-block: -7px -5px; }
+.statistics-design .tp-compare .tp-compare-water-steps { position: relative; display: grid; grid-template-columns: repeat(var(--step-count), minmax(48px, 1fr)); min-width: calc(var(--step-count) * 48px); }
+.statistics-design .tp-compare .tp-compare-water-steps::before { content: ''; position: absolute; inset: 0 0 auto; height: var(--plot-height); border-block: 1px solid var(--border); pointer-events: none; }
+.statistics-design .tp-compare .tp-compare-water-steps::after { content: ''; position: absolute; inset-inline: 0; top: calc(var(--plot-height) / 2); border-top: 1px solid var(--border); pointer-events: none; }
+.statistics-design .tp-compare .tp-compare-water-step, .statistics-design .tp-compare .tp-compare-water-total { display: block; align-self: start; min-width: 0; padding: 0; border: 0; border-radius: 6px; background: transparent; }
+.statistics-design .tp-compare .tp-compare-water-step[aria-pressed="true"] { background: color-mix(in srgb, var(--source-color) 9%, transparent); box-shadow: none; }
+.statistics-design .tp-compare .tp-compare-water-step[aria-pressed="true"] .tp-compare-step-label { text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 2px; }
+.statistics-design .tp-compare .tp-compare-step-space { position: relative; display: block; height: var(--plot-height); }
+.statistics-design .tp-compare .tp-compare-water-bar { position: absolute; z-index: 1; left: 22%; width: 56%; background: var(--source-color); border-radius: 2px; }
+.statistics-design .tp-compare .tp-compare-water-bar.is-prior-total { border: 1.5px solid var(--foreground); background: var(--surface); }
+.statistics-design .tp-compare .tp-compare-water-bar.is-current-total { background: var(--foreground); }
+.statistics-design .tp-compare .tp-compare-water-bar.is-zero { height: 0 !important; border: 0; border-top: 2px solid var(--source-color, var(--foreground)); border-radius: 0; }
+.statistics-design .tp-compare .tp-compare-water-connector { position: absolute; left: 78%; width: 44%; border-top: 1px dashed var(--text-muted); pointer-events: none; }
+.statistics-design .tp-compare .tp-compare-water-sign { position: absolute; inset-inline: 0; text-align: center; color: var(--foreground); font-size: 12px; font-weight: 500; }
+.statistics-design .tp-compare .tp-compare-step-label { position: relative; display: block; min-height: 26px; padding: 9px 3px 0; font-size: 10px; line-height: 1.3; text-align: center; overflow-wrap: anywhere; }
+.statistics-design .tp-compare .tp-compare-contribution-head { display: flex; justify-content: space-between; gap: 12px; margin: 18px 0 8px; padding-inline: 9px; color: var(--text-secondary); font-size: 11px; }
+.statistics-design .tp-compare .tp-compare-contribution-head > :last-child { text-align: end; }
+.statistics-design .tp-compare .tp-compare-contribution { display: grid; grid-template-columns: minmax(0, 1fr) var(--compare-number-width); align-items: center; gap: 12px; min-height: 56px; padding: 9px; border-radius: 10px; }
+.statistics-design .tp-compare .tp-compare-contribution + .tp-compare-contribution { border-top-color: var(--border); }
+.statistics-design .tp-compare .tp-compare-index { min-width: 2ch; color: var(--text-secondary); font-size: 10px; }
+.statistics-design .tp-compare .tp-compare-contribution-value { display: grid; justify-items: end; gap: 3px; text-align: end; }
+.statistics-design .tp-compare .tp-compare-contribution-value b { font-size: 12px; font-weight: 500; overflow-wrap: anywhere; }
+.statistics-design .tp-compare .tp-compare-contribution-value small { font-size: 10px; color: var(--text-secondary); }
+
+@container study (min-width: 560px) {
+ .statistics-design .tp-compare .tp-compare-totals dt > span { flex-basis: auto; margin-inline-start: auto; }
+ .statistics-design .tp-compare .tp-compare-dumbbell-head, .statistics-design .tp-compare .tp-compare-dumbbell-row { grid-template-columns: minmax(110px, .8fr) minmax(160px, 1.5fr) var(--compare-number-width); column-gap: 20px; }
+ .statistics-design .tp-compare .tp-compare-dumbbell-head > span:first-child { grid-column: 2; }
+ .statistics-design .tp-compare .tp-compare-dumbbell-row { row-gap: 6px; padding-block: 15px; }
+ .statistics-design .tp-compare .tp-compare-dumbbell-row > .tp-compare-source-name { grid-column: 1; grid-row: 1; }
+ .statistics-design .tp-compare .tp-compare-dumbbell-row > .tp-compare-difference { grid-column: 1; grid-row: 2; padding-inline-start: 24px; text-align: start; }
+ .statistics-design .tp-compare .tp-compare-dumbbell { grid-column: 2; grid-row: 1 / span 2; }
+ .statistics-design .tp-compare .tp-compare-dumbbell-row > .tp-compare-values { grid-column: 3; grid-row: 1 / span 2; }
+ .statistics-design .tp-compare .tp-compare-scale-note { min-height: auto; }
+ .statistics-design .tp-compare .tp-compare-trends { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+ .statistics-design .tp-compare .tp-compare-trend-card { grid-template-columns: minmax(0, 1fr) auto; }
+ .statistics-design .tp-compare .tp-compare-trend-frame { grid-column: 1 / -1; }
+ .statistics-design .tp-compare .tp-compare-trend-card > .tp-compare-values { grid-column: 1 / -1; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; border-top: 1px solid var(--border); padding-top: 10px; }
+ .statistics-design .tp-compare .tp-compare-trend-card .tp-compare-value { display: grid; grid-template-columns: 8px minmax(0, 1fr); gap: 3px 6px; }
+ .statistics-design .tp-compare .tp-compare-trend-card .tp-compare-value > .tp-compare-sr-only { position: static; grid-column: 2; grid-row: 1; width: auto; height: auto; margin: 0; clip-path: none; color: var(--text-secondary); font-size: 10px; white-space: normal; }
+ .statistics-design .tp-compare .tp-compare-trend-card .tp-compare-value > .tp-compare-dot { grid-column: 1; grid-row: 1; }
+ .statistics-design .tp-compare .tp-compare-trend-card .tp-compare-value > span:last-child { grid-column: 1 / -1; grid-row: 2; }
+ .statistics-design .tp-compare .tp-compare-waterfall { --plot-height: 220px; }
+ .statistics-design .tp-compare .tp-compare-water-bar { left: 28%; width: 44%; }
+ .statistics-design .tp-compare .tp-compare-water-connector { left: 72%; width: 56%; }
+}
+
+@media (hover: hover) and (pointer: fine) {
+ .statistics-design .tp-compare .tp-compare-source-button:hover { --point-surface: var(--surface-muted); background: var(--surface-muted); }
+ .statistics-design .tp-compare .tp-compare-water-step:hover { background: color-mix(in srgb, var(--source-color) 9%, transparent); }
+}
+@media (prefers-reduced-motion: reduce) {
+ .statistics-design .tp-compare *, .statistics-design .tp-compare *::before, .statistics-design .tp-compare *::after { transition: none; animation: none; }
+}

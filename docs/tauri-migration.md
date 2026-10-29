@@ -263,9 +263,10 @@ login takes precedence when the same identity is also in the default directory, 
 account switch does not disconnect that saved account. macOS and the .NET engines expose only
 matched directory paths to the UI, never credential contents.
 
-Home offers twelve style families in eight categories: Bars, Quota Ruler, Cells, Rings, Gauges, Numbers, Containers
-(battery, tank, thermometer, hourglass), Border Progress, Source Split, Side-by-Side Columns,
-Status Lights and Textured Bar. Choosing one reveals its options: Bars and Quota Ruler can show a
+Home groups its styles into ten categories: Bars, Cells, Rings, Instruments, Cycles, Containers,
+Editorial & Numbers, Side-by-Side Columns, Status Lights and Border Progress. Existing Quota Ruler,
+Source Split and Textured Bar belong to Bars; Gauges belong to Rings. Choosing a variant reveals
+its applicable options: Bars and Quota Ruler can show a
 striped forecast of where use will land by reset; Rings are single, double or tick; Cells are a
 grid or a single row of squares, capsules or rising bars with 5, 10 or 20 cells. Earlier saved
 choices keep their look. Source Split spreads the used part over each model's share of the last
@@ -280,17 +281,37 @@ halftone dots, diagonal stripes, solid, or varied per metric. Texture Color: the
 or a fixed blue, green, orange or purple; near-limit readings still turn red. Textured fills grow
 from empty when Home appears and glide to each new reading after a refresh, with the texture
 thickening into the solid part at the moving edge; with reduced motion they show the reading at
-once. Usage styles show no visible Used/Remaining label. No style shows a visible near-limit, exhausted or exceeded
-sentence; color alone carries that state.
+once. These existing variants retain their compact labels and warning presentation.
+
+Fifteen additional designs are now normal Home options, not exploration-only renderers.
+Instruments and Cycles each contain three new variants. Cursor/ruler variants join Bars;
+dot matrix and slanted grille join Cells; segmented battery joins Containers; quota ticket,
+used/remaining and number spine join Editorial & Numbers. They keep precise fractional and
+over-limit readings, visibly name warning states, and open exact quota/reset details without
+leaving Home. Missing readings never become zero. Cycle elapsed time requires a valid provider
+period and reset, stays unchanged when switching Used/Remaining, and is not a forecast. Money
+and credits remain in their original order; unrelated quotas are never combined. Both original
+exploration directories remain available separately and are not application dependencies.
 
 Home usage styles are local UI preferences. Unified mode retains the existing global style;
 Per Subscription exposes a style picker inside each subscription's Edit Home Display. Switching
 modes preserves per-account choices, including different styles for two accounts of one service.
 Each account's Current Quota on its detail page mirrors its effective style, so leaving the
 editor shows the chosen look without a reload.
-The nine choices include Tick Ring, with one independent dial per quota. It uses the same
+Tick Ring still provides one independent dial per quota. All variants use the same
 saved `tokenplan.homeUsagePreferences` record, displayed percentages, reset times and warning
 threshold as the other styles. No provider, history source or stored reading is changed.
+
+Usage Statistics adds fifteen designs within five presentation modules: Overview, Activity,
+Source Composition, Period Comparison and Personal Cost Reference. Quota Changes and Daily
+Records remain separate modules. Display Settings enables, reorders and previews these against
+actual local history for either 7 or 30 days. Tokens and known costs share the same account
+filter and deduplicated records. Missing dates and unknown costs do not become zero; incomplete
+periods cannot claim a comparable change. A personal cost reference is user-defined, local and
+off by default, never a provider allowance or forecast. Existing module preferences are preserved;
+the two new optional comparison/reference modules start disabled. Today and Yesterday retain
+overview and daily-record views. See [shared navigation behavior](mac-navigation-preview.md#statistics-display-settings)
+for the choices and completeness rules.
 
 ### Connection diagnosis
 

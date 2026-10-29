@@ -8,15 +8,14 @@ tray integration remain platform-specific. This change does not publish a releas
 
 - Home offers Compact (default) and Comfortable spacing. The preference stays on
   this device; the previous macOS preview preference is preserved on upgrade.
-- In Unified mode, General Settings › Usage Style offers nine Home Usage Styles, shown as one collapsed row with the
-  current style; opening it shows a small drawing of every style at once: Bars (default), Gauges,
-  Percentage Grid, Compact Rings, Quota Ruler, Concentric Rings, Numbers and
-  Segmented Bar, plus Tick Ring. The choice stays on this device, independently of spacing,
+- In Unified mode, General Settings › Usage Style groups related Home styles into ten
+  categories. The collapsed row names the current variant; opening it shows the categories
+  and their variant choices. Bars remains the default. The choice stays on this device, independently of spacing,
   used/remaining mode and tray style. It changes Home and the account detail's Current Quota,
   but not history or the menu bar. Each account and quota keeps its own reading; nothing is averaged
   or combined. Balances and existing history charts keep their original form and order.
 - All styles show the same percentages and reset times as bars, including
-  missing readings and windows that have not started. A grid has 100 whole cells,
+  missing readings and windows that have not started. The original grid has 100 whole cells,
   each representing one percentage point; fractions round to the nearest cell.
   Over-limit numbers are never clipped: a gauge stops at its endpoint but keeps
   the real percentage; a grid outside 0–100% shows the number without a grid.
@@ -61,8 +60,9 @@ tray integration remain platform-specific. This change does not publish a releas
   Amp's non-periodic Orb allowance uses the short label Orb rather than a missing
   period and separate caption.
 - Quota displays retain the service color until at least 80% is used (20% or less
-  remaining), then both the graphic and percentage turn red. Alternative styles also
-  name the near-limit, exhausted or exceeded state. The threshold uses the unrounded
+  remaining), then both the graphic and percentage turn red. The fifteen new designs also
+  visibly name the near-limit, exhausted or exceeded state; existing designs keep their prior presentation.
+  The threshold uses the unrounded
   reading, not the displayed number or the filled cell count, and is the same
   in Used and Remaining modes. Missing readings never signal a low quota.
   This display rule does not change the user's notification thresholds.
@@ -261,11 +261,22 @@ Real Swift-helper/Tauri save-and-restart, live-account refresh, macOS system-wid
 light/dark switching, VoiceOver and constrained multi-account menu-bar width remain
 unverified. App-theme screenshots and composited raster images do not replace these checks.
 
-Home style selection has eight entries arranged four per row: Bars, Cells, Rings,
-Containers, Numbers, Side-by-Side Columns, Status Lights and Border Progress. Bars includes the ruler, source split and row fill;
-Rings includes the dashboard gauge. The first four entries expose variants; the last four select their design directly. Saved style IDs
-remain unchanged. Border Progress places the value on the left and the period and countdown on the right; Textured Bar's Full-Width Card (which replaced Row Fill) uses the same split over a filled row. Styles show no visible warning sentence; color carries a near-limit or exhausted state. Both global and account style selectors show an immediate sample
-using the same Home renderer; account edits apply immediately.
+Home style selection has ten categories: Bars, Cells, Rings, Instruments, Cycles,
+Containers, Editorial & Numbers, Side-by-Side Columns, Status Lights and Border Progress.
+Instruments and Cycles each add three variants. The other nine new variants join related
+existing categories: cursor rulers under Bars, dot matrix and slanted grille under Cells,
+segmented battery under Containers, and quota ticket, used/remaining and number spine under
+Editorial & Numbers. Existing choices and their saved identifiers remain valid; nothing
+is replaced just because it shares a category. Both global and per-account selectors
+preview the selected variant with labelled sample data using the same Home renderer.
+
+The new designs retain fractional and over-limit readings. Only the graphical extent
+is bounded to 0–100%; a missing reading is not zero. Each quota opens its exact reading
+and reset details; closing returns focus to its entry. Cycle views show elapsed time only
+when the provider supplies a usable period and reset. Elapsed time is independent of
+Used/Remaining mode, and no cycle is invented for missing or invalid windows. Money and
+credits keep their original order among quotas. The two exploration pages remain separate
+and are not imported by the application.
 
 Style variants and forecast, shape and cell-count options use aligned dropdowns.
 The sample preview is inset inside its settings group with the shared control radius.
@@ -276,10 +287,47 @@ The sample preview is inset inside its settings group with the shared control ra
 
 ### Statistics display settings
 
-Usage Statistics has its own Display Settings, shared by the macOS, Windows and Linux interface. Modules can be enabled and reordered by dragging (or the handle's arrow keys); style choices and order persist locally. Usage Activity switches between calendar, folded bands and daily bars. Source Composition switches between a token-weighted service treemap and a list. Quota Changes is optional and switches between remaining-quota samples and original observations; Daily Records retains its existing drill-down. Home styles remain independent.
+Usage Statistics has its own Display Settings, shared by the macOS, Windows and Linux interface.
+Seven modules can be enabled and reordered by dragging or the handle's arrow keys. Style choices,
+visibility and order persist locally. Enabling a module or choosing a variant opens an inline
+preview using the selected accounts' actual recorded history, not demonstration data.
 
-Activity and source charts use the same filtered, deduplicated local history as the totals. Missing dates remain unknown, and partial-history notices stay visible. Treemap area measures recorded tokens, never money or a subscription limit. Quota charts select one account/metric/unit series at a time: percentage observations become remaining quota (100 minus recorded usage), while balance observations retain their native value. Lines stop at missing samples, resets and gaps over 90 minutes; they do not predict future usage or reconstruct missing history. No quota series is derived from token logs.
+- Usage Overview: Simple Totals, Arc Summary, Editorial Summary or Mini Instruments.
+- Usage Activity: Activity Calendar, Folded Bands, Daily Bars, Pulse Calendar, Pixel Equalizer or Cumulative Paths.
+- Source Composition: Source Treemap, Source List, Concentric Tracks, Waffle Share or Additive Steps.
+- Period Comparison: Paired Dots, Parallel Trends or Change Waterfall.
+- Personal Cost Reference: Reference Dial, Reference Cells or Reference Ruler.
+- Quota Changes: remaining-quota samples or original observations.
+- Daily Records: the existing date, account and model drill-down.
+
+Home styles remain independent. The chart measure switches between recorded tokens and known
+costs; Personal Cost Reference always uses costs. Source entries in the new charts open recorded
+model details. Closing details returns focus to the exact control that opened them.
+
+All history charts use the same filtered, deduplicated local records as their totals. Missing
+dates and unknown costs remain unknown, not zero or free usage. Source shares divide recorded
+tokens or known costs, never a subscription allowance. Fractional costs below one cent stay
+visible. Period comparisons use the preceding, nonoverlapping period of equal length. A missing
+account/day, a partial-history flag or an unknown cost suppresses the affected change calculation;
+a zero prior total never produces an invented growth percentage. Missing days break cumulative
+paths, and later incomplete totals are labelled as known lower bounds.
+
+Personal Cost Reference is optional and starts off. The user supplies a whole-dollar USD amount
+from 0 to 1,000,000; zero disables comparison. It is saved only on this device, separately by
+account selection and 7-/30-day range. It is not a provider balance, spending limit, bill or
+forecast. Incomplete history cannot claim a remaining amount; known overages are lower bounds.
+
+Quota charts select one account/metric/unit series at a time: percentage observations become
+remaining quota (100 minus recorded usage), while balance observations retain their native value.
+Lines stop at missing samples, resets and gaps over 90 minutes; they do not predict future usage
+or reconstruct missing history. No quota series is derived from token logs.
 
 The shared interface also saves actual successful percentage samples locally while TokenPlan is running, retaining at most 30 days / 2,400 points per account (one latest reading per hour and metric). Samples keep the provider's fetch timestamp. They are cleared when an account is removed or its identity changes. This supplies future observations on macOS, whose helper does not expose older quota samples; it cannot recover time before collection began. Backend-provided observations remain available on Windows/Linux. Storage failures are reported on the statistics page.
 
-Display Settings and chart modules apply only to Last 30 Days. Today and Yesterday always show the summary and daily records, independently of the 30-day module switches. Fresh settings enable activity (daily bars), sources (list), quota (line) and daily records. Existing saved choices are retained. The toolbar is labelled Detailed Statistics. Activity charts expose each date's exact reading on hover or keyboard focus, including an explicit missing-data state, instead of duplicating the calendar in a separate readings table.
+Display Settings and detailed modules apply to Last 7 Days and Last 30 Days. Today and Yesterday
+show the selected overview and daily records independently of those module switches. Fresh
+settings retain the simple overview, activity bars, source list, quota line and daily records;
+comparison and personal reference start disabled. Existing four-module preferences retain their
+order, styles and visibility when the new modules are added. The toolbar is labelled Detailed
+Statistics. Daily charts expose exact readings through pointer or keyboard selection, including
+an explicit missing-data state. All new controls and explanations ship in the five app languages.

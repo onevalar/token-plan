@@ -1,7 +1,12 @@
+.history-ranges{flex-wrap:wrap}.history-ranges>button{flex:1;min-height:36px}
+.statistics-measure{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin:12px 0}
+.statistics-measure>span{color:var(--text-secondary);font-size:var(--text-xs);font-variant-numeric:tabular-nums}
 .statistics-toolbar{display:flex;justify-content:flex-end;margin:12px 0}
 .statistics-settings,.statistics-modules{display:flex;flex-direction:column;gap:16px}
 .statistics-setting,.statistics-module{min-width:0;padding:14px;border:1px solid var(--border);border-radius:18px;background:var(--surface)}
 .statistics-setting-head{display:flex;align-items:center;gap:8px;margin-bottom:8px}.statistics-setting-head strong{flex:1;font-size:14px}.statistics-setting .sort-handle{touch-action:none}
+.statistics-style-control{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:end}
+.statistics-setting-preview{padding-top:16px;margin-top:16px;border-top:1px solid var(--border)}
 .statistics-module h2{font-size:14px;margin:0 0 12px}.statistics-module p{font-size:12px}.statistics-caption,.statistics-axis{color:var(--text-secondary);font-size:11px;line-height:1.5;margin:8px 0}
 .statistics-axis{display:flex;justify-content:space-between;gap:12px}.statistics-axis span:last-child{text-align:right}
 .statistics-activity{--statistics-band-0:#93b8ee;--statistics-band-1:#4e87d4;--statistics-band-2:#2457a1;display:grid;gap:3px}
@@ -16,5 +21,5 @@
 
 .statistics-line text{fill:var(--text-secondary);font-size:10px}.statistics-setting[data-sort-dragging=true]{z-index:3;box-shadow:0 8px 20px #0002}.statistics-setting{position:relative}
 
-.statistics-toolbar{justify-content:space-between;align-items:center;gap:12px}.statistics-toolbar h2{font-size:14px;margin:0;font-weight:600}
+.statistics-toolbar{justify-content:space-between;align-items:center;gap:12px}.statistics-toolbar h2{font-size:14px;margin:0;font-weight:500}
 .statistics-chart-interactive{position:relative}.statistics-tooltip{position:absolute;z-index:5;bottom:calc(100% + 6px);left:0;max-width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:10px;background:var(--surface);color:var(--foreground);box-shadow:0 4px 16px #0002;font-size:12px;pointer-events:none;overflow-wrap:anywhere}.statistics-day:focus-visible{outline:2px solid var(--foreground);outline-offset:1px;z-index:1}

@@ -2,31 +2,33 @@ import {useId,useState} from 'react';
 import {Select} from '../components/arc/select/select';
 import {providerText} from '../providerText';
 import {historyColor} from '../historyModel';
-import {activityDays,sourceParts,treeRects,quotaSeries} from '../statisticsModel';
-import type {historyRows,Account} from '../desktop';
-type Props={rows:ReturnType<typeof historyRows>;range:string;language:string};
+import {treeRects,quotaSeries} from '../statisticsModel';
+import {statisticsCopy,valueOf,type StatisticsView,type StatisticsMeasure} from '../statisticsData';
+import type {Account} from '../desktop';
+type Props={view:StatisticsView;measure:StatisticsMeasure;language:string};
 const exact=(v:number,language:string)=>v.toLocaleString(language,{maximumFractionDigits:2});
-export function ActivityChart({rows,range,language,style}:Props&{style:string}) {
- const tr=(s:string)=>providerText(s,language),days=activityDays(rows,range),max=Math.max(1,...days.map(d=>d.value??0));
+export function ActivityChart({view,measure,language,style}:Props&{style:string}) {
+ const {tr,format,unit}=statisticsCopy(language),days=view.days.map(day=>({...day,value:valueOf(day,measure)})),max=Math.max(Number.EPSILON,...days.map(d=>d.value??0));
  const [hovered,setHovered]=useState<string|null>(null),tooltipID=useId();
  const selected=days.find(d=>d.date===hovered);
- const reading=(d:typeof days[number])=>`${d.date}: ${d.value==null?tr('No Recorded Data'):exact(d.value,language)+' token'}`;
+ const reading=(d:typeof days[number])=>`${d.date}: ${d.value==null?tr('No Recorded Data'):format(d.value,measure,false)+' '+unit(measure)}${d.incomplete||measure==='cost'&&d.partial?` · ${tr('Recorded Portion Only')}`:''}`;
  const offset=new Date(`${days[0].date}T12:00:00`).getDay();
- return <><p className="statistics-caption">{tr('Daily Token Usage')}</p><div className="statistics-chart-interactive">{selected&&<div className="statistics-tooltip" id={tooltipID} role="tooltip">{reading(selected)}</div>}<div className={`statistics-activity ${style==='Activity Calendar'?'statistics-calendar':style==='Folded Bands'?'statistics-horizon':'statistics-bars'}`} role="list">
+ return <><p className="statistics-caption">{tr(measure==='tokens'?'Daily Token Usage':'Daily Known Cost')}</p><div className="statistics-chart-interactive">{selected&&<div className="statistics-tooltip" id={tooltipID} role="tooltip">{reading(selected)}</div>}<div className={`statistics-activity ${style==='Activity Calendar'?'statistics-calendar':style==='Folded Bands'?'statistics-horizon':'statistics-bars'}`} role="list">
  {style==='Activity Calendar'&&Array.from({length:offset},(_,i)=><span key={`blank-${i}`} aria-hidden="true"/>)}
- {days.map(d=><div role="listitem" key={d.date} className="statistics-day" tabIndex={0} onMouseEnter={()=>setHovered(d.date)} onMouseLeave={()=>setHovered(null)} onFocus={()=>setHovered(d.date)} onBlur={()=>setHovered(null)} onKeyDown={e=>{if(e.key==='Escape')setHovered(null);}} aria-describedby={hovered===d.date?tooltipID:undefined} data-missing={d.value==null} aria-label={`${d.date}: ${d.value==null?tr('No Recorded Data'):exact(d.value,language)+' token'}`}>
+ {days.map(d=><div role="listitem" key={d.date} className="statistics-day" tabIndex={0} onMouseEnter={()=>setHovered(d.date)} onMouseLeave={()=>setHovered(null)} onFocus={()=>setHovered(d.date)} onBlur={()=>setHovered(null)} onKeyDown={e=>{if(e.key==='Escape')setHovered(null);}} aria-describedby={hovered===d.date?tooltipID:undefined} data-missing={d.value==null} aria-label={reading(d)}>
  {style==='Folded Bands'?<svg viewBox="0 0 10 40" preserveAspectRatio="none" aria-hidden="true">{d.value!=null&&[0,1,2].map(band=>{const height=Math.max(0,Math.min(1,d.value!/max*3-band))*40;return <rect key={band} x="0" y={40-height} width="10" height={height} fill={`var(--statistics-band-${band})`}/>;})}</svg>:<span className="statistics-day-fill" style={style==='Activity Calendar'?{opacity:d.value==null?0:.12+.88*d.value/max}:{height:d.value==null?0:`${d.value/max*100}%`}}/>}
  {style==='Activity Calendar'&&<span className="statistics-date">{Number(d.date.slice(-2))}</span>}
  </div>)}</div></div><div className="statistics-axis"><span>{days[0].date}</span><span>{days.at(-1)!.date}</span></div>
- {style==='Folded Bands'&&<p className="statistics-caption">{tr('Each darker band adds')}: {exact(max/3,language)} token</p>}
+ {style==='Folded Bands'&&max>Number.EPSILON&&<p className="statistics-caption">{tr('Each darker band adds')}: {format(max/3,measure,false)} {unit(measure)}</p>}
  <p className="statistics-caption">{tr('Empty cells have no recorded data, not zero usage.')}</p>
  </>;
 }
-export function SourcesChart({rows,language,style}:Props&{style:string}) {
- const tr=(s:string)=>providerText(s,language),parts=sourceParts(rows),sum=parts.reduce((n,p)=>n+p.value,0);
- if(!sum)return <p>{tr('No Recorded Data')}</p>;
- return <><p className="statistics-caption">{tr('Share of Recorded Tokens')}</p>{style==='Source Treemap'&&<svg className="statistics-tree" viewBox="0 0 100 60" role="img" aria-label={tr('Source Composition')}>{treeRects(parts).map(p=><rect key={p.label} x={p.x} y={p.y} width={p.w} height={p.h} fill={historyColor(p.label)} stroke="var(--surface)" strokeWidth=".3"/>)}</svg>}
- <ol className="statistics-sources">{parts.map(p=><li key={p.label}><i style={{background:historyColor(p.label)}}/><span>{p.label}<small>{exact(p.value,language)} token</small></span><strong>{(p.value/sum).toLocaleString(language,{style:'percent',maximumFractionDigits:1})}</strong></li>)}</ol></>;
+export function SourcesChart({view,measure,language,style}:Props&{style:string}) {
+ const {tr,format,unit}=statisticsCopy(language),parts=view.sources.map(source=>({label:source.name,value:valueOf(source,measure)})).sort((a,b)=>(b.value??-1)-(a.value??-1)),sum=valueOf(view.total,measure);
+ const positive=parts.filter((part):part is {label:string;value:number}=>part.value!==null&&part.value>0);
+ if(sum===null)return <p>{tr(measure==='cost'?'Cost Not Recorded':'No Recorded Data')}</p>;
+ return <><p className="statistics-caption">{tr(measure==='tokens'?'Share of Recorded Tokens':'Share of Known Cost')}</p>{sum===0&&<p>{tr('Recorded Zero')}</p>}{style==='Source Treemap'&&sum>0&&<svg className="statistics-tree" viewBox="0 0 100 60" role="img" aria-label={tr('Source Composition')}>{treeRects(positive).map(p=><rect key={p.label} x={p.x} y={p.y} width={p.w} height={p.h} fill={historyColor(p.label)} stroke="var(--surface)" strokeWidth=".3"/>)}</svg>}
+ <ol className="statistics-sources">{parts.map(p=><li key={p.label}><i style={{background:historyColor(p.label)}}/><span>{p.label}<small>{format(p.value,measure,false)} {unit(measure)}</small></span><strong>{p.value===null?tr('Unknown'):sum===0?tr('Share Not Applicable'):(p.value/sum).toLocaleString(language,{style:'percent',maximumFractionDigits:1})}</strong></li>)}</ol></>;
 }
 export function QuotaChart({accounts,range,language,style}:{accounts:Account[];range:string;language:string;style:string}) {
  const tr=(s:string)=>providerText(s,language),series=quotaSeries(accounts,range),[selected,setSelected]=useState('');

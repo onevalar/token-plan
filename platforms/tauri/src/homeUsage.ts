@@ -1,5 +1,5 @@
 import type {MetricRowProps} from './Metrics';
-import {metricName,usageTone} from './Metrics';
+import {metricName} from './Metrics';
 import {providerText} from './providerText';
 import {textureChoices,tints,type TextureChoice,type Tint} from './DitherFill';
 
@@ -8,14 +8,35 @@ import {textureChoices,tints,type TextureChoice,type Tint} from './DitherFill';
  * with the provider tint omitted. Saved choices from before the options existed
  * (bars, gauges, cells, rings, ruler, concentric, numbers, segments, ticks) stay valid and keep their look.
  */
-export const homeUsageFamilies={bars:'Bars',ruler:'Quota Ruler',cells:'Cells',rings:'Rings',gauges:'Gauges',numbers:'Numbers',vessel:'Containers',frame:'Border Progress',sources:'Source Split',columns:'Side-by-Side Columns',signal:'Status Lights',texturebar:'Textured Bar'} as const;
+export const homeUsageFamilies={bars:'Bars',ruler:'Quota Ruler',cells:'Cells',rings:'Rings',gauges:'Gauges',numbers:'Numbers',vessel:'Containers',frame:'Border Progress',sources:'Source Split',columns:'Side-by-Side Columns',signal:'Status Lights',texturebar:'Textured Bar',instrument:'Instruments',cycle:'Cycles'} as const;
+export type HomeQuotaDesign={group:'instrument'|'cells'|'cycle'|'rail'|'editorial';variant:0|1|2};
+/** New looks are variants of related families, never replacements for a saved renderer. */
+export const homeQuotaDesigns={
+ instrument:{family:'instrument',group:'instrument',variant:0,label:'Needle Dials'},
+ 'instrument:edge':{family:'instrument',group:'instrument',variant:1,label:'Side Dials'},
+ 'instrument:primary':{family:'instrument',group:'instrument',variant:2,label:'Primary Dial'},
+ 'cells:dots':{family:'cells',group:'cells',variant:0,label:'Dot Matrix'},
+ 'cells:grille':{family:'cells',group:'cells',variant:1,label:'Slanted Grille'},
+ 'vessel:chambers':{family:'vessel',group:'cells',variant:2,label:'Segmented Battery'},
+ cycle:{family:'cycle',group:'cycle',variant:0,label:'Dual Racetrack'},
+ 'cycle:lanes':{family:'cycle',group:'cycle',variant:1,label:'Parallel Cycle'},
+ 'cycle:clock':{family:'cycle',group:'cycle',variant:2,label:'Reset Sundial'},
+ 'ruler:cursor':{family:'ruler',group:'rail',variant:0,label:'Horizontal Cursor'},
+ 'ruler:edge':{family:'ruler',group:'rail',variant:1,label:'Edge Ruler'},
+ 'ruler:folded':{family:'ruler',group:'rail',variant:2,label:'Folded Ruler'},
+ 'numbers:ticket':{family:'numbers',group:'editorial',variant:0,label:'Quota Ticket'},
+ 'numbers:spread':{family:'numbers',group:'editorial',variant:1,label:'Used & Remaining'},
+ 'numbers:spine':{family:'numbers',group:'editorial',variant:2,label:'Number Spine'},
+} as const satisfies Record<string,HomeQuotaDesign&{family:HomeUsageFamily;label:string}>;
 // Presentation groups are independent of persisted renderer IDs.
 export const styleCategories=[
- {id:'bars',label:'Bars',styles:['bars','ruler','sources','texturebar']},
- {id:'cells',label:'Cells',styles:['cells','segments']},
+ {id:'bars',label:'Bars',styles:['bars','ruler','ruler:cursor','ruler:edge','ruler:folded','sources','texturebar']},
+ {id:'cells',label:'Cells',styles:['cells','segments','cells:dots','cells:grille']},
  {id:'rings',label:'Rings',styles:['rings','concentric','ticks','gauges']},
- {id:'vessel',label:'Containers',styles:['vessel','vessel:tank','vessel:thermometer','vessel:hourglass']},
- {id:'numbers',label:'Numbers',styles:['numbers']},
+ {id:'instrument',label:'Instruments',styles:['instrument','instrument:edge','instrument:primary']},
+ {id:'cycle',label:'Cycles',styles:['cycle','cycle:lanes','cycle:clock']},
+ {id:'vessel',label:'Containers',styles:['vessel','vessel:tank','vessel:thermometer','vessel:hourglass','vessel:chambers']},
+ {id:'numbers',label:'Editorial & Numbers',styles:['numbers','numbers:ticket','numbers:spread','numbers:spine']},
  {id:'columns',label:'Side-by-Side Columns',styles:['columns']},
  {id:'signal',label:'Status Lights',styles:['signal']},
  {id:'frame',label:'Border Progress',styles:['frame']},
@@ -27,13 +48,17 @@ export type HomeUsageStyle=string;
 export type CellShape='square'|'capsule'|'rising';
 export type VesselShape='battery'|'tank'|'thermometer'|'hourglass';
 export type BarLayout='card'|'half'|'row';
-export type StyleSpec={family:HomeUsageFamily;root:string;forecast:boolean;shape:CellShape;count:5|10|20;vessel:VesselShape;layout:BarLayout;texture:TextureChoice;tint:Tint};
+export type StyleSpec={family:HomeUsageFamily;root:string;forecast:boolean;shape:CellShape;count:5|10|20;vessel:VesselShape;layout:BarLayout;texture:TextureChoice;tint:Tint;design?:HomeQuotaDesign};
 
 const layouts:BarLayout[]=['card','half','row'],defaultTexture:Record<BarLayout,TextureChoice>={card:'dither',half:'dither',row:'lines'};
 const cellShapes:CellShape[]=['square','capsule','rising'],cellCounts=[5,10,20] as const,vessels:VesselShape[]=['battery','tank','thermometer','hourglass'];
 export function parseStyle(id:string):StyleSpec|null {
  const [root,a,b,c,...extra]=id.split(':');
  const spec=(family:HomeUsageFamily,patch:Partial<StyleSpec>={}):StyleSpec=>({family,root,forecast:false,shape:'square',count:20,vessel:'battery',layout:'row',texture:'lines',tint:'provider',...patch});
+ if(Object.hasOwn(homeQuotaDesigns,id)){
+  const design=homeQuotaDesigns[id as keyof typeof homeQuotaDesigns];
+  return spec(design.family,{design:{group:design.group,variant:design.variant}});
+ }
  if(extra.length||c!==undefined&&root!=='texturebar')return null;
  switch(root){
   case 'bars':case 'ruler':return a===undefined?spec(root):a==='forecast'&&b===undefined?spec(root,{forecast:true}):null;
@@ -70,7 +95,7 @@ export type StyleChoice={label:string;id:HomeUsageStyle};
 export type StyleOptionGroup={name:string;choices:StyleChoice[]};
 /** The options a style offers, each as the full style it would select. The choice matching `id` is marked by the caller. */
 export function styleOptions(id:string):StyleOptionGroup[] {
- const spec=parseStyle(id);if(!spec)return [];
+ const spec=parseStyle(id);if(!spec||spec.design)return [];
  const {family,root}=spec;
  if(family==='bars'||family==='ruler')return [{name:'Forecast',choices:[{label:'Off',id:family},{label:'Show Forecast',id:`${family}:forecast`}]}];
  if(family==='rings')return [{name:'Rings',choices:[{label:'Single Ring',id:'rings'},{label:'Double Ring',id:'concentric'},{label:'Ticks',id:'ticks'}]}];
@@ -97,6 +122,7 @@ export function canonicalStyle(id:string) {
 }
 export function styleLabel(id:string) {
  const spec=parseStyle(id);if(!spec)return id;
+ if(spec.design)return homeQuotaDesigns[id as keyof typeof homeQuotaDesigns].label;
  if(spec.root==='concentric')return 'Concentric Rings';
  if(spec.root==='ticks')return 'Tick Ring';
  return homeUsageFamilies[spec.family];
@@ -106,10 +132,26 @@ export function quotaReading({metric:m,language,missing,remaining=false}:MetricR
  const tr=(s:string)=>providerText(s,language),name=metricName(m,language),mode=tr(remaining?'Remaining':'Used');
  // The helper already converted percent to the chosen mode. Only danger uses actual consumption.
  const value=m.hasData?m.percent:null,used=value===null?null:remaining?100-value:value;
- const tone=value===null?'normal':usageTone(value,remaining),label=`${name} · ${mode}`;
+ const tone=used!==null&&used>=80?'critical':'normal',label=`${name} · ${mode}`;
  const warning=used===null?'':used>100?tr('Quota exceeded'):used===100?tr('Quota exhausted'):tone==='critical'?tr('Near quota limit'):'';
  const valueText=value===null?missing:`${Math.round(value)}%`,description=[valueText,warning].filter(Boolean).join(' · ');
  return {value,used,tone,name,mode,label,warning,valueText,description};
+}
+
+/** Fractional readings for the new designs; the legacy renderers retain their original whole-percent look. */
+export const quotaPercent=(value:number,language:string)=>`${new Intl.NumberFormat(language,{maximumFractionDigits:8,useGrouping:false}).format(value)}%`;
+export function preciseQuotaReading(props:MetricRowProps) {
+ const r=quotaReading(props),valueText=r.value===null?props.missing:quotaPercent(r.value,props.language);
+ return {...r,valueText,description:[valueText,r.warning].filter(Boolean).join(' · ')};
+}
+
+/** Observed time within this metric's own window, never a forecast or an inferred renewal. */
+export function quotaCycle(m:MetricRowProps['metric'],now:number) {
+ const end=m.resetsAt?Date.parse(m.resetsAt):NaN;
+ const endsAt=m.hasData&&!m.notStarted&&Number.isFinite(end)?end:null;
+ const span=(m.periodSeconds??0)*1000;
+ const elapsed=endsAt!==null&&Number.isFinite(now)&&now>0&&endsAt>now&&span>0&&endsAt-now<=span?100*(1-(endsAt-now)/span):null;
+ return {endsAt,elapsed};
 }
 
 export function quotaMeter(reading:ReturnType<typeof quotaReading>) {

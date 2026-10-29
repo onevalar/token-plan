@@ -1,0 +1,51 @@
+.hq-cycles { display:grid;gap:var(--hq-space);min-width:0; }
+.hq-cycle-item { min-width:0; }
+.hq-cycle-item:not(:last-child) { padding-block-end:var(--hq-space);border-block-end:1px solid var(--border-subtle); }
+.hq-cycle-heading { display:flex;align-items:center;justify-content:space-between;gap:12px;margin-block-end:8px; }
+.hq-cycle-heading > .hq-metric-label { flex:1; }
+.hq-cycle-heading > :is(.hq-warning,.hq-missing) { max-width:50%; }
+.hq-cycle-mode { color:var(--text-secondary);font:400 var(--text-xs)/1.5 var(--font-body); }
+.hq-cycle-elapsed { color:var(--text-secondary);font:500 var(--text-sm)/1.5 var(--font-display);font-variant-numeric:tabular-nums;white-space:nowrap; }
+.hq-cycle-reset { margin-block-start:8px; }
+.hq-cycle-unavailable { margin:4px 0 0;color:var(--text-secondary);font:400 var(--text-xs)/1.6 var(--font-body); }
+
+/* Uniform scaling keeps the two independent path-length readings true at every width. */
+.hq-cycle-racetrack { display:grid;max-width:360px;margin-inline:auto; }
+.hq-cycle-racetrack > .hq-meter,.hq-cycle-race-reading { grid-area:1/1; }
+.hq-cycle-race-reading { display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;place-self:center;max-width:calc(100% - 80px); }
+.hq-cycle-race-reading > .hq-cycle-mode { display:flex;align-items:center;gap:6px;text-align:center; }
+.hq-cycle-race-base { fill:none;stroke:var(--border-strong);stroke-width:9; }
+.hq-cycle-race-quota { fill:none;stroke:var(--hq-fill);stroke-width:9;stroke-linecap:butt; }
+.hq-cycle-race-time-base { fill:none;stroke:var(--border-strong);stroke-width:2; }
+.hq-cycle-race-time { fill:none;stroke:var(--text-secondary);stroke-width:2; }
+.hq-cycle-key { display:inline-block;flex:none;width:14px;height:3px;background:var(--hq-fill); }
+.hq-cycle-key-time { height:0;border-block-start:2px dashed var(--text-secondary);background:none; }
+.hq-cycle-race-legend { display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;column-gap:8px;row-gap:2px;margin-block-start:8px; }
+.hq-cycle-race-legend > span:first-child { display:inline-flex;align-items:center;gap:6px;color:var(--text-secondary);font:400 var(--text-xs)/1.5 var(--font-body); }
+
+/* Shared endpoints, but only quota carries provider/danger colour. */
+.hq-cycle-lanes { display:grid;grid-template-columns:minmax(0,max-content) minmax(24px,1fr) 96px;align-items:center;gap:12px; }
+.hq-cycle-lanes > .hq-cycle-mode { overflow-wrap:anywhere; }
+.hq-cycle-lanes > :is(.hq-value,.hq-cycle-elapsed) { justify-self:end; }
+.hq-cycle-lanes > .hq-cycle-elapsed { font-size:var(--text-xs); }
+.hq-cycles .hq-cycle-lane { height:6px;border-radius:0;overflow:visible; }
+.hq-cycles .hq-cycle-lane > span { border-radius:0; }
+.hq-cycle-endpoint { position:absolute;top:50%;width:4px;height:12px;background:var(--hq-fill);transform:translate(-50%,-50%); }
+.hq-cycles .hq-cycle-lane[data-channel="time"] { --hq-fill:var(--text-secondary);height:2px;background:transparent;border-block-start:1px dashed var(--border-strong); }
+.hq-cycles .hq-cycle-lane[data-channel="time"] > span { top:-1px;bottom:auto;height:2px; }
+.hq-cycle-lane[data-channel="time"] > .hq-cycle-endpoint { top:0;width:6px;height:6px;border-radius:50%;background:var(--surface);border:1.5px solid var(--text-secondary); }
+.hq-cycles .hq-cycle-lane[data-unknown="true"] { border:0;border-block-start:1px dashed var(--border-strong);height:0; }
+
+/* The small dial describes time, not quota consumption. */
+.hq-cycle-clock-row { display:grid;grid-template-columns:112px minmax(0,1fr);gap:16px;align-items:center; }
+.hq-cycle-clock { display:flex;flex-direction:column;align-items:center;gap:4px;margin:0;min-width:0; }
+.hq-cycle-dial { display:block;width:88px;height:88px; }
+.hq-cycle-dial-base { fill:none;stroke:var(--border-strong);stroke-width:1; }
+.hq-cycle-dial-elapsed { fill:none;stroke:var(--text-secondary);stroke-width:2;stroke-linecap:butt; }
+.hq-cycle-dial-hand { stroke:var(--text-secondary);stroke-width:1.5; }
+.hq-cycle-dial-pin { fill:var(--text-secondary); }
+.hq-cycle-clock > figcaption { display:flex;flex-direction:column;align-items:center;gap:2px;color:var(--text-secondary);font:400 var(--text-xs)/1.5 var(--font-body);text-align:center; }
+.hq-cycle-clock .hq-cycle-elapsed { font-size:var(--text-xs); }
+.hq-cycle-clock-reading { display:flex;flex-direction:column;gap:8px;min-width:0;padding-inline-start:16px;border-inline-start:1px solid var(--border); }
+.hq-cycle-no-clock { display:grid;place-items:center;width:88px;height:88px;color:var(--text-secondary);font:400 var(--text-2xl)/1 var(--font-display); }
+@container (max-width:320px) { .hq-cycle-clock-row { grid-template-columns:88px minmax(0,1fr);gap:12px; }.hq-cycle-clock-reading { padding-inline-start:12px; } }

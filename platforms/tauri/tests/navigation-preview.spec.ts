@@ -110,7 +110,9 @@ test('history supports account filtering, pagination and model details without d
  await expect(visible(page).locator('.history-entry')).toHaveCount(1);
  await visible(page).locator('.entry-trigger').click();
  await expect(visible(page).locator('.history-model-legend')).toContainText('synthetic-model');
- await expect(visible(page).locator('.usage-summary')).toHaveCount(1);
+ // The filtered account's 30 daily records yield one pair of totals, regardless of its wrapper.
+ await expect(visible(page).getByRole('term')).toHaveText(['已知费用','已记录 token']);
+ await expect(visible(page).getByRole('definition')).toHaveText(['$193.50','3004.35万']);
  await noOverflow(page);
 });
 

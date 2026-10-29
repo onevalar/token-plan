@@ -4,7 +4,7 @@ import {metricSchema} from '../desktop';
 import {SelectRow} from './shared';
 import {ChevronDown} from 'lucide-react';
 import {Button} from '../components/arc/button/button';
-import {categoryOf,styleCategories,variantLabel,sameLook,styleOptions,type HomeUsageFamily,styleLabel,type HomeUsageStyle} from '../homeUsage';
+import {categoryOf,styleCategories,variantLabel,sameLook,styleOptions,type HomeUsageFamily,type HomeUsageStyle} from '../homeUsage';
 
 /** A small drawing of each Home style, so the choice can be made without trying every option. */
 function StyleGlyph({style}:{style:HomeUsageFamily}) {
@@ -22,11 +22,13 @@ function StyleGlyph({style}:{style:HomeUsageFamily}) {
   columns:<>{[14,8,18].map((h,i)=><g key={i}><rect x={6+i*11} y="3" width="7" height="18" rx="2" fill="currentColor" opacity=".2"/><rect x={6+i*11} y={21-h} width="7" height={h} rx="2" fill="currentColor"/></g>)}</>,
   signal:<>{[0,1,2].map(i=><circle key={i} cx={10+i*10} cy="12" r="4" fill="currentColor" opacity={i===0?1:.2}/>)}</>,
   texturebar:<><rect x="2" y="9" width="17" height="6" rx="2" fill="currentColor"/>{[21,24,27,30,33,36].map(x=><rect key={x} x={x} y="9" width="1.2" height="6" fill="currentColor" opacity=".45"/>)}</>,
+  instrument:<><path d="M8 19a13 13 0 1 1 24 0" fill="none" stroke="currentColor" opacity=".35" strokeWidth="1.5"/><path d="M20 16l8-9" stroke="currentColor" strokeWidth="2"/><circle cx="20" cy="16" r="2" fill="currentColor"/>{[9,20,31].map((x,i)=><path key={x} d={`M${x} ${i===1?1:7}v3`} stroke="currentColor"/>)}</>,
+  cycle:<><rect x="2" y="4" width="36" height="16" rx="8" fill="none" stroke="currentColor" opacity=".25" strokeWidth="2"/><rect x="2" y="4" width="36" height="16" rx="8" fill="none" stroke="currentColor" strokeWidth="2" pathLength="100" strokeDasharray="64 100"/><rect x="6" y="8" width="28" height="8" rx="4" fill="none" stroke="currentColor" opacity=".6" strokeDasharray="1 2"/></>,
  };
  return <svg width="40" height="24" viewBox="0 0 40 24" aria-hidden="true">{glyph[style]}</svg>;
 }
 
-/** Collapsed to one row showing the current style; expands into every style at once. */
+/** Categories keep related looks together; the selected variant always uses its real production renderer below. */
 export function UsageStylePicker({value,onChange,tr,language,remaining=false,disabled=false}:{language:string;remaining?:boolean;disabled?:boolean;value:HomeUsageStyle;onChange:(style:HomeUsageStyle)=>void;tr:(s:string)=>string}) {
  const [open,setOpen]=useState(false),current=categoryOf(value),groups=styleOptions(value).filter(g=>['Forecast','Shape','Cell Count','Bar Layout','Texture Type','Texture Color'].includes(g.name)&&current.id!=='vessel');
  return <div className="usage-style-picker">

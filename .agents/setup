@@ -33,10 +33,12 @@ export MSBUILDDISABLENODEREUSE=1
 # xvfb: runs the Linux client itself, for fixture and visual checks.
 # fonts-noto-cjk: CJK text renders faithfully in desktop UI checks and screenshots.
 # Tauri libraries match .github/workflows/tauri-preview.yml; WebKit pulls in GTK 3 development files.
+# libgstreamer-plugins-bad1.0-0: codec parsers required by the Playwright WebKit shell checks.
 # build-essential and pkg-config provide the native compiler/linker and library discovery.
 system_packages=(
   ca-certificates curl fonts-noto-cjk nsis xvfb
   build-essential pkg-config libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev patchelf
+  libgstreamer-plugins-bad1.0-0
 )
 missing_packages=()
 for package in "${system_packages[@]}"; do

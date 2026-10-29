@@ -1,0 +1,36 @@
+.statistics-design .tp-composition-key { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px 8px;margin:12px 0 4px; }
+.statistics-design .tp-composition-key button { display:flex;align-items:center;justify-content:flex-start;gap:6px;min-height:36px;min-width:0;padding:4px 0;border:0;background:transparent;color:var(--text-secondary);font:inherit;font-size:var(--text-xs);cursor:pointer;overflow-wrap:anywhere;text-align:left; }
+.statistics-design .tp-composition-key i { width:7px;height:7px;flex:none;border-radius:50%;background:var(--source-color); }
+.statistics-design .tp-composition-key [aria-pressed="true"] { color:var(--foreground);text-decoration:underline;text-underline-offset:4px; }
+.statistics-design .tp-orbits { position:relative;max-width:248px;margin:12px auto 0; }
+.statistics-design .tp-orbits svg { display:block;width:100%;overflow:visible; }
+.statistics-design .tp-orbits g { cursor:pointer; }
+.statistics-design .tp-orbits g[data-dim="true"] { opacity:.23; }
+.statistics-design .tp-orbit-track { stroke:var(--border); }
+.statistics-design .tp-orbit-center { position:absolute;top:calc(50% - 22px);left:50%;transform:translateX(-50%);display:grid;justify-items:center;pointer-events:none; }
+.statistics-design .tp-orbit-center strong { font-size:var(--text-2xl);line-height:1.1; }
+.statistics-design .tp-orbit-center span { margin-top:4px;font-size:var(--text-xs);color:var(--text-secondary); }
+.statistics-design .tp-orbit-ends { position:absolute;bottom:3px;left:50%;transform:translateX(-50%);display:flex;justify-content:space-between;width:110px;color:var(--text-secondary);font-size:var(--text-xs);font-variant-numeric:tabular-nums; }
+.statistics-design .tp-orbit-pager { display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:var(--text-xs); }
+.statistics-design .tp-waffle { width:min(100%,220px);margin:20px auto 16px; }
+.statistics-design .tp-waffle-readout { display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;min-height:30px;margin-bottom:10px;font-size:var(--text-xs);color:var(--text-secondary); }
+.statistics-design .tp-waffle-readout strong { color:var(--foreground); }
+.statistics-design .tp-composition-waterfall { padding:32px 0 8px;margin:12px 0;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:thin; }
+.statistics-design .tp-step-grid { display:grid;grid-template-columns:repeat(var(--steps),minmax(80px,1fr));gap:8px;padding-inline:6px; }
+.statistics-design .tp-step-grid > button,.statistics-design .tp-step-total { display:block;min-width:0;border:0;padding:0;color:var(--foreground);background:transparent;font:inherit;text-align:center; }
+.statistics-design .tp-step-grid > button { cursor:pointer; }
+.statistics-design .tp-step-plot { height:170px;display:block;position:relative;border-bottom:1px solid var(--border-strong); }
+.statistics-design .tp-step-plot > i { position:absolute;left:12%;right:12%;background:var(--source-color,var(--foreground));border-radius:3px; }
+.statistics-design .tp-step-plot > i.tp-step-zero { height:3px !important;border-radius:0; }
+.statistics-design .tp-step-number { position:absolute;left:50%;transform:translateX(-50%);margin-bottom:8px;white-space:nowrap;font-size:var(--text-xs);font-variant-numeric:tabular-nums; }
+.statistics-design .tp-step-connector { position:absolute;left:90%;width:calc(20% + 8px);border-top:1px dashed var(--text-secondary); }
+.statistics-design .tp-step-missing { position:absolute;inset:auto 12% 0;height:36px;border:1px dashed var(--border-strong);display:grid;place-content:center; }
+.statistics-design .tp-step-label { display:block;font-size:var(--text-xs);line-height:1.4;margin-top:10px;overflow-wrap:anywhere; }
+.statistics-design .tp-step-grid [aria-pressed="true"] .tp-step-label { text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:5px; }
+.statistics-design .tp-composition .tp-section-title { margin-top:16px; }
+@container study (min-width:560px) { .statistics-design .tp-orbits { max-width:300px; }.statistics-design .tp-waffle { width:290px; }.statistics-design .tp-step-plot { height:220px; } }
+@media (hover:hover) and (pointer:fine) {
+ .statistics-design .tp-composition-key button:hover,.statistics-design .tp-step-grid > button:hover .tp-step-label { color:var(--foreground);text-decoration:underline;text-underline-offset:4px; }
+ .statistics-design .tp-orbits g:hover { opacity:.7; }
+}
+@media (pointer:coarse) { .statistics-design .tp-composition-key button { min-height:44px; } }

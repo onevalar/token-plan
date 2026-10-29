@@ -6,6 +6,7 @@ import {isQuotaMetric,MetricRow,MetricReset,MetricExpiries,type MetricRowProps} 
 import './home-metrics.css';
 import {HomeQuotaStyles} from './HomeQuotaStyles';
 import {HomeExtraStyles,type SourceShare} from './HomeExtraStyles';
+import {HomeQuotaDesigns} from './HomeQuotaDesigns';
 import {textureAt} from './DitherFill';
 import {parseStyle,quotaReading,quotaMeter,type HomeUsageStyle} from './homeUsage';
 
@@ -13,6 +14,7 @@ export type {HomeUsageStyle} from './homeUsage';
 type ReadingProps=Omit<MetricRowProps,'metric'>;
 export function HomeMetrics({metrics,style,sources=[],...reading}:{metrics:Metric[];style:HomeUsageStyle;sources?:SourceShare[]}&ReadingProps) {
  const spec=parseStyle(style)??parseStyle('bars')!,{root}=spec;
+ if(spec.design)return <HomeQuotaDesigns key={style} metrics={metrics} design={spec.design} style={style} {...reading}/>;
  if(root==='cells'||root==='gauges'||root==='ticks')return <div className="home-metrics" data-style={root}>{metrics.map(metric=>isQuotaMetric(metric)?
   <QuotaTile key={metric.id} metric={metric} style={root} {...reading}/>:
   <div className="home-metric-row" key={metric.id}><MetricRow metric={metric} {...reading}/></div>

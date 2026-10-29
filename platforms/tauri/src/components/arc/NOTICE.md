@@ -68,6 +68,16 @@ straight segments replace min/max-normalized smoothing. Missing days break the
 line, zero stays zero, and a single record stays a point. There are no invented
 samples, forecasts, scrubbing, tooltips, fill animations or rolling numbers.
 
+SegmentedControl and RulerSlider were retrieved on 2026-10-29 from the free registries:
+- https://uiarc.dev/r/segmented-control.json
+- https://uiarc.dev/r/ruler-slider.json
+
+The existing MIT license applies. Their upstream interactions and motion tokens are
+retained. RulerSlider adds an optional `animateReadout` flag (true by default) so the
+personal cost reference can display a synchronous exact number during adjustment.
+Reduced-motion mode also uses the static readout. The reference is a local user input,
+not a provider quota, forecast or payment control.
+
 ## Arc Pro Exception: Tick Ring
 
 `tick-ring/tick-ring.tsx` and `tick-ring/tick-ring.module.css` adapt Activity Rings,

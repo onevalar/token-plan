@@ -16,7 +16,7 @@ async function settings(page:Page,language='en') {
  await page.getByRole('menuitem',{name:textFor(language).settings,exact:true}).click();
 }
 // Earlier single-name styles are now a family tile plus an option.
-const legacy:Record<string,string[]>={'Gauges':['Rings','Dashboard Ring'],'Quota Ruler':['Bars','Quota Ruler'],'Numbers':['Numbers'],'Percentage Grid':['Cells','Grid'],'Compact Rings':['Rings','Single Ring'],'Concentric Rings':['Rings','Double Ring'],'Tick Ring':['Rings','Single Ring Ticks'],'Segmented Bar':['Cells','Single Row']};
+const legacy:Record<string,string[]>={'Gauges':['Rings','Dashboard Ring'],'Quota Ruler':['Bars','Quota Ruler'],'Numbers':['Editorial & Numbers','Numbers'],'Percentage Grid':['Cells','Grid'],'Compact Rings':['Rings','Single Ring'],'Concentric Rings':['Rings','Double Ring'],'Tick Ring':['Rings','Single Ring Ticks'],'Segmented Bar':['Cells','Single Row']};
 async function choose(page:Page,name:string,language='en') {
  const label=providerText('Usage Style',language),toggle=page.getByRole('button',{name:new RegExp(`^${label}`)});
  if(await toggle.getAttribute('aria-expanded')==='false')await toggle.click();
@@ -36,7 +36,7 @@ test('Home style persists independently of density, tray and details, with keybo
  const toggle=page.getByRole('button',{name:/^Usage Style/}),options=page.getByRole('group',{name:'Usage Style',exact:true});
  await expect(toggle).toHaveAttribute('aria-expanded','false');await expect(toggle).toContainText('Standard Bar');await expect(options).toHaveCount(0);
  await toggle.focus();await page.keyboard.press('Enter');await expect(toggle).toHaveAttribute('aria-expanded','true');
- await expect(options.getByRole('button')).toHaveCount(8);
+ await expect(options.getByRole('button')).toHaveCount(10);
  await expect(options.getByRole('button',{name:'Bars',exact:true})).toHaveAttribute('aria-pressed','true');
  await options.getByRole('button',{name:'Rings',exact:true}).focus();await page.keyboard.press('Enter');await page.getByRole('combobox',{name:'Variant',exact:true}).click();await page.getByRole('option',{name:'Dashboard Ring',exact:true}).click();
  await expect(home(page)).toHaveAttribute('data-usage-style','gauges');
@@ -287,7 +287,7 @@ for(const language of ['en','zh-Hans','zh-Hant','ja','ko'])test(`style picker ke
  const label=providerText('Usage Style',language);
  await page.getByRole('button',{name:new RegExp(`^${label}`)}).click();
  const options=page.getByRole('group',{name:label,exact:true});
- await expect(options.getByRole('button')).toHaveCount(8);
+ await expect(options.getByRole('button')).toHaveCount(10);
  await options.scrollIntoViewIfNeeded();await page.evaluate(()=>document.fonts.ready);
  for(const colorScheme of ['light','dark'] as const){
   await page.emulateMedia({colorScheme});
@@ -356,5 +356,113 @@ for(const theme of ['light','dark'] as const)test(`single rings bind percentages
   for(const b of boxes){expect(b.value.left).toBeGreaterThanOrEqual(b.meter.left);expect(b.value.right).toBeLessThanOrEqual(b.meter.right);expect(b.text.left-b.meter.right).toBeGreaterThanOrEqual(10);}
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
   await page.screenshot({path:info.outputPath(`single-ring-${theme}-${width}.png`)});
+ }
+});
+
+const approved=[
+ ['instrument','Instruments','Needle Dials'],['instrument:edge','Instruments','Side Dials'],['instrument:primary','Instruments','Primary Dial'],
+ ['cells:dots','Cells','Dot Matrix'],['cells:grille','Cells','Slanted Grille'],['vessel:chambers','Containers','Segmented Battery'],
+ ['cycle','Cycles','Dual Racetrack'],['cycle:lanes','Cycles','Parallel Cycle'],['cycle:clock','Cycles','Reset Sundial'],
+ ['ruler:cursor','Bars','Horizontal Cursor'],['ruler:edge','Bars','Edge Ruler'],['ruler:folded','Bars','Folded Ruler'],
+ ['numbers:ticket','Editorial & Numbers','Quota Ticket'],['numbers:spread','Editorial & Numbers','Used & Remaining'],['numbers:spine','Editorial & Numbers','Number Spine'],
+] as const;
+
+for(const [style] of approved)for(const remaining of [false,true])test(`approved Home ${style}: precise ${remaining?'Remaining':'Used'}, mixed metrics and responsive themes`,async({page})=>{
+ const data=largeDesktop(),account=data.accounts[0],base=account.metrics[0];data.accounts=[account];data.settings.showRemaining=remaining;
+ const used=[0,.4,79.6,80,100,112,-12],values=used.map(n=>remaining?Number((100-n).toFixed(8)):n);
+ account.metrics=values.map((percent,i)=>({...base,id:`q${i}`,label:i===2?'Long Model Name With Its Own Independent Allowance':`Quota ${i}`,percent,notStarted:i===0}));
+ account.metrics.splice(1,0,{...base,id:'balance',label:'Balance',percent:null,periodSeconds:null,unit:'dollars',amount:7.25});
+ account.metrics.push({...base,id:'missing',label:'Missing',hasData:false,percent:95},{...base,id:'null',label:'Null',percent:null,resetsAt:null});
+ account.metrics[0].expiries=['2026-10-30T03:01:06Z'];
+ await page.addInitScript(style=>localStorage.setItem('tokenplan.homeUsageStyle',style),style);await mockDesktop(page,'en',false,data);await page.goto('/');
+ const design=home(page).locator('.home-quota-designs');await expect(design).toHaveAttribute('data-style',style);
+ expect(await design.locator('[data-metric]').evaluateAll(es=>es.map(e=>e.getAttribute('data-metric')))).toEqual(account.metrics.map(m=>m.id));
+ for(let i=0;i<values.length;i++){
+  const tile=design.locator(`[data-metric="q${i}"]`);await expect(tile.locator('[data-quota-value]')).toHaveText(`${values[i]}%`);
+  await expect(tile).toHaveAttribute('data-tone',used[i]>=80?'critical':'normal');expect(Number(await tile.getAttribute('data-used'))).toBeCloseTo(used[i],8);
+  const encoded=style==='numbers:spread'?used[i]:values[i];
+  expect(Number(await tile.getByRole('meter').getAttribute('aria-valuenow'))).toBeCloseTo(Math.max(0,Math.min(100,encoded)),8);
+ }
+ for(const id of ['missing','null']){
+  const tile=design.locator(`[data-metric="${id}"]`);await expect(tile).toContainText(messages('en').missing);await expect(tile.getByRole('meter')).toHaveCount(0);
+  await expect(tile.locator('[data-needle-value],[data-rail-marker],[data-quota-fill],.hq-b-battery-fill')).toHaveCount(0);
+  if(id==='missing')await expect(tile.locator('.reset')).toHaveCount(0);
+ }
+ await expect(design.locator('[data-metric="balance"]')).toContainText('$7.25');await expect(design.locator('[data-metric="q0"] .expiries')).toContainText('2026');
+ await expect(design.locator('[data-metric="q0"] .reset')).toHaveText(textFor('en').notStarted);
+ for(const width of [390,560])for(const colorScheme of ['light','dark'] as const){
+  await page.setViewportSize({width,height:800});await page.emulateMedia({colorScheme});await page.evaluate(()=>document.fonts.ready);
+  expect(await design.evaluate(e=>e.scrollWidth<=e.clientWidth+1)).toBe(true);
+  expect(await design.locator('[data-metric]').evaluateAll(es=>es.every(e=>e.scrollWidth<=e.clientWidth+1))).toBe(true);
+  expect(await visible(page).evaluate(e=>e.scrollWidth<=e.clientWidth+1)).toBe(true);
+ }
+});
+
+test('all approved looks are categorized, selectable and previewed with the production renderer',async({page})=>{
+ await mockDesktop(page,'en',false,largeDesktop());await page.goto('/');await settings(page);
+ for(const [id,category,label] of approved){
+  await choose(page,category);await page.getByRole('combobox',{name:'Variant',exact:true}).click();await page.getByRole('option',{name:label,exact:true}).click();
+  await expect(page.getByRole('region',{name:'Style Preview'}).locator('.home-quota-designs')).toHaveAttribute('data-style',id);
+  await expect(page.getByRole('button',{name:/^Usage Style/})).toContainText(label);await expect(home(page)).toHaveAttribute('data-usage-style',id);
+ }
+ await back(page);await page.reload();await expect(home(page).locator('.home-quota-designs').first()).toHaveAttribute('data-style','numbers:spine');
+});
+
+test('quota disclosure shows real readings and reset time, and Escape or close restores the trigger',async({page})=>{
+ const data=largeDesktop();data.accounts=[data.accounts[0]];data.settings.showRemaining=true;data.accounts[0].metrics[0].percent=-12;
+ await page.addInitScript(()=>localStorage.setItem('tokenplan.homeUsageStyle','numbers:ticket'));await mockDesktop(page,'en',false,data);await page.goto('/');
+ const trigger=home(page).getByRole('button',{name:'View 5h Quota Details',exact:true}),detail=home(page).getByRole('region',{name:'5h · Quota Details',exact:true});
+ await trigger.focus();await page.keyboard.press('Enter');await expect(detail).toBeFocused();await expect(trigger).toHaveAttribute('aria-expanded','true');
+ await expect(trigger).toHaveAttribute('aria-controls',(await detail.getAttribute('id'))!);
+ await expect(detail.locator('dd').nth(0)).toHaveText('112%');await expect(detail.locator('dd').nth(1)).toHaveText('-12%');
+ await expect(detail.locator('time')).toHaveAttribute('datetime',data.accounts[0].metrics[0].resetsAt!);
+ await page.keyboard.press('Tab');await expect(detail.getByRole('button',{name:'Close Quota Details'})).toBeFocused();
+ await page.keyboard.press('Escape');await expect(detail).toHaveCount(0);await expect(trigger).toBeFocused();
+ await page.keyboard.press('Space');await detail.getByRole('button',{name:'Close Quota Details'}).click();await expect(trigger).toBeFocused();
+ await page.evaluate(()=>{(window as any).__beforeRefresh=(s:any)=>{s.accounts[0].metrics[0].hasData=false;};});
+ await page.getByRole('button',{name:messages('en').refresh,exact:true}).click();await trigger.click();
+ await expect(detail.locator('dd')).toHaveText(Array(4).fill(messages('en').missing));await expect(detail.locator('time')).toHaveCount(0);
+ await page.keyboard.press('Escape');await expect(trigger).toBeFocused();await expect(trigger).not.toHaveAttribute('aria-controls');
+ expect(await page.evaluate(()=>(window as any).__panelHides??0)).toBe(0);
+});
+
+test('Primary Dial arrows only move focus; Enter and Space activate without dropping other windows',async({page})=>{
+ const data=largeDesktop();data.accounts=[data.accounts[0]];
+ await page.addInitScript(()=>localStorage.setItem('tokenplan.homeUsageStyle','instrument:primary'));await mockDesktop(page,'en',false,data);await page.goto('/');
+ const hero=home(page).locator('.hq-primary-hero'),buttons=home(page).locator('.hq-primary-select');
+ await buttons.first().focus();await page.keyboard.press('ArrowDown');await expect(buttons.nth(1)).toBeFocused();await expect(hero).toHaveAttribute('data-focused-metric','session');
+ await page.keyboard.press('Enter');await expect(hero).toHaveAttribute('data-focused-metric','weekly');await expect(buttons.nth(1)).toHaveAttribute('aria-pressed','true');
+ await page.keyboard.press('Home');await expect(buttons.first()).toBeFocused();await expect(hero).toHaveAttribute('data-focused-metric','weekly');
+ await page.keyboard.press('Space');await expect(hero).toHaveAttribute('data-focused-metric','session');await expect(home(page).getByRole('meter')).toHaveCount(2);
+ await expect(buttons).toContainText(['46%','92%']);
+});
+
+for(const style of ['cycle','cycle:lanes','cycle:clock'])test(`${style} keeps independent time channels and never infers a missing or renewed cycle`,async({page})=>{
+ const now=Date.parse('2026-10-28T08:00:00Z'),data=largeDesktop(new Date(now));data.accounts=[data.accounts[0]];
+ await page.clock.setFixedTime(now);data.accounts[0].metrics[1].resetsAt=new Date(now+604800000*.3).toISOString();
+ await page.addInitScript(style=>localStorage.setItem('tokenplan.homeUsageStyle',style),style);await mockDesktop(page,'en',false,data);await page.goto('/');
+ const cycles=home(page).locator('.hq-cycle-item');await expect(cycles.nth(0)).toHaveAttribute('data-cycle-elapsed','40');await expect(cycles.nth(1)).toHaveAttribute('data-cycle-elapsed','70');
+ await settings(page);await page.getByRole('switch',{name:textFor('en').showRemaining,exact:true}).click();await back(page);
+ await expect(cycles.nth(0)).toHaveAttribute('data-cycle-elapsed','40');await expect(cycles.nth(1)).toHaveAttribute('data-cycle-elapsed','70');
+ await page.evaluate(()=>{(window as any).__beforeRefresh=(s:any)=>{s.accounts[0].metrics[0].resetsAt=new Date(Date.now()).toISOString();s.accounts[0].metrics[1].periodSeconds=null;};});
+ await page.getByRole('button',{name:messages('en').refresh,exact:true}).click();
+ for(const row of await cycles.all()){await expect(row).toHaveAttribute('data-cycle-elapsed','unknown');await expect(row.locator('[data-time-fill],[data-channel="time"] .hq-cycle-endpoint')).toHaveCount(0);await expect(row).toContainText('Cycle progress unavailable');}
+});
+
+test('Folded Ruler keeps 50% at the bend and 0/100 at opposite ends at both panel widths',async({page})=>{
+ const data=largeDesktop(),account=data.accounts[0];data.accounts=[account];
+ account.metrics=[0,50,100].map((percent,i)=>({...account.metrics[0],id:`q${i}`,percent}));
+ await page.addInitScript(()=>localStorage.setItem('tokenplan.homeUsageStyle','ruler:folded'));await mockDesktop(page,'en',false,data);await page.goto('/');
+ const scales=home(page).locator('.hq-rail-fold-scale');
+ for(const width of [390,560]){
+  await page.setViewportSize({width,height:800});
+  await expect.poll(()=>scales.first().evaluate(e=>Math.abs(Number(e.querySelector('svg')!.getAttribute('width'))-e.getBoundingClientRect().width))).toBeLessThan(.1);
+  const points=await scales.evaluateAll(es=>es.map(e=>{
+   const dot=e.querySelector('[data-rail-marker]')!;
+   return {width:e.getBoundingClientRect().width,x:Number(dot.getAttribute('cx')),y:Number(dot.getAttribute('cy'))};
+  }));
+  expect(points[0].x).toBeCloseTo(8,5);expect(points[0].y).toBeCloseTo(26,5);
+  expect(points[1].x).toBeCloseTo(points[1].width-28,5);expect(points[1].y).toBeCloseTo(42,5);
+  expect(points[2].x).toBeCloseTo(8,5);expect(points[2].y).toBeCloseTo(58,5);
  }
 });
