@@ -1,0 +1,45 @@
+.hu-instruments { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--hu-space) 20px; }
+.hu-instruments[data-variant="1"] { grid-template-columns:minmax(0,1fr);gap:8px; }
+.hu-needle-instrument { min-width:0; }
+.hu-needle-instrument > .hu-metric-label { margin:auto;justify-content:center; }
+.hu-instrument-dial { position:relative;max-width:180px;margin:auto; }
+.hu-instrument-dial > svg { width:100%;display:block; }
+.hu-instrument-rim { stroke:var(--border-strong);fill:none;stroke-width:2; }
+.hu-instrument-inner { stroke:var(--border-subtle);fill:none;stroke-width:.7; }
+.hu-instrument-boundary { stroke:var(--text-secondary);stroke-width:2; }
+.hu-instrument-sweep { stroke:var(--hu-fill);fill:none;stroke-width:2; }
+.hu-instrument-sweep[data-zero="true"] { opacity:0; }
+.hu-instrument-needle { stroke:var(--hu-fill);stroke-width:2;stroke-linecap:round; }
+.hu-instrument-hub { fill:var(--hu-fill);stroke:var(--background);stroke-width:1.5; }
+.hu-instrument-label { fill:var(--text-secondary);font:400 12px var(--font-body);font-variant-numeric:tabular-nums; }
+.hu-instrument-readout { position:absolute;top:72%;left:50%;transform:translateX(-50%); }
+.hu-instrument-readout .hu-value { font-size:clamp(var(--text-xl),calc(var(--hu-number-size) - 8px),var(--text-3xl)); }
+.hu-instrument-readout .hu-value > small { font-size:var(--text-sm); }
+.hu-instrument-meta { display:flex;flex-direction:column;align-items:center;gap:4px;min-height:44px;text-align:center; }
+.hu-side-instrument { display:grid;grid-template-columns:minmax(0,1fr) 92px;gap:24px;align-items:center;border-bottom:1px solid var(--border-subtle);padding:0 0 12px; }
+.hu-side-instrument:last-child { border-bottom:0; }
+.hu-side-reading { min-width:0;display:flex;align-items:flex-start;flex-direction:column;gap:4px; }
+.hu-side-reading > .hu-value { margin-top:4px; }
+.hu-side-mode { color:var(--text-muted);font-size:var(--text-xs);margin-bottom:4px; }
+.hu-side-scale { display:grid;gap:4px;color:var(--text-secondary);font:400 var(--text-xs)/1.3 var(--font-body);font-variant-numeric:tabular-nums; }
+.hu-side-scale > svg { width:100%;display:block;overflow:visible; }
+.hu-side-dot { fill:var(--hu-fill);stroke:var(--background);stroke-width:2; }
+.hu-side-boundary { fill:var(--text-secondary); }
+.hu-primary-hero { --hu-fill:var(--provider-color);display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:center;margin-top:4px; }
+.hu-primary-hero[data-tone="critical"] { --hu-fill:var(--danger); }
+.hu-window[data-monochrome="true"] .hu-primary-hero:not([data-tone="critical"]) { --hu-fill:var(--foreground); }
+.hu-primary-face { position:relative;max-width:200px; }
+.hu-primary-face > svg { display:block;width:100%; }
+.hu-primary-number { position:absolute;left:50%;top:71%;transform:translateX(-50%);font-size:calc(var(--hu-number-size) - 8px); }
+.hu-primary-context { display:grid;align-content:center;gap:6px; }
+.hu-primary-context > span:not(.hu-warning,.hu-reset) { color:var(--text-secondary);font-size:var(--text-xs); }
+.hu-primary-list { display:grid;gap:12px;margin-top:8px; }
+.hu-primary-row { padding:6px 10px 10px;border-top:1px solid var(--border-subtle); }
+.hu-primary-row:has([aria-pressed="true"]) { background:var(--surface-muted);border-radius:8px;border-color:transparent; }
+.hu-primary-select { display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;min-height:52px;color:var(--foreground);background:transparent;border:0;padding:0;cursor:pointer;text-align:left;font:400 var(--text-sm)/1.5 var(--font-body); }
+.hu-primary-select > span:first-child { min-width:0;overflow-wrap:anywhere; }
+.hu-primary-select small { display:block;font-size:var(--text-xs); }
+.hu-primary-select > .hu-value { flex:none; }
+.hu-primary-row > .hu-warning,.hu-primary-row > .hu-missing { margin-top:6px; }
+@media (hover:hover) and (pointer:fine) { .hu-primary-select:hover { color:var(--hu-fill); } }
+@container (max-width:350px) { .hu-instruments { gap:16px 12px; }.hu-instrument-readout .hu-value { font-size:clamp(var(--text-lg),calc(var(--hu-number-size) - 14px),var(--text-2xl)); }.hu-primary-hero { gap:12px; }.hu-side-instrument { grid-template-columns:minmax(0,1fr) 82px;gap:16px; } }

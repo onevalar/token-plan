@@ -1,0 +1,54 @@
+.hu-cycles { display:grid;gap:var(--hu-space);min-width:0; }
+.hu-cycle-item { min-width:0; }
+.hu-cycle-item:not(:last-child) { padding-block-end:var(--hu-space);border-block-end:1px solid var(--border-subtle); }
+.hu-cycle-heading { display:flex;align-items:center;justify-content:space-between;gap:12px;margin-block-end:8px; }
+.hu-cycle-heading > .hu-metric-label { flex:1; }
+.hu-cycle-heading > :is(.hu-warning,.hu-missing) { flex:none; }
+.hu-cycle-mode { color:var(--text-secondary);font:400 var(--text-xs)/1.5 var(--font-body); }
+.hu-cycle-elapsed { color:var(--text-secondary);font:500 var(--text-sm)/1.5 var(--font-display);font-variant-numeric:tabular-nums;white-space:nowrap; }
+.hu-cycle-reset { margin-block-start:8px; }
+.hu-cycle-unavailable { margin:4px 0 0;color:var(--text-secondary);font:400 var(--text-xs)/1.6 var(--font-body); }
+
+/* C1: a uniformly scaled stadium keeps path-length percentages true at every width. */
+.hu-cycle-racetrack { display:grid;max-width:360px;margin-inline:auto; }
+.hu-cycle-racetrack > .hu-meter,.hu-cycle-race-reading { grid-area:1/1; }
+.hu-cycle-race-reading { display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;place-self:center;max-width:calc(100% - 80px); }
+.hu-cycle-race-reading > .hu-cycle-mode { display:flex;align-items:center;gap:6px; }
+.hu-cycle-race-base { fill:none;stroke:var(--border-strong);stroke-width:9; }
+.hu-cycle-race-quota { fill:none;stroke:var(--hu-fill);stroke-width:9;stroke-linecap:butt; }
+.hu-cycle-race-time-base { fill:none;stroke:var(--border-strong);stroke-width:2; }
+.hu-cycle-race-time { fill:none;stroke:var(--text-secondary);stroke-width:2; }
+.hu-cycle-key { display:inline-block;flex:none;width:14px;height:3px;background:var(--hu-fill); }
+.hu-cycle-key-time { height:0;border-block-start:2px dashed var(--text-secondary);background:none; }
+.hu-cycle-race-legend { display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;column-gap:8px;row-gap:2px;margin-block-start:8px; }
+.hu-cycle-race-legend > span:first-child { display:inline-flex;align-items:center;gap:6px;color:var(--text-secondary);font:400 var(--text-xs)/1.5 var(--font-body); }
+
+/* C2: both lanes share the same endpoints; only quota carries provider/danger colour. */
+.hu-cycle-lanes { display:grid;grid-template-columns:max-content minmax(0,1fr) 96px;align-items:center;gap:12px; }
+.hu-cycle-lanes > .hu-cycle-mode { white-space:nowrap; }
+.hu-cycle-lanes > :is(.hu-value,.hu-cycle-elapsed) { justify-self:end; }
+.hu-cycle-lanes > .hu-cycle-elapsed { font-size:var(--text-xs); }
+.hu-cycles .hu-cycle-lane { height:6px;border-radius:0;overflow:visible; }
+.hu-cycles .hu-cycle-lane > span { border-radius:0; }
+.hu-cycle-endpoint { position:absolute;top:50%;width:4px;height:12px;background:var(--hu-fill);transform:translate(-50%,-50%); }
+.hu-cycles .hu-cycle-lane[data-channel="time"] { --hu-fill:var(--text-secondary);height:2px;background:transparent;border-block-start:1px dashed var(--border-strong); }
+.hu-cycles .hu-cycle-lane[data-channel="time"] > span { top:-1px;bottom:auto;height:2px; }
+.hu-cycle-lane[data-channel="time"] > .hu-cycle-endpoint { top:0;width:6px;height:6px;border-radius:50%;background:var(--surface);border:1.5px solid var(--text-secondary); }
+.hu-cycles .hu-cycle-lane[data-unknown="true"] { border:0;border-block-start:1px dashed var(--border-strong);height:0; }
+
+/* C3: the dial is time only, with a separate, larger quota reading. */
+.hu-cycle-clock-row { display:grid;grid-template-columns:112px minmax(0,1fr);gap:16px;align-items:center; }
+.hu-cycle-clock { display:flex;flex-direction:column;align-items:center;gap:4px;margin:0;min-width:0; }
+.hu-cycle-dial { display:block;width:88px;height:88px; }
+.hu-cycle-dial-base { fill:none;stroke:var(--border-strong);stroke-width:1; }
+.hu-cycle-dial-elapsed { fill:none;stroke:var(--text-secondary);stroke-width:2;stroke-linecap:butt; }
+.hu-cycle-dial-hand { stroke:var(--text-secondary);stroke-width:1.5; }
+.hu-cycle-dial-pin { fill:var(--text-secondary); }
+.hu-cycle-clock > figcaption { display:flex;flex-direction:column;align-items:center;gap:2px;color:var(--text-secondary);font:400 var(--text-xs)/1.5 var(--font-body); }
+.hu-cycle-clock .hu-cycle-elapsed { font-size:var(--text-xs); }
+.hu-cycle-clock-reading { display:flex;flex-direction:column;gap:8px;min-width:0;padding-inline-start:16px;border-inline-start:1px solid var(--border); }
+.hu-cycle-no-clock { display:grid;place-items:center;width:88px;height:88px;color:var(--text-secondary);font:400 var(--text-2xl)/1 var(--font-display); }
+@container (max-width:320px) {
+ .hu-cycle-clock-row { grid-template-columns:88px minmax(0,1fr);gap:12px; }
+ .hu-cycle-clock-reading { padding-inline-start:12px; }
+}

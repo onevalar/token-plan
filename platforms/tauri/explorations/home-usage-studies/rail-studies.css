@@ -1,0 +1,57 @@
+.hu-rails { display:grid;gap:var(--hu-space);min-width:0; }
+.hu-rail-row { min-width:0;font-variant-numeric:tabular-nums; }
+.hu-rail-row + .hu-rail-row { border-top:1px solid var(--border-subtle);padding-top:var(--hu-space); }
+.hu-rail-expiries { min-width:0;grid-column:1/-1; }
+.hu-rail-expiries:empty { display:none; }
+.hu-rail-expiries .expiries { margin-top:var(--space-2);overflow-wrap:anywhere; }
+
+/* D1: a compact readout with a fine, unfilled, full-range ruler below it. */
+.hu-rail-horizontal { display:grid;gap:var(--space-2); }
+.hu-rail-inline { display:flex;align-items:center;justify-content:space-between;gap:var(--space-3);min-width:0; }
+.hu-rail-caption { display:grid;gap:var(--space-1);min-width:0; }
+.hu-rail-caption .hu-reset { overflow-wrap:anywhere; }
+.hu-rail-reading { display:grid;justify-items:end;gap:var(--space-1);flex:none;max-width:100%; }
+.hu-rail-horizontal-meter { min-width:0; }
+.hu-rail-horizontal-scale { padding-inline:5px; }
+.hu-rail-axis { height:20px;position:relative; }
+.hu-rail-axis::before { content:"";position:absolute;inset:8px 0 auto;border-top:1px solid var(--border-strong); }
+.hu-rail-tick { position:absolute;top:8px;height:4px;border-left:1px solid var(--border-strong); }
+.hu-rail-tick[data-major="true"] { height:8px;border-color:var(--text-secondary); }
+.hu-rail-dot { position:absolute;top:8px;width:10px;height:10px;border-radius:50%;background:var(--hu-fill);border:2px solid var(--surface);transform:translate(-50%,-50%); }
+.hu-rail-scale-labels { display:flex;justify-content:space-between;position:relative;font-size:var(--text-xs);line-height:1.4;color:var(--text-secondary); }
+.hu-rail-scale-labels span:nth-child(2) { position:absolute;left:50%;transform:translateX(-50%); }
+
+/* D2: leave the horizontal field for words and a large number, with the scale on the edge. */
+.hu-rail-edge { display:grid;grid-template-columns:minmax(0,1fr) 30px;align-items:center;column-gap:var(--space-4); }
+.hu-rail-edge-body { display:grid;gap:var(--space-3);min-width:0; }
+.hu-rail-edge-readout { display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-2) var(--space-3);min-width:0; }
+.hu-rail-edge-meta { display:grid;gap:var(--space-1);min-width:0;flex:1 1 90px; }
+.hu-rail-edge-meta .hu-reset { overflow-wrap:anywhere; }
+.hu-rail-edge-meter { align-self:stretch;min-width:0; }
+.hu-rail-edge-scale { display:flex;flex-direction:column;align-items:stretch;gap:var(--space-2);height:100%;min-height:104px;font-size:var(--text-xs);line-height:1;color:var(--text-secondary); }
+.hu-rail-edge-end { text-align:right; }
+.hu-rail-edge-axis { position:relative;flex:1;min-height:64px; }
+.hu-rail-edge-axis::before { content:"";position:absolute;inset:0 6px 0 auto;border-right:1px solid var(--border-strong); }
+.hu-rail-edge-tick { position:absolute;right:6px;width:5px;border-top:1px solid var(--border-strong); }
+.hu-rail-edge-tick[data-major="true"] { width:11px;border-color:var(--text-secondary); }
+.hu-rail-edge-dot { position:absolute;right:6px;width:10px;height:10px;border-radius:50%;background:var(--hu-fill);border:2px solid var(--surface);transform:translate(50%,50%); }
+
+/* D3: a single continuous ruler, not a pair of progress bars or independent quotas. */
+.hu-rail-folded { display:grid;gap:var(--space-2); }
+.hu-rail-fold-heading { display:flex;align-items:center;justify-content:space-between;gap:var(--space-3);min-width:0; }
+.hu-rail-fold-heading .hu-value { flex:none; }
+.hu-rail-fold-meter { min-width:0; }
+.hu-rail-fold-scale { position:relative;height:84px;min-width:0;font-size:var(--text-xs);line-height:1.2;color:var(--text-secondary); }
+.hu-rail-fold-scale svg { display:block;width:100%;height:84px;overflow:visible; }
+.hu-rail-fold-path { fill:none;stroke:var(--border-strong);stroke-width:1; }
+.hu-rail-fold-tick { stroke:var(--border-strong);stroke-width:1; }
+.hu-rail-fold-tick[data-major="true"] { stroke:var(--text-secondary); }
+.hu-rail-fold-dot { fill:var(--hu-fill);stroke:var(--surface);stroke-width:2; }
+.hu-rail-fold-start,.hu-rail-fold-end,.hu-rail-fold-quarter,.hu-rail-fold-turn { position:absolute; }
+.hu-rail-fold-start { top:0;left:3px; }
+.hu-rail-fold-end { bottom:0;left:3px; }
+.hu-rail-fold-quarter { top:0;transform:translateX(-50%); }
+.hu-rail-fold-lower { top:auto;bottom:0; }
+.hu-rail-fold-turn { right:0;top:28px;display:grid;justify-items:center;gap:1px; }
+.hu-rail-fold-turn > span { font-size:var(--text-sm); }
+.hu-rail-fold-meta { display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:var(--space-1) var(--space-3); }

@@ -1,0 +1,45 @@
+.hu-window { --hu-fill:var(--provider-color,var(--foreground));--hu-number-size:var(--text-3xl);--hu-space:20px;--hu-radius:16px;container-type:inline-size; }
+.hu-account [data-kind="quota"] { min-width:0;--hu-fill:var(--provider-color,var(--foreground)); }
+.hu-window[data-monochrome="true"] .hu-account [data-kind="quota"] { --hu-fill:var(--foreground); }
+.hu-account [data-kind="quota"][data-tone="critical"],.hu-window[data-monochrome="true"] [data-kind="quota"][data-tone="critical"] { --hu-fill:var(--danger); }
+.hu-value { display:inline-flex;align-items:baseline;gap:2px;min-width:0;color:var(--foreground);font:500 var(--hu-number-size)/1.08 var(--font-display);font-variant-numeric:tabular-nums;letter-spacing:var(--tracking-display);white-space:nowrap; }
+.hu-value > small { color:var(--text-secondary);font:400 var(--text-lg)/1 var(--font-body);letter-spacing:0; }
+.hu-value-small { font-size:calc(var(--hu-number-size) - 8px); }
+[data-tone="critical"] .hu-value,[data-tone="critical"] .hu-value > small { color:var(--danger); }
+.hu-metric-label { display:flex;align-items:center;gap:4px;max-width:100%;min-width:0;min-height:36px;text-align:start;padding:0;border:0;background:transparent;color:var(--foreground);font:500 var(--text-sm)/1.45 var(--font-body);cursor:pointer;--focus-outline-offset:1px; }
+.hu-metric-label > span { overflow-wrap:anywhere;min-width:0; }
+.hu-metric-label > svg { color:var(--text-muted);flex:none; }
+.hu-metric-label[aria-expanded="true"] > svg { transform:rotate(90deg); }
+.hu-warning,.hu-missing { display:inline-flex;gap:4px;align-items:center;font:400 var(--text-xs)/1.5 var(--font-body);overflow-wrap:anywhere; }
+.hu-warning { color:var(--danger); }
+.hu-warning > svg { flex:none; }
+.hu-missing { color:var(--text-secondary); }
+.hu-reset { color:var(--text-secondary);font:400 var(--text-xs)/1.5 var(--font-body);font-variant-numeric:tabular-nums;overflow-wrap:anywhere; }
+.hu-meter { min-width:0; }
+.hu-meter > svg { width:100%;display:block;overflow:visible; }
+.hu-amount { grid-column:1/-1;min-width:0;padding-block:8px; }
+.hu-amount .metric-name { font-size:var(--text-sm); }
+.hu-amount .amount { font-size:var(--text-lg); }
+.hu-amount .text-metric { grid-template-columns:minmax(0,1fr) minmax(0,auto); }
+.hu-account .expiries { margin-top:8px;grid-column:1/-1; }
+.hu-track { position:relative;min-width:0;height:5px;border-radius:var(--radius-pill);background:var(--border-strong);overflow:hidden; }
+.hu-track > span { display:block;position:absolute;inset:0;background:var(--hu-fill);transform-origin:0 50%; }
+.hu-track[data-vertical="true"] { height:100%;width:5px; }
+.hu-track[data-vertical="true"] > span { transform-origin:50% 100%; }
+.hu-track[data-unknown="true"] { background:transparent;border:1px dashed var(--border-strong); }
+.hu-cells { display:grid;gap:3px; }
+.hu-cells > i { display:block;position:relative;aspect-ratio:1;min-width:0;overflow:hidden;background:var(--border-strong);border-radius:2px; }
+.hu-cells > i > span { position:absolute;inset:0;background:var(--hu-fill);transform-origin:left; }
+.hu-cells[data-cell-shape="round"] > i { border-radius:50%; }
+.hu-cells[data-cell-shape="slash"] > i { transform:skewX(-16deg);border-radius:1px;aspect-ratio:1/3; }
+.hu-cells[data-unknown="true"] { border:1px dashed var(--border-strong);padding:3px;border-radius:4px; }
+.hu-cells[data-unknown="true"] > i { visibility:hidden; }
+.hu-scale-ticks line { stroke:var(--border-strong);stroke-width:1; }
+.hu-scale-ticks line[data-major="true"] { stroke:var(--text-muted); }
+.hu-chart-track { fill:none;stroke:var(--border-strong); }
+.hu-chart-fill { fill:none;stroke:var(--hu-fill); }
+.hu-caption { font-size:var(--text-xs);line-height:1.6;color:var(--text-secondary);margin:8px 0 0; }
+.hu-sr { position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0; }
+@media (hover:hover) and (pointer:fine) { .hu-metric-label:hover { color:var(--hu-fill); }.hu-metric-label:hover > svg { color:currentColor; } }
+@media (pointer:coarse) { .hu-metric-label { min-height:44px; } }
+@media (prefers-reduced-motion:reduce) { .hu-window *, .hu-window { scroll-behavior:auto; } }

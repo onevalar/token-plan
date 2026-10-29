@@ -1,0 +1,44 @@
+.tp-composition .tp-composition-key { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px 8px;margin:14px 0 4px; }
+.tp-composition .tp-composition-key button { display:flex;align-items:center;justify-content:flex-start;gap:6px;min-height:32px;min-width:0;padding:4px 0;border:0;background:transparent;color:var(--text-secondary);font:inherit;font-size:11px;cursor:pointer; }
+.tp-composition .tp-composition-key i { width:7px;height:7px;flex:none;border-radius:50%;background:var(--source-color); }
+.tp-composition .tp-composition-key [aria-pressed="true"] { color:var(--foreground);text-decoration:underline;text-underline-offset:4px; }
+.tp-composition .tp-orbits { position:relative;max-width:248px;margin:12px auto 0; }
+.tp-composition .tp-orbits svg { display:block;width:100%;overflow:visible; }
+.tp-composition .tp-orbits g { cursor:pointer;transition:opacity var(--duration-fast) var(--ease-standard); }
+.tp-composition .tp-orbits g[data-dim="true"] { opacity:.23; }
+.tp-composition .tp-orbit-track { stroke:var(--border); }
+.tp-composition .tp-orbit-center { position:absolute;top:calc(50% - 22px);left:50%;transform:translateX(-50%);display:grid;justify-items:center;pointer-events:none; }
+.tp-composition .tp-orbit-center strong { font-size:25px;line-height:1.1;font-weight:500; }
+.tp-composition .tp-orbit-center span { margin-top:4px;font-size:10px;color:var(--text-secondary); }
+.tp-composition .tp-orbit-ends { position:absolute;bottom:3px;left:50%;transform:translateX(-50%);display:flex;justify-content:space-between;width:110px;color:var(--text-secondary);font-size:11px;font-variant-numeric:tabular-nums; }
+.tp-composition .tp-waffle { width:min(100%,220px);margin:22px auto 18px; }
+.tp-composition .tp-waffle-readout { display:flex;justify-content:space-between;gap:12px;min-height:30px;margin:0 0 10px;font-size:12px;color:var(--text-secondary); }
+.tp-composition .tp-waffle-readout strong { font-weight:500;color:var(--foreground); }
+.tp-composition .tp-composition-waterfall { padding:32px 0 8px;margin:12px 0; }
+.tp-composition .tp-step-grid { display:grid;grid-template-columns:repeat(var(--steps),minmax(0,1fr));gap:8px; }
+.tp-composition .tp-step-grid > button,.tp-composition .tp-step-total { display:block;min-width:0;border:0;padding:0;color:var(--foreground);background:transparent;font:inherit;text-align:center; }
+.tp-composition .tp-step-grid > button { cursor:pointer; }
+.tp-composition .tp-step-plot { height:190px;display:block;position:relative;border-bottom:1px solid var(--border-strong); }
+.tp-composition .tp-step-plot > i { position:absolute;left:12%;right:12%;min-height:0;background:var(--source-color,var(--foreground));border-radius:3px; }
+.tp-composition .tp-step-plot > i.tp-step-zero { height:3px !important;border-radius:0; }
+.tp-composition .tp-step-number { position:absolute;left:50%;transform:translateX(-50%);margin-bottom:8px;white-space:nowrap;font-size:10px;font-variant-numeric:tabular-nums; }
+.tp-composition .tp-step-connector { position:absolute;left:90%;width:calc(20% + 8px);border-top:1px dashed var(--text-muted); }
+.tp-composition .tp-step-missing { position:absolute;inset:auto 12% 0;height:36px;border:1px dashed var(--border-strong);display:grid;place-content:center; }
+.tp-composition .tp-step-label { display:block;font-size:10px;line-height:1.4;margin-top:12px; }
+.tp-composition .tp-step-grid [aria-pressed="true"] .tp-step-label { text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:5px; }
+.tp-composition .tp-step-grid [aria-pressed="true"] .tp-step-plot > i { box-shadow:0 0 0 2px var(--surface),0 0 0 3px var(--source-color); }
+.tp-composition .tp-section-title { margin-top:20px; }
+@container study (min-width:560px) {
+ .tp-composition .tp-orbits { max-width:300px; }
+ .tp-composition .tp-waffle { width:290px; }
+ .tp-composition .tp-step-number,.tp-composition .tp-step-label { font-size:12px; }
+ .tp-composition .tp-step-plot { height:230px; }
+ .tp-composition .tp-step-plot > i { left:20%;right:20%; }
+}
+@media (hover:hover) and (pointer:fine) {
+ .tp-composition .tp-composition-key button:hover { color:var(--foreground);text-decoration:underline;text-underline-offset:4px; }
+ .tp-composition .tp-orbits g:hover { opacity:.7; }
+ .tp-composition .tp-step-grid > button:hover .tp-step-label { text-decoration:underline;text-underline-offset:5px; }
+}
+@media (pointer:coarse) { .tp-composition .tp-composition-key button { min-height:44px; } }
+@media (prefers-reduced-motion:reduce) { .tp-composition .tp-orbits g { transition:none; } }
