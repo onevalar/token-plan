@@ -78,8 +78,8 @@ jobs:
           sudo find /etc/apt -maxdepth 2 -type f \( -name '*.list' -o -name '*.sources' -o -name '*mirrors.txt' \) -exec sed -i 's|http://azure.archive.ubuntu.com/ubuntu|https://archive.ubuntu.com/ubuntu|g' {} +
       - name: Install the platform test engine
         # Windows --with-deps installs the unrelated media feature via DISM
-        # (~4 minutes); the Chromium test engine only needs its own download.
-        run: npx playwright install ${{ runner.os == 'Linux' && '--with-deps' || '' }} ${{ matrix.target.browser }}
+        # (~4 minutes); Chromium uses only the precompiled headless shell.
+        run: npx playwright install ${{ runner.os == 'Linux' && '--with-deps' || '' }} ${{ matrix.target.browser == 'chromium' && '--only-shell' || '' }} ${{ matrix.target.browser }}
       - name: Verify interface and platform layouts
         run: npm run test:release-ui -- --project='${{ matrix.target.platform }}-*' --shard=${{ matrix.shard }}/4
       - uses: actions/upload-artifact@v4

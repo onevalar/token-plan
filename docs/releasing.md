@@ -38,9 +38,11 @@ NSIS installer are for first installs, see `docs/desktop-clients.md#installers`.
   signing. Restoring a cache never skips tests. Installers, signing credentials and update manifests are not cached.
   Avoid per-commit multi-gigabyte caches and browser caches: their upload/restore costs and eviction pressure can outweigh downloading.
 - UI regression and native building/packaging run in separate jobs. Publishing still waits for both jobs on all three systems.
-  Each OS runs four UI shards, serial within each shard. Frontend unit/script checks still run once on each actual OS, not once per shard;
+  Each OS runs four UI shards of individual isolated cases, serial within each shard; large files cannot monopolize a runner.
+  Frontend unit/script checks still run once on each actual OS, not once per shard;
   platform-independent migration metadata and CI policy checks run once on Ubuntu. Failed UI checks block publication even if an installer
-  has already been built. Chromium on Windows downloads without DISM media-feature installation; Linux WebKit keeps its system dependencies.
+  has already been built. Windows downloads only Chromium's precompiled headless shell, without DISM media-feature installation;
+  Linux WebKit keeps its system dependencies. Each UI artifact includes a JSON report with case outcomes and durations for future balancing.
 - `playwright.release.config.ts` collects every existing test once per platform: WebKit on macOS/Linux, Chromium on Windows.
   Shared regression and compact layout suites are disjoint and retain their respective viewport/motion settings. The original standalone
   Chromium/WebKit and preview commands remain available for targeted diagnosis; releases no longer run all three overlapping suites.

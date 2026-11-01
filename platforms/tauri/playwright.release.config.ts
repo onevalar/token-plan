@@ -21,8 +21,14 @@ const projects: Project[] = (['macos', 'windows', 'linux'] as const).flatMap(pla
 export default defineConfig({
  testDir: './tests',
  outputDir: './test-results-release',
+ // Shard individual page-isolated cases instead of keeping a large file on
+ // one runner. Each shard still executes serially with a single worker.
+ fullyParallel: true,
  workers: 1,
  forbidOnly: true,
+ reporter: process.env.CI
+  ? [['dot'], ['json', {outputFile: 'test-results-release/results.json'}]]
+  : [['list']],
  globalTimeout: 60 * 60 * 1000,
  projects,
  use: {baseURL: 'http://127.0.0.1:1421', locale: 'zh-CN', trace: 'retain-on-failure'},
