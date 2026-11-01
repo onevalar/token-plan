@@ -25,13 +25,22 @@ NSIS installer are for first installs, see `docs/desktop-clients.md#installers`.
 
 ## Build time and cache reuse
 
-- Main CI runs the same native regression checks as releases, without signing or packaging. It prepares the Rust Debug dependency,
+- Every main commit runs the full CI suite, including documentation commits; queued main commits do not replace one another.
+  New PR commits cancel superseded runs. Documentation-only PRs skip expensive jobs but still finish the `CI` gate successfully;
+  require that stable check in branch protection rather than matrix job names. Empty, oversized or mixed code/documentation diffs run
+  the full suite. Failure or cancellation of an expected suite fails the gate, never turns it into a successful documentation skip.
+- Main CI runs the same native regression checks as releases, without signing or packaging. It prepares separate Rust dependency,
   Swift build and NuGet caches on `main`, where future release tags can restore them. Tag-only caches cannot be reused by another tag
   ([GitHub cache scope](https://docs.github.com/en/actions/reference/workflows-and-actions/dependency-caching#restrictions-for-accessing-a-cache)).
-  Keys include runner image, architecture, compiler versions, dependency locks and source commit. Restoring a cache never skips tests.
-  Release-profile Rust binaries are still rebuilt; installers, signing credentials and update manifests are not cached.
+  Node and NuGet use setup-action caches. Rust uses `rust-cache` to retain compatible dependencies and discard workspace binaries and
+  incremental intermediates. Its key follows the OS, architecture, compiler and dependency locks, not each source commit. Swift keys
+  follow Xcode/Swift, dependency locks and actual Swift package inputs, not unrelated web or documentation commits. Swift is saved before
+  signing. Restoring a cache never skips tests. Installers, signing credentials and update manifests are not cached.
+  Avoid per-commit multi-gigabyte caches and browser caches: their upload/restore costs and eviction pressure can outweigh downloading.
 - UI regression and native building/packaging run in separate jobs. Publishing still waits for both jobs on all three systems.
-  UI tests remain serial within each job. Failed UI checks block publication even if an installer has already been built.
+  Each OS runs four UI shards, serial within each shard. Frontend unit/script checks still run once on each actual OS, not once per shard;
+  platform-independent migration metadata and CI policy checks run once on Ubuntu. Failed UI checks block publication even if an installer
+  has already been built. Chromium on Windows downloads without DISM media-feature installation; Linux WebKit keeps its system dependencies.
 - `playwright.release.config.ts` collects every existing test once per platform: WebKit on macOS/Linux, Chromium on Windows.
   Shared regression and compact layout suites are disjoint and retain their respective viewport/motion settings. The original standalone
   Chromium/WebKit and preview commands remain available for targeted diagnosis; releases no longer run all three overlapping suites.
@@ -39,7 +48,9 @@ NSIS installer are for first installs, see `docs/desktop-clients.md#installers`.
 - Local preflight checks validate simulated platform behavior; Windows/Linux native webviews, helpers and packaging are checked on their
   cloud runners. Signatures, macOS notarization, signed helper startup and Ubuntu package migration checks remain required.
 - The first run is a cold cache baseline. Compare later warm-cache runs of the same workflow before claiming a speedup. Browser system
-  dependencies remain installed until a native Windows run proves they can safely be omitted.
+  dependencies remain installed on Linux. Use `python3 script/ci/actions_timing.py --output /tmp/actions-timing` to export the latest 50
+  runs and per-job queue, preparation, test, build and cache timings using `gh`. Failed/cancelled runs are retained separately; combined
+  build/test steps in historical workflows cannot be separated from timestamps alone. New shell builds and tests have separate steps.
 
 ## Linux compatibility and repair builds
 

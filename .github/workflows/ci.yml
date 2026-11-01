@@ -3,28 +3,57 @@ name: CI
 on:
   push:
     branches: [main]
-    paths-ignore:
-      - 'updates/**'
-      - 'README.md'
-      - 'docs/**'
-      - 'showcase/**'
-      - 'assets/showcase/**'
-      - '.github/workflows/showcase-pages.yml'
-      - 'release/*.md'
   pull_request:
     branches: [main]
 
 permissions:
   contents: read
 
-# Superseded checks need not finish; release workflows have separate concurrency.
+# PR updates replace old checks. Unique push groups also avoid GitHub replacing
+# a pending main run: every main commit must finish its complete suite.
 concurrency:
-  group: tokenplan-ci-${{ github.ref }}
-  cancel-in-progress: true
+  group: tokenplan-ci-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      run_checks: ${{ steps.changes.outputs.run_checks }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - id: changes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 script/ci/ci_changes.py
+
   check:
+    needs: changes
+    if: needs.changes.outputs.run_checks == 'true'
     uses: ./.github/workflows/tauri-preview.yml
     with:
       source_ref: ${{ github.sha }}
       checks_only: true
+
+  # Require this stable check, not a path-filtered workflow or matrix job.
+  # It must fail on a failed/cancelled suite and succeed on a docs-only PR.
+  gate:
+    name: CI
+    if: always()
+    needs: [changes, check]
+    runs-on: ubuntu-latest
+    steps:
+      - env:
+          CHANGES_RESULT: ${{ needs.changes.result }}
+          RUN_CHECKS: ${{ needs.changes.outputs.run_checks }}
+          CHECK_RESULT: ${{ needs.check.result }}
+        run: |
+          test "$CHANGES_RESULT" = success
+          if [ "$RUN_CHECKS" = true ]; then
+            test "$CHECK_RESULT" = success
+          else
+            test "$RUN_CHECKS" = false
+            test "$CHECK_RESULT" = skipped
+          fi

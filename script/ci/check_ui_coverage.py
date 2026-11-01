@@ -8,10 +8,10 @@ ROOT = Path(__file__).resolve().parents[2]
 PROJECT = ROOT / 'platforms' / 'tauri'
 
 
-def inventory(config):
+def inventory(config, *options):
     result = subprocess.run(
         ['node', 'node_modules/@playwright/test/cli.js', 'test', '--config', config,
-         '--list', '--reporter=json'], cwd=PROJECT, text=True, capture_output=True, check=True)
+         '--list', '--reporter=json', *options], cwd=PROJECT, text=True, capture_output=True, check=True)
     data = json.loads(result.stdout)
     if data.get('errors'):
         raise RuntimeError(data['errors'])
@@ -42,7 +42,12 @@ def main():
         duplicates = {case for case, count in counts.items() if count != 1}
         if missing or extra or duplicates:
             raise RuntimeError(f'{platform}: missing={sorted(missing)}, extra={sorted(extra)}, duplicate={sorted(duplicates)}')
-        print(f'{platform}: all {len(expected)} existing cases collected exactly once (platform skips remain in tests).')
+        sharded = Counter(case for shard in range(1, 5)
+                          for _, case in inventory('playwright.release.config.ts',
+                                                   f'--project={platform}-*', f'--shard={shard}/4'))
+        if sharded != counts:
+            raise RuntimeError(f'{platform}: four CI shards differ from the full inventory: {sharded - counts}, {counts - sharded}')
+        print(f'{platform}: all {len(expected)} existing cases collected exactly once across four shards (platform skips remain in tests).')
 
 
 if __name__ == '__main__':

@@ -46,8 +46,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include: ${{ fromJSON(inputs.platforms == 'linux' && '[{"os":"ubuntu-22.04","platform":"linux","browser":"webkit"}]' || inputs.platforms == 'windows-linux' && '[{"os":"windows-latest","platform":"windows","browser":"chromium"},{"os":"ubuntu-22.04","platform":"linux","browser":"webkit"}]' || '[{"os":"macos-26","platform":"macos","browser":"webkit"},{"os":"windows-latest","platform":"windows","browser":"chromium"},{"os":"ubuntu-22.04","platform":"linux","browser":"webkit"}]') }}
-    runs-on: ${{ matrix.os }}
+        target: ${{ fromJSON(inputs.platforms == 'linux' && '[{"os":"ubuntu-22.04","platform":"linux","browser":"webkit"}]' || inputs.platforms == 'windows-linux' && '[{"os":"windows-latest","platform":"windows","browser":"chromium"},{"os":"ubuntu-22.04","platform":"linux","browser":"webkit"}]' || '[{"os":"macos-26","platform":"macos","browser":"webkit"},{"os":"windows-latest","platform":"windows","browser":"chromium"},{"os":"ubuntu-22.04","platform":"linux","browser":"webkit"}]') }}
+        shard: [1, 2, 3, 4]
+    name: interface (${{ matrix.target.platform }}, ${{ matrix.shard }}/4)
+    runs-on: ${{ matrix.target.os }}
     defaults:
       run:
         working-directory: platforms/tauri
@@ -63,21 +65,27 @@ jobs:
           cache-dependency-path: platforms/tauri/package-lock.json
       - run: npm ci
       - run: npm test
+        if: matrix.shard == 1
       - name: Verify no UI cases were lost or duplicated
-        if: runner.os == 'Linux'
-        run: python3 ../../script/ci/check_ui_coverage.py
+        if: runner.os == 'Linux' && matrix.shard == 1
+        run: |
+          python3 ../../script/ci/check_ui_coverage.py
+          python3 ../../script/test_tauri_migration_update.py
+          python3 -m unittest discover -s ../../script/ci -p 'test_*.py'
       - name: Use Ubuntu HTTPS package mirror
         if: runner.os == 'Linux'
         run: |
           sudo find /etc/apt -maxdepth 2 -type f \( -name '*.list' -o -name '*.sources' -o -name '*mirrors.txt' \) -exec sed -i 's|http://azure.archive.ubuntu.com/ubuntu|https://archive.ubuntu.com/ubuntu|g' {} +
       - name: Install the platform test engine
-        run: npx playwright install --with-deps ${{ matrix.browser }}
+        # Windows --with-deps installs the unrelated media feature via DISM
+        # (~4 minutes); the Chromium test engine only needs its own download.
+        run: npx playwright install ${{ runner.os == 'Linux' && '--with-deps' || '' }} ${{ matrix.target.browser }}
       - name: Verify interface and platform layouts
-        run: npm run test:release-ui -- --project='${{ matrix.platform }}-*'
+        run: npm run test:release-ui -- --project='${{ matrix.target.platform }}-*' --shard=${{ matrix.shard }}/4
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: interface-${{ matrix.platform }}
+          name: interface-${{ matrix.target.platform }}-${{ matrix.shard }}
           path: platforms/tauri/test-results-release/
           retention-days: 7
           if-no-files-found: warn
@@ -104,7 +112,9 @@ jobs:
       - uses: actions/setup-dotnet@v5
         if: runner.os != 'macOS'
         with:
-          dotnet-version: 10.0.x
+          global-json-file: platforms/desktop/global.json
+          cache: true
+          cache-dependency-path: platforms/desktop/TokenPlan.Core/packages.lock.json
       - name: Use Ubuntu HTTPS package mirror
         if: runner.os == 'Linux'
         run: |
@@ -114,30 +124,31 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev patchelf
-      - name: Select Rust toolchain
-        run: rustup toolchain install 1.90.0 --profile minimal
-      - name: Identify compiler cache
+      - uses: dtolnay/rust-toolchain@1.90.0
+        with:
+          targets: ${{ runner.os == 'macOS' && 'x86_64-apple-darwin' || '' }}
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: platforms/tauri/src-tauri
+          shared-key: tauri-${{ matrix.os }}-${{ runner.arch }}
+          cache-bin: false
+          save-if: ${{ github.ref == 'refs/heads/main' }}
+      - name: Identify Swift compiler cache
+        if: runner.os == 'macOS'
         id: compiler
         shell: bash
         run: python3 ../../script/ci/compiler_cache_key.py
-      - name: Restore native build cache
-        id: native-cache
+      - name: Restore Swift build cache
+        if: runner.os == 'macOS'
+        id: swift-cache
         uses: actions/cache/restore@v4
         with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            ~/.nuget/packages
-            .build
-            platforms/tauri/src-tauri/target/debug/deps
-            platforms/tauri/src-tauri/target/debug/build
-            platforms/tauri/src-tauri/target/debug/.fingerprint
-          key: native-v1-${{ matrix.os }}-${{ runner.arch }}-${{ steps.compiler.outputs.toolchain }}-${{ hashFiles('platforms/tauri/src-tauri/Cargo.lock', 'Package.resolved', 'platforms/desktop/**/packages.lock.json') }}-${{ steps.compiler.outputs.source }}
+          path: .build
+          key: swift-v1-${{ runner.arch }}-${{ steps.compiler.outputs.toolchain }}-${{ hashFiles('Package.resolved') }}-${{ hashFiles('Package.swift', 'Sources/**', 'Tests/**') }}
           restore-keys: |
-            native-v1-${{ matrix.os }}-${{ runner.arch }}-${{ steps.compiler.outputs.toolchain }}-${{ hashFiles('platforms/tauri/src-tauri/Cargo.lock', 'Package.resolved', 'platforms/desktop/**/packages.lock.json') }}-
+            swift-v1-${{ runner.arch }}-${{ steps.compiler.outputs.toolchain }}-${{ hashFiles('Package.resolved') }}-
       - run: npm ci
       - run: npm run build
-      - run: python3 ../../script/test_tauri_migration_update.py
       - name: Native backend regression checks
         if: runner.os != 'macOS'
         run: |
@@ -146,21 +157,19 @@ jobs:
       - name: Swift backend regression checks
         if: runner.os == 'macOS'
         run: swift test --package-path ../..
-      - name: Add Intel Mac target
-        if: runner.os == 'macOS'
-        run: rustup target add x86_64-apple-darwin --toolchain 1.90.0
       - name: Build native helper
         env:
           TOKENPLAN_UNIVERSAL: ${{ runner.os == 'macOS' && 'true' || 'false' }}
         run: npm run prepare:bridge
-      - name: Build and test Tauri shell
-        env:
-          TOKENPLAN_NATIVE_TRAY_REVIEW: tray-native-review.png
+      - name: Build Tauri shell
         run: |
           # Restage fresh helper resources even after restoring build-script outputs.
           python3 -c "from pathlib import Path; Path('src-tauri/build.rs').touch()"
           cargo build --locked --manifest-path src-tauri/Cargo.toml
-          cargo test --locked --manifest-path src-tauri/Cargo.toml
+      - name: Test Tauri shell
+        env:
+          TOKENPLAN_NATIVE_TRAY_REVIEW: tray-native-review.png
+        run: cargo test --locked --manifest-path src-tauri/Cargo.toml
       - name: Native helper protocol smoke test
         shell: bash
         run: |
@@ -169,19 +178,12 @@ jobs:
           else
             node scripts/smoke-bridge.mjs src-tauri/target/debug/tokenplan-bridge
           fi
-      - name: Save reusable main cache before signing
-        if: github.ref == 'refs/heads/main' && steps.native-cache.outputs.cache-hit != 'true'
+      - name: Save reusable Swift cache before signing
+        if: runner.os == 'macOS' && github.ref == 'refs/heads/main' && steps.swift-cache.outputs.cache-hit != 'true'
         uses: actions/cache/save@v4
         with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            ~/.nuget/packages
-            .build
-            platforms/tauri/src-tauri/target/debug/deps
-            platforms/tauri/src-tauri/target/debug/build
-            platforms/tauri/src-tauri/target/debug/.fingerprint
-          key: ${{ steps.native-cache.outputs.cache-primary-key }}
+          path: .build
+          key: ${{ steps.swift-cache.outputs.cache-primary-key }}
       - uses: apple-actions/import-codesign-certs@v7
         if: runner.os == 'macOS' && !inputs.checks_only
         with:
