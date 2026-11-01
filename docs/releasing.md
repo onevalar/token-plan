@@ -38,6 +38,9 @@ NSIS installer are for first installs, see `docs/desktop-clients.md#installers`.
   signing. Restoring a cache never skips tests. Installers, signing credentials and update manifests are not cached.
   Avoid per-commit multi-gigabyte caches and browser caches: their upload/restore costs and eviction pressure can outweigh downloading.
 - UI regression and native building/packaging run in separate jobs. Publishing still waits for both jobs on all three systems.
+  Swift backend tests also run independently of Mac helper/shell building; neither cache hits nor a successful build skip those tests.
+  The test job only reads the Swift cache, so it cannot race the helper job to save a partial cache. Swift still recompiles substantial
+  code after restoring `.build`; treat this as partial reuse, not a guarantee of a no-op build.
   Each OS runs four UI shards of individual isolated cases, serial within each shard; large files cannot monopolize a runner.
   Frontend unit/script checks still run once on each actual OS, not once per shard;
   platform-independent migration metadata and CI policy checks run once on Ubuntu. Failed UI checks block publication even if an installer

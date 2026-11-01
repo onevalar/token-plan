@@ -90,6 +90,29 @@ jobs:
           retention-days: 7
           if-no-files-found: warn
 
+  swift-tests:
+    if: inputs.platforms != 'linux' && inputs.platforms != 'windows-linux'
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.source_ref || github.sha }}
+          persist-credentials: false
+      - name: Identify Swift compiler cache
+        id: compiler
+        run: python3 script/ci/compiler_cache_key.py
+      # Read-only: the helper build is the sole writer, so parallel jobs cannot
+      # race to save an incomplete .build tree under the same immutable key.
+      - name: Restore Swift build cache
+        uses: actions/cache/restore@v4
+        with:
+          path: .build
+          key: swift-v1-${{ runner.arch }}-${{ steps.compiler.outputs.toolchain }}-${{ hashFiles('Package.resolved') }}-${{ hashFiles('Package.swift', 'Sources/**', 'Tests/**') }}
+          restore-keys: |
+            swift-v1-${{ runner.arch }}-${{ steps.compiler.outputs.toolchain }}-${{ hashFiles('Package.resolved') }}-
+      - name: Swift backend regression checks
+        run: swift test
+
   build:
     strategy:
       fail-fast: false
@@ -154,9 +177,6 @@ jobs:
         run: |
           dotnet run --project ../desktop/TokenPlan.Core.Tests -c Release
           dotnet run --project ../desktop/TokenPlan.Bridge.Tests -c Release
-      - name: Swift backend regression checks
-        if: runner.os == 'macOS'
-        run: swift test --package-path ../..
       - name: Build native helper
         env:
           TOKENPLAN_UNIVERSAL: ${{ runner.os == 'macOS' && 'true' || 'false' }}
