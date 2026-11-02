@@ -609,6 +609,7 @@
 "Manage" = "管理";
 "Manage Providers" = "プロバイダーの管理";
 "Manage services, logins and metrics" = "サービス、ログイン、表示項目の管理";
+"Medium" = "中";
 "Menu Bar" = "メニューバー";
 "Menu Bar Preview" = "メニューバープレビュー";
 "Menu Bar Services" = "メニューバーのサービス";
@@ -771,7 +772,6 @@
 "Paired Comparison" = "ペア比較";
 "Paired Dots" = "ペアドット";
 "Paired source comparisons. Arrow keys browse; Enter or Space opens details." = "ソースのペア比較。矢印キーで移動し、Enterキーまたはスペースキーで詳細を開きます。";
-"Panel Appearance" = "パネルの外観";
 "Panel Style" = "パネルのスタイル";
 "Parallel Cycle" = "並列サイクル";
 "Parallel Trends" = "並列トレンド";
@@ -1168,6 +1168,7 @@
 "Total usage limit missing from API response." = "API の応答に合計使用量の上限がありません。";
 "Track your AI subscriptions and API balances from your menu bar or system tray." = "AI サブスクリプションと API 残高を、メニューバーやシステムトレイから確認できます。";
 "Transparency" = "透明度";
+"Transparency is turned off in system settings, so the panel stays solid." = "システム設定で透明効果がオフのため、パネルは不透明のままです。";
 "Tray Style" = "トレイの表示";
 "Trend Vertical Scale" = "トレンドの縦軸スケール";
 "Try Again" = "再試行";

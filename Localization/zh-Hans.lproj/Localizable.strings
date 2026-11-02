@@ -609,6 +609,7 @@
 "Manage" = "管理";
 "Manage Providers" = "管理提供方";
 "Manage services, logins and metrics" = "管理服务、登录来源和显示指标";
+"Medium" = "中";
 "Menu Bar" = "菜单栏";
 "Menu Bar Preview" = "菜单栏预览";
 "Menu Bar Services" = "菜单栏服务";
@@ -771,7 +772,6 @@
 "Paired Comparison" = "成对比较";
 "Paired Dots" = "配对圆点";
 "Paired source comparisons. Arrow keys browse; Enter or Space opens details." = "来源成对比较。用方向键浏览；按 Enter 或空格键查看详情。";
-"Panel Appearance" = "面板外观";
 "Panel Style" = "面板样式";
 "Parallel Cycle" = "并行周期";
 "Parallel Trends" = "并列走势";
@@ -1168,6 +1168,7 @@
 "Total usage limit missing from API response." = "API 响应中缺少总用量上限。";
 "Track your AI subscriptions and API balances from your menu bar or system tray." = "在菜单栏或系统托盘中追踪你的 AI 订阅额度和 API 余额。";
 "Transparency" = "透明度";
+"Transparency is turned off in system settings, so the panel stays solid." = "系统设置中已关闭透明效果，面板保持不透明。";
 "Tray Style" = "托盘样式";
 "Trend Vertical Scale" = "走势纵轴刻度";
 "Try Again" = "重试";

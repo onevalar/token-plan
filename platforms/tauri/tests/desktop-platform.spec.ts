@@ -65,3 +65,29 @@ test('native Show Home returns from settings to Home',async({page})=>{
  await expect(page.getByRole('heading',{level:1})).toHaveText('TokenPlan');
  await expect(visible(page).locator('.dashboard')).toBeVisible();
 });
+
+for(const reduced of [false,true])test(`panel style sits under Appearance and follows the system transparency setting${reduced?' (reduced)':''}`,async({page},info)=>{
+ const platform=String(info.project.metadata.platform??'macos');
+ if(reduced)await page.addInitScript(()=>{const original=window.matchMedia.bind(window);window.matchMedia=query=>query.includes('reduced-transparency')?{...original(query),matches:true,media:query,addEventListener(){},removeEventListener(){}} as MediaQueryList:original(query);});
+ await mockDesktop(page);await page.goto('/');await settings(page);
+ const style=page.getByRole('combobox',{name:'面板样式',exact:true}),slider=page.getByRole('slider',{name:'透明度',exact:true});
+ if(platform==='linux'){await expect(style).toHaveCount(0);await expect(slider).toHaveCount(0);return;}
+ const group=visible(page).locator('.preference-group').filter({has:page.getByRole('heading',{name:'外观与语言',exact:true})});
+ await expect(group.getByRole('combobox',{name:'面板样式',exact:true})).toBeVisible();
+ await expect(slider).toHaveAttribute('aria-valuetext','中');
+ await expect(slider).toHaveAttribute('aria-valuemin','20');
+ await expect(group.getByText('系统设置中已关闭透明效果，面板保持不透明。',{exact:true})).toHaveCount(reduced?1:0);
+ await expect(page.locator('html')).toHaveAttribute('data-panel',reduced?'solid':'glass');
+ const effects=()=>page.evaluate(()=>(window as any).__windowEffects??[]);
+ if(reduced){
+  await expect(style).toBeDisabled();await expect(slider).toHaveAttribute('aria-disabled','true');
+  if(platform==='windows')await expect.poll(effects).toEqual([null]);
+  return;
+ }
+ if(platform==='windows')await expect.poll(effects).toEqual([{effects:['acrylic']}]);
+ await style.click();await page.getByRole('option',{name:'纯色',exact:true}).click();
+ await expect(page.locator('html')).toHaveAttribute('data-panel','solid');
+ await expect(slider).toHaveCount(0);
+ // Only Windows turns its native material off; macOS keeps vibrancy under the opaque page.
+ await expect.poll(effects).toEqual(platform==='windows'?[{effects:['acrylic']},null]:[]);
+});

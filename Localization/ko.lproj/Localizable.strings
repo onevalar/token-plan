@@ -609,6 +609,7 @@
 "Manage" = "관리";
 "Manage Providers" = "제공업체 관리";
 "Manage services, logins and metrics" = "서비스, 로그인 및 지표 관리";
+"Medium" = "중간";
 "Menu Bar" = "메뉴 막대";
 "Menu Bar Preview" = "메뉴 막대 미리 보기";
 "Menu Bar Services" = "메뉴 막대 서비스";
@@ -771,7 +772,6 @@
 "Paired Comparison" = "쌍별 비교";
 "Paired Dots" = "짝지은 점";
 "Paired source comparisons. Arrow keys browse; Enter or Space opens details." = "소스별 쌍 비교. 방향키로 탐색하고 Enter 또는 스페이스 키로 상세 정보를 엽니다.";
-"Panel Appearance" = "패널 모양";
 "Panel Style" = "패널 스타일";
 "Parallel Cycle" = "나란한 주기";
 "Parallel Trends" = "나란한 추이";
@@ -1168,6 +1168,7 @@
 "Total usage limit missing from API response." = "API 응답에 총 사용량 한도가 없습니다.";
 "Track your AI subscriptions and API balances from your menu bar or system tray." = "메뉴 막대나 시스템 트레이에서 AI 구독 한도와 API 잔액을 확인하세요.";
 "Transparency" = "투명도";
+"Transparency is turned off in system settings, so the panel stays solid." = "시스템 설정에서 투명 효과가 꺼져 있어 패널이 불투명하게 유지됩니다.";
 "Tray Style" = "트레이 스타일";
 "Trend Vertical Scale" = "추이 세로축 눈금";
 "Try Again" = "다시 시도";

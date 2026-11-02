@@ -9,9 +9,11 @@ export async function mockDesktop(page:Page,language='zh-Hans',cloud=false,data:
   (window as any).__emitTauriEvent=(event:string,payload:unknown)=>events.get(event)?.forEach(id=>callbacks.get(id)?.({event,id,payload}));
   Object.defineProperty(window,'__TAURI_EVENT_PLUGIN_INTERNALS__',{value:{unregisterListener:()=>{}}});
   Object.defineProperty(window,'__TAURI_INTERNALS__',{value:{
+   metadata:{currentWindow:{label:'main'},currentWebview:{windowLabel:'main',label:'main'}},
    transformCallback:(fn:unknown)=>{callbacks.set(++sequence,fn);return sequence;},
    unregisterCallback:(id:number)=>callbacks.delete(id),
    invoke:async(command:string,args:any)=>{
+    if(command==='plugin:window|set_effects'){((window as any).__windowEffects??=[]).push(args.value);return;}
     if(command==='panel_content_height'){((window as any).__panelHeights??=[]).push(args.height);return;}
     if(command==='account_setups')return JSON.parse(localStorage.getItem('fixture.setups')??'[]');
     if(command==='account_setup_create'){

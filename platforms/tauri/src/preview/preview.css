@@ -275,8 +275,12 @@
  --text-muted:color-mix(in srgb,var(--foreground) var(--glass-muted),transparent);
  --border:color-mix(in srgb,var(--foreground) 10%,transparent);--border-subtle:color-mix(in srgb,var(--foreground) 7%,transparent);--border-strong:color-mix(in srgb,var(--foreground) 18%,transparent);
  --surface:rgb(255 255 255 / .5);--surface-raised:rgb(255 255 255 / .6);--background:rgb(255 255 255 / .75);--surface-muted:rgb(255 255 255 / .38);
- --control-track:rgb(0 0 0 / .1);--control-track-hover:rgb(0 0 0 / .14);--shadow-resting:0 1px 2px rgb(0 0 0 / .05); }
+ --control-track:rgb(0 0 0 / .1);--control-track-hover:rgb(0 0 0 / .14);--shadow-resting:0 1px 2px rgb(0 0 0 / .05);
+ --success:var(--glass-success-light);--warning:var(--glass-warning-light);--danger:var(--glass-danger-light);--usage-normal:var(--glass-usage-light); }
 :root[data-panel="glass"][data-theme="dark"] .mac-preview {
  --surface:rgb(255 255 255 / .07);--surface-raised:rgb(255 255 255 / .09);--background:rgb(255 255 255 / .12);--surface-muted:rgb(255 255 255 / .06);
- --control-track:rgb(255 255 255 / .16);--control-track-hover:rgb(255 255 255 / .2);--shadow-resting:none; }
+ --control-track:rgb(255 255 255 / .16);--control-track-hover:rgb(255 255 255 / .2);--shadow-resting:none;
+ --success:var(--glass-success-dark);--warning:var(--glass-warning-dark);--danger:var(--glass-danger-dark);--usage-normal:var(--glass-usage-dark); }
+/* The danger color already meets its contrast target on glass; mixing it with the translucent background would undo that. */
+:root[data-panel="glass"] .mac-preview .metric[data-tone="critical"] .value { color:var(--danger); }
 :root[data-panel="glass"] .mac-preview .preview-header { background:transparent;border-bottom-color:var(--border-subtle);-webkit-backdrop-filter:blur(20px) saturate(1.5);backdrop-filter:blur(20px) saturate(1.5); }
