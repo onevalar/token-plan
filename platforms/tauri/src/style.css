@@ -8,7 +8,11 @@ body { margin:0; background:transparent; color:var(--foreground); font:400 var(-
    where the platform supports it; the scrollbar only appears while hovering. */
 #root { height:100%;overflow:hidden auto;scrollbar-gutter:stable both-edges;background:var(--background); }
 :root[data-rounded="true"] #root { border-radius:13px;border:1px solid var(--border-subtle); }
-:root[data-platform="macos"][data-rounded="true"] #root { background:color-mix(in oklab,var(--background) 84%,transparent); }
+/* Frosted glass: the window's native blur (macOS vibrancy, Windows acrylic) shows through a
+   partial tint. panelSurface.ts sets the tint and the legibility-safe text opacities. */
+:root[data-panel="glass"] { --panel-tint:var(--panel-tint-light);--glass-secondary:var(--glass-secondary-light);--glass-muted:var(--glass-muted-light); }
+:root[data-panel="glass"][data-theme="dark"] { --panel-tint:var(--panel-tint-dark);--glass-secondary:var(--glass-secondary-dark);--glass-muted:var(--glass-muted-dark); }
+:root[data-panel="glass"] #root { background:color-mix(in srgb,var(--background) var(--panel-tint),transparent); }
 :root[data-platform="macos"][data-rounded="true"] .app-header { background:transparent;backdrop-filter:blur(24px); }
 #root::-webkit-scrollbar { width:10px;background:transparent; }
 #root::-webkit-scrollbar-track { background:transparent; }

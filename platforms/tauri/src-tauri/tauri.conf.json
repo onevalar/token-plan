@@ -27,7 +27,8 @@
         "transparent": true,
         "windowEffects": {
           "effects": [
-            "popover"
+            "popover",
+            "acrylic"
           ],
           "state": "active",
           "radius": 13

@@ -94,3 +94,7 @@ licenses**. Copyright (c) 2026 Elia Kuratli. The applicable Arc Pro terms are in
 The license permits embedding Pro source in a public open-source end product,
 not distributing it as a standalone component, library, registry, kit or template.
 Retain the notices and license exception in source and bundled licenses.
+
+Slider was retrieved on 2026-11-02 from the free registry:
+https://uiarc.dev/r/slider.json. It is used unchanged for the panel's Transparency
+setting. The existing MIT license applies.

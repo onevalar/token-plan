@@ -7,20 +7,26 @@ import type {Density,useDensity} from './useDensity';
 import type {useHomeUsageStyle} from './useHomeUsageStyle';
 import {UsageStylePicker} from './UsageStylePicker';
 import {MenuBarSettings} from './MenuBarSettings';
+import {Slider} from '../components/arc/slider/slider';
+import type {PanelStyle,usePanelSurface} from './panelSurface';
 
 /** Settings that apply to the whole app. Anything that belongs to one account lives in that account's settings. */
-export function GeneralSettings({state,send,t,busy,language,now,densityPreference,usageStylePreference,platform,openAccounts}:{platform:string;densityPreference:ReturnType<typeof useDensity>;usageStylePreference:ReturnType<typeof useHomeUsageStyle>;state:DesktopState;send:Send;t:Copy;busy:boolean;language:string;now:number;openAccounts:()=>void}) {
+export function GeneralSettings({state,send,t,busy,language,now,densityPreference,usageStylePreference,panelSurface,platform,openAccounts}:{platform:string;panelSurface:ReturnType<typeof usePanelSurface>;densityPreference:ReturnType<typeof useDensity>;usageStylePreference:ReturnType<typeof useHomeUsageStyle>;state:DesktopState;send:Send;t:Copy;busy:boolean;language:string;now:number;openAccounts:()=>void}) {
  const tr=(s:string)=>providerText(s,language),{pending,change,notice}=useChange(send,t),disabled=busy||pending;
  const settings=(value:unknown)=>void change({method:'settings',value});
 
  return <div className="general-preferences">
   {notice}
-  {densityPreference.failed&&<p role="alert" className="inline-error">{t.failed}</p>}
+  {(densityPreference.failed||panelSurface.failed)&&<p role="alert" className="inline-error">{t.failed}</p>}
   {usageStylePreference.error&&<p role="alert" className="inline-error">{tr(usageStylePreference.error)}</p>}
   <Group title={tr('Appearance and Language')}>
    <SelectRow label={t.appearance} value={state.settings.appearance} disabled={disabled} options={['system','light','dark'].map(value=>({value,label:t[value as 'system']}))} onValueChange={appearance=>settings({appearance})}/>
    <SelectRow label={t.language} value={state.settings.language} disabled={disabled} options={[{value:'system',label:t.system},{value:'en',label:'English'},{value:'zh-Hans',label:'简体中文'},{value:'zh-Hant',label:'繁體中文'},{value:'ja',label:'日本語'},{value:'ko',label:'한국어'}]} onValueChange={language=>settings({language})}/>
   </Group>
+  {panelSurface.material&&<Group title={tr('Panel Appearance')} description={panelSurface.surface.style==='glass'?tr('Text contrast adjusts automatically so it stays readable over any background.'):undefined}>
+   <SelectRow label={tr('Panel Style')} value={panelSurface.surface.style} options={[{value:'glass',label:tr(panelSurface.material)},{value:'solid',label:tr('Solid')}]} onValueChange={style=>panelSurface.change({style:style as PanelStyle})}/>
+   {panelSurface.surface.style==='glass'&&<div className="setting-slider"><Slider label={tr('Transparency')} value={panelSurface.surface.transparency} onValueChange={transparency=>panelSurface.change({transparency})} step={5} format={value=>`${value}%`}/></div>}
+  </Group>}
   <Group title={tr('Usage Style')}>
    <SelectRow label={tr('Apply Style')} value={usageStylePreference.mode} options={[{value:'uniform',label:tr('Unified Style')},{value:'custom',label:tr('Per Subscription')}]} onValueChange={value=>usageStylePreference.changeMode(value as 'uniform'|'custom')}/>
    {usageStylePreference.mode==='uniform'?<UsageStylePicker language={language} remaining={state.settings.showRemaining} value={usageStylePreference.style} onChange={usageStylePreference.changeStyle} tr={tr}/>:<p className="group-description">{tr("Set a subscription's usage style in its details via Edit Home Display.")}</p>}

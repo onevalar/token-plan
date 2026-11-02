@@ -95,6 +95,7 @@
 "Accounts already signed in on this Mac appear here automatically." = "この Mac でサインイン済みのアカウントは、自動的にここに表示されます。";
 "Accounts follow the order in Service Configuration." = "アカウントはサービス設定と同じ順序で表示されます。";
 "Accounts in the Menu Bar" = "メニューバーに表示するアカウント";
+"Acrylic" = "アクリル";
 "Active Days" = "利用日数";
 "Activity" = "アクティビティ";
 "Activity Calendar" = "アクティビティカレンダー";
@@ -480,6 +481,7 @@
 "From your Cursor usage history." = "Cursor の使用履歴から取得しています。";
 "From your Grok logs (estimated)" = "Grok のログから（推定）";
 "From your OpenCode logs" = "OpenCode のログから";
+"Frosted Glass" = "すりガラス";
 "Full-Width Card" = "全幅カード";
 "Gaps break the line. Later points add only known values; no zero filling or forecasts." = "欠落部分で線を切ります。その後の点には判明している値のみを加算し、ゼロ補完や予測は行いません。";
 "Gauges" = "個別メーター";
@@ -769,6 +771,8 @@
 "Paired Comparison" = "ペア比較";
 "Paired Dots" = "ペアドット";
 "Paired source comparisons. Arrow keys browse; Enter or Space opens details." = "ソースのペア比較。矢印キーで移動し、Enterキーまたはスペースキーで詳細を開きます。";
+"Panel Appearance" = "パネルの外観";
+"Panel Style" = "パネルのスタイル";
 "Parallel Cycle" = "並列サイクル";
 "Parallel Trends" = "並列トレンド";
 "Partial" = "一部のみ";
@@ -1082,6 +1086,7 @@
 "Terminal Helper" = "ターミナルヘルパー";
 "Terminal login and history are kept." = "ターミナルのログインと履歴は保持されます。";
 "TestFlight requires folder authorization to read existing service logins and usage history. API keys can be entered directly in service settings." = "TestFlight 版では既存のログインと使用履歴を読むためフォルダの許可が必要です。API キーはサービス設定に直接入力できます。";
+"Text contrast adjusts automatically so it stays readable over any background." = "文字のコントラストは自動で調整され、どんな背景でも読みやすく保たれます。";
 "Texture Color" = "テクスチャの色";
 "Texture Type" = "テクスチャの種類";
 "Textured Bar" = "テクスチャバー";
@@ -1162,6 +1167,7 @@
 "Total usage" = "合計使用量";
 "Total usage limit missing from API response." = "API の応答に合計使用量の上限がありません。";
 "Track your AI subscriptions and API balances from your menu bar or system tray." = "AI サブスクリプションと API 残高を、メニューバーやシステムトレイから確認できます。";
+"Transparency" = "透明度";
 "Tray Style" = "トレイの表示";
 "Trend Vertical Scale" = "トレンドの縦軸スケール";
 "Try Again" = "再試行";

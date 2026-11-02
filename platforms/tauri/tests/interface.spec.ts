@@ -10,6 +10,8 @@ for(const remaining of [false,true])test(`quota emphasis follows real usage, rem
  data.accounts[2].metrics=[{...base,percent:remaining?20:80}];
  data.accounts[2].email='personal@example.com';
  data.accounts=data.accounts.slice(0,3);
+ // Contrast is measured against the panel color, so use the opaque style; frosted legibility is covered in panelSurface.test.ts.
+ await page.addInitScript(()=>localStorage.setItem('tokenplan.panelSurface',JSON.stringify({style:'solid',transparency:60})));
  await mockDesktop(page,'zh-Hans',false,data);await page.goto('/');
  await page.setViewportSize({width:390,height:720});
  const rows=page.locator('.dashboard .metric'),values=rows.locator('.value');

@@ -145,3 +145,4 @@
 .mac-preview .usage-live-preview .metric[data-tone="critical"] .value { color:var(--danger); }
 .mac-preview .usage-live-preview .metric progress { background:var(--border-strong); }
 .mac-preview .usage-live-preview .metric progress::-webkit-progress-bar { background:var(--border-strong); }
+.mac-preview .setting-slider { padding:10px 0 12px; }

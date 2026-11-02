@@ -95,6 +95,7 @@
 "Accounts already signed in on this Mac appear here automatically." = "이 Mac에 로그인된 계정은 자동으로 여기에 표시됩니다.";
 "Accounts follow the order in Service Configuration." = "계정은 서비스 설정과 같은 순서로 표시됩니다.";
 "Accounts in the Menu Bar" = "메뉴 막대에 표시할 계정";
+"Acrylic" = "아크릴";
 "Active Days" = "사용한 일수";
 "Activity" = "활동";
 "Activity Calendar" = "활동 달력";
@@ -480,6 +481,7 @@
 "From your Cursor usage history." = "Cursor 사용 기록에서 가져왔습니다.";
 "From your Grok logs (estimated)" = "Grok 로그에서 (추정)";
 "From your OpenCode logs" = "OpenCode 로그에서";
+"Frosted Glass" = "반투명 유리";
 "Full-Width Card" = "전체 너비 카드";
 "Gaps break the line. Later points add only known values; no zero filling or forecasts." = "누락 구간에서는 선을 끊습니다. 이후 점은 확인된 값만 더하며, 0으로 채우거나 예측하지 않습니다.";
 "Gauges" = "개별 게이지";
@@ -769,6 +771,8 @@
 "Paired Comparison" = "쌍별 비교";
 "Paired Dots" = "짝지은 점";
 "Paired source comparisons. Arrow keys browse; Enter or Space opens details." = "소스별 쌍 비교. 방향키로 탐색하고 Enter 또는 스페이스 키로 상세 정보를 엽니다.";
+"Panel Appearance" = "패널 모양";
+"Panel Style" = "패널 스타일";
 "Parallel Cycle" = "나란한 주기";
 "Parallel Trends" = "나란한 추이";
 "Partial" = "일부";
@@ -1082,6 +1086,7 @@
 "Terminal Helper" = "터미널 도우미";
 "Terminal login and history are kept." = "터미널 로그인과 기록은 유지됩니다.";
 "TestFlight requires folder authorization to read existing service logins and usage history. API keys can be entered directly in service settings." = "TestFlight 버전은 기존 로그인 및 사용 기록을 읽으려면 폴더 권한이 필요합니다. API 키는 서비스 설정에 직접 입력할 수 있습니다.";
+"Text contrast adjusts automatically so it stays readable over any background." = "글자 대비가 자동으로 조정되어 어떤 배경에서도 잘 읽힙니다.";
 "Texture Color" = "질감 색상";
 "Texture Type" = "질감 종류";
 "Textured Bar" = "질감 막대";
@@ -1162,6 +1167,7 @@
 "Total usage" = "총 사용량";
 "Total usage limit missing from API response." = "API 응답에 총 사용량 한도가 없습니다.";
 "Track your AI subscriptions and API balances from your menu bar or system tray." = "메뉴 막대나 시스템 트레이에서 AI 구독 한도와 API 잔액을 확인하세요.";
+"Transparency" = "투명도";
 "Tray Style" = "트레이 스타일";
 "Trend Vertical Scale" = "추이 세로축 눈금";
 "Try Again" = "다시 시도";

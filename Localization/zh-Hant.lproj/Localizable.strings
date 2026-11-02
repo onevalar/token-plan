@@ -95,6 +95,7 @@
 "Accounts already signed in on this Mac appear here automatically." = "這台 Mac 上已登入的帳號會自動顯示在這裡。";
 "Accounts follow the order in Service Configuration." = "帳號順序與服務設定保持一致。";
 "Accounts in the Menu Bar" = "顯示在選單列的帳號";
+"Acrylic" = "壓克力";
 "Active Days" = "活躍天數";
 "Activity" = "活動";
 "Activity Calendar" = "活動熱力日曆";
@@ -480,6 +481,7 @@
 "From your Cursor usage history." = "來自你的 Cursor 用量記錄。";
 "From your Grok logs (estimated)" = "來自你的 Grok 記錄檔（估算）";
 "From your OpenCode logs" = "來自你的 OpenCode 記錄檔";
+"Frosted Glass" = "毛玻璃";
 "Full-Width Card" = "全幅卡片";
 "Gaps break the line. Later points add only known values; no zero filling or forecasts." = "缺失處斷開連線。後續資料點只累加已知數值；不以零填補，也不預測。";
 "Gauges" = "獨立儀表";
@@ -769,6 +771,8 @@
 "Paired Comparison" = "成對比較";
 "Paired Dots" = "配對圓點";
 "Paired source comparisons. Arrow keys browse; Enter or Space opens details." = "來源成對比較。用方向鍵瀏覽；按 Enter 或空白鍵查看詳情。";
+"Panel Appearance" = "面板外觀";
+"Panel Style" = "面板樣式";
 "Parallel Cycle" = "並行週期";
 "Parallel Trends" = "並列走勢";
 "Partial" = "部分";
@@ -1082,6 +1086,7 @@
 "Terminal Helper" = "終端機輔助工具";
 "Terminal login and history are kept." = "終端機登入與歷史記錄會保留。";
 "TestFlight requires folder authorization to read existing service logins and usage history. API keys can be entered directly in service settings." = "TestFlight 版需授權資料夾後才能讀取現有服務登入和用量記錄。API Key 可直接在服務設定中填寫。";
+"Text contrast adjusts automatically so it stays readable over any background." = "文字對比度會自動調整，任何背景下都清晰可讀。";
 "Texture Color" = "底紋顏色";
 "Texture Type" = "底紋類別";
 "Textured Bar" = "底紋橫條";
@@ -1162,6 +1167,7 @@
 "Total usage" = "總用量";
 "Total usage limit missing from API response." = "API 回應中缺少總用量上限。";
 "Track your AI subscriptions and API balances from your menu bar or system tray." = "在選單列或系統匣中追蹤你的 AI 訂閱額度與 API 餘額。";
+"Transparency" = "透明度";
 "Tray Style" = "系統匣樣式";
 "Trend Vertical Scale" = "走勢縱軸刻度";
 "Try Again" = "重試";

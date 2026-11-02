@@ -112,7 +112,15 @@ tray integration remain platform-specific. This change does not publish a releas
   permission first). Both can be dismissed; the choice is kept per device in the webview's own storage and never in preferences.
 - About shows only the product icon, name, version and the no-analytics/no-crash-report statement.
   Project links and attribution text are removed from this page; packaged license files remain unchanged.
-- Each setting has one home. General Settings groups, in order: Appearance and Language, Usage Style, Home (density, used/remaining), Menu Bar (macOS), Data Refresh, then notifications and shortcuts. The Menu Bar group holds everything
+- **Panel Appearance** picks the panel's style; more styles can join the list later. The blur style uses each system's own
+  material and name: **Frosted Glass** on macOS (system vibrancy), **Acrylic** on Windows. It is the default; **Transparency**
+  sets how much shows through. Linux desktops offer no common window blur, so the group is not shown there until another style
+  exists. In the blur style every surface (cards, buttons, selects, segmented controls, switches, tracks) becomes a translucent
+  layer, so nothing sits on the glass as an opaque patch; menus and dialogs stay opaque. The panel cannot see what is behind it,
+  so it picks text strength by itself: secondary text and lines are semi-transparent (taking on the background's color) and get
+  darker as transparency rises, staying readable (WCAG AA) even over a pure black or white backdrop; the highest transparency
+  stops where that would no longer hold. With the system's Reduce Transparency setting on, the panel is solid. Kept per device.
+- Each setting has one home. General Settings groups, in order: Appearance and Language, Panel Appearance, Usage Style, Home (density, used/remaining), Menu Bar (macOS), Data Refresh, then notifications and shortcuts. The Menu Bar group holds everything
   about the menu bar: a live preview at the top, style and icon position, and every shown account with its switch; a switched-on
   account lists its metrics with plus/minus controls to add or remove up to three for the menu bar. Hints about three rings or value-only metrics appear
   only when they apply. Order comes from Subscription Management, linked with Adjust Order.
