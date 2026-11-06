@@ -109,10 +109,14 @@ test('service heading stays visible while scrolling accounts without covering ke
  const headingBox=(await heading.boundingBox())!;
  expect(headingBox.y).toBeGreaterThanOrEqual(viewport.y);
  expect(headingBox.y+headingBox.height).toBeLessThan(viewport.y+60);
+ expect((await account.boundingBox())!.y).toBeLessThan(headingBox.y+headingBox.height);
  await account.focus();
+ // WebKit sets focus before its deferred reveal scroll. Wait for the observable result, not a fixed delay.
+ await expect.poll(()=>account.evaluate(e=>{
+  const r=e.getBoundingClientRect(),header=e.closest('.provider')!.querySelector('.family-heading')!.getBoundingClientRect();
+  return {belowHeading:r.top>header.bottom,hit:e.contains(document.elementFromPoint(r.x+r.width/2,r.y+r.height/2))};
+ })).toEqual({belowHeading:true,hit:true});
  await expect(account).toBeFocused();
- expect((await account.boundingBox())!.y).toBeGreaterThan(headingBox.y+headingBox.height);
- expect(await account.evaluate(e=>{const r=e.getBoundingClientRect();return e.contains(document.elementFromPoint(r.x+r.width/2,r.y+r.height/2));})).toBe(true);
  await page.keyboard.press('Enter');
  await expect(page.getByRole('heading',{level:1})).toHaveText('Claude');
 });
