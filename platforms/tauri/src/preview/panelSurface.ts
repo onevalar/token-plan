@@ -56,7 +56,8 @@ export function glassColors(theme:Theme,transparency:number) {
  const opacity=(target:number)=>{for(let o=0;o<=100;o++)if(ratio(luminance(o/100*p.text+(1-o/100)*backdrop),back)>=target)return o;return 100;};
  const strongest=ratio(luminance(p.text),back);
  const status=Object.fromEntries((Object.keys(statusTarget) as StatusColor[]).map(name=>{
-  const at=(mix:number)=>p.status[name].map(c=>mix/100*p.text+(1-mix/100)*c) as Channels;
+  // Check the integer RGB channels emitted below; rounding after solving can miss the target.
+  const at=(mix:number)=>p.status[name].map(c=>Math.round((mix/100*p.text+(1-mix/100)*c)*255)/255) as Channels;
   let mix=0;while(mix<100&&ratio(relative(at(mix)),back)<statusTarget[name])mix++;
   return [name,{mix,color:at(mix)}];
  })) as Record<StatusColor,{mix:number;color:Channels}>;
@@ -72,17 +73,19 @@ function read():PanelSurface {
 const reducedQuery=()=>matchMedia('(prefers-reduced-transparency: reduce)');
 
 /** Local to this device, like Density. Applies the chosen surface to the panel. */
-export function usePanelSurface(platform:string) {
- const [surface,setSurface]=useState(read),[failed,setFailed]=useState(false),[reduced,setReduced]=useState(()=>reducedQuery().matches);
+export function usePanelSurface(platform:string,nativeReduceTransparency:boolean) {
+ const [surface,setSurface]=useState(read),[failed,setFailed]=useState(false),[mediaReduced,setMediaReduced]=useState(()=>reducedQuery().matches);
  const change=(patch:Partial<PanelSurface>)=>{
   const next={...surface,...patch};setSurface(next);
   try {localStorage.setItem(key,JSON.stringify(next));setFailed(false);} catch {setFailed(true);}
  };
  useEffect(()=>{
-  const query=reducedQuery(),update=()=>setReduced(query.matches);
+  const query=reducedQuery(),update=()=>setMediaReduced(query.matches);
   update();query.addEventListener('change',update);
   return()=>query.removeEventListener('change',update);
  },[]);
+ // WKWebView does not implement this media query; macOS supplies the live NSWorkspace value.
+ const reduced=platform==='macos'?nativeReduceTransparency:mediaReduced;
  const glass=surface.style==='glass'&&glassSupported(platform)&&!reduced;
  useEffect(()=>{
   const root=document.documentElement;

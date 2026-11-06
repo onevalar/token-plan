@@ -331,7 +331,8 @@ export function Slider<T extends SliderValue = number>({ label, value, defaultVa
   }
 
   function onKeyDown(index: number, event: KeyboardEvent<HTMLDivElement>) {
-    if (disabled) return;
+    // Leave application and browser shortcuts alone; Shift still selects the larger step below.
+    if (disabled || event.altKey || event.metaKey || event.ctrlKey) return;
     const current = latest.current, now = current[index]!;
     const large = largeStep ?? Math.max(step, snap(min + span / 10) - min);
     const moves: Record<string, number> = { ArrowRight: step, ArrowUp: step, ArrowLeft: -step, ArrowDown: -step, PageUp: large, PageDown: -large };

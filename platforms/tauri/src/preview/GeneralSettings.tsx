@@ -19,7 +19,7 @@ export function GeneralSettings({state,send,t,busy,language,now,densityPreferenc
   {notice}
   {(densityPreference.failed||panelSurface.failed)&&<p role="alert" className="inline-error">{t.failed}</p>}
   {usageStylePreference.error&&<p role="alert" className="inline-error">{tr(usageStylePreference.error)}</p>}
-  <Group title={tr('Appearance and Language')} description={!panelSurface.material||panelSurface.surface.style!=='glass'?undefined:panelSurface.reduced?tr('Transparency is turned off in system settings, so the panel stays solid.'):tr('Text contrast adjusts automatically so it stays readable over any background.')}>
+  <Group title={tr('Appearance and Language')} description={!panelSurface.material?undefined:panelSurface.reduced?tr('Transparency is turned off in system settings, so the panel stays solid.'):panelSurface.surface.style==='glass'?tr('Text contrast adjusts automatically so it stays readable over any background.'):undefined}>
    <SelectRow label={t.appearance} value={state.settings.appearance} disabled={disabled} options={['system','light','dark'].map(value=>({value,label:t[value as 'system']}))} onValueChange={appearance=>settings({appearance})}/>
    {panelSurface.material&&<>
     <SelectRow label={tr('Panel Style')} value={panelSurface.surface.style} disabled={panelSurface.reduced} options={[{value:'glass',label:tr(panelSurface.material)},{value:'solid',label:tr('Solid')}]} onValueChange={style=>panelSurface.change({style:style as PanelStyle})}/>

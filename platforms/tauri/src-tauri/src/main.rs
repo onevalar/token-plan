@@ -16,6 +16,8 @@ mod windows_tray;
 mod panel;
 #[cfg(any(target_os="macos",test))]
 mod mac_panel;
+#[cfg(target_os="macos")]
+mod mac_accessibility;
 #[cfg(target_os="linux")]
 mod linux_tray;
 #[cfg(any(target_os="linux",test))]
@@ -85,6 +87,7 @@ fn main() {
             {
                 app.set_activation_policy(tauri::ActivationPolicy::Accessory);
                 if let Some(window)=app.get_webview_window("main") {panel::make_menu_bar_panel(&window)?;}
+                mac_accessibility::observe(app.handle());
                 // The menu-bar panel starts closed. Otherwise the window counts as visible
                 // without being drawn, and the first menu-bar click only hides it.
                 panel::hide(app.handle());

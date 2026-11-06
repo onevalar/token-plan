@@ -1,45 +1,22 @@
-/* One surface per service, not per account or metric. Keep the reading stronger than its metadata. */
+/* Service grouping is structural, not another card surface over the panel material. */
 .mac-preview .preview-page[data-page="home"] { scroll-padding-top:calc(44px + var(--space-2)); }
-.mac-preview .dashboard { display:grid;gap:var(--space-3);padding-block:var(--space-3); }
 .mac-preview .dashboard .service-group {
- padding:var(--space-3);border:1px solid var(--border);border-radius:var(--radius-control);
- background:var(--surface);min-width:0;
+ padding-inline:0;border:0;border-bottom:1px solid var(--border);border-radius:0;
+ background:transparent;min-width:0;
 }
-.mac-preview .dashboard .service-group:last-child { border-bottom:1px solid var(--border); }
-.mac-preview .dashboard .family-heading { gap:var(--space-2);margin:0 0 var(--space-2);min-height:32px; }
-.mac-preview .dashboard .family-heading h2 { font-size:var(--text-base);font-weight:500; }
-.mac-preview .dashboard .provider-logo { width:24px;height:24px; }
-.mac-preview .dashboard .provider-heading { margin:0 0 var(--space-2); }
-.mac-preview .dashboard .identity-line { gap:var(--space-2); }
-.mac-preview .dashboard .identity-line h2 { font-size:var(--text-sm);font-weight:500; }
-.mac-preview .dashboard .provider[data-multiple="false"]:not(.openai-group .provider) .identity-line h2 { font-size:var(--text-base); }
-.mac-preview .dashboard .email,.mac-preview .dashboard .plan { color:var(--text-secondary); }
-.mac-preview .dashboard .email { margin-top:2px; }
-.mac-preview .dashboard .account-chevron { width:16px;color:var(--text-secondary); }
-.mac-preview .dashboard .account-block + .account-block {
- margin-top:var(--space-3);padding-top:var(--space-3);border-top:1px solid var(--border);
-}
-.mac-preview .dashboard .openai-group .provider { padding:0;border:0; }
-.mac-preview .dashboard .openai-group .provider + .provider { margin-top:var(--space-3);padding-top:var(--space-3);border-top:1px solid var(--border); }
-.mac-preview .dashboard .metric { min-height:32px;grid-template-columns:28px minmax(28px,1fr) 42px 76px;column-gap:var(--space-2); }
-.mac-preview .dashboard .text-metric { grid-template-columns:minmax(80px,1fr) minmax(0,auto); }
-.mac-preview .dashboard .metric-name,.mac-preview .dashboard .value,.mac-preview .dashboard .amount { font-size:var(--text-sm); }
-.mac-preview .dashboard .value,.mac-preview .dashboard .amount { color:var(--foreground);font-weight:500; }
-.mac-preview .dashboard .metric[data-tone="critical"] .value { color:color-mix(in oklab,var(--danger) 90%,var(--background)); }
-.mac-preview .dashboard .reset { color:var(--text-secondary); }
-.mac-preview .dashboard .metric-chart { margin-top:var(--space-1);font-size:var(--text-xs);color:var(--text-secondary); }
-.mac-preview .dashboard progress { height:6px; }
-.mac-preview[data-density="comfortable"] .dashboard .service-group { padding:var(--space-4); }
-.mac-preview[data-density="comfortable"] .dashboard .metric { min-height:36px; }
+.mac-preview .dashboard > .service-group:last-child,
+.mac-preview .dashboard > .dashboard-group:last-child > .service-group:last-child { border-bottom:0; }
+.mac-preview .dashboard .openai-group { padding-block:14px; }
+.mac-preview[data-density="compact"] .dashboard .openai-group { padding-block:10px; }
+.mac-preview .dashboard .openai-group .provider { border:0; }
+.mac-preview .dashboard .openai-group .provider + .provider { border-top:1px solid var(--border-subtle); }
+.mac-preview .dashboard .value,.mac-preview .dashboard .amount { font-weight:500; }
+.mac-preview .dashboard .metric:not([data-tone="critical"]) .value,.mac-preview .dashboard .amount { color:var(--foreground); }
 /* The service name remains in view while scrolling through its accounts and large usage styles. */
 .mac-preview .dashboard .service-group > .family-heading {
- position:sticky;top:0;z-index:2;margin:calc(-1 * var(--space-3)) calc(-1 * var(--space-3)) var(--space-2);
- padding:var(--space-2) var(--space-3);min-height:44px;border-bottom:1px solid var(--border);
- border-radius:var(--radius-control) var(--radius-control) 0 0;background:var(--surface-raised);
+ position:sticky;top:0;z-index:2;margin:0 0 var(--space-2);
+ padding:var(--space-2) 0;min-height:44px;background:var(--background);
 }
 :root[data-panel="glass"] .mac-preview .dashboard .service-group > .family-heading {
- -webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);
-}
-.mac-preview[data-density="comfortable"] .dashboard .service-group > .family-heading {
- margin:calc(-1 * var(--space-4)) calc(-1 * var(--space-4)) var(--space-2);padding-inline:var(--space-4);
+ background:transparent;-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);
 }

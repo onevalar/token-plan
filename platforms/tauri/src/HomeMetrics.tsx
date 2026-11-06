@@ -1,3 +1,4 @@
+import {useLayoutEffect,useRef,useState} from 'react';
 import {GaugeArc} from './components/arc/gauge/gauge';
 import {TickRing} from './components/arc/tick-ring/tick-ring';
 import {WaffleChart} from './components/arc/waffle-chart/waffle-chart';
@@ -32,12 +33,32 @@ function QuotaTile({metric:m,style,now,language,missing,remaining=false}:MetricR
   {style!=='gauges'&&<div className="quota-title">{name}</div>}
   <div className="quota-body">{value===null?<div className="quota-missing">{style==='gauges'&&<span>{name}</span>}<span aria-hidden="true">—</span><span>{missing}</span></div>:
    style==='ticks'?<div className="quota-ticks" {...quotaMeter(reading)}><TickRing value={value} valueText={valueText} tone={tone==='critical'?'danger':'accent'}/></div>:
-   style==='gauges'?<div className="quota-gauge" {...quotaMeter(reading)}><svg viewBox="0 0 100 94" aria-hidden="true"><GaugeArc value={value} tone={tone==='critical'?'danger':'accent'}/></svg><div className="quota-gauge-reading"><span>{name}</span><strong>{valueText}</strong></div></div>:
+   style==='gauges'?<QuotaGauge reading={reading}/>:
    <div className="quota-cells">{value>=0&&value<=100&&<div className="quota-grid"><WaffleChart label={`${label} · ${description}`} data={[
     {key:'reading',value,color:'var(--quota-color)'},{key:'rest',value:100-value,color:'var(--border-strong)'},
    ]}/></div>}<div className="quota-number"><strong>{valueText}</strong></div></div>
   }</div>
   {m.hasData?<MetricReset metric={m} now={now} missing={missing} language={language}/>:<span/>}
   <div className="quota-expiries"><MetricExpiries metric={m} language={language}/></div>
+ </div>;
+}
+
+function QuotaGauge({reading}:{reading:ReturnType<typeof quotaReading>}) {
+ const {name,value,valueText,tone}=reading,probe=useRef<HTMLDivElement>(null),[outside,setOutside]=useState(false);
+ useLayoutEffect(()=>{
+  const node=probe.current;if(!node)return;
+  const measure=()=>{if(node.clientWidth)setOutside(node.scrollHeight>node.clientHeight||node.scrollWidth>node.clientWidth);};
+  measure();const observer=new ResizeObserver(measure);observer.observe(node);
+  // Keep measuring the in-arc layout after moving the visible name, including font and width changes.
+  for(const child of node.children)observer.observe(child);
+  return()=>observer.disconnect();
+ },[name,valueText]);
+ return <div className="quota-gauge-tile">
+  {outside&&<div className="quota-title">{name}</div>}
+  <div className="quota-gauge" {...quotaMeter(reading)}>
+   <svg viewBox="0 0 100 94" aria-hidden="true"><GaugeArc value={value} tone={tone==='critical'?'danger':'accent'}/></svg>
+   <div className="quota-gauge-fit" ref={probe} aria-hidden="true"><span>{name}</span><strong>{valueText}</strong></div>
+   <div className="quota-gauge-reading">{!outside&&<span>{name}</span>}<strong>{valueText}</strong></div>
+  </div>
  </div>;
 }

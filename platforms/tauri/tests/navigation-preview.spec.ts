@@ -558,9 +558,9 @@ test('service accents adapt to light and dark while quota warnings keep priority
   await page.emulateMedia({colorScheme:mode});
   await expect(page.locator('html')).toHaveAttribute('data-theme',mode);
   const claude=page.locator('.dashboard section[data-provider="claude"]').first();
-  const codex=page.locator('.dashboard section[data-provider="codex"]').first();
+  const openai=page.getByRole('region',{name:'OpenAI',exact:true});
   const c=await claude.locator('.provider-logo').evaluate(e=>getComputedStyle(e).color);
-  const x=await codex.locator('.provider-logo').evaluate(e=>getComputedStyle(e).color);
+  const x=await openai.locator('.openai-heading .provider-logo').evaluate(e=>getComputedStyle(e).color);
   expect(c).not.toBe(x);
   expect(c).toBe(mode==='light'?'rgb(191, 86, 57)':'rgb(237, 153, 125)');
   const normal=await claude.locator('.metric[data-tone="normal"]').first().evaluate(e=>getComputedStyle(e).getPropertyValue('--meter-fill').trim());
@@ -782,7 +782,8 @@ test('hidden accounts survive a fresh UI load and an empty Home links to managem
 test('service-first addition handles failure, success and API-key setup with management as parent',async({page})=>{
  const data=largeDesktop();data.accounts.find(a=>a.family==='grok')!.apiKey=true;
  await setup(page,data);
- await visible(page).getByRole('button',{name:'添加账号',exact:true}).click();
+ await menu(page,'订阅管理');
+ await page.getByRole('button',{name:'添加账号',exact:true}).click();
  await visible(page).getByRole('button',{name:'Cursor',exact:true}).click();
  await page.evaluate(()=>(window as any).__failNextRequest=true);
  await page.getByRole('button',{name:'添加 Cursor',exact:true}).click();

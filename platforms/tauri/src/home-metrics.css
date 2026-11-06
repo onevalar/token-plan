@@ -21,7 +21,7 @@
 .quota-expiries .expiries { flex-direction:column;gap:4px;text-align:center;overflow-wrap:anywhere; }
 .quota-expiries .expiries ul { text-align:center; }
 .quota-missing { display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center; }
-.quota-missing > span:first-child { font-size:var(--text-2xl); }
+.quota-missing > span[aria-hidden="true"] { font-size:var(--text-2xl); }
 .mac-preview[data-density="comfortable"] .home-metrics { row-gap:20px;padding-block:12px 4px; }
 
 /* Grid tiles: one reading per column, with stable vertical alignment. */
@@ -34,10 +34,14 @@
 
 /* Dashboard rings keep the cycle inside the dial, with reset time at its open edge. */
 .home-metrics[data-style="gauges"] .home-quota { grid-row:span 3; }
-.home-metrics[data-style="gauges"] .quota-body { min-height:0; }
+.home-metrics[data-style="gauges"] .quota-body { min-height:0;align-self:stretch;align-items:flex-end; }
+.quota-gauge-tile { display:flex;flex-direction:column;align-items:center;gap:4px;width:100%;min-width:0; }
 .quota-gauge { position:relative;width:116px; }
 .quota-gauge>svg { display:block;width:100%; }
-.quota-gauge-reading { position:absolute;inset:22% 12% 15%;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:2px;text-align:center; }
-.quota-gauge-reading>span { font-size:var(--text-xs);line-height:1.2;max-width:100%;overflow-wrap:anywhere; }
-.quota-gauge-reading>strong { font-size:var(--text-xl);font-weight:600;line-height:1.2;color:var(--quota-color);font-variant-numeric:tabular-nums; }
+/* A 53-unit square fits inside the arc's 37.5-unit inner radius, centered at (50,50). */
+.quota-gauge-reading,.quota-gauge-fit { position:absolute;top:25%;left:23.5%;width:53%;height:calc(100% * 53 / 94);display:flex;flex-direction:column;justify-content:center;align-items:center;gap:2px;text-align:center; }
+.quota-gauge-fit { visibility:hidden;pointer-events:none;overflow:hidden; }
+:is(.quota-gauge-reading,.quota-gauge-fit)>span { font-size:var(--text-xs);line-height:1.2;max-width:100%;overflow-wrap:anywhere; }
+:is(.quota-gauge-reading,.quota-gauge-fit)>strong { font-size:var(--text-xl);font-weight:600;line-height:1.2;color:var(--foreground);font-variant-numeric:tabular-nums; }
+.home-quota[data-tone="critical"] .quota-gauge-reading>strong { color:var(--danger); }
 .home-metrics[data-style="gauges"] .quota-expiries:empty { display:none; }

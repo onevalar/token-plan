@@ -37,16 +37,19 @@ export function DesktopApp() {
  const {feedback,refresh:refreshWithFeedback,refreshing}=useRefreshFeedback(send);
  const updater=useUpdater(import.meta.env.VITE_MAC_NAVIGATION_PREVIEW!=='1'&&(state?.settings.autoUpdates??false));
  const [platform,setPlatform]=useState('');
+ const [reduceTransparency,setReduceTransparency]=useState(false);
  useEffect(()=>{
-  type Frame={platform:string;rounded:boolean};
-  const apply=(frame:Frame)=>{document.documentElement.dataset.platform=frame.platform;document.documentElement.dataset.rounded=String(frame.rounded);setPlatform(frame.platform);};
-  void invoke<Frame>('panel_frame').then(apply).catch(()=>{});
-  const stop=listen<Frame>('panel-frame',e=>apply(e.payload));
-  return()=>{void stop.then(f=>f()).catch(()=>{});};
+  type Frame={platform:string;rounded:boolean;reduceTransparency:boolean};
+  let active=true,receivedUpdate=false;
+  const apply=(frame:Frame)=>{if(!active)return;document.documentElement.dataset.platform=frame.platform;document.documentElement.dataset.rounded=String(frame.rounded);setPlatform(frame.platform);setReduceTransparency(frame.reduceTransparency);};
+  // Subscribe before reading, and never let an older initial response replace a live update.
+  const stop=listen<Frame>('panel-frame',e=>{receivedUpdate=true;apply(e.payload);});
+  void stop.then(()=>invoke<Frame>('panel_frame')).then(frame=>{if(!receivedUpdate)apply(frame);}).catch(()=>{});
+  return()=>{active=false;void stop.then(f=>f()).catch(()=>{});};
  },[]);
  const setups=useAccountSetups();
  const densityPreference=useDensity();
- const panelSurface=usePanelSurface(platform);
+ const panelSurface=usePanelSurface(platform,reduceTransparency);
  const usageStylePreference=useHomeUsageStyle();
  const [routes,setRoutes]=useState<Route[]>([{key:0,page:'home'}]);
  const sequence=useRef(0),heading=useRef<HTMLHeadingElement>(null);

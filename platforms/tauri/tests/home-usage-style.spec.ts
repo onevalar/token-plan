@@ -447,6 +447,51 @@ test('Dashboard Ring is an instrument with its cycle inside the dial',async({pag
  await preview.screenshot({path:'../../dist/review-instruments/gauges.png'});
 });
 
+test('Dashboard Ring moves an overflowing name above its unchanged dial while short cycles stay inside',async({page},info)=>{
+ const data=largeDesktop(),account=data.accounts[0],base=account.metrics[0];data.accounts=[account];
+ const name='Long Model Name With Its Own Independent Allowance';account.metrics=[base,{...base,id:'long',label:name,percent:92}];
+ await page.addInitScript(()=>localStorage.setItem('tokenplan.homeUsageStyle','gauges'));await mockDesktop(page,'en',false,data);await page.goto('/');
+ for(const density of ['compact','comfortable']){
+  await page.evaluate(value=>localStorage.setItem('tokenplan.homeDensity',value),density);await page.reload();await page.evaluate(()=>document.fonts.ready);
+  const short=home(page).locator('[data-metric="session"]'),long=home(page).locator('[data-metric="long"]');
+  await expect(long.locator('.quota-title')).toHaveText(`${name} · 5h`);await expect(short.locator('.quota-title')).toHaveCount(0);
+  await expect(short.locator('.quota-gauge-reading>span')).toHaveText('5h');await expect(long.locator('.quota-gauge-reading>strong')).toHaveText('92%');
+  const label=(await long.locator('.quota-title').boundingBox())!,dial=(await long.locator('.quota-gauge').boundingBox())!,small=(await short.locator('.quota-gauge').boundingBox())!;
+  expect(label.y+label.height).toBeLessThanOrEqual(dial.y);expect(dial.width).toBe(116);expect(dial.height).toBeCloseTo(small.height,1);expect(dial.y).toBeCloseTo(small.y,1);
+  const inside=(await short.locator('.quota-gauge-reading>span').boundingBox())!;
+  expect(inside.y).toBeGreaterThan(small.y);expect(inside.y+inside.height).toBeLessThan(small.y+small.height);
+  expect(await visible(page).evaluate(e=>e.scrollWidth<=e.clientWidth)).toBe(true);
+  await home(page).screenshot({path:info.outputPath(`gauge-label-${density}.png`)});
+ }
+ await page.evaluate(()=>{(window as any).__beforeRefresh=(s:any)=>{s.accounts[0].metrics[1].label='Session';};});
+ await page.getByRole('button',{name:messages('en').refresh,exact:true}).click();
+ await expect(home(page).locator('.quota-title')).toHaveCount(0);await expect(home(page).locator('.quota-gauge-reading>span')).toHaveText(['5h','5h']);
+});
+
+test('Dashboard Ring preserves readable values, colored arcs and missing-value hierarchy',async({page})=>{
+ const data=largeDesktop(),account=data.accounts[0],base=account.metrics[0];data.accounts=[account];
+ account.metrics.push({...base,id:'missing',hasData:false},{...base,id:'null',percent:null});
+ await page.addInitScript(()=>localStorage.setItem('tokenplan.homeUsageStyle','gauges'));await mockDesktop(page,'en',false,data);await page.goto('/');
+ const normal=home(page).locator('[data-metric="session"]'),critical=home(page).locator('[data-metric="weekly"]');
+ for(const colorScheme of ['light','dark'] as const){
+  await page.emulateMedia({colorScheme});await expect(page.locator('html')).toHaveAttribute('data-theme',colorScheme);
+  const label=normal.locator('.quota-gauge-reading>span'),value=normal.locator('.quota-gauge-reading>strong');
+  await expect(value).toBeVisible();await expect(value).toHaveText('46%');
+  await expect.soft(value).toHaveCSS('color',await label.evaluate(e=>getComputedStyle(e).color));
+  const brand=await home(page).locator('.provider-logo').evaluate(e=>getComputedStyle(e).color);
+  await expect(normal.locator('.quota-gauge path').last()).toHaveCSS('stroke',brand);
+  await expect(critical.locator('.quota-gauge-reading>strong')).toHaveText('92%');
+  await expect(critical.locator('.quota-gauge-reading>strong')).toHaveCSS('color',await critical.locator('.quota-gauge path').last().evaluate(e=>getComputedStyle(e).stroke));
+  for(const id of ['missing','null']){
+   const tile=home(page).locator(`[data-metric="${id}"]`),name=tile.locator('.quota-missing>span').first(),dash=tile.locator('.quota-missing>[aria-hidden="true"]');
+   await expect(name).toBeVisible();await expect(dash).toHaveText('—');await expect(tile).toContainText(messages('en').missing);
+   await expect(tile.getByRole('meter')).toHaveCount(0);
+   await expect.soft(name).toHaveCSS('font-size',await label.evaluate(e=>getComputedStyle(e).fontSize));
+   expect.soft(await dash.evaluate(e=>parseFloat(getComputedStyle(e).fontSize))).toBeGreaterThan(await name.evaluate(e=>parseFloat(getComputedStyle(e).fontSize)));
+  }
+ }
+});
+
 for(const style of ['cycle','cycle:lanes','cycle:clock'])test(`${style} keeps independent time channels and never infers a missing or renewed cycle`,async({page})=>{
  const now=Date.parse('2026-10-28T08:00:00Z'),data=largeDesktop(new Date(now));data.accounts=[data.accounts[0]];
  await page.clock.setFixedTime(now);data.accounts[0].metrics[1].resetsAt=new Date(now+604800000*.3).toISOString();

@@ -22,7 +22,7 @@
 .mac-preview .preview-page::-webkit-scrollbar-track { background:transparent; }
 .mac-preview .preview-page::-webkit-scrollbar-thumb { background:transparent;border:2px solid transparent;border-radius:9999px;background-clip:padding-box; }
 .mac-preview .preview-page:hover::-webkit-scrollbar-thumb { background-color:color-mix(in oklab,var(--foreground) 25%,transparent); }
-.mac-preview .preview-page[data-page="home"] { padding:0 var(--space-4) var(--space-2); }
+.mac-preview .preview-page[data-page="home"] { padding:0 24px var(--space-2); }
 .mac-preview .provider:last-child { border-bottom:0; }
 .mac-preview .provider { padding-block:14px; }
 .mac-preview .dashboard .identity-line h2 { color:var(--foreground); }
@@ -265,21 +265,22 @@
 
 .mac-preview .metric-column-labels[data-tray="false"],.mac-preview .placement-row[data-tray="false"] { grid-template-columns:minmax(0,1fr) minmax(140px,1fr); }
 
-/* Frosted glass. Every surface token turns into a translucent layer, so cards, buttons, selects,
-   segmented controls, switches and tracks become glass over the window's blur instead of opaque
-   patches. Text colors come from panelSurface.ts. Menus and dialogs render outside .mac-preview
-   and stay opaque for legibility. */
+/* Frosted glass changes surface paints, not --background: controls also use that opaque
+   token for inverse text. Text colors come from panelSurface.ts. Menus and dialogs render
+   outside .mac-preview and stay opaque for legibility. */
 :root[data-panel="glass"] .mac-preview { background:transparent;
  --text-secondary:color-mix(in srgb,var(--foreground) var(--glass-secondary),transparent);
  --text-muted:color-mix(in srgb,var(--foreground) var(--glass-muted),transparent);
  --border:color-mix(in srgb,var(--foreground) 14%,transparent);--border-subtle:color-mix(in srgb,var(--foreground) 9%,transparent);--border-strong:color-mix(in srgb,var(--foreground) 22%,transparent);
- --surface:rgb(255 255 255 / .22);--surface-raised:rgb(255 255 255 / .36);--background:rgb(255 255 255 / .5);--surface-muted:rgb(255 255 255 / .16);
+ --surface:rgb(255 255 255 / .22);--surface-raised:rgb(255 255 255 / .36);--surface-muted:rgb(255 255 255 / .16);
  --control-track:rgb(0 0 0 / .1);--control-track-hover:rgb(0 0 0 / .14);--shadow-resting:0 1px 2px rgb(0 0 0 / .05);
  --success:var(--glass-success-light);--warning:var(--glass-warning-light);--danger:var(--glass-danger-light);--usage-normal:var(--glass-usage-light); }
 :root[data-panel="glass"][data-theme="dark"] .mac-preview {
- --surface:rgb(255 255 255 / .04);--surface-raised:rgb(255 255 255 / .08);--background:rgb(255 255 255 / .12);--surface-muted:rgb(255 255 255 / .04);
+ --surface:rgb(255 255 255 / .04);--surface-raised:rgb(255 255 255 / .08);--surface-muted:rgb(255 255 255 / .04);
  --control-track:rgb(255 255 255 / .16);--control-track-hover:rgb(255 255 255 / .2);--shadow-resting:none;
  --success:var(--glass-success-dark);--warning:var(--glass-warning-dark);--danger:var(--glass-danger-dark);--usage-normal:var(--glass-usage-dark); }
+/* Selected style previews are surfaces; selected metric chips keep opaque inverse text. */
+:root[data-panel="glass"] .mac-preview :is(.usage-style-option,.ring-layout-option)[aria-pressed="true"] { background:var(--surface-raised); }
 /* The danger color already meets its contrast target on glass; mixing it with the translucent background would undo that. */
 :root[data-panel="glass"] .mac-preview .metric[data-tone="critical"] .value { color:var(--danger); }
 :root[data-panel="glass"] .mac-preview .preview-header { background:transparent;border-bottom-color:var(--border-subtle);-webkit-backdrop-filter:blur(20px) saturate(1.5);backdrop-filter:blur(20px) saturate(1.5); }

@@ -116,19 +116,21 @@ tray integration remain platform-specific. This change does not publish a releas
   style uses each system's own material and name: **Frosted Glass** on macOS (system vibrancy), **Acrylic** on Windows. It is
   the default; **Transparency** runs from Low to High (no percentages, since even High keeps enough tint for legibility; Low
   still differs visibly from Solid). Linux desktops offer no common window blur, so the rows are not shown there until another
-  style exists. In the blur style every surface (cards, buttons, selects, segmented controls, switches, tracks) becomes a
-  translucent layer, so nothing sits on the glass as an opaque patch; menus and dialogs stay opaque. The panel cannot see what
-  is behind it, so it picks text strength by itself: secondary text and lines are semi-transparent (taking on the background's
-  color) and get darker as transparency rises, staying readable (WCAG AA) even over a pure black or white backdrop; success,
-  warning and error colors deepen toward the text color just enough to stay readable too, and the usage meter color keeps the
-  3:1 minimum for graphics (service brand colors are unchanged). The highest transparency stops where that would no longer
-  hold. When the system turns transparency off (macOS Reduce Transparency, Windows Transparency effects), the panel is solid
-  and both rows are disabled with a note explaining why. On Windows, Solid also turns the window's acrylic off. Kept per device.
-- Home keeps each service together, including its multiple accounts. The service heading stays visible while scrolling
-  through that group without covering keyboard-focused account entries; selected usage styles and account order are unchanged.
-  The transparency control preserves the same minimum text contrast. On macOS, choosing Light or Dark also changes the panel's native material; System restores automatic
-  appearance. This does not change the menu bar's system appearance. Verify desktop blur in the native app over a varied
-  backdrop, not from a browser screenshot.
+  style exists. Glass changes background surfaces, not the Home layout or the meaning of selected controls. Menus and dialogs
+  stay opaque; inverse labels and numeric readings retain their text contrast rather than inheriting a translucent paint.
+  The panel cannot inspect the desktop behind it. Its tint and secondary/status text colors are calculated against black and
+  white backdrops; contrast checks use the actual RGB channels sent to CSS. Provider brand colors are not a blanket guarantee
+  of chart contrast on every background.
+  When the system turns transparency off, the panel is solid and both rows are disabled with an explanation, including when
+  Solid was already selected. macOS reads and observes the native accessibility setting because WKWebView does not support
+  the reduced-transparency media query. Windows uses the supported media query and turns Acrylic off for Solid.
+  Changing the system preference does not overwrite the saved panel style or transparency.
+  On macOS, choosing Light or Dark also changes the native material's appearance; System restores automatic appearance.
+  This does not change the menu bar. Verify desktop blur in the native app over a varied backdrop, not from a browser screenshot.
+- Home keeps each service together, including its multiple accounts. Group headings stay visible while scrolling their
+  accounts without covering keyboard-focused entries; selected usage styles and account order are unchanged.
+  The More menu scrolls within short Home panels so its last action remains reachable by pointer and keyboard.
+  Transparency supports arrow keys, Shift-arrow larger steps, Home and End; Alt-Left still goes back without changing it.
 - Each setting has one home. General Settings groups, in order: Appearance and Language (appearance, panel style, language), Usage Style, Home (density, used/remaining), Menu Bar (macOS), Data Refresh, then notifications and shortcuts. The Menu Bar group holds everything
   about the menu bar: a live preview at the top, style and icon position, and every shown account with its switch; a switched-on
   account lists its metrics with plus/minus controls to add or remove up to three for the menu bar. Hints about three rings or value-only metrics appear
@@ -351,4 +353,4 @@ an explicit missing-data state. All new controls and explanations ship in the fi
 
 Home sizes to its visible content on macOS, Windows and Linux, including a single basic bar or an account with all metrics hidden. Its bottom inset is 8px; the native minimum only reserves the 54px header rather than imposing a 120px content floor. Larger pages retain scrolling and the screen-height cap.
 
-Dashboard Ring is listed under Instruments while retaining the saved `gauges` identifier. Its cycle label sits inside the arc above the reading, with the countdown below. Primary Dial now shows one compact pointer row per quota, with one reading and a direct detail disclosure; the repeated hero and selectable bar list have been removed. The shared renderer applies on all three platforms.
+Dashboard Ring is listed under Instruments while retaining the saved `gauges` identifier. Short cycle labels sit inside the arc above the reading; labels that cannot fit move above the dial without abbreviation. Neighboring dials stay aligned, with the countdown below. Primary Dial now shows one compact pointer row per quota, with one reading and a direct detail disclosure; the repeated hero and selectable bar list have been removed. The shared renderer applies on all three platforms.

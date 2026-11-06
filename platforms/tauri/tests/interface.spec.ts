@@ -324,3 +324,71 @@ test('reduced motion stops the pending spinner without hiding its status',async(
  await expect(spinner).toHaveCSS('animation-name','none');
  await expect(control.locator('[data-face="pending"]')).toBeVisible();
 });
+
+for(const colorScheme of ['light','dark'] as const)test(`compact Home keeps the More menu reachable by keyboard and pointer (${colorScheme})`,async({page})=>{
+ const data=largeDesktop();data.accounts=data.accounts.slice(0,1);
+ const account=data.accounts[0];account.email='';account.plan='';account.error='';
+ account.metrics=account.metrics.slice(0,1);account.metrics[0].placement='home';
+ await page.setViewportSize({width:390,height:680});
+ await page.emulateMedia({colorScheme,reducedMotion:'reduce'});
+ await mockDesktop(page,'en',false,data);await page.goto('/');
+ await expect(page.locator('.dashboard').getByRole('progressbar')).toHaveCount(1);
+ // Measure the loaded Home, not the short loading state that precedes the fixture response.
+ await page.evaluate(async()=>{await document.fonts.ready;await new Promise<void>(resolve=>requestAnimationFrame(()=>requestAnimationFrame(()=>resolve())));});
+ const height=()=>page.evaluate(()=>(window as any).__panelHeights?.at(-1) as number);
+ await expect.poll(height).toBeGreaterThan(54);await expect.poll(height).toBeLessThan(200);
+ const homeHeight=await height();await page.setViewportSize({width:390,height:homeHeight});
+ const more=page.getByRole('button',{name:'More',exact:true}),menu=page.getByRole('menu');
+ await more.focus();await page.keyboard.press('Enter');
+ await expect(page.getByRole('menuitem').first()).toBeFocused();
+ await page.keyboard.press('End');
+ const quit=page.getByRole('menuitem',{name:'Quit',exact:true});
+ await expect(quit).toBeFocused();
+ await expect(quit).toBeInViewport({ratio:1});
+ expect(await quit.evaluate(e=>{const r=e.getBoundingClientRect();return e.contains(document.elementFromPoint(r.x+r.width/2,r.y+r.height/2));})).toBe(true);
+ expect(await height()).toBe(homeHeight);
+ await page.keyboard.press('Escape');await expect(menu).toHaveCount(0);await expect(more).toBeFocused();
+ expect(await page.evaluate(()=>(window as any).__panelHides??0)).toBe(0);
+ await more.click();await menu.hover();
+ const about=page.getByRole('menuitem',{name:'About',exact:true});
+ // WebKit may apply a wheel gesture in smaller animated steps; keep scrolling through the real input.
+ await expect(async()=>{await page.mouse.wheel(0,400);await expect(about).toBeInViewport({ratio:1,timeout:1000});}).toPass({timeout:5000});
+ await about.click();await expect(page.getByRole('heading',{level:1})).toHaveText('About');
+});
+
+test('transparency slider keeps its keyboard controls without consuming application shortcuts',async({page})=>{
+ await page.setViewportSize({width:390,height:680});
+ await mockDesktop(page,'en');await page.goto('/');
+ const more=page.getByRole('button',{name:'More',exact:true});
+ await more.click();await page.getByRole('menuitem',{name:'General Settings',exact:true}).click();
+ const slider=page.getByRole('slider',{name:'Transparency',exact:true});
+ await expect(slider).toHaveAttribute('aria-valuenow','60');await slider.focus();
+ for(const [key,value] of [['ArrowRight',65],['ArrowUp',70],['ArrowLeft',65],['ArrowDown',60],['Shift+ArrowRight',70],['Shift+ArrowLeft',60],['PageUp',70],['PageDown',60],['Home',20],['End',100]] as const){
+  await page.keyboard.press(key);await expect(slider).toHaveAttribute('aria-valuenow',String(value));
+ }
+ for(const key of ['Control+ArrowLeft','Meta+ArrowLeft','Alt+ArrowDown','Control+Home','Meta+Home']){
+  await page.keyboard.press(key);await expect(slider).toHaveAttribute('aria-valuenow','100');
+ }
+ await page.keyboard.press('Alt+ArrowLeft');
+ await expect(page.getByRole('heading',{level:1})).toHaveText('TokenPlan');await expect(more).toBeFocused();
+ expect(await page.evaluate(()=>JSON.parse(localStorage.getItem('tokenplan.panelSurface')!))).toEqual({style:'glass',transparency:100});
+ await more.click();await page.getByRole('menuitem',{name:'General Settings',exact:true}).click();
+ await expect(page.getByRole('slider',{name:'Transparency',exact:true})).toHaveAttribute('aria-valuenow','100');
+});
+
+test('saved Solid explains why Panel Style is disabled by system transparency settings',async({page})=>{
+ await page.setViewportSize({width:390,height:680});
+ await mockDesktop(page,'en');await page.goto('/');
+ await page.getByRole('button',{name:'More',exact:true}).click();await page.getByRole('menuitem',{name:'General Settings',exact:true}).click();
+ await page.getByRole('combobox',{name:'Panel Style',exact:true}).click();await page.getByRole('option',{name:'Solid',exact:true}).click();
+ await expect(page.locator('html')).toHaveAttribute('data-panel','solid');
+ // Reload with the OS setting enabled, keeping the style chosen through the real control.
+ await page.addInitScript(()=>{(window as any).__panelFrame={platform:'macos',rounded:true,reduceTransparency:true};});
+ await page.reload();
+ expect(await page.evaluate(()=>matchMedia('(prefers-reduced-transparency: reduce)').matches)).toBe(false);
+ await page.getByRole('button',{name:'More',exact:true}).click();await page.getByRole('menuitem',{name:'General Settings',exact:true}).click();
+ const style=page.getByRole('combobox',{name:'Panel Style',exact:true});
+ await expect(style).toBeDisabled();await expect(style).toContainText('Solid');
+ await expect(page.getByRole('slider',{name:'Transparency',exact:true})).toHaveCount(0);
+ await expect(page.getByText('Transparency is turned off in system settings, so the panel stays solid.',{exact:true})).toBeVisible();
+});

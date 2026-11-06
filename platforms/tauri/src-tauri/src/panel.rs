@@ -8,6 +8,7 @@ pub(super) const MIN_PANEL_HEIGHT:f64=54.;
 pub struct Panel {
     revision: AtomicU64,
     persistent: AtomicBool,
+    pub(super) reduce_transparency: AtomicBool,
     pub(super) content_height: AtomicU32,
     #[cfg(target_os="macos")]
     pub(super) mac_anchor: std::sync::Mutex<Option<(f64,f64)>>,
@@ -239,7 +240,8 @@ pub fn panel_content_height(app:tauri::AppHandle,height:f64)->Result<(),String> 
 
 /// How the web interface should draw the panel's outer frame.
 #[derive(serde::Serialize,Clone)]
-pub struct Frame { platform:&'static str, rounded:bool }
+#[serde(rename_all="camelCase")]
+pub struct Frame { platform:&'static str, rounded:bool, reduce_transparency:bool }
 #[tauri::command]
 pub fn panel_frame(app:tauri::AppHandle)->Frame { frame(&app) }
 fn frame(app:&tauri::AppHandle)->Frame {
@@ -252,7 +254,8 @@ fn frame(app:&tauri::AppHandle)->Frame {
         .is_some_and(|window|{use gtk::prelude::WidgetExt;window.screen().is_some_and(|screen|screen.is_composited())});
     #[cfg(not(target_os="linux"))]
     let rounded={let _=app;cfg!(target_os="macos")};
-    Frame{platform,rounded}
+    let reduce_transparency=app.state::<Panel>().reduce_transparency.load(Ordering::SeqCst);
+    Frame{platform,rounded,reduce_transparency}
 }
 
 /// GTK reports activation at the toplevel, including desktop/shell focus changes.
@@ -299,6 +302,12 @@ pub fn linux_tray_available(app:&tauri::AppHandle,available:bool) {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test] fn panel_frame_serializes_the_native_transparency_preference() {
+        for reduce_transparency in [false,true] {
+            let value=serde_json::to_value(Frame{platform:"macos",rounded:true,reduce_transparency}).unwrap();
+            assert_eq!(value,serde_json::json!({"platform":"macos","rounded":true,"reduceTransparency":reduce_transparency}));
+        }
+    }
     #[test] fn content_height_shrinks_grows_and_respects_screen_scale() {
         assert_eq!(bounded_height(210.,2.,1800),420);
         assert_eq!(bounded_height(2000.,2.,1800),1360);

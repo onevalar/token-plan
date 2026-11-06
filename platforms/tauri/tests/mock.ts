@@ -27,7 +27,7 @@ export async function mockDesktop(page:Page,language='zh-Hans',cloud=false,data:
     if(command==='hide'){(window as any).__panelHides=((window as any).__panelHides??0)+1;return;}
     if(command==='shortcut_capture'){(window as any).__shortcutPaused=args.paused;return;}
     if(command==='plugin:app|version')return '0.0.0';
-    if(command==='panel_frame')return (window as any).__panelFrame??{platform:'macos',rounded:true};
+    if(command==='panel_frame')return {reduceTransparency:false,...((window as any).__panelFrame??{platform:'macos',rounded:true})};
     if(command==='plugin:event|listen'){if(!events.has(args.event))events.set(args.event,new Set());events.get(args.event)!.add(args.handler);return args.handler;}
     if(command==='plugin:event|unlisten'){events.get(args.event)?.delete(args.eventId);return;}
     if(command.startsWith('plugin:event|'))return ++sequence;
