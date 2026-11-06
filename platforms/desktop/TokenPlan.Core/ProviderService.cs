@@ -45,7 +45,7 @@ public sealed partial class ProviderService : IDisposable
         var name = ProviderCatalog.Get(id).Name;
         // ResponseHeadersRead ends HttpClient's timeout at the headers; bound the body too.
         using var deadline = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-        deadline.CancelAfter(id is "claude" or "codex" ? TimeSpan.FromMilliseconds(http.Timeout.TotalMilliseconds * 4 + 3000) : http.Timeout);
+        deadline.CancelAfter(id is "claude" or "codex" ? TimeSpan.FromMilliseconds(http.Timeout.TotalMilliseconds * 4 + 3000) : id is "openai" or "anthropic" ? TimeSpan.FromSeconds(120) : http.Timeout);
         var operationToken = deadline.Token;
         string? fingerprint = null;
         var metadata = id == "claude" && alternateAuthFile == null ? ClaudeAccountMetadata.Read(claudeHome, userHome) : null;

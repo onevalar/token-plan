@@ -106,6 +106,8 @@
 "Add Service" = "서비스 추가";
 "Add Service Login" = "서비스 로그인 추가";
 "Add an API key in service settings, then refresh." = "서비스 설정에서 API 키를 추가한 후 새로 고침하세요.";
+"Add an Anthropic organization Admin key to read API usage and costs." = "API 사용량과 비용을 읽으려면 Anthropic 조직 Admin 키를 추가하세요.";
+"Add an OpenAI organization Admin key to read API usage and costs." = "API 사용량과 비용을 읽으려면 OpenAI 조직 Admin 키를 추가하세요.";
 "Added to Home" = "홈에 추가됨";
 "Additional Claude and Codex logins can come from Claude Swap, Codex Swap, supported Codex homes or pi. TokenPlan only reads these logins; it does not switch accounts." = "추가 Claude 및 Codex 로그인은 Claude Swap, Codex Swap, 지원되는 Codex 홈 또는 pi에서 읽습니다. TokenPlan은 계정을 전환하지 않습니다.";
 "Additional accounts could not be read. Check the account configuration folders." = "추가 계정을 읽을 수 없습니다. 계정 설정 폴더를 확인하세요.";
@@ -138,6 +140,8 @@
 "Another Account" = "다른 계정";
 "Another account is connected." = "다른 계정이 연결되어 있습니다.";
 "Another account is currently connected. This saved account is kept; connect its configuration directory or sign in to it." = "현재 다른 계정이 연결되어 있습니다. 저장된 계정의 설정 디렉터리를 연결하거나 해당 계정으로 로그인하세요.";
+"Anthropic API reporting is unavailable. Try again later." = "Anthropic API 통계를 사용할 수 없습니다. 나중에 다시 시도하세요.";
+"Anthropic API usage data is incomplete or invalid. Try again later." = "Anthropic API 사용량 데이터가 불완전하거나 잘못되었습니다. 나중에 다시 시도하세요.";
 "Anthropic has temporarily limited usage queries. Data may be out of date." = "Anthropic이 사용량 조회를 일시적으로 제한했습니다. 데이터가 최신이 아닐 수 있습니다.";
 "Antigravity credentials are invalid. Open Antigravity or run `agy` to sign in again." = "Antigravity 자격 증명이 올바르지 않습니다. Antigravity를 열거나 `agy`를 실행해 다시 로그인하세요.";
 "Antigravity sign-in expired. Open Antigravity or run `agy` to refresh." = "Antigravity 로그인이 만료되었습니다. Antigravity를 열거나 `agy`를 실행해 갱신하세요.";
@@ -300,7 +304,9 @@
 "Couldn't %@ the terminal helper: %@" = "터미널 도우미를 %1$@하지 못했습니다: %2$@";
 "Couldn't copy the log path to the clipboard." = "로그 경로를 클립보드에 복사하지 못했습니다.";
 "Couldn't reach %@. Check your connection." = "%@에 연결할 수 없습니다. 연결을 확인하세요.";
+"Couldn't reach Anthropic API. Check your connection and proxy." = "Anthropic API에 연결하지 못했습니다. 네트워크와 프록시를 확인하세요.";
 "Couldn't reach GitHub. Check your connection." = "GitHub에 연결할 수 없습니다. 연결을 확인하세요.";
+"Couldn't reach OpenAI API. Check your connection and proxy." = "OpenAI API에 연결하지 못했습니다. 네트워크와 프록시를 확인하세요.";
 "Couldn't reach OpenRouter. Check your connection." = "OpenRouter에 연결할 수 없습니다. 연결을 확인하세요.";
 "Couldn't read Amp usage. Check amp usage in Terminal or update the Amp CLI." = "Amp 사용량을 읽을 수 없습니다. 터미널에서 amp usage를 확인하거나 Amp CLI를 업데이트하세요.";
 "Couldn't read Amp's saved login. Check its file permissions or log in to Amp again." = "Amp에 저장된 로그인을 읽을 수 없습니다. 파일 권한을 확인하거나 Amp에 다시 로그인하세요.";
@@ -313,6 +319,8 @@
 "Couldn't remove the saved OpenRouter API key." = "저장된 OpenRouter API 키를 삭제하지 못했습니다.";
 "Couldn't remove the saved Z.ai API key." = "저장된 Z.ai API 키를 삭제하지 못했습니다.";
 "Couldn't reset usage. Please try again." = "사용량을 초기화하지 못했습니다. 다시 시도하세요.";
+"Couldn't save or remove the Anthropic Admin key." = "Anthropic Admin 키를 저장하거나 삭제하지 못했습니다.";
+"Couldn't save or remove the OpenAI Admin key." = "OpenAI Admin 키를 저장하거나 삭제하지 못했습니다.";
 "Couldn't save the %@ API key." = "%@ API 키를 저장하지 못했습니다.";
 "Couldn't save the OpenRouter API key." = "OpenRouter API 키를 저장하지 못했습니다.";
 "Couldn't save the Z.ai API key." = "Z.ai API 키를 저장하지 못했습니다.";
@@ -634,6 +642,8 @@
 "Model token counts are invalid. Showing the original model list." = "모델 토큰 수가 유효하지 않아 원래 모델 목록을 표시합니다.";
 "Model tokens exceed the recorded total. Showing the original model list." = "모델 토큰 합계가 기록된 총량보다 커서 원래 모델 목록을 표시합니다.";
 "Monitor Your AI Subscriptions with TokenPlan" = "TokenPlan으로 AI 구독을 모니터링하세요";
+"Month Requests" = "이번 달 요청";
+"Month Tokens" = "이번 달 토큰";
 "Monthly" = "월간";
 "More" = "더 보기";
 "More Metrics" = "추가 지표";
@@ -729,6 +739,7 @@
 "Numbers" = "숫자";
 "Observation List" = "관측 기록";
 "Off" = "끔";
+"Official API reports use UTC and may be delayed. Model costs are unavailable; local records may overlap API reports." = "공식 API 통계는 UTC 기준이며 지연될 수 있습니다. 모델별 비용은 제공하지 않으며 로컬 기록과 중복될 수 있습니다.";
 "On Demand" = "필요할 때 표시";
 "One column per day, %@ in total. Move the pointer or use arrow keys to select a day. The 12 cells show relative intensity, rounded up, not a live rate." = "하루에 한 열씩 총 %@일입니다. 포인터를 움직이거나 방향키로 날짜를 선택하세요. 12개의 셀은 올림한 상대적 강도를 나타내며 실시간 속도가 아닙니다.";
 "One day is a point, not a trend." = "하루의 데이터는 점 하나이며 추이가 아닙니다.";
@@ -744,6 +755,9 @@
 "Open Terminal to Sign In" = "터미널을 열어 로그인";
 "Open TokenPlan from anywhere" = "어디서나 TokenPlan 열기";
 "Open-Source Licenses" = "오픈 소스 라이선스";
+"OpenAI API costs are reported by the organization in UTC and may be delayed. Model token counts cover the completions usage endpoint; model costs are unavailable. Other sources may use local estimates." = "OpenAI API 비용은 조직에서 UTC 날짜로 보고하며 지연될 수 있습니다. 모델 토큰은 completions 사용량 기준이며 모델별 비용은 제공되지 않습니다. 다른 출처는 로컬 추정치를 사용할 수 있습니다.";
+"OpenAI API reporting is unavailable. Try again later." = "OpenAI API 통계를 사용할 수 없습니다. 나중에 다시 시도하세요.";
+"OpenAI API usage data is incomplete or invalid. Try again later." = "OpenAI API 사용량 데이터가 불완전하거나 잘못되었습니다. 나중에 다시 시도하세요.";
 "OpenCode Go key was rejected. Log into OpenCode Go again." = "OpenCode Go 키가 거부되었습니다. OpenCode Go에 다시 로그인하세요.";
 "OpenCode not detected. Log in with OpenCode Go or use OpenCode locally first." = "OpenCode를 찾을 수 없습니다. OpenCode Go에 로그인하거나 먼저 로컬에서 OpenCode를 사용하세요.";
 "OpenRouter API key invalid. Check your key at openrouter.ai/keys." = "OpenRouter API 키가 올바르지 않습니다. openrouter.ai/keys에서 키를 확인하세요.";
@@ -757,6 +771,7 @@
 "Org Credits" = "조직 크레딧";
 "Org Spend" = "조직 지출";
 "Organization" = "조직";
+"Organization Admin Key" = "조직 Admin 키";
 "Other" = "기타";
 "Other Models" = "기타 모델";
 "Other Reported Tokens" = "기타 보고된 토큰";
@@ -847,6 +862,7 @@
 "Read-only in TokenPlan. Use reset credits in the provider's own app." = "TokenPlan에서는 조회만 가능합니다. 초기화 크레딧은 제공업체의 앱에서 사용하세요.";
 "Reading local token logs…" = "로컬 토큰 로그를 읽는 중…";
 "Reads existing logins on this device. Credentials are never copied or synced." = "이 기기의 기존 로그인을 읽습니다. 자격 증명은 복사하거나 동기화하지 않습니다.";
+"Reads organization-wide API usage and costs. Requires an organization Admin key; a model API key is not sufficient." = "조직 전체의 API 사용량과 비용을 읽습니다. 일반 모델 API 키가 아닌 조직 Admin 키가 필요합니다.";
 "Recalculating Estimates…" = "추정치 다시 계산 중…";
 "Receive pre-release builds before they ship to everyone" = "정식 배포 전에 사전 출시 빌드를 받습니다";
 "Record Shortcut" = "단축키 기록";
@@ -1094,6 +1110,8 @@
 "The API key could not be removed. Check local folder permissions." = "API 키를 제거할 수 없습니다. 폴더 권한을 확인하세요.";
 "The API key could not be saved. Check the key and local folder permissions." = "API 키를 저장할 수 없습니다. 키와 폴더 권한을 확인하세요.";
 "The API key was rejected. Check the key in service settings." = "API 키가 거부되었습니다. 서비스 설정에서 확인하세요.";
+"The Anthropic Admin key was rejected. Replace it in service settings." = "Anthropic Admin 키가 거부되었습니다. 서비스 설정에서 교체하세요.";
+"The OpenAI Admin key was rejected. Replace it in service settings." = "OpenAI Admin 키가 거부되었습니다. 서비스 설정에서 교체하세요.";
 "The browser could not be opened." = "브라우저를 열 수 없습니다.";
 "The bundled terminal helper couldn't be found. Reinstall TokenPlan and try again." = "내장된 터미널 도우미를 찾을 수 없습니다. TokenPlan을 다시 설치한 뒤 시도하세요.";
 "The connection timed out. Check whether the desktop app can use your proxy or VPN, then retry." = "연결 시간이 초과되었습니다. 데스크톱 앱에서 프록시나 VPN을 사용할 수 있는지 확인한 후 다시 시도하세요.";
@@ -1125,6 +1143,7 @@
 "This Month" = "이번 달";
 "This Week" = "이번 주";
 "This account does not expose a personal quota. Organization billing requires billing permissions." = "이 계정은 개인 할당량을 제공하지 않습니다. 조직 청구 정보에는 청구 관리 권한이 필요합니다.";
+"This key cannot read organization usage or costs. Check its permissions." = "이 키는 조직 사용량 또는 비용을 읽을 수 없습니다. 권한을 확인하세요.";
 "This login cannot renew automatically. Open the CLI for this account to refresh its login, then retry." = "이 로그인은 자동 갱신할 수 없습니다. 해당 계정의 CLI에서 로그인 상태를 갱신한 후 다시 시도하세요.";
 "This model's pricing is unavailable. Choose another model or None." = "이 모델의 가격을 사용할 수 없습니다. 다른 모델이나 '없음'을 선택하세요.";
 "This period used a model with unknown pricing" = "이 기간에 가격을 알 수 없는 모델이 사용되었습니다";
@@ -1191,6 +1210,7 @@
 "Unknown models found" = "알 수 없는 모델 발견";
 "Unknown provider: %@" = "알 수 없는 제공업체: %@";
 "Unknown values are not treated as zero." = "알 수 없는 값은 0으로 처리하지 않습니다.";
+"Unlimited" = "무제한";
 "Unsaved Changes" = "저장하지 않은 변경 사항";
 "Unstar" = "별표 해제";
 "Up to %lld stars per provider" = "제공업체당 별표는 최대 %lld개";
@@ -1224,6 +1244,7 @@
 "Usage or login data could not be read. Sign in again." = "사용량 또는 로그인 정보를 읽을 수 없습니다. 다시 로그인하세요.";
 "Usage queries are temporarily rate limited. Data may be out of date. Retrying automatically later." = "사용량 조회가 일시적으로 제한되었습니다. 데이터가 최신이 아닐 수 있습니다. 나중에 자동으로 다시 시도합니다.";
 "Usage queries are temporarily rate limited. Data may be out of date. Retrying automatically shortly." = "사용량 조회가 일시적으로 제한되었습니다. 데이터가 최신이 아닐 수 있습니다. 잠시 후 자동으로 다시 시도합니다.";
+"Usage queries are temporarily rate limited. Try again later." = "사용량 조회가 일시적으로 제한되었습니다. 나중에 다시 시도하세요.";
 "Usage request failed (HTTP %lld). Try again later." = "사용량 요청 실패 (HTTP %lld). 나중에 다시 시도하세요.";
 "Usage request failed after refresh. Try again." = "새로고침 후에도 사용량 요청에 실패했습니다. 다시 시도하세요.";
 "Usage request failed. Check your connection." = "사용량 요청에 실패했습니다. 연결을 확인하세요.";

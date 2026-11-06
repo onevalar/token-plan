@@ -11,7 +11,7 @@ public sealed class UsageHistory
     const int MaximumBytes = 2 * 1024 * 1024;
     const int MaximumReadings = 2400;
     static readonly HashSet<string> Providers = ProviderCatalog.All.Select(p => p.Id).ToHashSet();
-    static readonly HashSet<string> Metrics = new() { "Session", "Weekly", "Sonnet", "Total usage", "Cursor Models", "Other Models", "Balance", "Topped Up", "Granted", "Cash", "Voucher", "Gift", "Credits", "Today", "This Week", "This Month", "Key Limit", "Web Searches", "Agent Usage", "Orb Usage", "Monthly", "Chat", "Completions", "Daily quota", "Weekly quota", "Extra usage balance", "Claude", "Claude Weekly", "Argon Weekly", "Last 4 Weeks", "Fable", "Extra usage spent", "Reset Credits", "Rate Limit Resets", "Spark", "Spark Weekly", "Org Credits", "Org Spend" };
+    static readonly HashSet<string> Metrics = new() { "Session", "Weekly", "Sonnet", "Total usage", "Cursor Models", "Other Models", "Balance", "Topped Up", "Granted", "Cash", "Voucher", "Gift", "Credits", "Today", "This Week", "This Month", "Key Limit", "Web Searches", "Agent Usage", "Orb Usage", "Monthly", "Chat", "Completions", "Daily quota", "Weekly quota", "Extra usage balance", "Claude", "Claude Weekly", "Argon Weekly", "Last 4 Weeks", "Fable", "Extra usage spent", "Reset Credits", "Rate Limit Resets", "Spark", "Spark Weekly", "Org Credits", "Org Spend", "Month Tokens", "Month Requests" };
     HistoryDocument document = new(1, new(), new());
 
     public static UsageHistory Load(string file, DateTimeOffset now)
@@ -29,7 +29,7 @@ public sealed class UsageHistory
         {
             if (entry == null || !Providers.Contains(entry.Provider) || !value.Accounts.ContainsKey(entry.Provider)
                 || entry.FetchedAt == default || entry.FetchedAt > now.AddMinutes(5) || entry.Windows == null || entry.Windows.Count is < 1 or > 16
-                || entry.Windows.Any(w => w == null || !Metrics.Contains(w.Label) || (w.Limit is { } limit && (!double.IsFinite(limit) || limit <= 0)) || (w.Expiries?.Count > 128) || !double.IsFinite(w.UsedPercent) || w.UsedPercent < 0 || (w.Amount is { } amount && (!double.IsFinite(amount) || amount < 0 || w.Currency is not ("CNY" or "USD" or "COUNT"))))
+                || entry.Windows.Any(w => w == null || !Metrics.Contains(w.Label) || (w.Limit is { } limit && (!double.IsFinite(limit) || limit <= 0)) || (w.Expiries?.Count > 128) || !double.IsFinite(w.UsedPercent) || w.UsedPercent < 0 || (w.Amount is { } amount && (!double.IsFinite(amount) || (amount < 0 && w.Currency != "CREDITS") || w.Currency is not ("CNY" or "USD" or "COUNT" or "CREDITS"))))
                 || entry.Windows.Select(w => w.Label).Distinct().Count() != entry.Windows.Count)
                 throw new InvalidDataException("Invalid history reading");
         }

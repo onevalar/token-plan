@@ -4,7 +4,7 @@ import Foundation
 /// edge (see `MetricFormatter`) instead of being baked into a string the way `.text` rows used to.
 ///
 /// A single row can hold several values — a daily-spend row carries dollars *and* tokens, a Codex
-/// credits row carries dollars *and* a credit count — and each widget chooses which to render via
+/// credits row carries its original credit count — and each widget chooses which to render via
 /// `ValueSelection`. That's what lets one row back a cost-only tile, a tokens-only tile, and a
 /// combined tile without the mapper emitting the data three times.
 struct MetricValue: Hashable, Sendable, Codable {

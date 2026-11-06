@@ -169,10 +169,8 @@ final class WidgetDataStoreTests: XCTestCase {
         XCTAssertFalse(requests.hasResetLabel())
     }
 
-    func testCreditsRenderDollarAndCountCombinedInvariantToMeterStyle() async {
-        // Codex flex credits show the dollar value and the raw count combined ("$40.00 · 1,000
-        // credits"), invariant to the Used/Left meter style, while the dollar value drives the menu
-        // bar's compact reading — all from one `.values` row, no string re-parse.
+    func testCreditsRenderOriginalCountInvariantToMeterStyle() async {
+        // Count units remain invariant to Used/Left meter styles.
         let provider = Provider(id: "codex", displayName: "Codex", icon: .providerMark("codex"))
         let descriptor = WidgetDescriptor.combined(
             id: "codex.credits", provider: provider, title: "Extra Usage", metricLabel: "Credits"
@@ -198,8 +196,8 @@ final class WidgetDataStoreTests: XCTestCase {
         store.meterStyle = .remaining
         let remaining = store.data(for: descriptor)
         XCTAssertFalse(remaining.isBounded)
-        XCTAssertEqual(remaining.unboundedDetail, "$40.00 · 1K credits")
-        XCTAssertEqual(remaining.menuBarValue, "$40")   // dollar value → compact tray reading
+        XCTAssertEqual(remaining.unboundedDetail, "1K credits")
+        XCTAssertEqual(remaining.menuBarValue, "1K credits")
         XCTAssertNil(remaining.unboundedSubtitle)
 
         store.meterStyle = .used
@@ -401,13 +399,13 @@ final class WidgetDataStoreTests: XCTestCase {
         XCTAssertEqual(data.unboundedTooltip, "$1,234.56")      // hover still reveals the exact figure
     }
 
-    func testCreditValuesFloorAndClampBalance() {
+    func testCreditValuesPreserveFractionAndDebt() {
         var data = WidgetData(title: "Extra Usage", icon: .providerMark("codex"), kind: .dollars, used: 0, limit: nil)
         data.values = CodexUsageMapper.creditValues(remaining: 820.9)
-        XCTAssertEqual(data.unboundedDetail, "$32.80 · 820 credits")
-        // An exhausted/negative balance clamps to a real, measured zero — "$0.00 · 0 credits", not "No data".
+        XCTAssertEqual(data.unboundedDetail, "820.9 credits")
+        // Preserve the provider's measured negative balance.
         data.values = CodexUsageMapper.creditValues(remaining: -5)
-        XCTAssertEqual(data.unboundedDetail, "$0.00 · 0 credits")
+        XCTAssertEqual(data.unboundedDetail, "-5 credits")
     }
 
     func testCreditsRenderUpToOneDecimalPlace() {

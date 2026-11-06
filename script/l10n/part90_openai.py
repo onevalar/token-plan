@@ -1,0 +1,16 @@
+T = {
+ 'Unlimited': ('不限量', '不限量', '無制限', '무제한'),
+ 'Organization Admin Key': ('组织 Admin 密钥', '組織 Admin 金鑰', '組織の Admin キー', '조직 Admin 키'),
+ 'Month Tokens': ('本月 Token', '本月 Token', '今月のトークン', '이번 달 토큰'),
+ 'Month Requests': ('本月请求', '本月請求', '今月のリクエスト', '이번 달 요청'),
+ 'Add an OpenAI organization Admin key to read API usage and costs.': ('添加 OpenAI 组织 Admin 密钥以读取 API 用量和费用。', '新增 OpenAI 組織 Admin 金鑰以讀取 API 用量與費用。', 'API の使用量と費用を読むには OpenAI 組織の Admin キーを追加してください。', 'API 사용량과 비용을 읽으려면 OpenAI 조직 Admin 키를 추가하세요.'),
+ "Couldn't save or remove the OpenAI Admin key.": ('无法保存或移除 OpenAI Admin 密钥。', '無法儲存或移除 OpenAI Admin 金鑰。', 'OpenAI Admin キーを保存または削除できませんでした。', 'OpenAI Admin 키를 저장하거나 삭제하지 못했습니다.'),
+ 'OpenAI API usage data is incomplete or invalid. Try again later.': ('OpenAI API 用量数据不完整或无效，请稍后重试。', 'OpenAI API 用量資料不完整或無效，請稍後重試。', 'OpenAI API の使用量データが不完全または無効です。後で再試行してください。', 'OpenAI API 사용량 데이터가 불완전하거나 잘못되었습니다. 나중에 다시 시도하세요.'),
+ "Couldn't reach OpenAI API. Check your connection and proxy.": ('无法连接 OpenAI API，请检查网络和代理。', '無法連線 OpenAI API，請檢查網路與代理。', 'OpenAI API に接続できません。ネットワークとプロキシを確認してください。', 'OpenAI API에 연결하지 못했습니다. 네트워크와 프록시를 확인하세요.'),
+ 'The OpenAI Admin key was rejected. Replace it in service settings.': ('OpenAI Admin 密钥被拒绝，请在服务设置中更换。', 'OpenAI Admin 金鑰遭拒，請在服務設定中更換。', 'OpenAI Admin キーが拒否されました。サービス設定で交換してください。', 'OpenAI Admin 키가 거부되었습니다. 서비스 설정에서 교체하세요.'),
+ 'This key cannot read organization usage or costs. Check its permissions.': ('此密钥无权读取组织用量或费用，请检查权限。', '此金鑰無權讀取組織用量或費用，請檢查權限。', 'このキーには組織の使用量または費用の読み取り権限がありません。権限を確認してください。', '이 키는 조직 사용량 또는 비용을 읽을 수 없습니다. 권한을 확인하세요.'),
+ 'Usage queries are temporarily rate limited. Try again later.': ('用量查询暂时受到限流，请稍后重试。', '用量查詢暫時受到限流，請稍後重試。', '使用量の照会が一時的に制限されています。後で再試行してください。', '사용량 조회가 일시적으로 제한되었습니다. 나중에 다시 시도하세요.'),
+ 'OpenAI API reporting is unavailable. Try again later.': ('OpenAI API 统计暂不可用，请稍后重试。', 'OpenAI API 統計暫不可用，請稍後重試。', 'OpenAI API の統計を取得できません。後で再試行してください。', 'OpenAI API 통계를 사용할 수 없습니다. 나중에 다시 시도하세요.'),
+ 'Reads organization-wide API usage and costs. Requires an organization Admin key; a model API key is not sufficient.': ('读取整个组织的 API 用量和费用。需要组织 Admin 密钥，普通模型 API 密钥不适用。', '讀取整個組織的 API 用量與費用。需要組織 Admin 金鑰，普通模型 API 金鑰不適用。', '組織全体の API 使用量と費用を読み取ります。通常のモデル API キーではなく、組織の Admin キーが必要です。', '조직 전체의 API 사용량과 비용을 읽습니다. 일반 모델 API 키가 아닌 조직 Admin 키가 필요합니다.'),
+ 'OpenAI API costs are reported by the organization in UTC and may be delayed. Model token counts cover the completions usage endpoint; model costs are unavailable. Other sources may use local estimates.': ('OpenAI API 费用来自组织统计，按 UTC 日期记录，可能有延迟。模型 Token 来自 completions 用量接口，不提供模型费用；其他来源可能使用本机估算。', 'OpenAI API 費用來自組織統計，按 UTC 日期記錄，可能有延遲。模型 Token 來自 completions 用量介面，不提供模型費用；其他來源可能使用本機估算。', 'OpenAI API の費用は組織から UTC 日付で報告され、遅延する場合があります。モデル別トークンは completions 使用量に基づき、モデル別費用は不明です。他のソースはローカル推計の場合があります。', 'OpenAI API 비용은 조직에서 UTC 날짜로 보고하며 지연될 수 있습니다. 모델 토큰은 completions 사용량 기준이며 모델별 비용은 제공되지 않습니다. 다른 출처는 로컬 추정치를 사용할 수 있습니다.'),
+}

@@ -65,7 +65,7 @@ fn main() {
         .manage(tray::Trays::default())
         .manage(panel::Panel::default())
         .manage(account_setup::AccountSetup::default())
-        .invoke_handler(tauri::generate_handler![bridge::desktop_request, shortcuts::shortcut_capture, panel::panel_frame, panel::panel_content_height, account_setup::account_login, account_setup::account_setups, account_setup::account_setup_create, account_setup::account_setup_remove, account_setup::account_directory, links::open_link, quit, hide])
+        .invoke_handler(tauri::generate_handler![bridge::desktop_request, shortcuts::shortcut_capture, panel::panel_frame, panel::panel_content_height, panel::panel_appearance, account_setup::account_login, account_setup::account_setups, account_setup::account_setup_create, account_setup::account_setup_remove, account_setup::account_directory, links::open_link, quit, hide])
         .setup(|app| {
             // A missing global-hotkey backend (e.g. a Wayland-only session) must not prevent startup.
             if app.handle().plugin(tauri_plugin_global_shortcut::Builder::new().with_handler(|app,_,event| {

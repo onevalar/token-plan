@@ -48,8 +48,10 @@ const ratio=(a:number,b:number)=>(Math.max(a,b)+.05)/(Math.min(a,b)+.05);
  * Status and usage colors are mixed toward the text color by the least amount that meets their target there.
  */
 export function glassColors(theme:Theme,transparency:number) {
- // Rounded the way the CSS applies it, so contrast is checked against the tint actually drawn.
- const p=palette[theme],tint=Math.round(100-Math.min(100,Math.max(0,transparency))*(1-minimumTint[theme]))/100;
+ // Native materials already carry a tint. Give the middle of the slider visible glass instead of
+ // coating it twice; retain the same worst-backdrop contrast floor at maximum transparency.
+ const amount=Math.sqrt(Math.min(100,Math.max(0,transparency))/100);
+ const p=palette[theme],tint=Math.round((1-amount*(1-minimumTint[theme]))*10000)/10000;
  const panel=tint*p.tint+(1-tint)*p.worst,backdrop=panel+p.lift*(1-panel),back=luminance(backdrop);
  const opacity=(target:number)=>{for(let o=0;o<=100;o++)if(ratio(luminance(o/100*p.text+(1-o/100)*backdrop),back)>=target)return o;return 100;};
  const strongest=ratio(luminance(p.text),back);
@@ -58,7 +60,7 @@ export function glassColors(theme:Theme,transparency:number) {
   let mix=0;while(mix<100&&ratio(relative(at(mix)),back)<statusTarget[name])mix++;
   return [name,{mix,color:at(mix)}];
  })) as Record<StatusColor,{mix:number;color:Channels}>;
- return {tint:Math.round(tint*100),secondary:opacity(Math.max(4.5,Math.min(7,strongest*.85))),muted:opacity(4.5),worstContrast:strongest,status};
+ return {tint:Math.round(tint*10000)/100,secondary:opacity(Math.max(4.5,Math.min(7,strongest*.85))),muted:opacity(4.5),worstContrast:strongest,status};
 }
 
 function read():PanelSurface {

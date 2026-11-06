@@ -16,7 +16,7 @@ async function settings(page:Page,language='en') {
  await page.getByRole('menuitem',{name:textFor(language).settings,exact:true}).click();
 }
 // Earlier single-name styles are now a family tile plus an option.
-const legacy:Record<string,string[]>={'Gauges':['Rings','Dashboard Ring'],'Quota Ruler':['Bars','Quota Ruler'],'Numbers':['Editorial & Numbers','Numbers'],'Percentage Grid':['Cells','Grid'],'Compact Rings':['Rings','Single Ring'],'Concentric Rings':['Rings','Double Ring'],'Tick Ring':['Rings','Single Ring Ticks'],'Segmented Bar':['Cells','Single Row']};
+const legacy:Record<string,string[]>={'Gauges':['Instruments','Dashboard Ring'],'Quota Ruler':['Bars','Quota Ruler'],'Numbers':['Editorial & Numbers','Numbers'],'Percentage Grid':['Cells','Grid'],'Compact Rings':['Rings','Single Ring'],'Concentric Rings':['Rings','Double Ring'],'Tick Ring':['Rings','Single Ring Ticks'],'Segmented Bar':['Cells','Single Row']};
 async function choose(page:Page,name:string,language='en') {
  const label=providerText('Usage Style',language),toggle=page.getByRole('button',{name:new RegExp(`^${label}`)});
  if(await toggle.getAttribute('aria-expanded')==='false')await toggle.click();
@@ -38,9 +38,9 @@ test('Home style persists independently of density, tray and details, with keybo
  await toggle.focus();await page.keyboard.press('Enter');await expect(toggle).toHaveAttribute('aria-expanded','true');
  await expect(options.getByRole('button')).toHaveCount(10);
  await expect(options.getByRole('button',{name:'Bars',exact:true})).toHaveAttribute('aria-pressed','true');
- await options.getByRole('button',{name:'Rings',exact:true}).focus();await page.keyboard.press('Enter');await page.getByRole('combobox',{name:'Variant',exact:true}).click();await page.getByRole('option',{name:'Dashboard Ring',exact:true}).click();
+ await options.getByRole('button',{name:'Instruments',exact:true}).focus();await page.keyboard.press('Enter');await page.getByRole('combobox',{name:'Variant',exact:true}).click();await page.getByRole('option',{name:'Dashboard Ring',exact:true}).click();
  await expect(home(page)).toHaveAttribute('data-usage-style','gauges');
- await expect(options.getByRole('button',{name:'Rings',exact:true})).toHaveAttribute('aria-pressed','true');
+ await expect(options.getByRole('button',{name:'Instruments',exact:true})).toHaveAttribute('aria-pressed','true');
  await expect(options.getByRole('button',{name:'Bars',exact:true})).toHaveAttribute('aria-pressed','false');
  await expect(toggle).toContainText('Dashboard Ring');
  await toggle.click();await expect(options).toHaveCount(0);
@@ -426,15 +426,25 @@ test('quota disclosure shows real readings and reset time, and Escape or close r
  expect(await page.evaluate(()=>(window as any).__panelHides??0)).toBe(0);
 });
 
-test('Primary Dial arrows only move focus; Enter and Space activate without dropping other windows',async({page})=>{
+test('Primary Dial shows each quota once in compact independent rows',async({page})=>{
  const data=largeDesktop();data.accounts=[data.accounts[0]];
  await page.addInitScript(()=>localStorage.setItem('tokenplan.homeUsageStyle','instrument:primary'));await mockDesktop(page,'en',false,data);await page.goto('/');
- const hero=home(page).locator('.hq-primary-hero'),buttons=home(page).locator('.hq-primary-select');
- await buttons.first().focus();await page.keyboard.press('ArrowDown');await expect(buttons.nth(1)).toBeFocused();await expect(hero).toHaveAttribute('data-focused-metric','session');
- await page.keyboard.press('Enter');await expect(hero).toHaveAttribute('data-focused-metric','weekly');await expect(buttons.nth(1)).toHaveAttribute('aria-pressed','true');
- await page.keyboard.press('Home');await expect(buttons.first()).toBeFocused();await expect(hero).toHaveAttribute('data-focused-metric','weekly');
- await page.keyboard.press('Space');await expect(hero).toHaveAttribute('data-focused-metric','session');await expect(home(page).getByRole('meter')).toHaveCount(2);
- await expect(buttons).toContainText(['46%','92%']);
+ const rows=home(page).locator('.hq-primary-row');await expect(rows).toHaveCount(2);
+ await expect(home(page).locator('.hq-primary-hero,.hq-track')).toHaveCount(0);
+ await expect(home(page).getByRole('meter')).toHaveCount(2);
+ for(const row of await rows.all()){await expect(row.locator('[data-quota-value]')).toHaveCount(1);expect((await row.boundingBox())!.height).toBeLessThan(145);}
+ await rows.first().getByRole('button').click();await expect(home(page).getByRole('region',{name:/Quota Details/})).toBeVisible();
+ await page.keyboard.press('Escape');await expect(rows.first().getByRole('button')).toBeFocused();
+ await page.screenshot({path:'../../dist/review-instruments/needle.png'});
+});
+
+test('Dashboard Ring is an instrument with its cycle inside the dial',async({page})=>{
+ await mockDesktop(page,'en',false,largeDesktop());await page.goto('/');await settings(page);await choose(page,'Gauges');
+ const preview=page.getByRole('region',{name:'Style Preview'});
+ await expect(preview.locator('.quota-gauge-reading')).toHaveCount(2);
+ await expect(preview.locator('.quota-title')).toHaveCount(0);
+ await expect(preview.locator('.quota-gauge-reading').first()).toContainText('5h');
+ await preview.screenshot({path:'../../dist/review-instruments/gauges.png'});
 });
 
 for(const style of ['cycle','cycle:lanes','cycle:clock'])test(`${style} keeps independent time channels and never infers a missing or renewed cycle`,async({page})=>{

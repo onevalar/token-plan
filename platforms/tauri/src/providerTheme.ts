@@ -9,7 +9,7 @@ const colors:Record<string,[string,string]>={
  copilot:['#8652bd','#c098ec'],amp:['#c64d3b','#f18b79'],
  deepseek:['#3d60d2','#91a6ff'],devin:['#147b91','#6bc5d5'],
  moonshot:['#3268d6','#8aacf5'],kimi:['#3268d6','#8aacf5'],
- minimax:['#bd426b','#ef8fac'],openrouter:['#6655c4','#afa2f3'],
+ anthropic:['#d97757','#efa98d'],openai:['#10a37f','#6bd9bc'],minimax:['#bd426b','#ef8fac'],openrouter:['#6655c4','#afa2f3'],
  siliconflow:['#7954c0','#bc9af0'],ollama:['#647353','#b4c69d'],
  zai:['#526e9d','#a2bbe4'],
 };

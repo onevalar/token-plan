@@ -10,7 +10,7 @@
 .mac-preview .home-header { grid-template-columns:minmax(0,1fr) auto; }
 .mac-preview .configure-header { grid-template-columns:36px minmax(0,1fr) auto; }
 .mac-preview .home-header .page-title { justify-content:flex-start;gap:8px; }
-.mac-preview .home-header h1 { font-size:17px; }
+.mac-preview .home-header h1 { font:500 var(--text-base)/var(--leading-body) var(--font-body); }
 .mac-preview .header-actions { display:flex;align-items:center;justify-content:flex-end;gap:4px;min-width:36px;--control-height-md:var(--control-height-sm); }
 .mac-preview .update-button { flex:none;gap:5px;height:32px;min-height:32px;padding-inline:9px;font-size:12px; }
 .mac-preview .update-button svg { flex:none;color:var(--text-secondary); }
@@ -22,11 +22,11 @@
 .mac-preview .preview-page::-webkit-scrollbar-track { background:transparent; }
 .mac-preview .preview-page::-webkit-scrollbar-thumb { background:transparent;border:2px solid transparent;border-radius:9999px;background-clip:padding-box; }
 .mac-preview .preview-page:hover::-webkit-scrollbar-thumb { background-color:color-mix(in oklab,var(--foreground) 25%,transparent); }
-.mac-preview .preview-page[data-page="home"] { padding-top:0; }
+.mac-preview .preview-page[data-page="home"] { padding:0 var(--space-4) var(--space-2); }
 .mac-preview .provider:last-child { border-bottom:0; }
 .mac-preview .provider { padding-block:14px; }
 .mac-preview .dashboard .identity-line h2 { color:var(--foreground); }
-.mac-preview .dashboard .email,.mac-preview .dashboard .plan { font-size:var(--text-xs);font-weight:400;color:var(--text-muted); }
+.mac-preview .dashboard .email,.mac-preview .dashboard .plan { font-size:var(--text-xs);font-weight:400;color:var(--text-secondary); }
 .mac-preview .detail-group > p,.mac-preview .dashboard .notice { overflow-wrap:anywhere; }
 .mac-preview .inline-error { margin:10px 12px;padding:10px 12px;font-size:12px;border:1px solid var(--border);border-radius:var(--radius-control);color:var(--danger);overflow-wrap:anywhere; }
 .mac-preview .empty-state { color:var(--text-secondary);font-size:13px;padding:22px 8px;text-align:center; }
@@ -209,7 +209,6 @@
 @media(prefers-reduced-motion:reduce) { .refresh-button .refresh-symbol { animation:none !important; } .mac-preview .refresh-status { animation:none; } }
 
 /* Accounts: adding, notes and removal. */
-.mac-preview .add-account-row { width:100%;justify-content:center;gap:6px;margin-top:10px;color:var(--text-secondary);font-size:13px; }
 .mac-preview .empty-state .empty-actions { display:flex;justify-content:center;gap:8px;margin-top:12px; }
 .mac-preview .add-intro { color:var(--text-secondary);font-size:12px;line-height:1.6;margin:0 2px 18px; }
 .mac-preview .added-note { display:flex;align-items:center;gap:6px;margin:0 0 8px;color:var(--success);font-size:12px;overflow-wrap:anywhere; }
@@ -273,12 +272,12 @@
 :root[data-panel="glass"] .mac-preview { background:transparent;
  --text-secondary:color-mix(in srgb,var(--foreground) var(--glass-secondary),transparent);
  --text-muted:color-mix(in srgb,var(--foreground) var(--glass-muted),transparent);
- --border:color-mix(in srgb,var(--foreground) 10%,transparent);--border-subtle:color-mix(in srgb,var(--foreground) 7%,transparent);--border-strong:color-mix(in srgb,var(--foreground) 18%,transparent);
- --surface:rgb(255 255 255 / .5);--surface-raised:rgb(255 255 255 / .6);--background:rgb(255 255 255 / .75);--surface-muted:rgb(255 255 255 / .38);
+ --border:color-mix(in srgb,var(--foreground) 14%,transparent);--border-subtle:color-mix(in srgb,var(--foreground) 9%,transparent);--border-strong:color-mix(in srgb,var(--foreground) 22%,transparent);
+ --surface:rgb(255 255 255 / .22);--surface-raised:rgb(255 255 255 / .36);--background:rgb(255 255 255 / .5);--surface-muted:rgb(255 255 255 / .16);
  --control-track:rgb(0 0 0 / .1);--control-track-hover:rgb(0 0 0 / .14);--shadow-resting:0 1px 2px rgb(0 0 0 / .05);
  --success:var(--glass-success-light);--warning:var(--glass-warning-light);--danger:var(--glass-danger-light);--usage-normal:var(--glass-usage-light); }
 :root[data-panel="glass"][data-theme="dark"] .mac-preview {
- --surface:rgb(255 255 255 / .07);--surface-raised:rgb(255 255 255 / .09);--background:rgb(255 255 255 / .12);--surface-muted:rgb(255 255 255 / .06);
+ --surface:rgb(255 255 255 / .04);--surface-raised:rgb(255 255 255 / .08);--background:rgb(255 255 255 / .12);--surface-muted:rgb(255 255 255 / .04);
  --control-track:rgb(255 255 255 / .16);--control-track-hover:rgb(255 255 255 / .2);--shadow-resting:none;
  --success:var(--glass-success-dark);--warning:var(--glass-warning-dark);--danger:var(--glass-danger-dark);--usage-normal:var(--glass-usage-dark); }
 /* The danger color already meets its contrast target on glass; mixing it with the translucent background would undo that. */

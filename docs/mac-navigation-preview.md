@@ -85,7 +85,7 @@ tray integration remain platform-specific. This change does not publish a releas
   back to Add Account. Never-added service placeholders stay out of this list. Older
   versions did not record this distinction: previously hidden accounts can be added once
   from Add Account, after which hiding them preserves their membership.
-- Add Account is an action inside Subscription Management, with a shortcut at the end of Home.
+- Add Account is an action inside Subscription Management. Home has no persistent add-account footer; an empty account list still offers onboarding.
   Choose a service first, then use its available account or connection options. Claude
   and Codex create a local pending record with an optional note and a private `.claude-accountN` or
   `.codex-accountN` directory, skipping existing folders. Login opens the official CLI in that folder;
@@ -124,6 +124,11 @@ tray integration remain platform-specific. This change does not publish a releas
   3:1 minimum for graphics (service brand colors are unchanged). The highest transparency stops where that would no longer
   hold. When the system turns transparency off (macOS Reduce Transparency, Windows Transparency effects), the panel is solid
   and both rows are disabled with a note explaining why. On Windows, Solid also turns the window's acrylic off. Kept per device.
+- Home keeps each service together, including its multiple accounts. The service heading stays visible while scrolling
+  through that group without covering keyboard-focused account entries; selected usage styles and account order are unchanged.
+  The transparency control preserves the same minimum text contrast. On macOS, choosing Light or Dark also changes the panel's native material; System restores automatic
+  appearance. This does not change the menu bar's system appearance. Verify desktop blur in the native app over a varied
+  backdrop, not from a browser screenshot.
 - Each setting has one home. General Settings groups, in order: Appearance and Language (appearance, panel style, language), Usage Style, Home (density, used/remaining), Menu Bar (macOS), Data Refresh, then notifications and shortcuts. The Menu Bar group holds everything
   about the menu bar: a live preview at the top, style and icon position, and every shown account with its switch; a switched-on
   account lists its metrics with plus/minus controls to add or remove up to three for the menu bar. Hints about three rings or value-only metrics appear
@@ -343,3 +348,7 @@ comparison and personal reference start disabled. Existing four-module preferenc
 order, styles and visibility when the new modules are added. The toolbar is labelled Detailed
 Statistics. Daily charts expose exact readings through pointer or keyboard selection, including
 an explicit missing-data state. All new controls and explanations ship in the five app languages.
+
+Home sizes to its visible content on macOS, Windows and Linux, including a single basic bar or an account with all metrics hidden. Its bottom inset is 8px; the native minimum only reserves the 54px header rather than imposing a 120px content floor. Larger pages retain scrolling and the screen-height cap.
+
+Dashboard Ring is listed under Instruments while retaining the saved `gauges` identifier. Its cycle label sits inside the arc above the reading, with the countdown below. Primary Dial now shows one compact pointer row per quota, with one reading and a direct detail disclosure; the repeated hero and selectable bar list have been removed. The shared renderer applies on all three platforms.

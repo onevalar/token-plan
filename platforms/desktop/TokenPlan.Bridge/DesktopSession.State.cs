@@ -24,20 +24,21 @@ public sealed partial class DesktopSession
             tray = preferences.TrayServices.GetValueOrDefault(a.Id, true) && preferences.TrayAccounts.GetValueOrDefault(a.SettingsKey, true),
             removable = Preferences.AccountRemovalKey(a) != null, apiKey = ProviderCatalog.Get(a.Id).EnvironmentKey != null,
             apiKeyStatus = KeyStatus(a.Id),
+            warning = a.Snapshot?.Warning ?? "",
             note = preferences.ProviderNotes.GetValueOrDefault(a.SettingsKey, ""), error = a.ErrorKey ?? "",
             fetchedAt = a.Snapshot?.FetchedAt.ToString("O") ?? "",
             metrics = preferences.OrderedMetrics(a.SettingsKey, a.Snapshot?.Windows ?? []).Select(w => new {
                 id = w.Label, label = w.Label, placement = preferences.Placement(a.SettingsKey, w.Label).ToString().ToLowerInvariant(),
-                pinned = (preferences.PinnedMetrics.GetValueOrDefault(a.SettingsKey) ?? a.Snapshot!.Windows.Take(2).Select(x => x.Label).ToArray()).Contains(w.Label),
-                pinnable = true, hasData = true, unit = w.Currency == "USD" ? "dollars" : w.Currency == "CNY" ? "yuan" : w.Currency == "COUNT" ? "count" : "percent",
+                pinned = (preferences.PinnedMetrics.GetValueOrDefault(a.SettingsKey) ?? (a.Id is "openai" or "anthropic" ? Array.Empty<string>() : a.Snapshot!.Windows.Take(2).Select(x => x.Label).ToArray())).Contains(w.Label),
+                statusText = w.StatusText ?? "", pinnable = w.StatusText == null, hasData = true, unit = w.Currency == "USD" ? "dollars" : w.Currency == "CNY" ? "yuan" : w.Currency is "COUNT" or "CREDITS" ? "count" : "percent",
                 percent = w.IsBalance ? (double?)null : preferences.ShowRemaining ? Math.Max(0, 100 - w.UsedPercent) : w.UsedPercent, amount = w.Amount,
                 notStarted = w.PeriodSeconds == 18000 && w.UsedPercent == 0 && w.ResetsAt == null, expiries = w.Expiries?.Select(d => d.ToString("O")).ToArray() ?? [], chart = Array.Empty<object>(),
                 resetsAt = w.ResetsAt?.ToString("O"), periodSeconds = w.PeriodSeconds, values = Array.Empty<object>()
             }),
-            history = a.AccountKey == null && trends.TryGetValue(a.Id, out var trend)
+            history = a.AccountKey == null && (a.Snapshot?.History ?? trends.GetValueOrDefault(a.Id)) is { } trend
                 ? trend.Days.Select(d => new { date = d.Date.ToString("yyyy-MM-dd"), tokens = d.Tokens.Total, cost = d.Cost is { Priced: > 0 } cost ? (double?)cost.Dollars : null, models = (d.Models ?? []).Select(m => new { model = m.Model, tokens = m.Tokens.Total, cost = m.Cost.Unpriced > 0 ? (double?)null : m.Cost.Dollars, variants = Array.Empty<object>() }).ToArray() }).ToArray() : [],
             observations = Observations(a),
-            historyScope = a.Id == "cursor" ? "account" : "device", historyPartial = failedHistories.Contains(HistoryFile(a)) || ((trends.GetValueOrDefault(a.Id)?.Partial ?? false) || (trends.GetValueOrDefault(a.Id)?.Days.Any(d => d.Cost?.Unpriced > 0) ?? false))
+            historyScope = a.Id is "cursor" or "openai" or "anthropic" ? "account" : "device", historyPartial = failedHistories.Contains(HistoryFile(a)) || (((a.Snapshot?.History ?? trends.GetValueOrDefault(a.Id))?.Partial ?? false) || (trends.GetValueOrDefault(a.Id)?.Days.Any(d => d.Cost?.Unpriced > 0) ?? false))
         }).ToArray()
     };
 }

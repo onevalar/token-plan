@@ -32,8 +32,8 @@ export const homeQuotaDesigns={
 export const styleCategories=[
  {id:'bars',label:'Bars',styles:['bars','ruler','ruler:cursor','ruler:edge','ruler:folded','sources','texturebar']},
  {id:'cells',label:'Cells',styles:['cells','segments','cells:dots','cells:grille']},
- {id:'rings',label:'Rings',styles:['rings','concentric','ticks','gauges']},
- {id:'instrument',label:'Instruments',styles:['instrument','instrument:edge','instrument:primary']},
+ {id:'rings',label:'Rings',styles:['rings','concentric','ticks']},
+ {id:'instrument',label:'Instruments',styles:['gauges','instrument','instrument:edge','instrument:primary']},
  {id:'cycle',label:'Cycles',styles:['cycle','cycle:lanes','cycle:clock']},
  {id:'vessel',label:'Containers',styles:['vessel','vessel:tank','vessel:thermometer','vessel:hourglass','vessel:chambers']},
  {id:'numbers',label:'Editorial & Numbers',styles:['numbers','numbers:ticket','numbers:spread','numbers:spine']},

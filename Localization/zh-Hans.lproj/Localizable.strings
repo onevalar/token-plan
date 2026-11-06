@@ -106,6 +106,8 @@
 "Add Service" = "添加服务";
 "Add Service Login" = "添加服务登录";
 "Add an API key in service settings, then refresh." = "在服务设置中添加 API 密钥，然后刷新。";
+"Add an Anthropic organization Admin key to read API usage and costs." = "添加 Anthropic 组织 Admin 密钥以读取 API 用量和费用。";
+"Add an OpenAI organization Admin key to read API usage and costs." = "添加 OpenAI 组织 Admin 密钥以读取 API 用量和费用。";
 "Added to Home" = "已添加到首页";
 "Additional Claude and Codex logins can come from Claude Swap, Codex Swap, supported Codex homes or pi. TokenPlan only reads these logins; it does not switch accounts." = "多个 Claude、Codex 登录可来自 Claude Swap、Codex Swap、受支持的 Codex 目录或 pi。TokenPlan 只读取登录，不负责切换账号。";
 "Additional accounts could not be read. Check the account configuration folders." = "无法读取其他账号，请检查账号配置文件夹。";
@@ -138,6 +140,8 @@
 "Another Account" = "其他账号";
 "Another account is connected." = "当前连接的是另一个账号。";
 "Another account is currently connected. This saved account is kept; connect its configuration directory or sign in to it." = "当前连接的是另一个账号。此账号仍会保留，可连接它的配置目录或登录此账号。";
+"Anthropic API reporting is unavailable. Try again later." = "Anthropic API 统计暂不可用，请稍后重试。";
+"Anthropic API usage data is incomplete or invalid. Try again later." = "Anthropic API 用量数据不完整或无效，请稍后重试。";
 "Anthropic has temporarily limited usage queries. Data may be out of date." = "Anthropic 暂时限制了用量查询，当前数据可能不是最新。";
 "Antigravity credentials are invalid. Open Antigravity or run `agy` to sign in again." = "Antigravity 凭据无效。请打开 Antigravity 或运行 `agy` 重新登录。";
 "Antigravity sign-in expired. Open Antigravity or run `agy` to refresh." = "Antigravity 登录已过期。请打开 Antigravity 或运行 `agy` 刷新。";
@@ -300,7 +304,9 @@
 "Couldn't %@ the terminal helper: %@" = "无法%1$@终端助手：%2$@";
 "Couldn't copy the log path to the clipboard." = "无法将日志路径复制到剪贴板。";
 "Couldn't reach %@. Check your connection." = "无法连接 %@，请检查网络。";
+"Couldn't reach Anthropic API. Check your connection and proxy." = "无法连接 Anthropic API，请检查网络和代理。";
 "Couldn't reach GitHub. Check your connection." = "无法连接 GitHub，请检查网络。";
+"Couldn't reach OpenAI API. Check your connection and proxy." = "无法连接 OpenAI API，请检查网络和代理。";
 "Couldn't reach OpenRouter. Check your connection." = "无法连接 OpenRouter，请检查网络。";
 "Couldn't read Amp usage. Check amp usage in Terminal or update the Amp CLI." = "无法识别 Amp 用量。请在终端检查 amp usage，或更新 Amp 命令行工具。";
 "Couldn't read Amp's saved login. Check its file permissions or log in to Amp again." = "无法读取 Amp 已保存的登录。请检查文件权限，或重新登录 Amp。";
@@ -313,6 +319,8 @@
 "Couldn't remove the saved OpenRouter API key." = "无法移除已保存的 OpenRouter API 密钥。";
 "Couldn't remove the saved Z.ai API key." = "无法移除已保存的 Z.ai API 密钥。";
 "Couldn't reset usage. Please try again." = "无法重置用量，请重试。";
+"Couldn't save or remove the Anthropic Admin key." = "无法保存或移除 Anthropic Admin 密钥。";
+"Couldn't save or remove the OpenAI Admin key." = "无法保存或移除 OpenAI Admin 密钥。";
 "Couldn't save the %@ API key." = "无法保存 %@ 的 API 密钥。";
 "Couldn't save the OpenRouter API key." = "无法保存 OpenRouter 的 API 密钥。";
 "Couldn't save the Z.ai API key." = "无法保存 Z.ai 的 API 密钥。";
@@ -634,6 +642,8 @@
 "Model token counts are invalid. Showing the original model list." = "模型 token 数值无效，改为显示原始模型列表。";
 "Model tokens exceed the recorded total. Showing the original model list." = "模型 token 之和超过记录总数，改为显示原始模型列表。";
 "Monitor Your AI Subscriptions with TokenPlan" = "用 TokenPlan 监控你的 AI 订阅";
+"Month Requests" = "本月请求";
+"Month Tokens" = "本月 Token";
 "Monthly" = "每月";
 "More" = "更多";
 "More Metrics" = "更多指标";
@@ -729,6 +739,7 @@
 "Numbers" = "醒目数字";
 "Observation List" = "采样记录";
 "Off" = "关闭";
+"Official API reports use UTC and may be delayed. Model costs are unavailable; local records may overlap API reports." = "官方 API 统计按 UTC 日期记录，可能有延迟。暂无模型费用；本机记录可能与 API 统计重叠。";
 "On Demand" = "按需展开";
 "One column per day, %@ in total. Move the pointer or use arrow keys to select a day. The 12 cells show relative intensity, rounded up, not a live rate." = "每天一列，共 %@ 天。移动指针或使用方向键选择日期。12 格表示向上取整后的相对强度，并非实时速率。";
 "One day is a point, not a trend." = "一天的数据只是一个点，不构成走势。";
@@ -744,6 +755,9 @@
 "Open Terminal to Sign In" = "打开终端登录";
 "Open TokenPlan from anywhere" = "在任何地方打开 TokenPlan";
 "Open-Source Licenses" = "开源许可证";
+"OpenAI API costs are reported by the organization in UTC and may be delayed. Model token counts cover the completions usage endpoint; model costs are unavailable. Other sources may use local estimates." = "OpenAI API 费用来自组织统计，按 UTC 日期记录，可能有延迟。模型 Token 来自 completions 用量接口，不提供模型费用；其他来源可能使用本机估算。";
+"OpenAI API reporting is unavailable. Try again later." = "OpenAI API 统计暂不可用，请稍后重试。";
+"OpenAI API usage data is incomplete or invalid. Try again later." = "OpenAI API 用量数据不完整或无效，请稍后重试。";
 "OpenCode Go key was rejected. Log into OpenCode Go again." = "OpenCode Go 密钥被拒绝。请重新登录 OpenCode Go。";
 "OpenCode not detected. Log in with OpenCode Go or use OpenCode locally first." = "未检测到 OpenCode。请先登录 OpenCode Go 或在本地使用 OpenCode。";
 "OpenRouter API key invalid. Check your key at openrouter.ai/keys." = "OpenRouter 的 API 密钥无效。请到 openrouter.ai/keys 检查你的密钥。";
@@ -757,6 +771,7 @@
 "Org Credits" = "组织额度";
 "Org Spend" = "组织花费";
 "Organization" = "组织";
+"Organization Admin Key" = "组织 Admin 密钥";
 "Other" = "其他";
 "Other Models" = "其他模型";
 "Other Reported Tokens" = "其他已报告 Token";
@@ -847,6 +862,7 @@
 "Read-only in TokenPlan. Use reset credits in the provider's own app." = "TokenPlan 仅展示这些额度，请在服务商自己的应用中使用。";
 "Reading local token logs…" = "正在读取本机 Token 日志…";
 "Reads existing logins on this device. Credentials are never copied or synced." = "读取本机的现有登录，凭据不会被复制或同步。";
+"Reads organization-wide API usage and costs. Requires an organization Admin key; a model API key is not sufficient." = "读取整个组织的 API 用量和费用。需要组织 Admin 密钥，普通模型 API 密钥不适用。";
 "Recalculating Estimates…" = "正在重新计算估算…";
 "Receive pre-release builds before they ship to everyone" = "在正式发布前抢先收到预发布版本";
 "Record Shortcut" = "录制快捷键";
@@ -1094,6 +1110,8 @@
 "The API key could not be removed. Check local folder permissions." = "无法移除 API 密钥，请检查本地文件夹权限。";
 "The API key could not be saved. Check the key and local folder permissions." = "无法保存 API 密钥，请检查密钥和本地文件夹权限。";
 "The API key was rejected. Check the key in service settings." = "API 密钥被拒绝，请在服务设置中检查密钥。";
+"The Anthropic Admin key was rejected. Replace it in service settings." = "Anthropic Admin 密钥被拒绝，请在服务设置中更换。";
+"The OpenAI Admin key was rejected. Replace it in service settings." = "OpenAI Admin 密钥被拒绝，请在服务设置中更换。";
 "The browser could not be opened." = "无法打开浏览器。";
 "The bundled terminal helper couldn't be found. Reinstall TokenPlan and try again." = "找不到内置的终端助手。请重新安装 TokenPlan 后重试。";
 "The connection timed out. Check whether the desktop app can use your proxy or VPN, then retry." = "连接超时，请检查桌面应用是否能使用代理或 VPN 后重试。";
@@ -1125,6 +1143,7 @@
 "This Month" = "本月";
 "This Week" = "本周";
 "This account does not expose a personal quota. Organization billing requires billing permissions." = "此账号不提供个人额度，组织账单需要账单管理权限。";
+"This key cannot read organization usage or costs. Check its permissions." = "此密钥无权读取组织用量或费用，请检查权限。";
 "This login cannot renew automatically. Open the CLI for this account to refresh its login, then retry." = "此登录信息无法自动续期。请打开该账号的 CLI 更新登录状态后重试。";
 "This model's pricing is unavailable. Choose another model or None." = "该模型的定价不可用。请选择其他模型或“无”。";
 "This period used a model with unknown pricing" = "这段时间使用了价格未知的模型";
@@ -1191,6 +1210,7 @@
 "Unknown models found" = "发现未知模型";
 "Unknown provider: %@" = "未知的服务商：%@";
 "Unknown values are not treated as zero." = "未知值不视为零。";
+"Unlimited" = "不限量";
 "Unsaved Changes" = "尚未保存";
 "Unstar" = "取消星标";
 "Up to %lld stars per provider" = "每个服务商最多 %lld 个星标";
@@ -1224,6 +1244,7 @@
 "Usage or login data could not be read. Sign in again." = "无法读取用量或登录信息，请重新登录。";
 "Usage queries are temporarily rate limited. Data may be out of date. Retrying automatically later." = "用量查询暂时受限，当前数据可能不是最新。稍后自动重试。";
 "Usage queries are temporarily rate limited. Data may be out of date. Retrying automatically shortly." = "用量查询暂时受限，当前数据可能不是最新。稍后自动重试。";
+"Usage queries are temporarily rate limited. Try again later." = "用量查询暂时受到限流，请稍后重试。";
 "Usage request failed (HTTP %lld). Try again later." = "用量请求失败（HTTP %lld），请稍后重试。";
 "Usage request failed after refresh. Try again." = "刷新后用量请求仍然失败，请重试。";
 "Usage request failed. Check your connection." = "用量请求失败，请检查网络。";

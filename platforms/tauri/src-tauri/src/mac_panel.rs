@@ -13,7 +13,7 @@ fn screen_at(frames:&[Frame],point:(f64,f64))->Option<usize> {
 }
 fn fitted_frame(area:Frame,center:f64,top:f64,height:f64)->Frame {
     let width=390_f64.min(area.width);
-    let height=height.clamp(120.,680.).min((area.height-12.).max(1.));
+    let height=height.clamp(crate::panel::MIN_PANEL_HEIGHT,680.).min((area.height-12.).max(1.));
     let inset=6_f64.min(((area.width-width)/2.).max(0.));
     let x=(center-width/2.).clamp(area.x+inset,area.x+area.width-width-inset);
     let y=(top-height).clamp(area.y,(area.top()-height).max(area.y));
@@ -125,6 +125,15 @@ mod tests {
         assert_eq!(small.x,large.x);
         assert_eq!(large.x+large.width,-6.);
         assert!(work.contains((large.x,large.y)));
+    }
+    #[test]
+    fn compact_content_keeps_its_height_and_top_anchor() {
+        let small=fitted_frame(LAPTOP,400.,950.,96.);
+        assert_eq!(small.height,96.);
+        assert_eq!(small.top(),950.);
+        let grown=fitted_frame(LAPTOP,400.,small.top(),500.);
+        assert_eq!(grown.top(),small.top());
+        assert_eq!(fitted_frame(LAPTOP,400.,grown.top(),96.).height,96.);
     }
     #[test]
     fn auto_hidden_menu_and_docks_keep_the_panel_inside_the_visible_frame() {

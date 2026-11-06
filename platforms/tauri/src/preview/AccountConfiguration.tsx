@@ -44,12 +44,13 @@ export function AccountConfiguration({account:a,send,t,busy,language,draft,onDra
    </form>}
    {feedback.note==='saved'&&!editingNote&&<p className="save-status" role="status">{t.done}</p>}
    {a.apiKey&&<div className="api-key-summary">
-    <span className="api-key-name">{t.key}</span>
+    <span className="api-key-name">{['openai','anthropic'].includes(a.family)?tr('Organization Admin Key'):t.key}</span>
     <span className="api-key-status" data-state={a.apiKeyStatus}>{keyStatus}</span>
     {!keyOpen&&<Button size="sm" variant="ghost" disabled={disabled} onClick={()=>setKeyOpen(true)}>{savedKey||a.apiKeyStatus==='fromEnvironment'?tr('Replace Key'):tr('Set API Key')}</Button>}
    </div>}
+   {['openai','anthropic'].includes(a.family)&&<p className="group-description">{tr('Reads organization-wide API usage and costs. Requires an organization Admin key; a model API key is not sufficient.')}</p>}
    {a.apiKey&&keyOpen&&<form className="key-editor" onSubmit={e=>{e.preventDefault();void save('key');}}>
-    <Input ref={keyInput} label={t.key} type="password" autoComplete="off" autoFocus value={key} readOnly={disabled||!!saving} maxLength={8192} error={feedback.key==='failed'?t.failed:undefined} onChange={e=>edit('key',e.target.value)}/>
+    <Input ref={keyInput} label={['openai','anthropic'].includes(a.family)?tr('Organization Admin Key'):t.key} type="password" autoComplete="off" autoFocus value={key} readOnly={disabled||!!saving} maxLength={8192} error={feedback.key==='failed'?t.failed:undefined} onChange={e=>edit('key',e.target.value)}/>
     <div className="key-editor-actions">
      <p className="save-status" role="status">{saving==='key'?tr('Saving…'):''}</p>
      <Button size="sm" variant="ghost" disabled={!!saving} onClick={closeKey}>{t.cancel}</Button>

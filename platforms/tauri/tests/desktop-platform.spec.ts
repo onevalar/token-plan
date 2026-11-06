@@ -91,3 +91,25 @@ for(const reduced of [false,true])test(`panel style sits under Appearance and fo
  // Only Windows turns its native material off; macOS keeps vibrancy under the opaque page.
  await expect.poll(effects).toEqual(platform==='windows'?[{effects:['acrylic']},null]:[]);
 });
+
+test('service heading stays visible while scrolling accounts without covering keyboard focus',async({page})=>{
+ await page.setViewportSize({width:390,height:680});
+ await page.addInitScript(()=>localStorage.setItem('tokenplan.homeUsageStyle','instrument'));
+ await mockDesktop(page,'zh-Hans',false,largeDesktop());await page.goto('/');
+ const group=visible(page).locator('.provider[data-provider="claude"]');
+ const heading=group.getByRole('heading',{name:'Claude',exact:true});
+ const account=group.getByRole('button',{name:'Claude second.with.a.long.address@example.com',exact:true});
+ await expect(account).toBeVisible();
+ const viewport=(await visible(page).boundingBox())!,entry=(await account.boundingBox())!;
+ // Put the second account just below the viewport edge, where a sticky heading could cover it.
+ await visible(page).evaluate((e,y)=>e.scrollTop=y,entry.y-viewport.y-4);
+ const headingBox=(await heading.boundingBox())!;
+ expect(headingBox.y).toBeGreaterThanOrEqual(viewport.y);
+ expect(headingBox.y+headingBox.height).toBeLessThan(viewport.y+60);
+ await account.focus();
+ await expect(account).toBeFocused();
+ expect((await account.boundingBox())!.y).toBeGreaterThan(headingBox.y+headingBox.height);
+ expect(await account.evaluate(e=>{const r=e.getBoundingClientRect();return e.contains(document.elementFromPoint(r.x+r.width/2,r.y+r.height/2));})).toBe(true);
+ await page.keyboard.press('Enter');
+ await expect(page.getByRole('heading',{level:1})).toHaveText('Claude');
+});

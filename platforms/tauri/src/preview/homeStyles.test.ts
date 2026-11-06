@@ -30,6 +30,7 @@ describe('account style preferences',()=>{
  });
  it('groups all existing renderers without losing saved variants',()=>{
   expect(styleCategories).toHaveLength(10);
+  expect(categoryOf('gauges').id).toBe('instrument');expect(categoryOf('rings').styles).not.toContain('gauges');
   for(const c of styleCategories){expect(c.styles.length).toBeGreaterThanOrEqual(1);for(const id of c.styles)expect(categoryOf(id).id).toBe(c.id);}
   for(const id of Object.keys(homeUsageFamilies))expect(categoryOf(id).styles.some(s=>s===id)).toBe(true);
  });

@@ -74,6 +74,6 @@ static class AdvancedServiceChecks
         var usage = UsageParser.Parse("claude", """{"limits":[{"kind":"weekly_scoped","percent":12,"scope":{"model":{"display_name":"Fable"}}}],"extra_usage":{"is_enabled":true,"used_credits":250,"monthly_limit":1000}}""", DateTimeOffset.UtcNow);
         check(usage.Windows[0].Label == "Fable" && usage.Windows[1].Amount == 2.5 && usage.Windows[1].Limit == 10 && usage.Windows[1].UsedPercent == 25, "Claude scoped model and cents conversion match Mac");
         var codex = UsageParser.Parse("codex", """{"credits":{"balance":"20.9"},"rate_limit_reset_credits":{"available_count":1,"credits":[{"expires_at":"2099-01-01T00:00:00Z"},{"status":"consumed","expires_at":"2099-01-02T00:00:00Z"}]}}""", DateTimeOffset.UtcNow);
-        check(codex.Windows[0].Amount == 0.8 && codex.Windows[1].Expiries?.Count == 1, "Codex credits floor before valuation; consumed reset cards excluded");
+        check(codex.Windows[0].Amount == 20.9 && codex.Windows[0].Currency == "CREDITS" && codex.Windows[1].Expiries?.Count == 1, "Codex credits preserve original fractional units; consumed reset cards excluded");
     }
 }

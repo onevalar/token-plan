@@ -31,3 +31,13 @@
 .home-metrics[data-style="cells"] .quota-number strong { font-size:20px; }
 .home-metrics[data-style="cells"] .quota-body { min-height:0; }
 .home-metrics[data-style="cells"] .quota-expiries:empty { display:none; }
+
+/* Dashboard rings keep the cycle inside the dial, with reset time at its open edge. */
+.home-metrics[data-style="gauges"] .home-quota { grid-row:span 3; }
+.home-metrics[data-style="gauges"] .quota-body { min-height:0; }
+.quota-gauge { position:relative;width:116px; }
+.quota-gauge>svg { display:block;width:100%; }
+.quota-gauge-reading { position:absolute;inset:22% 12% 15%;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:2px;text-align:center; }
+.quota-gauge-reading>span { font-size:var(--text-xs);line-height:1.2;max-width:100%;overflow-wrap:anywhere; }
+.quota-gauge-reading>strong { font-size:var(--text-xl);font-weight:600;line-height:1.2;color:var(--quota-color);font-variant-numeric:tabular-nums; }
+.home-metrics[data-style="gauges"] .quota-expiries:empty { display:none; }

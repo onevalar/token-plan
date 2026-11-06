@@ -59,9 +59,8 @@ final class CodexProvider: ProviderRuntime {
                 .exportingLimit("spark", unit: "percent"),
             .percent(id: "\(provider.id).sparkWeekly", provider: provider, title: "Spark Weekly")
                 .exportingLimit("sparkWeekly", unit: "percent"),
-            .combined(id: "\(provider.id).credits", provider: provider, title: "Extra Usage", metricLabel: "Credits")
-                .exportingLimit("credits", kind: .balance, unit: "credits", source: .value(kind: .count, label: "credits"))
-                .exportingLimit("creditValue", kind: .balance, unit: "usd", source: .value(kind: .dollars)),
+            .values(id: "\(provider.id).credits", provider: provider, title: "Credits", metricLabel: "Credits", selection: .kind(.count))
+                .exportingLimit("credits", kind: .balance, unit: "credits", source: .value(kind: .count, label: "credits")),
             .values(id: "\(provider.id).rateLimitResets", provider: provider, title: "Rate Limit Resets", metricLabel: "Rate Limit Resets", traySuffix: "resets", showsResetExpiries: true)
                 .exportingLimit("rateLimitResets", kind: .balance, unit: "resets", source: .value(kind: .count, label: "available")),
             .usageTrend(provider: provider)

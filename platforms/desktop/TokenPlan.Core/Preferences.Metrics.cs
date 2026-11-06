@@ -2,7 +2,7 @@ namespace TokenPlan.Core;
 public enum MetricPlacement { Home, Details, Hidden }
 public partial record Preferences
 {
-    public MetricPlacement Placement(string id, string label) => (HiddenMetrics.GetValueOrDefault(id) ?? []).Contains(label) ? MetricPlacement.Hidden : (ExpandedMetrics.GetValueOrDefault(id) ?? []).Contains(label) ? MetricPlacement.Details : MetricPlacement.Home;
+    public MetricPlacement Placement(string id, string label) => (HiddenMetrics.GetValueOrDefault(id) ?? []).Contains(label) ? MetricPlacement.Hidden : (ExpandedMetrics.GetValueOrDefault(id) ?? (id is "openai" or "anthropic" ? ["Today", "Month Tokens", "Month Requests"] : [])).Contains(label) ? MetricPlacement.Details : MetricPlacement.Home;
     public IReadOnlyList<UsageWindow> OrderedMetrics(string id, IEnumerable<UsageWindow> metrics)
     {
         var values = metrics.ToArray(); var order = MetricOrder.GetValueOrDefault(id) ?? [];

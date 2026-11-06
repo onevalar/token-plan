@@ -172,10 +172,10 @@ final class CodexUsageMapperTests: XCTestCase {
         XCTAssertEqual(mapped.plan, "Pro 100")
         XCTAssertEqual(progress(mapped.lines, "Session")?.used, 10)
         XCTAssertEqual(progress(mapped.lines, "Weekly")?.used, 20)
-        // Credits lead with the dollar value (4¢/credit), then the raw count — no inverted fake cap.
+        // Credits retain their original unit; no inferred cash balance.
         XCTAssertNil(progress(mapped.lines, "Credits"))
         XCTAssertEqual(values(mapped.lines, "Credits"),
-                       [MetricValue(number: 4.0, kind: .dollars), MetricValue(number: 100, kind: .count, label: "credits")])
+                       [MetricValue(number: 100, kind: .count, label: "credits")])
         XCTAssertNotNil(progress(mapped.lines, "Session")?.resetsAt)
         XCTAssertEqual(progress(mapped.lines, "Session")?.periodDurationMs, CodexUsageMapper.sessionPeriodMs)
     }
@@ -356,9 +356,9 @@ final class CodexUsageMapperTests: XCTestCase {
     func testCreditValuesRenderGroupedThousands() {
         var data = WidgetData(title: "Extra Usage", icon: .providerMark("codex"), kind: .dollars, used: 0, limit: nil)
         data.values = CodexUsageMapper.creditValues(remaining: 30000)
-        // The row abbreviates ("$1.2K · 30K credits"); the hover tooltip keeps every digit.
-        XCTAssertEqual(data.unboundedDetail, "$1.2K · 30K credits")
-        XCTAssertEqual(data.unboundedTooltip, "$1,200.00 · 30,000 credits")
+        // The row abbreviates ("30K credits"); the hover tooltip keeps every digit.
+        XCTAssertEqual(data.unboundedDetail, "30K credits")
+        XCTAssertEqual(data.unboundedTooltip, "30,000 credits")
     }
 
     func testShowsRateLimitResetsBeforeCredits() throws {

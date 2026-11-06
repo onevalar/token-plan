@@ -24,6 +24,7 @@ final class ProviderLiveAuditTests: XCTestCase {
         case "minimax": provider = MiniMaxProvider()
         case "ollama": provider = OllamaProvider()
         case "opencode": provider = OpenCodeProvider()
+        case "openai": provider = OpenAIProvider()
         case "openrouter": provider = OpenRouterProvider()
         case "siliconflow": provider = SiliconFlowProvider()
         case "zai": provider = ZAIProvider()

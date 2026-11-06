@@ -2,13 +2,13 @@ using System.Text.Json;
 
 namespace TokenPlan.Core;
 
-public record UsageWindow(string Label, double UsedPercent, DateTimeOffset? ResetsAt, double? Amount = null, string? Currency = null, double? Limit = null, IReadOnlyList<DateTimeOffset>? Expiries = null, double? PeriodSeconds = null)
+public record UsageWindow(string Label, double UsedPercent, DateTimeOffset? ResetsAt, double? Amount = null, string? Currency = null, double? Limit = null, IReadOnlyList<DateTimeOffset>? Expiries = null, double? PeriodSeconds = null, string? StatusText = null)
 {
     public double RemainingPercent => Math.Max(0, 100 - UsedPercent);
-    public bool IsBalance => Amount != null && Limit == null;
+    public bool IsBalance => (Amount != null || StatusText != null) && Limit == null;
     public string FormattedAmount => (Currency == "CNY" ? "¥" : Currency == "USD" ? "$" : "") + (Currency == "COUNT" ? Amount?.ToString("N0") : Amount?.ToString("N2")) + (Limit != null ? " / " + Limit.Value.ToString("N2") : "");
 }
-public record UsageSnapshot(string Id, string Name, string? Plan, IReadOnlyList<UsageWindow> Windows, DateTimeOffset FetchedAt);
+public record UsageSnapshot(string Id, string Name, string? Plan, IReadOnlyList<UsageWindow> Windows, DateTimeOffset FetchedAt, TokenTrend? History = null, string? Warning = null);
 public record ProviderResult(string Id, string Name, UsageSnapshot? Snapshot, string? ErrorKey, string? CredentialFingerprint = null, string? AccountKey = null, string? AccountEmail = null, string? AccountIdentity = null, string? LoginDirectory = null)
 {
     public string SettingsKey => AccountKey ?? Id;

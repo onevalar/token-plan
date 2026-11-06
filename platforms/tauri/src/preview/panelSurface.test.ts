@@ -37,6 +37,9 @@ describe('frosted glass legibility',()=>{
  });
  it('shows more of the backdrop as transparency rises, and none at 0%',()=>{
   expect(glassColors('light',0).tint).toBe(100);
+  // A medium setting must not hide an already-tinted native material behind a near-solid page.
+  expect(glassColors('light',60).tint).toBeLessThan(70);
+  expect(glassColors('dark',60).tint).toBeLessThan(82);
   expect(glassColors('light',100).tint).toBeLessThan(65);
   expect(glassColors('dark',100).tint).toBeLessThan(80);
  });

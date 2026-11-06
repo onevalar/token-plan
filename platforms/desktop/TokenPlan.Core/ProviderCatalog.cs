@@ -7,12 +7,14 @@ public static class ProviderCatalog
     public static readonly IReadOnlyList<ProviderDefinition> All = new[] {
         new ProviderDefinition("claude", "Claude"), new ProviderDefinition("codex", "Codex"),
         new ProviderDefinition("cursor", "Cursor"), new ProviderDefinition("amp", "Amp"),
-        new ProviderDefinition("antigravity", "Antigravity"), new ProviderDefinition("copilot", "Copilot"),
+        new ProviderDefinition("antigravity", "Antigravity"),
+        new ProviderDefinition("anthropic", "Anthropic API", "ANTHROPIC_ADMIN_KEY", "https://platform.claude.com/settings/admin-keys"), new ProviderDefinition("copilot", "Copilot"),
         new ProviderDefinition("deepseek", "DeepSeek", "DEEPSEEK_API_KEY", "https://platform.deepseek.com/api_keys"),
         new ProviderDefinition("devin", "Devin"), new ProviderDefinition("grok", "Grok"),
         new ProviderDefinition("moonshot", "Kimi", "MOONSHOT_API_KEY", "https://platform.kimi.com/console/api-keys"),
         new ProviderDefinition("minimax", "MiniMax", "MINIMAX_API_KEY", "https://platform.minimaxi.com/user-center/basic-information/interface-key"),
-        new ProviderDefinition("ollama", "Ollama"), new ProviderDefinition("opencode", "OpenCode"),
+        new ProviderDefinition("ollama", "Ollama"), new ProviderDefinition("openai", "OpenAI API", "OPENAI_ADMIN_KEY", "https://platform.openai.com/settings/organization/admin-keys"),
+        new ProviderDefinition("opencode", "OpenCode"),
         new ProviderDefinition("openrouter", "OpenRouter", "OPENROUTER_API_KEY", "https://openrouter.ai/settings/keys"),
         new ProviderDefinition("siliconflow", "SiliconFlow", "SILICONFLOW_API_KEY", "https://cloud.siliconflow.cn/account/ak"),
         new ProviderDefinition("zai", "Z.ai", "ZAI_API_KEY", "https://z.ai/manage-apikey/apikey-list")

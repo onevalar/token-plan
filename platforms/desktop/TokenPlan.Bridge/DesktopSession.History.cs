@@ -42,6 +42,7 @@ public sealed partial class DesktopSession
     }
     void ObserveQuota(ProviderResult account)
     {
+        if (account.Id is "openai" or "anthropic") return;
         var history = QuotaHistory(account);
         if (failedHistories.Contains(HistoryFile(account))) return;
         history.Observe(account, DateTimeOffset.UtcNow);
@@ -51,7 +52,7 @@ public sealed partial class DesktopSession
     }
     object[] Observations(ProviderResult account) => QuotaHistory(account)
         .Read(new Dictionary<string, ProviderResult> { [account.Id] = account }, preferences, DateTimeOffset.UtcNow.AddDays(-30), DateTimeOffset.UtcNow)
-        .SelectMany(r => r.Windows.Select(w => (object)new {
+        .SelectMany(r => r.Windows.Where(w => w.StatusText == null).Select(w => (object)new {
             date = r.FetchedAt.ToString("O"), label = w.Label,
             value = w.IsBalance ? w.Amount : w.UsedPercent,
             unit = w.IsBalance ? w.Currency : "percent"

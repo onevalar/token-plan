@@ -56,8 +56,11 @@ p { margin:8px 0; }
 .reset > svg { transform:translateY(-1px); }
 .amount { text-align:right;overflow-wrap:anywhere;font-variant-numeric:tabular-nums; }
 .text-metric { grid-template-columns:minmax(120px,1fr) auto; }
-progress { width:100%;height:6px;border:0;border-radius:var(--radius-pill);overflow:hidden;background:var(--surface-muted);accent-color:var(--meter-fill); }
-progress::-webkit-progress-bar { background:var(--surface-muted); }
+/* A solid track keeps the empty part visible over changing glass backdrops. */
+:root[data-panel="glass"] { --usage-bar-track:#bcbcbc; }
+:root[data-panel="glass"][data-theme="dark"] { --usage-bar-track:#525252; }
+progress { width:100%;height:6px;border:0;border-radius:var(--radius-pill);overflow:hidden;background:var(--usage-bar-track,var(--surface-muted));accent-color:var(--meter-fill); }
+progress::-webkit-progress-bar { background:var(--usage-bar-track,var(--surface-muted)); }
 progress::-webkit-progress-value { background:var(--meter-fill);border-radius:var(--radius-pill); }
 progress::-moz-progress-bar { background:var(--meter-fill); }
 .metric-chart { display:flex;justify-content:space-between;align-items:center;gap:16px;min-height:36px;font-size:var(--text-sm); }
@@ -147,3 +150,10 @@ progress::-moz-progress-bar { background:var(--meter-fill); }
 /* Textured Bar: same row, a taller rounded rectangle in place of the 6px progress bar. */
 .metric-texture { display:block;width:100%; }
 .metric-texture-fill { position:relative;display:block;height:10px;overflow:hidden;border-radius:4px;color:var(--meter-fill);background:color-mix(in oklab,var(--meter-fill) 9%,transparent); }
+
+.openai-group { padding-top:14px;border-bottom:1px solid var(--border); }
+.openai-heading { margin-bottom:0; }
+.dashboard .openai-group .provider { border-bottom:0;padding-block:8px 12px; }
+.dashboard .openai-group .provider + .provider { border-top:1px solid var(--border-subtle); }
+.openai-group .provider-heading h2 { font-size:var(--text-sm); }
+.dashboard-group { display:contents; }

@@ -2,6 +2,17 @@ using System.Net;
 using System.Text;
 using TokenPlan.Core;
 
+if (args.SequenceEqual(new[] { "--openai-audit" }))
+{
+    DesktopProxy.Configure();
+    var temp = Path.Combine(Path.GetTempPath(), "TokenPlan-OpenAI-Audit-" + Guid.NewGuid().ToString("N"));
+    using var service = new ProviderService(temp,temp,keys:new APIKeyStore(temp),log:(_,_)=>{});
+    var auditResult = await service.Refresh("openai",CancellationToken.None);
+    Console.WriteLine("OpenAI live audit: " + (auditResult.ErrorKey == null ? "success" : "failed: " + auditResult.ErrorKey));
+    Console.WriteLine("History days: " + (auditResult.Snapshot?.History?.Days.Count ?? 0));
+    Environment.ExitCode = auditResult.ErrorKey == null ? 0 : 1;
+    return;
+}
 if (args.SequenceEqual(new[] { "usage" }) && Environment.GetEnvironmentVariable("TOKENPLAN_AMP_FIXTURE") is { } ampFixture)
 {
     if (ampFixture == "error") { Console.Error.WriteLine("not logged in"); Environment.ExitCode = 1; return; }
@@ -140,6 +151,8 @@ try
     await TokenChecks.Run(root, now, Check);
     await ParityChecks.Run(root, now, Check);
     await ProviderBoundaryChecks.Run(root, Check);
+    await OpenAIChecks.Run(root, Check);
+await AnthropicChecks.Run(root, Check);
     await ServiceContractChecks.Run(root, Check);
     await AmpProcessChecks.Run(root, Check);
     await AdvancedServiceChecks.Run(root, Check);

@@ -1,4 +1,4 @@
-import {Gauge} from './components/arc/gauge/gauge';
+import {GaugeArc} from './components/arc/gauge/gauge';
 import {TickRing} from './components/arc/tick-ring/tick-ring';
 import {WaffleChart} from './components/arc/waffle-chart/waffle-chart';
 import type {Metric} from './desktop';
@@ -29,10 +29,10 @@ function QuotaTile({metric:m,style,now,language,missing,remaining=false}:MetricR
  const reading=quotaReading({metric:m,now,language,missing,remaining});
  const {name,value,tone,label,valueText,description}=reading;
  return <div className="home-quota" data-metric={m.id} data-tone={tone}>
-  <div className="quota-title">{name}</div>
-  <div className="quota-body">{value===null?<div className="quota-missing"><span aria-hidden="true">—</span><span>{missing}</span></div>:
+  {style!=='gauges'&&<div className="quota-title">{name}</div>}
+  <div className="quota-body">{value===null?<div className="quota-missing">{style==='gauges'&&<span>{name}</span>}<span aria-hidden="true">—</span><span>{missing}</span></div>:
    style==='ticks'?<div className="quota-ticks" {...quotaMeter(reading)}><TickRing value={value} valueText={valueText} tone={tone==='critical'?'danger':'accent'}/></div>:
-   style==='gauges'?<div className="quota-gauge"><Gauge value={value} label={label} valueText={description} tone={tone==='critical'?'danger':'accent'}/></div>:
+   style==='gauges'?<div className="quota-gauge" {...quotaMeter(reading)}><svg viewBox="0 0 100 94" aria-hidden="true"><GaugeArc value={value} tone={tone==='critical'?'danger':'accent'}/></svg><div className="quota-gauge-reading"><span>{name}</span><strong>{valueText}</strong></div></div>:
    <div className="quota-cells">{value>=0&&value<=100&&<div className="quota-grid"><WaffleChart label={`${label} · ${description}`} data={[
     {key:'reading',value,color:'var(--quota-color)'},{key:'rest',value:100-value,color:'var(--border-strong)'},
    ]}/></div>}<div className="quota-number"><strong>{valueText}</strong></div></div>

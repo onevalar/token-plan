@@ -10,6 +10,7 @@ public final class DesktopBridge {
     private let accounts: ProviderAccountsStore
     private let enablement: ProviderEnablementStore
     private let layout: LayoutStore
+    private let snapshotCache: ProviderSnapshotCache
     private let store: WidgetDataStore
     private let observedIdentities: [String: String]
     private let loginDirectories: [String: [String]]
@@ -37,9 +38,9 @@ public final class DesktopBridge {
         let registry = SavedAccountProjection.retainingRecords(in: WidgetRegistry.from(runtimes), records: accounts.records)
         let expand: ([String]) -> [String] = { DefaultLayout.expandingAccounts($0, providerIDs: registry.providers.map(\.id)) }
         let layout = LayoutStore(registry: registry, pinLimit: 3, defaults: defaults,
-            defaultMetricIDs: expand(DefaultLayout.metricIDs),
+            defaultMetricIDs: expand(DefaultLayout.metricIDs) + ["openai.month", "openai.today", "openai.tokens", "openai.requests", "anthropic.month", "anthropic.today", "anthropic.tokens", "anthropic.requests"],
             defaultPinnedMetricIDs: expand(DefaultLayout.pinnedMetricIDs),
-            defaultExpandedMetricIDs: expand(DefaultLayout.expandedMetricIDs),
+            defaultExpandedMetricIDs: expand(DefaultLayout.expandedMetricIDs) + ["openai.today", "openai.tokens", "openai.requests", "anthropic.today", "anthropic.tokens", "anthropic.requests"],
             isProviderEnabled: { enablement.isEnabled($0) && !accounts.isRemoved($0) })
         layout.isProviderRemoved = { accounts.isRemoved($0) }
         var directories = Dictionary(uniqueKeysWithValues: assembly.claudeCards.map { ($0.id, $0.configDirectory.map { [$0] } ?? []) })
@@ -50,10 +51,16 @@ public final class DesktopBridge {
         self.runtimes = runtimes; self.registry = registry
         self.accounts = accounts; self.enablement = enablement; self.layout = layout
         self.notes = SubscriptionNotesStore(defaults: defaults)
+        let snapshotCache = Self.makeSnapshotCache(defaults: defaults)
+        self.snapshotCache = snapshotCache
         self.store = WidgetDataStore(registry: registry, providers: runtimes,
-            cache: Self.makeSnapshotCache(defaults: defaults),
+            cache: snapshotCache,
             defaults: defaults, isProviderEnabled: { enablement.isEnabled($0) && !accounts.isRemoved($0) },
             providerIdentityKeys: assembly.identityKeysByCard)
+        // An Admin key can be replaced outside the app. Verify the current organization before
+        // painting a persisted API report; the cache already requires a fresh fetch on launch.
+        self.store.snapshots["openai"] = nil
+        self.store.snapshots["anthropic"] = nil
     }
 
     /// The snapshot cache for this long-lived helper. The shell's own timer decides *when* to refresh (every
@@ -153,6 +160,13 @@ public final class DesktopBridge {
                 guard let provider = runtimes.first(where: { $0.provider.id == id }) as? any APIKeyManaging,
                       let key = value as? String, key.utf8.count <= 8192 else { throw Failure.invalid }
                 if key.isEmpty { try provider.deleteAPIKey() } else { try provider.saveAPIKey(key) }
+                if ["openai", "anthropic"].contains(id), let runtime = runtimes.first(where: { $0.provider.id == id }) {
+                    // A replacement Admin key can belong to a different organization.
+                    snapshotCache.store(.make(provider: runtime.provider, plan: nil, lines: [], refreshedAt: Date()))
+                    store.snapshots[id] = nil
+                    store.clearFailureBackoff(for: id)
+                    if !key.isEmpty { await store.refresh(providerID: id, force: true) }
+                }
             case "settings":
                 guard let settings = value as? [String: Any] else { throw Failure.invalid }
                 let trayStyle = try settings["trayStyle"].map { try DesktopTrayStyle(validating: $0) }
@@ -231,13 +245,14 @@ public final class DesktopBridge {
                     "placement": !layout.isMetricEnabled(descriptor.id) ? "hidden" : layout.expandedMetricIDs.contains(descriptor.id) ? "details" : "home",
                     "pinned": layout.isPinned(descriptor.id), "pinnable": descriptor.pinnable,
                     "hasData": data.hasData, "unit": data.kind.rawValue,
+                    "statusText": data.valueTextOverride ?? "",
                     "percent": NSNull(), "amount": NSNull(), "resetsAt": NSNull(), "periodSeconds": NSNull(),
                     "notStarted": data.hasData && data.isFreshSessionWindow(),
                     "expiries": data.expiriesAt.map { OpenUsageISO8601.string(from: $0) },
                     "chart": data.chartPoints.map { ["label": $0.label, "value": $0.value] as [String: Any] },
                     "values": data.selectedValues.map { ["amount": $0.number, "unit": $0.kind.rawValue, "label": $0.label ?? ""] as [String: Any] }
                 ]
-                if data.hasData {
+                if data.hasData && data.valueTextOverride == nil {
                     if let limit = data.limit, limit > 0 { metric["percent"] = data.displayedValue / limit * 100 }
                     else { metric["amount"] = data.used }
                     metric["resetsAt"] = data.resetsAt.map { OpenUsageISO8601.string(from: $0) } as Any? ?? NSNull()

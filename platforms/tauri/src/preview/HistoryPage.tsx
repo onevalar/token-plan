@@ -42,7 +42,7 @@ export function HistorySummary({accounts,t,language,range,onRange,showTrend=true
  return <div className="usage-summary">
   <HistoryRanges range={range} onRange={onRange} language={language}/>
   {rows.length?<>
-   <dl className="history-totals"><div><dt>{t.cost}</dt><dd>{money(total.cost,language)}</dd></div><div><dt>{t.tokens}</dt><dd>{number(total.tokens,language)}</dd></div></dl>
+   <dl className="history-totals"><div><dt>{accounts.some(a=>['openai','anthropic'].includes(a.family))?tr('Known Cost'):t.cost}</dt><dd>{money(total.cost,language)}</dd></div><div><dt>{t.tokens}</dt><dd>{number(total.tokens,language)}</dd></div></dl>
    {showTrend&&(range==='30'||range==='7')&&<div className="daily-trend"><div className="trend-bars" role="img" aria-label={tr('Daily Token Usage')}>{days.map(d=><span key={d.key} data-missing={d.tokens==null} style={{height:d.tokens==null?'0':`${(d.tokens/maximum)*100}%`}}/>)}</div><div className="trend-caption"><span>{tr('Daily Token Usage')}</span><span>{bounds.start.slice(5)} — {bounds.end.slice(5)}</span></div></div>}
   </>:<HistoryFallback accounts={accounts} t={t} language={language} range={range}/>}
   {(accounts.some(a=>a.historyPartial)||rows.some(r=>r.cost==null)&&total.cost!=null)&&<p className="notice" role="status">{t.historyWarning}</p>}
@@ -63,8 +63,8 @@ export function HistoryPage({accounts,t,language,initialRange='30'}:HistoryProps
  return <div className="history-page">
   {accounts.length>1&&<div className="history-filter"><Select label={tr('Account')} value={scope} onValueChange={v=>{setScope(v);reset();}} options={[{value:'all',label:t.all},...accounts.map(a=>({value:a.id,label:a.email?`${a.name} · ${a.email}`:a.name}))]}/></div>}
   <HistoryRanges language={language} range={range} onRange={value=>{setRange(value);reset();}}/>
-  <div className="statistics-measure"><SegmentedControl label={tr('Chart Measure')} options={[{value:'tokens',label:t.tokens},{value:'cost',label:t.cost}]} value={measure} onValueChange={value=>setMeasure(value as StatisticsMeasure)}/><span>{view.bounds.start} – {view.bounds.end}</span></div>
-  <p className="group-description">{t.deviceHistory}</p>
+  <div className="statistics-measure"><SegmentedControl label={tr('Chart Measure')} options={[{value:'tokens',label:t.tokens},{value:'cost',label:scoped.some(a=>['openai','anthropic'].includes(a.family))?tr('Known Cost'):t.cost}]} value={measure} onValueChange={value=>setMeasure(value as StatisticsMeasure)}/><span>{view.bounds.start} – {view.bounds.end}</span></div>
+  <p className="group-description">{scoped.some(a=>['openai','anthropic'].includes(a.family))?tr('Official API reports use UTC and may be delayed. Model costs are unavailable; local records may overlap API reports.'):t.deviceHistory}</p>
   {(view.partial||!view.costComplete)&&rows.length>0&&<p className="notice" role="status">{t.historyWarning}</p>}
   <StatisticsModules key={range} language={language} range={range}>{(id,style)=>{
    if(id==='overview'&&!rows.length)return <HistoryFallback accounts={scoped} t={t} language={language} range={range}/>;

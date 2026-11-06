@@ -41,7 +41,8 @@ export function MetricExpiries({metric:m,language}:Pick<MetricRowProps,'metric'|
 }
 export function metricAmount(m:Metric,language:string,missing:string) {
  if(!m.hasData)return missing;
- const format=(v:number,unit:string)=>unit==='dollars'?`$${v.toFixed(2)}`:unit==='yuan'?`¥${v.toFixed(2)}`:new Intl.NumberFormat(language,{notation:'compact',maximumFractionDigits:1}).format(v);
+ if(m.statusText)return providerText(m.statusText,language);
+ const format=(v:number,unit:string)=>m.label==='Credits'?new Intl.NumberFormat(language,{maximumFractionDigits:4}).format(v):unit==='dollars'?`$${v.toFixed(2)}`:unit==='yuan'?`¥${v.toFixed(2)}`:new Intl.NumberFormat(language,{notation:'compact',maximumFractionDigits:1}).format(v);
  return m.values.length?m.values.map(v=>`${format(v.amount,v.unit)}${v.label?` ${providerText(v.label,language)}`:''}`).join(' · '):m.amount==null?missing:format(m.amount,m.unit);
 }
 /**

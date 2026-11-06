@@ -801,3 +801,29 @@ test('service-first addition handles failure, success and API-key setup with man
  await expect(page.getByRole('heading',{level:1})).toHaveText('订阅管理');
  await expect(visible(page).locator('.configured-account')).toHaveCount(9);
 });
+
+for(const colorScheme of ['light','dark'] as const)test(`minimal home fits one bar without an add-account footer (${colorScheme})`,async({page},info)=>{
+ const data=largeDesktop();data.accounts=data.accounts.slice(0,1);
+ const account=data.accounts[0];account.enabled=true;account.email='';account.plan='';account.error='';
+ account.metrics=account.metrics.slice(0,1);account.metrics[0].placement='home';
+ await page.emulateMedia({colorScheme});await setup(page,data);
+ await page.evaluate(async()=>{await document.fonts.ready;});
+ const height=()=>page.evaluate(()=>(window as any).__panelHeights?.at(-1) as number);
+ await expect.poll(height).toBeGreaterThan(54);
+ await expect.poll(height).toBeLessThan(200);
+ await expect(visible(page).getByRole('button',{name:'添加账号',exact:true})).toHaveCount(0);
+ await expect(visible(page).getByRole('progressbar')).toHaveCount(1);
+ const homeHeight=await height();await page.setViewportSize({width:390,height:homeHeight});
+ const layout=await visible(page).evaluate(e=>{
+  const page=e.getBoundingClientRect(),content=e.querySelector('.page-content')!.getBoundingClientRect();
+  return {bottom:page.bottom-content.bottom,overflow:e.scrollHeight-e.clientHeight};
+ });
+ expect(layout.bottom).toBeGreaterThanOrEqual(5);expect(layout.bottom).toBeLessThanOrEqual(9);
+ expect(layout.overflow).toBeLessThanOrEqual(2);
+ await page.screenshot({path:info.outputPath(`minimal-home-${colorScheme}.png`)});
+ await menu(page,'订阅管理');
+ await expect(page.getByRole('button',{name:'添加账号',exact:true})).toBeVisible();
+ await expect.poll(height).toBeGreaterThan(homeHeight);
+ await page.setViewportSize({width:390,height:Math.min(680,await height())});
+ await back(page);await expect.poll(height).toBe(homeHeight);
+});

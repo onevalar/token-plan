@@ -8,10 +8,6 @@ struct CodexMappedUsage: Equatable, Sendable {
 enum CodexUsageMapper {
     static let sessionPeriodMs = MetricPeriod.sessionMs
     static let weeklyPeriodMs = MetricPeriod.weekMs
-    /// Codex flex credits are worth 4¢ each; the credits line leads with the dollar value
-    /// (mirrors the JS plugin's `CREDIT_USD_RATE`).
-    static let creditUSDRate = 0.04
-
     static func mapUsageResponse(
         _ response: HTTPResponse,
         resetCredits: HTTPResponse? = nil,
@@ -56,7 +52,9 @@ enum CodexUsageMapper {
             ))
         }
 
-        if let remaining = readCreditsRemaining(response: response, body: body) {
+        if (body["credits"] as? [String: Any])?["unlimited"] as? Bool == true {
+            lines.append(.badge(label: "Credits", text: "Unlimited", colorHex: "#10A37F"))
+        } else if let remaining = readCreditsRemaining(response: response, body: body) {
             lines.append(.values(label: "Credits", values: creditValues(remaining: remaining)))
         }
 
@@ -225,18 +223,9 @@ enum CodexUsageMapper {
         return Int(seconds * 1000)
     }
 
-    /// Codex flex credits as raw values: the floored credit count and its dollar value (count × 4¢),
-    /// shown combined as e.g. "$32.84 · 821 credits". The count is floored *before* pricing to match the
-    /// Codex CLI/plugin (so OpenUsage's dollar agrees with Codex's own), which keeps the two values
-    /// mutually consistent. Negative balances clamp to zero, so an exhausted balance reads
-    /// "$0.00 · 0 credits" — a real, measured zero, not "No data".
+    /// Credits are measured units, not cash. Preserve fractional and negative balances.
     static func creditValues(remaining: Double) -> [MetricValue] {
-        let credits = max(0, Int(remaining.rounded(.down)))
-        let usd = Double(credits) * creditUSDRate
-        return [
-            MetricValue(number: usd, kind: .dollars),
-            MetricValue(number: Double(credits), kind: .count, label: "credits")
-        ]
+        [MetricValue(number: remaining, kind: .count, label: "credits")]
     }
 
     /// On-demand reset credits: the floored available count plus each still-available credit's expiry

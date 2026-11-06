@@ -17,7 +17,7 @@
         "width": 390,
         "height": 280,
         "minWidth": 390,
-        "minHeight": 120,
+        "minHeight": 54,
         "decorations": false,
         "resizable": false,
         "maximizable": false,

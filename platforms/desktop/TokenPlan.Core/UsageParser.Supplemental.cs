@@ -53,7 +53,12 @@ public static partial class UsageParser
                     rows.AddRange(extra.Select(w => w with { Label = w.Label == "Weekly" ? "Spark Weekly" : "Spark" })); break;
                 }
             var credits = KeyUsageParser.Field(root, "credits");
-            if (KeyUsageParser.Number(credits, "balance") is { } balance) rows.Add(new("Credits", 0, null, Math.Floor(Math.Max(0, balance)) * 0.04, "USD"));
+            if (KeyUsageParser.Field(credits, "unlimited").ValueKind == JsonValueKind.True)
+                rows.Add(new("Credits", 0, null, Currency: "CREDITS", StatusText: "Unlimited"));
+            else if (KeyUsageParser.Number(credits, "balance") is { } balance)
+                rows.Add(new("Credits", 0, null, balance, "CREDITS"));
+            else if (KeyUsageParser.Field(credits, "has_credits").ValueKind == JsonValueKind.False)
+                rows.Add(new("Credits", 0, null, 0, "CREDITS"));
             var reset = KeyUsageParser.Field(root, "rate_limit_reset_credits");
             if (KeyUsageParser.Number(reset, "available_count") is >= 0 and var count)
             {

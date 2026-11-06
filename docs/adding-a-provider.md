@@ -35,7 +35,7 @@ of the number, not by the provider:
   - Add `resetsAt` when the window resets at a known time, and `periodDurationMs` for the cycle length.
 - **`.values`** — an unbounded row carrying one or more raw numbers (each a `MetricValue`: a number, its
   kind, an optional unit label like `"tokens"`). Use it for any limitless numeric row — a spend day carries
-  dollars *and* tokens, Codex credits carry dollars *and* a count. The widget picks which to show
+  dollars *and* tokens, Codex credits carry their original credit count. The widget picks which to show
   (cost-only, tokens-only, or both) via its descriptor, and formatting happens at the display edge, so the
   menu bar never re-parses a string. Prefer this for numbers.
 - **`.badge`** — a short status pill, like `Disabled` or a pay-as-you-go cap. Use it for state rather than

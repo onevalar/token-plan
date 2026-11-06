@@ -149,6 +149,10 @@ public sealed partial class DesktopSession : IDisposable
                 var key = value.GetString() ?? "";
                 if (key.Length > 8192) throw new InvalidDataException();
                 if (key == "") service.Keys.Delete(family); else service.Keys.Save(family, key);
+                if (family is "openai" or "anthropic") {
+                    results.TryRemove(id, out _); trends.TryRemove(id, out _); nextRefresh.TryRemove(id, out _);
+                    if (key != "") results[id] = await service.Refresh(family, CancellationToken.None);
+                }
                 break;
             case "settings": ApplySettings(value); break;
             default: throw new InvalidDataException();

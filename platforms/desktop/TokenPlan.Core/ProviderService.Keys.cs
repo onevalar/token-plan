@@ -8,6 +8,8 @@ public sealed partial class ProviderService
     static bool IsKeyProvider(string id) => ProviderCatalog.Get(id).EnvironmentKey != null;
     async Task<UsageSnapshot> FetchKeyUsage(string id, string key, string cooldown, CancellationToken cancellationToken)
     {
+        if (id == "anthropic") return await FetchAnthropic(key, cooldown, cancellationToken);
+        if (id == "openai") return await FetchOpenAI(key, cooldown, cancellationToken);
         var endpoints = id switch {
             "deepseek" => new[] { "https://api.deepseek.com/user/balance" },
             "moonshot" => new[] { "https://api.moonshot.cn/v1/users/me/balance", "https://api.moonshot.ai/v1/users/me/balance" },

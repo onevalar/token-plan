@@ -1,6 +1,9 @@
 use std::sync::atomic::{AtomicBool, AtomicU64, AtomicU32, Ordering};
 use tauri::{Emitter, Manager};
 
+// Keep only the header visible while content is loading; real content determines height.
+pub(super) const MIN_PANEL_HEIGHT:f64=54.;
+
 #[derive(Default)]
 pub struct Panel {
     revision: AtomicU64,
@@ -52,6 +55,29 @@ pub fn make_menu_bar_panel(window:&tauri::WebviewWindow)->Result<(),Box<dyn std:
     panel.add_style_mask(StyleMask::empty().nonactivating_panel().into())?;
     panel.set_collection_behavior(CollectionBehavior::new().can_join_all_spaces().full_screen_auxiliary().into());
     Ok(())
+}
+
+/// Match the material to the chosen interface theme without changing the system menu or tray appearance.
+#[tauri::command]
+pub fn panel_appearance(app:tauri::AppHandle,appearance:Option<tauri::Theme>)->Result<(),String> {
+    #[cfg(target_os="macos")]
+    {
+        let handle=app.clone();
+        app.run_on_main_thread(move||{
+            use tauri_nspanel::{ManagerExt,objc2_app_kit::{NSAppearance,NSAppearanceCustomization,NSAppearanceNameAqua,NSAppearanceNameDarkAqua}};
+            match handle.get_webview_panel("main") {
+                Ok(panel)=>{
+                    let native=appearance.and_then(|theme|NSAppearance::appearanceNamed(unsafe {
+                        if theme==tauri::Theme::Dark {NSAppearanceNameDarkAqua}else{NSAppearanceNameAqua}
+                    }));
+                    panel.as_panel().setAppearance(native.as_deref());
+                },
+                Err(error)=>{eprintln!("Panel appearance failed: {error:?}");let _=handle.emit("desktop-error","tray_failed");},
+            }
+        }).map_err(|e|e.to_string())
+    }
+    #[cfg(not(target_os="macos"))]
+    {let _=(app,appearance);Ok(())}
 }
 
 pub fn show(app:&tauri::AppHandle) {
@@ -181,7 +207,7 @@ fn show_placement(anchor:Option<(i32,i32,i32)>,origin:(i32,i32),area:(u32,u32),s
 }
 
 fn bounded_height(content:f64,scale:f64,available:u32)->u32 {
-    ((content.clamp(120.,680.)*scale).ceil() as u32).min(available.saturating_sub((12.*scale).ceil() as u32).max(1))
+    ((content.clamp(MIN_PANEL_HEIGHT,680.)*scale).ceil() as u32).min(available.saturating_sub((12.*scale).ceil() as u32).max(1))
 }
 
 #[tauri::command]
@@ -277,7 +303,11 @@ mod tests {
         assert_eq!(bounded_height(210.,2.,1800),420);
         assert_eq!(bounded_height(2000.,2.,1800),1360);
         assert_eq!(bounded_height(600.,2.,700),676);
-        assert_eq!(bounded_height(20.,1.,900),120);
+        assert_eq!(bounded_height(20.,1.,900),54);
+        assert_eq!(bounded_height(96.,1.,900),96);
+        assert_eq!(bounded_height(96.,2.,1800),192);
+        let config:serde_json::Value=serde_json::from_str(include_str!("../tauri.conf.json")).unwrap();
+        assert_eq!(config["app"]["windows"][0]["minHeight"].as_f64().unwrap(),MIN_PANEL_HEIGHT);
     }
     #[test] fn pending_blur_cannot_hide_reopened_or_refocused_panel() {
         let state=Panel::default();

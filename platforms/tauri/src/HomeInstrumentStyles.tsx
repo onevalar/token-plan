@@ -1,9 +1,7 @@
-import {useState,type KeyboardEvent} from 'react';
 import {isQuotaMetric} from './Metrics';
 import type {Metric} from './desktop';
 import {preciseQuotaReading} from './homeUsage';
-import {providerText} from './providerText';
-import {Amount,Expiries,MetricLabel,Value,Status,Reset,Meter,Track,ScaleTicks,point,arcPath,clamp,metricAttributes,type Reading,type DesignProps} from './HomeQuotaParts';
+import {Amount,Expiries,MetricLabel,Value,Status,Reset,Meter,ScaleTicks,point,arcPath,clamp,metricAttributes,type Reading,type DesignProps} from './HomeQuotaParts';
 import './home-instrument-styles.css';
 
 function Needle({r,remaining=false}:{r:Reading;remaining?:boolean}) {
@@ -45,32 +43,14 @@ function Instrument({metric,variant,...props}:Omit<DesignProps,'metrics'>&{metri
 }
 
 function PrimaryInstruments(props:DesignProps) {
- const {metrics,remaining,language}=props,[focusId,setFocusId]=useState('');
- const quotas=metrics.filter(isQuotaMetric),focus=quotas.find(m=>m.id===focusId)??quotas[0];
- if(!focus)return <>{metrics.map(metric=><Amount key={metric.id} metric={metric} {...props}/>)}</>;
- const r=preciseQuotaReading({metric:focus,...props});
- const move=(event:KeyboardEvent<HTMLButtonElement>)=>{
-  const buttons=Array.from(event.currentTarget.closest('.hq-primary-list')!.querySelectorAll<HTMLButtonElement>('.hq-primary-select'));
-  const i=buttons.indexOf(event.currentTarget),next=event.key==='ArrowDown'?(i+1)%buttons.length:event.key==='ArrowUp'?(i+buttons.length-1)%buttons.length:event.key==='Home'?0:event.key==='End'?buttons.length-1:-1;
-  // Manual activation: navigation moves only focus. Native Enter/Space clicks select the larger dial.
-  if(next>=0){event.preventDefault();event.stopPropagation();buttons[next].focus();}
- };
- return <div className="hq-primary-instruments">
-  <div className="hq-primary-hero" data-tone={r.tone} data-focused-metric={focus.id}>
-   <div className="hq-primary-face" aria-hidden="true"><Needle r={r} remaining={remaining}/><span className="hq-value hq-primary-number">{r.value===null?'—':r.valueText}</span></div>
-   <div className="hq-primary-context"><MetricLabel metric={focus} r={r} {...props}/><span>{r.mode}</span><Reset metric={focus} {...props}/><Status r={r} missing={props.missing}/></div>
-  </div>
-  <div className="hq-primary-list" role="group" aria-label={providerText('Choose a Quota to Enlarge',language)}>{metrics.map(metric=>{
-   if(!isQuotaMetric(metric))return <Amount key={metric.id} metric={metric} {...props}/>;
-   const q=preciseQuotaReading({metric,...props});
-   return <div key={metric.id} className="hq-primary-row" {...metricAttributes(metric,q)}>
-    <button type="button" className="hq-primary-select" aria-pressed={metric.id===focus.id} aria-label={providerText('Enlarge %@ Dial',language).replace('%@',q.name)} onClick={()=>setFocusId(metric.id)} onKeyDown={move}>
-     <span>{q.name}<small><Reset metric={metric} {...props}/></small></span><Value r={q} small/>
-    </button>
-    <Meter r={q}><Track value={q.value}/></Meter><Status r={q} missing={props.missing}/><Expiries metric={metric} {...props}/>
-   </div>;
-  })}</div>
- </div>;
+ return <div className="hq-primary-instruments">{props.metrics.map(metric=>{
+  if(!isQuotaMetric(metric))return <Amount key={metric.id} metric={metric} {...props}/>;
+  const r=preciseQuotaReading({metric,...props});
+  return <div key={metric.id} className="hq-primary-row" {...metricAttributes(metric,r)}>
+   <Meter r={r} className="hq-primary-face"><Needle r={r} remaining={props.remaining}/></Meter>
+   <div className="hq-primary-context"><div className="hq-primary-heading"><MetricLabel metric={metric} r={r} {...props}/><Value r={r} small/></div><Reset metric={metric} {...props}/><Status r={r} missing={props.missing}/><Expiries metric={metric} {...props}/></div>
+  </div>;
+ })}</div>;
 }
 
 export function HomeInstrumentStyles(props:DesignProps) {

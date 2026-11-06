@@ -11,7 +11,7 @@ fn logo(family: &str) -> &'static str {
         "claude"=>svg!("claude"), "codex"=>svg!("codex"), "cursor"=>svg!("cursor"), "antigravity"=>svg!("antigravity"),
         "amp"=>svg!("amp"), "copilot"=>svg!("copilot"), "deepseek"=>svg!("deepseek"), "devin"=>svg!("devin"), "grok"=>svg!("grok"),
         "moonshot"=>svg!("moonshot"), "minimax"=>svg!("minimax"), "ollama"=>svg!("ollama"), "opencode"=>svg!("opencode"),
-        "openrouter"=>svg!("openrouter"), "siliconflow"=>svg!("siliconflow"), "zai"=>svg!("zai"), _=>svg!("tokenplan")
+        "anthropic"=>svg!("claude"), "openai"=>svg!("codex"), "openrouter"=>svg!("openrouter"), "siliconflow"=>svg!("siliconflow"), "zai"=>svg!("zai"), _=>svg!("tokenplan")
     }
 }
 
@@ -216,7 +216,7 @@ mod tests {
     }
     #[test]
     fn marks_have_visible_clearance_inside_both_ring_sizes() {
-        for family in ["claude","codex","cursor","antigravity","amp","copilot","deepseek","devin","grok","moonshot","minimax","ollama","opencode","openrouter","siliconflow","zai","tokenplan"] {
+        for family in ["claude","codex","cursor","antigravity","amp","copilot","deepseek","devin","grok","moonshot","minimax","ollama","opencode","openai","openrouter","siliconflow","zai","tokenplan"] {
             for rings in [1,2] {
                 let inner=17.5-(rings-1) as f32*4.5-1.3;
                 let side=ring_logo_side(family,rings);

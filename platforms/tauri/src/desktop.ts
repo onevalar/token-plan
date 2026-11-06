@@ -2,7 +2,7 @@ import { z } from 'zod';
 const n = z.number().finite().nullable();
 export const metricSchema = z.object({
  id:z.string(), label:z.string(), placement:z.enum(['home','details','hidden']), pinned:z.boolean(), pinnable:z.boolean(), hasData:z.boolean(),
- notStarted:z.boolean().default(false),expiries:z.array(z.string()).default([]),chart:z.array(z.object({label:z.string(),value:z.number()})).default([]),
+ statusText:z.string().optional(),notStarted:z.boolean().default(false),expiries:z.array(z.string()).default([]),chart:z.array(z.object({label:z.string(),value:z.number()})).default([]),
  unit:z.string(), percent:n, amount:n, resetsAt:z.string().nullable(), periodSeconds:n,
  values:z.array(z.object({amount:z.number(),unit:z.string(),label:z.string()})),
 });
