@@ -287,6 +287,7 @@
 "Cost is unknown; the difference is unknown." = "費用未知，無法確定差額。";
 "Cost/MTok" = "每百萬 token 費用";
 "Costs are incomplete. Only known amounts are shown; no difference is calculated and unknown does not mean free." = "費用記錄不完整。僅顯示已知金額；不計算差額，未知不代表免費。";
+"Could not apply the panel appearance. Try again." = "無法套用面板外觀，請重試。";
 "Could not apply this change. Refresh and try again." = "無法套用變更，請重新整理後重試。";
 "Could not check for updates. Try again later." = "無法檢查更新，請稍後重試。";
 "Could not check or install the update. Try again later." = "無法檢查或安裝更新，請稍後重試。";

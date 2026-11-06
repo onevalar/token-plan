@@ -17,7 +17,7 @@ export function HomeQuotaStyles({metrics,spec,...props}:Props) {
    paired.set(i,[a,b]);consumed.add(i+1);i++;
   }
  }
- return <div className="home-metrics home-variants" data-style={style}>{metrics.map((metric,index)=>{
+ return <div className="home-metrics home-variants" data-style={style} data-quota-count={style==='numbers'?metrics.filter(isQuotaMetric).length:undefined}>{metrics.map((metric,index)=>{
   if(consumed.has(index))return null;
   if(!isQuotaMetric(metric))return <div className="home-metric-row" key={metric.id}><MetricRow metric={metric} {...props}/></div>;
   const quotas=paired.get(index);

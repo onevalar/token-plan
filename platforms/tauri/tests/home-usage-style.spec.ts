@@ -180,6 +180,68 @@ for(const style of ['gauges','cells','rings','ruler','concentric','numbers','seg
  if(style==='ticks')await expect(home(page).locator('[data-metric="quota-0"] .quota-ticks mask circle')).toHaveAttribute('stroke-dasharray','0.07 1');
 });
 
+for(const style of ['cells','numbers'])test(`${style} fits up to three compact quotas per row without reserving empty columns`,async({page},info)=>{
+ const data=largeDesktop(),base=data.accounts[0],quota=base.metrics[0],gap=style==='cells'?12:24;
+ const readings=[17,63,92].map((percent,i)=>({...quota,id:`q${i}`,label:['Session','Weekly','Monthly'][i],periodSeconds:[18000,604800,2592000][i],percent}));
+ const longName='Long Model Name With Its Own Independent Allowance';
+ const edge=[...readings,{...quota,id:'long',label:longName,percent:112},{...quota,id:'negative',label:'Extra',percent:-12},
+  {...quota,id:'missing',label:'Unavailable Allowance',hasData:false},{...quota,id:'null',label:'Pending Allowance',percent:null}];
+ const balance={...quota,id:'balance',label:'Balance',percent:null,periodSeconds:null,unit:'dollars',amount:7.25};
+ data.accounts=[readings,[...readings.slice(0,1),balance],[balance,...readings.slice(0,2)],edge,[...readings,balance,...readings.slice(0,2).map(m=>({...m,id:`after-${m.id}`}))]]
+  .map((metrics,i)=>({...structuredClone(base),id:`claude:layout-${i}`,email:`layout-${i}@example.com`,metrics}));
+ await page.addInitScript(style=>localStorage.setItem('tokenplan.homeUsageStyle',style),style);
+ await mockDesktop(page,'en',false,data);await page.goto('/');
+ const grids=home(page).locator('.home-metrics'),tiles=(index:number)=>grids.nth(index).locator(':scope > [data-metric]');
+ const boxes=(index:number)=>tiles(index).evaluateAll(es=>es.map(e=>{const r=e.getBoundingClientRect();return {x:r.x,y:r.y,right:r.right,bottom:r.bottom,width:r.width};}));
+ const rowCount=async(index:number)=>{const b=await boxes(index);return b.filter(r=>Math.abs(r.y-b[0].y)<1).length;};
+ for(const density of ['compact','comfortable']){
+  await page.evaluate(value=>localStorage.setItem('tokenplan.homeDensity',value),density);await page.reload();await page.evaluate(()=>document.fonts.ready);
+  await expect(grids).toHaveCount(5);
+  expect(await rowCount(0)).toBe(3);
+  for(const count of [1,2,3]){
+   const index=count===3?0:count,b=await boxes(index),grid=(await grids.nth(index).boundingBox())!;
+   expect(b).toHaveLength(count);expect(b[0].x).toBeCloseTo(grid.x,1);expect(b.at(-1)!.right).toBeCloseTo(grid.x+grid.width,1);
+   for(let i=1;i<count;i++){expect(b[i].y).toBeCloseTo(b[0].y,1);expect(b[i].x-b[i-1].right).toBeCloseTo(gap,1);}
+  }
+  const many=await boxes(3);expect(await rowCount(3)).toBe(3);expect(many[3].y).toBeGreaterThanOrEqual(many[0].bottom);expect(many[6].y).toBeGreaterThanOrEqual(many[3].bottom);
+  const valueSelector=style==='cells'?'.quota-number strong':'.home-number-value';
+  await expect(tiles(0).locator(valueSelector)).toHaveText(['17%','63%','92%']);
+  await expect(tiles(3).nth(3)).toContainText(longName);await expect(tiles(3).nth(3).locator(valueSelector)).toHaveText('112%');
+  await expect(tiles(3).nth(4).locator(valueSelector)).toHaveText('-12%');
+  for(const index of [5,6])await expect(tiles(3).nth(index)).toContainText(messages('en').missing);
+  // Inspect actual text bounds, not just scrollWidth: clipped names or split numbers must not pass.
+  const textBounds=await grids.locator('.quota-title,.home-number-label > span,.quota-number strong,.home-number-value').evaluateAll(es=>es.map(e=>{
+   const range=document.createRange();range.selectNodeContents(e);const tile=e.closest('[data-metric]')!.getBoundingClientRect(),rects=[...range.getClientRects()];
+   range.selectNodeContents(e.querySelector('strong')??e);
+   return {text:e.textContent,fits:rects.every(r=>r.left>=tile.left-1&&r.right<=tile.right+1&&r.top>=tile.top-1&&r.bottom<=tile.bottom+1),
+    clipped:getComputedStyle(e).textOverflow==='ellipsis',value:e.matches('.quota-number strong,.home-number-value'),lines:range.getClientRects().length};
+  }));
+  for(const b of textBounds){expect(b.fits,b.text!).toBe(true);expect(b.clipped,b.text!).toBe(false);if(b.value)expect(b.lines,b.text!).toBe(1);}
+  expect(await grids.locator('[data-metric]').evaluateAll(es=>es.every(e=>e.scrollWidth<=e.clientWidth+1))).toBe(true);
+  if(style==='cells')for(const width of await grids.locator('.quota-grid').evaluateAll(es=>es.map(e=>e.getBoundingClientRect().width)))expect(width).toBe(76);
+  else await expect(tiles(0).first().locator('.home-number-value strong')).toHaveCSS('font-size','36px');
+  const mixed=grids.nth(4),order=await mixed.locator(':scope > *').evaluateAll(es=>es.map(e=>e.getAttribute('data-metric')??'balance'));
+  expect(order).toEqual(['q0','q1','q2','balance','after-q0','after-q1']);
+  const mixedBox=(await mixed.boundingBox())!,full=(await mixed.locator('.home-metric-row').boundingBox())!,mb=await boxes(4);
+  expect(full.x).toBeCloseTo(mixedBox.x,1);expect(full.width).toBeCloseTo(mixedBox.width,1);expect(full.y).toBeGreaterThanOrEqual(mb[0].bottom);expect(mb[3].y).toBeGreaterThanOrEqual(full.y+full.height);
+  await grids.first().screenshot({path:info.outputPath(`${style}-three-${density}.png`)});
+  // Width belongs to the containing account, not the viewport; test both sides of each fit threshold.
+  for(const [width,columns] of [[288+2*gap,3],[287+2*gap,2],[192+gap,2],[191+gap,1]]){
+   await grids.first().locator('..').evaluate((e,width)=>{(e as HTMLElement).style.width=`${width}px`;},width);
+   expect(await rowCount(0),`container ${width}px`).toBe(columns);
+  }
+  await grids.first().locator('..').evaluate(e=>{(e as HTMLElement).style.removeProperty('width');});
+  await page.setViewportSize({width:560,height:680});expect(await rowCount(3)).toBe(3);await page.setViewportSize({width:390,height:680});
+ }
+ await settings(page);await choose(page,style==='cells'?'Percentage Grid':'Numbers');
+ const preview=page.getByRole('region',{name:'Style Preview'}),sample=preview.locator('[data-metric]');
+ const first=(await sample.first().boundingBox())!,last=(await sample.last().boundingBox())!;expect(first.y).toBeCloseTo(last.y,1);
+ const grid=(await preview.locator('.home-metrics').boundingBox())!;expect(last.x+last.width).toBeCloseTo(grid.x+grid.width,1);
+ await preview.evaluate(e=>{(e as HTMLElement).style.width='190px';});
+ expect((await sample.last().boundingBox())!.y).toBeGreaterThanOrEqual((await sample.first().boundingBox())!.y+(await sample.first().boundingBox())!.height);
+ expect(await preview.evaluate(e=>e.scrollWidth<=e.clientWidth+1)).toBe(true);
+});
+
 test('a saved row fill opens as the full-width textured card: percentage left and stacks the period over the countdown without warning copy',async({page})=>{
  const data=largeDesktop();data.accounts=[data.accounts[0]];
  await page.addInitScript(()=>localStorage.setItem('tokenplan.homeUsageStyle','rowfill'));

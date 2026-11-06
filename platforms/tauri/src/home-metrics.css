@@ -1,6 +1,11 @@
 .home-metrics { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding-top:8px; }
 .home-metrics:empty { display:none; }
 .home-metric-row { grid-column:1/-1;min-width:0; }
+/* Small standalone quotas keep 96px each, fit their container, and never exceed three columns.
+   Count quotas explicitly: a full-width nonquota row otherwise keeps auto-fit's empty tracks alive. */
+.home-metrics[data-quota-count] { --quota-columns:3;--quota-gap:12px;column-gap:var(--quota-gap);grid-template-columns:repeat(auto-fit,minmax(min(100%,max(96px,calc((100% - (var(--quota-columns) - 1) * var(--quota-gap)) / var(--quota-columns)))),1fr)); }
+.home-metrics[data-quota-count="1"] { --quota-columns:1; }
+.home-metrics[data-quota-count="2"] { --quota-columns:2; }
 /* Shared rows align charts even when one allowance name wraps onto several lines. */
 .home-quota { display:grid;grid-template-rows:subgrid;grid-row:span 4;justify-items:center;align-items:start;gap:4px;min-width:0;--quota-color:var(--provider-color,var(--usage-normal));--accent:var(--quota-color); }
 .home-quota[data-tone="critical"] { --quota-color:var(--danger); }

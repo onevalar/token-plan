@@ -8,10 +8,12 @@ import type {useHomeUsageStyle} from './useHomeUsageStyle';
 import {UsageStylePicker} from './UsageStylePicker';
 import {MenuBarSettings} from './MenuBarSettings';
 import {Slider} from '../components/arc/slider/slider';
+import {Button} from '../components/arc/button/button';
+import type {usePanelAppearance} from './usePanelAppearance';
 import {minimumTransparency,type PanelStyle,type usePanelSurface} from './panelSurface';
 
 /** Settings that apply to the whole app. Anything that belongs to one account lives in that account's settings. */
-export function GeneralSettings({state,send,t,busy,language,now,densityPreference,usageStylePreference,panelSurface,platform,openAccounts}:{platform:string;panelSurface:ReturnType<typeof usePanelSurface>;densityPreference:ReturnType<typeof useDensity>;usageStylePreference:ReturnType<typeof useHomeUsageStyle>;state:DesktopState;send:Send;t:Copy;busy:boolean;language:string;now:number;openAccounts:()=>void}) {
+export function GeneralSettings({state,send,t,busy,language,now,densityPreference,usageStylePreference,panelSurface,panelAppearance,platform,openAccounts}:{platform:string;panelAppearance:ReturnType<typeof usePanelAppearance>;panelSurface:ReturnType<typeof usePanelSurface>;densityPreference:ReturnType<typeof useDensity>;usageStylePreference:ReturnType<typeof useHomeUsageStyle>;state:DesktopState;send:Send;t:Copy;busy:boolean;language:string;now:number;openAccounts:()=>void}) {
  const tr=(s:string)=>providerText(s,language),{pending,change,notice}=useChange(send,t),disabled=busy||pending;
  const settings=(value:unknown)=>void change({method:'settings',value});
 
@@ -21,6 +23,7 @@ export function GeneralSettings({state,send,t,busy,language,now,densityPreferenc
   {usageStylePreference.error&&<p role="alert" className="inline-error">{tr(usageStylePreference.error)}</p>}
   <Group title={tr('Appearance and Language')} description={!panelSurface.material?undefined:panelSurface.reduced?tr('Transparency is turned off in system settings, so the panel stays solid.'):panelSurface.surface.style==='glass'?tr('Text contrast adjusts automatically so it stays readable over any background.'):undefined}>
    <SelectRow label={t.appearance} value={state.settings.appearance} disabled={disabled} options={['system','light','dark'].map(value=>({value,label:t[value as 'system']}))} onValueChange={appearance=>settings({appearance})}/>
+   {panelAppearance.failed&&<div role="alert" className="appearance-notice"><p>{tr('Could not apply the panel appearance. Try again.')}</p><Button size="sm" variant="secondary" disabled={panelAppearance.pending} loading={panelAppearance.pending} onClick={panelAppearance.retry}>{tr('Try Again')}</Button></div>}
    {panelSurface.material&&<>
     <SelectRow label={tr('Panel Style')} value={panelSurface.surface.style} disabled={panelSurface.reduced} options={[{value:'glass',label:tr(panelSurface.material)},{value:'solid',label:tr('Solid')}]} onValueChange={style=>panelSurface.change({style:style as PanelStyle})}/>
     {panelSurface.surface.style==='glass'&&<div className="setting-slider"><Slider label={tr('Transparency')} value={panelSurface.surface.transparency} disabled={panelSurface.reduced} onValueChange={transparency=>panelSurface.change({transparency})} min={minimumTransparency} step={5} showValue={false} marks={[{value:minimumTransparency,label:tr('Low')},{value:100,label:tr('High')}]} format={value=>tr(value<45?'Low':value<75?'Medium':'High')}/></div>}

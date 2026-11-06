@@ -287,6 +287,7 @@
 "Cost is unknown; the difference is unknown." = "費用が不明なため、差額も不明です。";
 "Cost/MTok" = "百万トークンあたりコスト";
 "Costs are incomplete. Only known amounts are shown; no difference is calculated and unknown does not mean free." = "費用の記録が不完全です。判明している金額のみを表示し、差額は計算しません。不明は無料を意味しません。";
+"Could not apply the panel appearance. Try again." = "パネルの外観を適用できませんでした。再試行してください。";
 "Could not apply this change. Refresh and try again." = "変更できません。更新して再試行してください。";
 "Could not check for updates. Try again later." = "更新を確認できません。後で再試行してください。";
 "Could not check or install the update. Try again later." = "更新を確認またはインストールできません。後で再試行してください。";

@@ -27,6 +27,10 @@ tray integration remain platform-specific. This change does not publish a releas
   Tick Ring uses a separate marked dial for each quota. Its illuminated extent follows
   the same percentage; the number keeps the actual reading, including overflow.
   It is available in both Unified Style and each account's custom style.
+- Grid and Numbers show up to three independent quotas across when space permits. One or two quotas use the available
+  row without reserving another column. Narrower containers, including Settings previews, automatically use fewer columns.
+  Long names wrap without being shortened; balances and charts keep their full-width rows and original order.
+  Larger instruments retain their existing layout.
 - These are independent quota displays, not combined goal rings, quota composition
   charts or forecasts without real data.
 - Home has matching icon-only Refresh/More actions. Inner pages have Back, a page
@@ -126,6 +130,9 @@ tray integration remain platform-specific. This change does not publish a releas
   the reduced-transparency media query. Windows uses the supported media query and turns Acrylic off for Solid.
   Changing the system preference does not overwrite the saved panel style or transparency.
   On macOS, choosing Light or Dark also changes the native material's appearance; System restores automatic appearance.
+  The native command confirms the actual appearance change, not just that it was queued. A failure is logged and shown
+  beside Appearance with Try Again; it does not claim the tray is unavailable or reset the saved choice. The notice stays
+  until the current change succeeds, and a late result from an older choice cannot replace it.
   This does not change the menu bar. Verify desktop blur in the native app over a varied backdrop, not from a browser screenshot.
 - Home keeps each service together, including its multiple accounts. Group headings stay visible while scrolling their
   accounts without covering keyboard-focused entries; selected usage styles and account order are unchanged.

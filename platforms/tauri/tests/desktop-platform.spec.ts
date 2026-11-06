@@ -171,3 +171,45 @@ test('native transparency changes update the open Mac panel without overwriting 
  }
  expect(await page.evaluate(()=>JSON.parse(localStorage.getItem('tokenplan.panelSurface')!))).toEqual({style:'glass',transparency:80});
 });
+
+test('native appearance failures stay beside Appearance until a retry completes',async({page},info)=>{
+ test.skip((info.project.metadata.platform??'macos')!=='macos','Native panel appearance is macOS-only.');
+ await page.setViewportSize({width:390,height:680});await mockDesktop(page);
+ await page.addInitScript(()=>{
+  const internals=(window as any).__TAURI_INTERNALS__,invoke=internals.invoke;
+  internals.invoke=(command:string,args:any)=>command==='panel_appearance'&&(window as any).__applyAppearance?(window as any).__applyAppearance(args.appearance):invoke(command,args);
+ });
+ await page.goto('/');await settings(page);
+ await page.evaluate(()=>(window as any).__applyAppearance=async()=>{throw 'appearance_failed';});
+ await page.getByRole('combobox',{name:'外观',exact:true}).click();await page.getByRole('option',{name:'深色',exact:true}).click();
+ const group=visible(page).locator('.preference-group').filter({has:page.getByRole('heading',{name:'外观与语言',exact:true})});
+ const alert=group.getByRole('alert'),retry=alert.getByRole('button',{name:'重试',exact:true});
+ await expect(alert).toContainText('无法应用面板外观，请重试。');await expect(retry).toBeEnabled();
+ await expect(page.getByRole('combobox',{name:'外观',exact:true})).toContainText('深色');
+ await expect(page.locator('html')).toHaveAttribute('data-theme','dark');
+ await page.getByRole('combobox',{name:'语言',exact:true}).click();await page.getByRole('option',{name:'English',exact:true}).click();
+ const english=visible(page).getByRole('alert');await expect(english).toContainText('Could not apply the panel appearance. Try again.');
+ await page.evaluate(()=>(window as any).__applyAppearance=()=>new Promise<void>(resolve=>{(window as any).__finishAppearance=resolve;}));
+ const again=english.getByRole('button',{name:'Try Again',exact:true});await again.click();
+ await expect(again).toBeDisabled();await expect(english).toBeVisible();
+ await page.evaluate(()=>(window as any).__finishAppearance());await expect(english).toHaveCount(0);
+ await expect(page.getByRole('combobox',{name:'Appearance',exact:true})).toContainText('Dark');
+});
+
+for(const oldFails of [false,true])test(`an older native appearance ${oldFails?'failure':'success'} cannot replace the latest result`,async({page},info)=>{
+ test.skip((info.project.metadata.platform??'macos')!=='macos','Native panel appearance is macOS-only.');
+ await mockDesktop(page);
+ await page.addInitScript(()=>{
+  const internals=(window as any).__TAURI_INTERNALS__,invoke=internals.invoke;
+  internals.invoke=(command:string,args:any)=>command==='panel_appearance'&&(window as any).__applyAppearance?(window as any).__applyAppearance(args.appearance):invoke(command,args);
+ });
+ await page.goto('/');await settings(page);
+ await page.evaluate(oldFails=>{(window as any).__applyAppearance=(appearance:string)=>appearance==='dark'?new Promise<void>((resolve,reject)=>{(window as any).__finishOldAppearance=()=>oldFails?reject('appearance_failed'):resolve();}):oldFails?Promise.resolve():Promise.reject('appearance_failed');},oldFails);
+ const appearance=page.getByRole('combobox',{name:'外观',exact:true});
+ await appearance.click();await page.getByRole('option',{name:'深色',exact:true}).click();
+ await appearance.click();await page.getByRole('option',{name:'浅色',exact:true}).click();
+ await expect(appearance).toContainText('浅色');await expect(page.locator('html')).toHaveAttribute('data-theme','light');
+ const alert=visible(page).getByRole('alert');await expect(alert).toHaveCount(oldFails?0:1);
+ await page.evaluate(async()=>{(window as any).__finishOldAppearance();await new Promise(resolve=>setTimeout(resolve,0));});
+ await expect(alert).toHaveCount(oldFails?0:1);await expect(appearance).toContainText('浅色');
+});

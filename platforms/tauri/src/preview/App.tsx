@@ -24,6 +24,7 @@ import {HistoryPage} from './HistoryPage';
 import {useDensity} from './useDensity';
 import {useHomeUsageStyle} from './useHomeUsageStyle';
 import {usePanelSurface} from './panelSurface';
+import {usePanelAppearance} from './usePanelAppearance';
 import {useAccountSetups} from './useAccountSetups';
 import './preview.css';
 import './settings.css';
@@ -50,6 +51,7 @@ export function DesktopApp() {
  const setups=useAccountSetups();
  const densityPreference=useDensity();
  const panelSurface=usePanelSurface(platform,reduceTransparency);
+ const panelAppearance=usePanelAppearance(platform,state?.settings.appearance);
  const usageStylePreference=useHomeUsageStyle();
  const [routes,setRoutes]=useState<Route[]>([{key:0,page:'home'}]);
  const sequence=useRef(0),heading=useRef<HTMLHeadingElement>(null);
@@ -97,11 +99,6 @@ export function DesktopApp() {
   theme();media.addEventListener('change',theme);
   return()=>{media.removeEventListener('change',theme);delete document.documentElement.dataset.macPreview;};
  },[language,state?.settings.appearance]);
- useEffect(()=>{
-  if(platform!=='macos'||!state)return;
-  void invoke('panel_appearance',{appearance:state.settings.appearance==='system'?null:state.settings.appearance})
-   .catch(error=>console.error('Native panel appearance could not be changed',error));
- },[platform,state?.settings.appearance]);
  useLayoutEffect(()=>{
   const saved=current.key<previousRoute.current?returnFocus.current.get(current.key):null;
   const target=saved==='menu'?document.querySelector<HTMLElement>('.header-actions [aria-haspopup="menu"]'):saved;
@@ -152,7 +149,7 @@ export function DesktopApp() {
    return <div className="preview-page" data-page={route.page} key={route.key} hidden={route.key!==current.key}><div className="page-content">
     {state&&route.page==='home'&&<>{!state.accounts.some(a=>a.enabled)?<div className="empty-state">{state.accounts.some(a=>a.added)?<><p>{tr('All accounts are hidden from Home. You can show them again in Subscription Management.')}</p><Button size="sm" variant="secondary" onClick={()=>push('configure')}>{t.configure}</Button></>:<><p>{tr('No accounts yet. Add one to start tracking your usage.')}</p><div className="empty-actions"><Button size="sm" variant="secondary" onClick={addAccount}><Plus size={15}/>{tr('Add Account')}</Button></div></>}</div>:<><HomeTips state={state} send={send} language={language} addAccount={addAccount}/><Dashboard accounts={state.accounts} open={accountId=>push('detail',{accountId})} openSettings={accountId=>push('detail',{accountId,focusManagement:true})} retry={retryAccount} busy={busy||refreshing} now={now} language={language} missing={basic.missing} remaining={state.settings.showRemaining} usageStyle={usageStylePreference.style} accountStyle={usageStylePreference.styleFor}/></>}</>}
     {state&&a&&route.page==='detail'&&<AccountDetail onSetupChange={setups.reload} usageStylePreference={usageStylePreference} focusManagement={route.focusManagement} draft={drafts[a.id]??{}} onDraftChange={patch=>setDrafts(d=>({...d,[a.id]:{...d[a.id],...patch}}))} retry={retryAccount} account={a} editing={route.editing??false} onEditing={editing=>setRoutes(r=>r.map(item=>item.key===route.key?{...item,editing}:item))} history={range=>push('history',{accountId:a.id,range})} send={send} t={t} busy={busy} language={language} now={now} remaining={state.settings.showRemaining} missing={basic.missing}/>}
-    {state&&route.page==='settings'&&<GeneralSettings platform={platform} panelSurface={panelSurface} openAccounts={()=>push('configure')} densityPreference={densityPreference} usageStylePreference={usageStylePreference} state={state} send={send} t={t} busy={busy} language={language} now={now}/>}
+    {state&&route.page==='settings'&&<GeneralSettings platform={platform} panelAppearance={panelAppearance} panelSurface={panelSurface} openAccounts={()=>push('configure')} densityPreference={densityPreference} usageStylePreference={usageStylePreference} state={state} send={send} t={t} busy={busy} language={language} now={now}/>}
     {state&&route.page==='configure'&&<>{addedName&&<p role="status" className="added-note">{tr('Added to Home')}: {addedName}</p>}<ServiceConfiguration setups={setups} resume={setupId=>push('add',{setupId})} platform={platform} state={state} send={send} t={t} busy={busy} language={language}/></>}
     {state&&route.page==='add'&&<AddAccount setup={setups.records.find(r=>r.id===route.setupId)} onSetupChange={setups.reload} state={state} send={send} t={t} busy={busy} language={language} complete={finishAdding} open={accountId=>{back();push('detail',{accountId,focusManagement:true});}}/>}
     {state&&route.page==='history'&&<>{quotaSamples.error&&<p role="alert">{tr(quotaSamples.error)}</p>}{a&&<div className="history-account-context">{a.name}{a.email&&<span>{a.email}</span>}</div>}<HistoryPage accounts={a?quotaSamples.accounts.filter(item=>item.id===a.id):quotaSamples.accounts} t={t} language={language} initialRange={route.range}/></>}

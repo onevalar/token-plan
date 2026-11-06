@@ -60,22 +60,31 @@ pub fn make_menu_bar_panel(window:&tauri::WebviewWindow)->Result<(),Box<dyn std:
 
 /// Match the material to the chosen interface theme without changing the system menu or tray appearance.
 #[tauri::command]
-pub fn panel_appearance(app:tauri::AppHandle,appearance:Option<tauri::Theme>)->Result<(),String> {
+pub async fn panel_appearance(app:tauri::AppHandle,appearance:Option<tauri::Theme>)->Result<(),String> {
     #[cfg(target_os="macos")]
     {
         let handle=app.clone();
-        app.run_on_main_thread(move||{
-            use tauri_nspanel::{ManagerExt,objc2_app_kit::{NSAppearance,NSAppearanceCustomization,NSAppearanceNameAqua,NSAppearanceNameDarkAqua}};
-            match handle.get_webview_panel("main") {
-                Ok(panel)=>{
-                    let native=appearance.and_then(|theme|NSAppearance::appearanceNamed(unsafe {
-                        if theme==tauri::Theme::Dark {NSAppearanceNameDarkAqua}else{NSAppearanceNameAqua}
-                    }));
+        let result=async {
+            let (send,receive)=tokio::sync::oneshot::channel();
+            app.run_on_main_thread(move||{
+                use tauri_nspanel::{ManagerExt,objc2_app_kit::{NSAppearance,NSAppearanceCustomization,NSAppearanceNameAqua,NSAppearanceNameDarkAqua}};
+                let applied=(||->Result<(),String>{
+                    let panel=handle.get_webview_panel("main").map_err(|error|format!("{error:?}"))?;
+                    let native=match appearance {
+                        Some(theme)=>Some(NSAppearance::appearanceNamed(unsafe {
+                            if theme==tauri::Theme::Dark {NSAppearanceNameDarkAqua}else{NSAppearanceNameAqua}
+                        }).ok_or_else(||"Requested macOS appearance is unavailable".to_string())?),
+                        None=>None,
+                    };
                     panel.as_panel().setAppearance(native.as_deref());
-                },
-                Err(error)=>{eprintln!("Panel appearance failed: {error:?}");let _=handle.emit("desktop-error","tray_failed");},
-            }
-        }).map_err(|e|e.to_string())
+                    Ok(())
+                })();
+                let _=send.send(applied);
+            }).map_err(|error|error.to_string())?;
+            // Scheduling succeeded, but only the main-thread result says whether it was applied.
+            receive.await.map_err(|error|error.to_string())?
+        }.await;
+        result.map_err(|error|{eprintln!("Panel appearance failed: {error}");"appearance_failed".into()})
     }
     #[cfg(not(target_os="macos"))]
     {let _=(app,appearance);Ok(())}

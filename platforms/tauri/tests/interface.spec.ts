@@ -366,8 +366,19 @@ test('transparency slider keeps its keyboard controls without consuming applicat
  for(const [key,value] of [['ArrowRight',65],['ArrowUp',70],['ArrowLeft',65],['ArrowDown',60],['Shift+ArrowRight',70],['Shift+ArrowLeft',60],['PageUp',70],['PageDown',60],['Home',20],['End',100]] as const){
   await page.keyboard.press(key);await expect(slider).toHaveAttribute('aria-valuenow',String(value));
  }
+ // Observe real keys after the app has handled them, then stop only the test browser's default action.
+ // macOS Playwright WebKit treats Control+Left as browser Back and otherwise leaves for about:blank.
+ await page.evaluate(()=>window.addEventListener('keydown',event=>{
+  if((event.ctrlKey||event.metaKey)&&['ArrowLeft','Home'].includes(event.key)||event.altKey&&event.key==='ArrowDown'){
+   (window as any).__shortcutPrevented=event.defaultPrevented;
+   event.preventDefault();
+  }
+ }));
  for(const key of ['Control+ArrowLeft','Meta+ArrowLeft','Alt+ArrowDown','Control+Home','Meta+Home']){
-  await page.keyboard.press(key);await expect(slider).toHaveAttribute('aria-valuenow','100');
+  await page.evaluate(()=>(window as any).__shortcutPrevented=null);
+  await page.keyboard.press(key);
+  expect(await page.evaluate(()=>(window as any).__shortcutPrevented)).toBe(false);
+  await expect(slider).toHaveAttribute('aria-valuenow','100');
  }
  await page.keyboard.press('Alt+ArrowLeft');
  await expect(page.getByRole('heading',{level:1})).toHaveText('TokenPlan');await expect(more).toBeFocused();

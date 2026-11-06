@@ -146,3 +146,6 @@
 .mac-preview .usage-live-preview .metric progress { background:var(--border-strong); }
 .mac-preview .usage-live-preview .metric progress::-webkit-progress-bar { background:var(--border-strong); }
 .mac-preview .setting-slider { padding:10px 0 12px; }
+.mac-preview .appearance-notice { display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border); }
+.mac-preview .appearance-notice p { flex:1;min-width:0;margin:0;color:var(--danger);font-size:12px;overflow-wrap:anywhere; }
+.mac-preview .appearance-notice > button { flex:none; }

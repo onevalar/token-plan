@@ -16,7 +16,7 @@ type ReadingProps=Omit<MetricRowProps,'metric'>;
 export function HomeMetrics({metrics,style,sources=[],...reading}:{metrics:Metric[];style:HomeUsageStyle;sources?:SourceShare[]}&ReadingProps) {
  const spec=parseStyle(style)??parseStyle('bars')!,{root}=spec;
  if(spec.design)return <HomeQuotaDesigns key={style} metrics={metrics} design={spec.design} style={style} {...reading}/>;
- if(root==='cells'||root==='gauges'||root==='ticks')return <div className="home-metrics" data-style={root}>{metrics.map(metric=>isQuotaMetric(metric)?
+ if(root==='cells'||root==='gauges'||root==='ticks')return <div className="home-metrics" data-style={root} data-quota-count={root==='cells'?metrics.filter(isQuotaMetric).length:undefined}>{metrics.map(metric=>isQuotaMetric(metric)?
   <QuotaTile key={metric.id} metric={metric} style={root} {...reading}/>:
   <div className="home-metric-row" key={metric.id}><MetricRow metric={metric} {...reading}/></div>
  )}</div>;
