@@ -1,6 +1,8 @@
 # Tauri migration verification
 
-The migration keeps the native provider engines and uses a shared React/Arc interface.
+On `valar-svelte`, the shared interface uses Svelte/Valar; native provider engines
+are retained. See the [current Svelte acceptance record](svelte-migration.md).
+The dated results below describe earlier React/Arc builds, not Svelte verification.
 Tests use synthetic accounts, isolated preferences and disposable signing fixtures; they do
 not change the installed application or refresh real credentials.
 

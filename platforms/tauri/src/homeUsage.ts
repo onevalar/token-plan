@@ -1,7 +1,7 @@
-import type {MetricRowProps} from './Metrics';
-import {metricName} from './Metrics';
+import type {MetricRowProps} from './metric';
+import {metricName} from './metric';
 import {providerText} from './providerText';
-import {textureChoices,tints,type TextureChoice,type Tint} from './DitherFill';
+import {textureChoices,tints,type TextureChoice,type Tint} from './texture';
 
 /**
  * A Home style is a string: `family`, or `family:option:option`. Textured Bar is `texturebar:layout:texture:tint`,

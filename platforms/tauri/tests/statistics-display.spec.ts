@@ -88,7 +88,8 @@ test('comparison keeps fractional costs and source navigation restores the activ
  const current=data.accounts.flatMap(a=>a.history.slice(0,30)).reduce((sum,day)=>sum+day.cost!,0),prior=data.accounts.flatMap(a=>a.history.slice(30)).reduce((sum,day)=>sum+day.cost!,0);
  await page.addInitScript(({key,preferences})=>localStorage.setItem(key,JSON.stringify(preferences)),{key:statisticsKey,preferences});
  await mockDesktop(page,'en',false,data);await page.goto('/');await openEnglish(page);
- await page.getByRole('group',{name:'Chart Measure',exact:true}).getByRole('button',{name:'Estimated cost',exact:true}).click();
+ const cost=page.getByRole('group',{name:'Chart Measure',exact:true}).getByRole('radio',{name:'Estimated cost',exact:true});
+ await cost.click();await expect(cost).toHaveAttribute('aria-checked','true');
  const module=active(page).locator('[data-statistics-module="comparison"]');
  expect(Number(await module.getByTestId('hero-total').getAttribute('data-value'))).toBeCloseTo(current,12);
  const changes=await module.locator('.tp-compare-contribution-value').evaluateAll(nodes=>nodes.map(node=>Number(node.getAttribute('data-delta'))));
@@ -108,7 +109,8 @@ test('incomplete source days suppress comparisons instead of becoming zero',asyn
  await mockDesktop(page,'en',false,data);await page.goto('/');await openEnglish(page);
  const module=active(page).locator('[data-statistics-module="comparison"]');
  await expect(module.getByText('Difference Unavailable',{exact:true})).toBeVisible();await expect(module.locator('.tp-compare-waterfall')).toHaveCount(0);
- await page.getByRole('group',{name:'Chart Measure'}).getByRole('button',{name:'Estimated cost'}).click();
+ const cost=page.getByRole('group',{name:'Chart Measure'}).getByRole('radio',{name:'Estimated cost',exact:true});
+ await cost.click();await expect(cost).toHaveAttribute('aria-checked','true');
  await expect(module.getByText('Difference Unavailable',{exact:true})).toBeVisible();
  const calendar=active(page).getByRole('grid',{name:'Daily Usage, Monday to Sunday'}),selected=calendar.locator('button[tabindex="0"]');
  await selected.focus();await page.keyboard.press('Home');await page.keyboard.press('ArrowRight');await expect(calendar.locator('button[tabindex="0"]')).toBeFocused();
@@ -117,6 +119,7 @@ test('incomplete source days suppress comparisons instead of becoming zero',asyn
 
 test('personal reference validates input, persists, and stays separate by account and range',async({page})=>{
  const preferences=defaultStatistics();preferences.enabled.budget=true;preferences.styles.budget='Reference Ruler';
+ await page.emulateMedia({reducedMotion:'reduce'});
  await page.addInitScript(({key,preferences})=>localStorage.setItem(key,JSON.stringify(preferences)),{key:statisticsKey,preferences});
  await mockDesktop(page,'en',false,statisticsDesktop());await page.goto('/');await openEnglish(page);
  const reference=active(page).getByRole('spinbutton',{name:'Personal Reference (USD)'});
@@ -124,8 +127,10 @@ test('personal reference validates input, persists, and stays separate by accoun
  await expect(reference).toHaveAttribute('aria-invalid','true');
  await reference.fill('150');await active(page).getByRole('button',{name:'Apply',exact:true}).click();await expect(active(page).getByRole('button',{name:'Saved',exact:true})).toBeVisible();
  const slider=active(page).getByRole('slider',{name:'Drag to Adjust Reference'});await slider.focus();await page.keyboard.press('ArrowRight');await expect(reference).toHaveValue('151');
- await page.reload();await openEnglish(page);await expect(reference).toHaveValue('151');
+ await slider.hover();await page.mouse.wheel(40,0);await expect(reference).toHaveValue('171');
+ await expect(active(page).getByRole('button',{name:'Saved',exact:true})).toBeVisible();
+ await page.reload();await openEnglish(page);await expect(reference).toHaveValue('171');
  await page.getByRole('button',{name:'Last 7 Days',exact:true}).click();await expect(reference).toHaveValue('0');
- await page.getByRole('button',{name:'Last 30 Days',exact:true}).click();await expect(reference).toHaveValue('151');
+ await page.getByRole('button',{name:'Last 30 Days',exact:true}).click();await expect(reference).toHaveValue('171');
  await page.getByRole('combobox',{name:'Account',exact:true}).click();await page.getByRole('option',{name:'Claude · first@example.com',exact:true}).click();await expect(reference).toHaveValue('0');
 });

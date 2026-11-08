@@ -1,11 +1,10 @@
 import {describe,it,expect} from 'vitest';
-import {createElement} from 'react';
-import {renderToStaticMarkup} from 'react-dom/server';
-import {homeStyleKey,readHomeStyles,homeStyleMode,homeStyleFor} from './useHomeUsageStyle';
+import {render as renderComponent} from 'svelte/server';
+import {homeStyleKey,readHomeStyles,homeStyleMode,homeStyleFor} from '../svelte/preferences.svelte';
 import {sameLook,styleCategories,categoryOf,homeUsageFamilies,homeQuotaDesigns,parseStyle,canonicalStyle,styleOptions,variantLabel,preciseQuotaReading,quotaReading,quotaMeter,quotaCycle,quotaPercent} from '../homeUsage';
-import {HomeMetrics} from '../HomeMetrics';
+import HomeMetrics from '../svelte/usage/HomeMetrics.svelte';
 import type {Metric} from '../desktop';
-import {sameLoginDirectory} from './AccountOnboarding';
+import {sameLoginDirectory} from '../svelte/accounts/AccountOnboarding.svelte';
 describe('account style preferences',()=>{
  it('adds Instruments and Cycles while keeping every earlier saved style valid',()=>{
   expect(Object.keys(homeUsageFamilies)).toHaveLength(14);
@@ -89,7 +88,8 @@ const now=Date.parse('2026-10-28T08:00:00Z');
 const quota:Metric={id:'session',label:'Session',placement:'home',pinned:false,pinnable:true,hasData:true,notStarted:false,
  unit:'percent',percent:38,amount:null,periodSeconds:18000,resetsAt:new Date(now+10800000).toISOString(),values:[],chart:[],expiries:[]};
 const reading={now,language:'en',missing:'No data'};
-const render=(style:string,metrics:Metric[],remaining=false)=>renderToStaticMarkup(createElement(HomeMetrics,{style,metrics,remaining,...reading}));
+// Framework anchors are not part of the meter's public contract.
+const render=(style:string,metrics:Metric[],remaining=false)=>renderComponent(HomeMetrics,{props:{style,metrics,remaining,...reading}}).body.replace(/<!--[\s\S]*?-->/g,'');
 
 describe('precise Home quota data contract',()=>{
  it.each([false,true])('uses already-converted readings once, remaining=%s',remaining=>{
@@ -108,7 +108,7 @@ describe('precise Home quota data contract',()=>{
  it.each([['cells:dots',100],['cells:grille',40],['vessel:chambers',10]] as const)('%s keeps partial cells and only clamps their graphics', (style,count)=>{
   for(const value of [0,.4,38,79.6,112,-12]){
    const html=render(style,[{...quota,percent:value}]);
-   const pattern=style==='vessel:chambers'?/data-fraction="([^"]+)"/g:/transform:scaleX\(([^)]+)\)/g;
+   const pattern=style==='vessel:chambers'?/data-fraction="([^"]+)"/g:/transform:\s*scaleX\(([^)]+)\)/g;
    const fractions=[...html.matchAll(pattern)].map(m=>Number(m[1]));
    expect(fractions).toHaveLength(count);
    expect(fractions.reduce((sum,n)=>sum+n,0)).toBeCloseTo(Math.max(0,Math.min(100,value))*count/100,8);

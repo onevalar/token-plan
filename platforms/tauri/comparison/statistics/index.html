@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>History: React → Svelte Live Comparison</title>
+<style>
+body{margin:24px;font:15px/1.5 system-ui;background:#fafafa;color:#18181b}h1{font-size:24px}label{display:inline-flex;gap:6px;align-items:center;margin:6px}select,button{font:inherit;padding:5px}button:focus-visible,select:focus-visible{outline:3px solid #0c73bf}#panes{display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap}article{min-width:0}iframe{display:block;border:1px solid #888;background:white;max-width:calc(100vw - 50px);height:760px}output{display:block;max-width:720px}pre{max-width:100%;white-space:pre-wrap;max-height:240px;overflow:auto}small{display:block}h2{font-size:18px}
+</style>
+<h1>History: React → Svelte Live Comparison</h1>
+<p>Original left, native target right. Each pane runs its real HistoryPage independently. Fixtures simulate local records only. Controls remount both panes; direct interactions remain independent.</p>
+<form id="controls">
+<label>Scenario <select name="scenario"><option>complete</option><option>partial</option><option>unknown</option><option>zero</option><option>empty</option></select></label>
+<label>Language <select name="language"><option>en</option><option>zh-Hans</option><option>zh-Hant</option><option>ja</option><option>ko</option></select></label>
+<label>Theme <select name="theme"><option>light</option><option>dark</option></select></label>
+<label>Range <select name="range"><option>30</option><option>7</option><option>1</option><option>yesterday</option></select></label>
+<label>Equal Component Width <select name="width"><option>390</option><option>760</option></select></label>
+<label>Motion <select name="motion"><option>normal</option><option>reduce</option></select></label>
+<button type="submit">Apply and Remount</button><button type="button" id="reset">Reset Both Device Preferences</button>
+</form>
+<p><strong>Known adaptations:</strong> native Valar controls and tokens replace Arc; Valar sparkline geometry may differ. Exact values, all styles and interactions remain acceptance requirements. Iframe checks do not prove whole-app overlays or platform chrome.</p>
+<div id="panes"><article><h2>Original · React 19</h2><small>src/preview/HistoryPage.tsx · c588b28</small><output id="source-state">Loading</output><iframe id="source" title="Original React HistoryPage"></iframe></article><article><h2>Target · Svelte 5 Runes</h2><small>src/svelte/HistoryPage.svelte · working tree</small><output id="target-state">Loading</output><iframe id="target" title="Migrated Native Svelte HistoryPage"></iframe></article></div>
+<h2>Raw Public Interaction Logs</h2><p>Events are source-attributed, not replayed; focus is sampled after rendering. No private account data is used.</p><pre id="events"></pre>
+<script type="module">
+const form=document.querySelector('#controls'),frames={source:document.querySelector('#source'),target:document.querySelector('#target')},events=document.querySelector('#events');
+const origins={source:'http://127.0.0.1:1443',target:location.origin};let run='',sequences={source:0,target:0};
+function load(reset=false){run=crypto.randomUUID();sequences={source:0,target:0};events.textContent='';const params=new URLSearchParams(new FormData(form));params.set('run',run);params.set('clock',String(Date.now()));params.set('reset',reset?'yes':'no');for(const side of ['source','target']){frames[side].style.width=`${params.get('width')}px`;frames[side].src=`${origins[side]}/statistics-pane?${params}`;document.querySelector(`#${side}-state`).textContent='Loading real component…';}}
+form.addEventListener('submit',e=>{e.preventDefault();load();});document.querySelector('#reset').addEventListener('click',()=>load(true));
+window.addEventListener('message',event=>{const data=event.data;if(!data||data.protocol!=='tokenplan-statistics-v1'||data.run!==run||!['source','target'].includes(data.side)||event.origin!==origins[data.side]||event.source!==frames[data.side].contentWindow||!Number.isInteger(data.sequence)||data.sequence<=sequences[data.side]||!['ready','error','event'].includes(data.kind)||typeof data.detail!=='string')return;sequences[data.side]=data.sequence;if(data.kind!=='event')document.querySelector(`#${data.side}-state`).textContent=`${data.kind}: ${data.detail}`;events.textContent+=`${data.side} #${data.sequence} ${data.kind}: ${data.detail}\n`;});load();
+</script></html>

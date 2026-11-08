@@ -1,9 +1,8 @@
-import {useEffect,useState} from 'react';
 import {z} from 'zod';
 import {accountSchema,type Account} from '../desktop';
-const key='tokenplan.quotaSamples.v1';
-const schema=z.record(z.string(),z.object({identity:z.string(),points:accountSchema.shape.observations}));
-export type QuotaSamples=z.infer<typeof schema>;
+export const quotaSamplesKey='tokenplan.quotaSamples.v1';
+export const quotaSamplesSchema=z.record(z.string(),z.object({identity:z.string(),points:accountSchema.shape.observations}));
+export type QuotaSamples=z.infer<typeof quotaSamplesSchema>;
 export function collectQuotaSamples(saved:QuotaSamples,accounts:Account[],now=Date.now()):QuotaSamples {
  const next:QuotaSamples={};
  for(const a of accounts){
@@ -29,10 +28,3 @@ export function withQuotaSamples(accounts:Account[],saved:QuotaSamples):Account[
  for(const p of a.observations)points.set(JSON.stringify([p.date,p.label,p.unit]),p);
  return {...a,observations:[...points.values()]};
 });}
-export function useQuotaSamples(accounts:Account[]|undefined){
- const [error,setError]=useState(''),[saved,setSaved]=useState<QuotaSamples>(()=>{try{const raw=localStorage.getItem(key);return raw?schema.parse(JSON.parse(raw)):{};}catch(e){console.error('Quota samples could not be read',e);setError('Could not load quota samples.');return {};}});
- useEffect(()=>{if(!accounts)return;const next=collectQuotaSamples(saved,accounts);if(JSON.stringify(next)===JSON.stringify(saved))return;
-  try{localStorage.setItem(key,JSON.stringify(next));setSaved(next);setError('');}catch(e){console.error('Quota samples could not be saved',e);setError('Could not save quota samples.');}
- },[accounts,saved]);
- return {accounts:withQuotaSamples(accounts??[],saved),error};
-}

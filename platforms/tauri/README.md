@@ -1,10 +1,13 @@
 # TokenPlan shared desktop interface
 
-Tauri 2 + React + free Arc components, with the existing native usage engines behind a
+On `valar-svelte`: Tauri 2 + Svelte 5 + Valar components, with existing usage engines behind a
 persistent JSON-lines bridge. See [migration status](../../docs/tauri-migration.md) for the
-implemented features, platform integration and release acceptance requirements.
+implemented features and [Svelte acceptance](../../docs/svelte-migration.md) for the
+real original/target comparison, component inventory and verification limits.
 
-Use Node 22, the repository's Rust 1.90 toolchain, and .NET 10 on Windows/Linux.
+Use the existing Node 24.22.2 for Valar synchronization, the repository's Rust 1.90
+toolchain, and .NET 10 on Windows/Linux. Library commands pin pnpm 12.14.0 through npx;
+do not change global Node/Corepack settings.
 Mac builds use the existing `/Applications/Xcode.app` toolchain.
 
 ```
@@ -34,6 +37,8 @@ The bridge exposes only account display data and explicit configuration actions.
 expose credential reads, arbitrary files or shell commands. Existing provider code retains
 identity checks, token renewal, caches and rate-limit protection.
 
-Arc's free components are vendored unchanged from its public registry, following its manual
-installation instructions when registry CLI requests failed. Its MIT license is bundled;
-no Arc Pro source is redistributed. See `src/components/arc/NOTICE.md`.
+Missing reusable components enter the Valar library first, then this app consumes
+the actual packages in `vendor/`. React and Arc run only in the isolated development
+comparison baseline, never the production interface. Retained licenses and provenance
+are in `vendor/Valar-NOTICE.md`; TickMeter is independently authored, not copied from
+Arc Pro. See the acceptance record for package-refresh and comparison commands.

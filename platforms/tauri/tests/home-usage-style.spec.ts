@@ -143,13 +143,17 @@ for(const style of ['gauges','cells','rings','ruler','concentric','numbers','seg
    await expect(tile.locator('.home-number-value > span')).toHaveCSS('color',color);
   }
   if(style==='ticks'){
-   await expect(tile.locator('.quota-ticks strong')).toHaveText(shown[i]);await expect(tile.locator('.quota-ticks')).not.toContainText(mode);
-   await expect(tile.locator('.quota-ticks mask circle')).toHaveAttribute('stroke-dasharray',`${Math.max(0,Math.min(1,values[i]/100))} 1`);
+   await expect(tile.locator('.quota-ticks')).toHaveText(shown[i]);
+   await expect(tile.locator('.quota-ticks')).not.toContainText(mode);
+   // The independently authored meter need not use the former Pro SVG mask.
+   await expect(tile.getByRole('meter')).toHaveAttribute('aria-valuemin','0');
+   await expect(tile.getByRole('meter')).toHaveAttribute('aria-valuemax','100');
   }
  }
  if(style==='ticks'){
-  const rings=home(page).locator('.quota-ticks'),ids=await rings.locator('mask').evaluateAll(es=>es.map(e=>e.id));
-  expect(new Set(ids).size).toBe(values.length+1); // Includes the independent not-started quota, never the missing readings.
+  const rings=home(page).locator('.quota-ticks');
+  await expect(rings.getByRole('meter')).toHaveCount(values.length+1); // Includes the independent not-started quota, never missing readings.
+  await expect(home(page).locator('[data-metric="missing"],[data-metric="null"]').getByRole('meter')).toHaveCount(0);
   await expect(rings.locator('button,[tabindex]')).toHaveCount(0);
   expect(await rings.evaluateAll(es=>es.flatMap(e=>e.getAnimations({subtree:true})).length)).toBe(0);
  }
@@ -177,7 +181,10 @@ for(const style of ['gauges','cells','rings','ruler','concentric','numbers','seg
  await page.evaluate(()=>{(window as any).__beforeRefresh=(state:any)=>{state.accounts[0].metrics[0].percent=7;};});
  await page.getByRole('button',{name:messages('en').refresh,exact:true}).click();
  await expect(home(page).locator('[data-metric="quota-0"]')).toContainText('7%');
- if(style==='ticks')await expect(home(page).locator('[data-metric="quota-0"] .quota-ticks mask circle')).toHaveAttribute('stroke-dasharray','0.07 1');
+ if(style==='ticks'){
+  const meter=home(page).locator('[data-metric="quota-0"]').getByRole('meter');
+  await expect(meter).toHaveAttribute('aria-valuenow','7');await expect(meter).toHaveAttribute('aria-valuetext',remaining?'7% · Near quota limit':'7%');
+ }
 });
 
 for(const style of ['cells','numbers'])test(`${style} fits up to three compact quotas per row without reserving empty columns`,async({page},info)=>{

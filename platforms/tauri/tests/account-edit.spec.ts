@@ -25,6 +25,10 @@ for(const theme of ['light','dark'] as const)test(`view and editor are separate 
  await expect(page.getByRole('button',{name:'刷新',exact:true})).toHaveCount(0);
  await expect(editor(page)).toBeFocused();
  expect(await visible(page).evaluate(e=>e.scrollWidth<=e.clientWidth)).toBe(true);
+ for(const choice of await editor(page).getByRole('combobox').all()){
+  expect((await choice.innerText()).trim()).not.toBe('');
+  expect((await choice.boundingBox())!.width).toBeGreaterThanOrEqual(96);
+ }
  await page.screenshot({path:info.outputPath(`editor-${theme}.png`)});
 });
 test('placement and order save at once, and header Done leaves without another write',async({page})=>{

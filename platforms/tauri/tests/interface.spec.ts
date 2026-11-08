@@ -283,17 +283,18 @@ test('confirmation timeout pauses for keyboard focus, including internal focus m
 
  await page.mouse.move(0,0);
  await page.getByRole('button',{name:'移除账号',exact:true}).focus();await page.keyboard.press('Enter');
- const control=page.locator('.danger-zone [data-mode]');
- await expect(control.getByRole('group').getByRole('button',{name:'移除账号',exact:true})).toBeFocused();
+ const control=page.locator('.danger-zone').getByRole('group',{name:'移除账号',exact:true});
+ await expect(control.getByRole('button',{name:'移除账号',exact:true})).toBeFocused();
  await page.waitForTimeout(6200);
- await expect(control).toHaveAttribute('data-state','confirming');
+ await expect(control.getByRole('button',{name:'取消',exact:true})).toBeVisible();
  await page.keyboard.press(previousControl);
  await expect(control.getByRole('button',{name:'取消',exact:true})).toBeFocused();
  await page.waitForTimeout(6200);
- await expect(control).toHaveAttribute('data-state','confirming');
+ await expect(control.getByRole('button',{name:'取消',exact:true})).toBeVisible();
  // Leaving by keyboard resumes the clock; an outside click would cancel immediately instead.
  await page.keyboard.press(previousControl);
- await expect(control).toHaveAttribute('data-state','idle',{timeout:7000});
+ await expect(control.getByRole('button',{name:'取消',exact:true})).toHaveCount(0,{timeout:7000});
+ await expect(control.getByRole('button',{name:'移除账号',exact:true})).toBeVisible();
 });
 
 test('reduced motion stops the pending spinner without hiding its status',async({page})=>{
@@ -312,17 +313,17 @@ test('reduced motion stops the pending spinner without hiding its status',async(
  await page.getByRole('button',{name:'移除账号',exact:true}).click();
  await page.waitForTimeout(300);
  await page.getByRole('group').getByRole('button',{name:'移除账号',exact:true}).click();
- const control=page.locator('.danger-zone [data-mode]'),spinner=control.locator('svg');
- await expect(control).toHaveAttribute('data-state','pending');
+ const control=page.locator('.danger-zone').getByRole('group',{name:'移除账号',exact:true}),spinner=control.locator('svg');
  await expect(control).toHaveAttribute('aria-busy','true');
- await expect(control.locator('[data-face="pending"]')).toHaveText('正在移除…');
+ await expect(control).toContainText('正在移除…');
+ await expect(control.getByRole('button')).toHaveCount(0);
  await expect(control.getByRole('status')).toHaveText('正在移除…');
  await expect(spinner).toHaveCSS('animation-name','none');
  await page.emulateMedia({reducedMotion:'no-preference'});
  await expect(spinner).not.toHaveCSS('animation-name','none');
  await page.emulateMedia({reducedMotion:'reduce'});
  await expect(spinner).toHaveCSS('animation-name','none');
- await expect(control.locator('[data-face="pending"]')).toBeVisible();
+ await expect(control.getByText('正在移除…',{exact:true}).first()).toBeVisible();
 });
 
 for(const colorScheme of ['light','dark'] as const)test(`compact Home keeps the More menu reachable by keyboard and pointer (${colorScheme})`,async({page})=>{

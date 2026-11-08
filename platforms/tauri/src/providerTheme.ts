@@ -1,5 +1,3 @@
-import type {CSSProperties} from 'react';
-
 // Stable service identities, independent of account order. Neutral brands receive
 // an application accent; these are interface colors, not replacements for brand assets.
 const colors:Record<string,[string,string]>={
@@ -13,7 +11,7 @@ const colors:Record<string,[string,string]>={
  siliconflow:['#7954c0','#bc9af0'],ollama:['#647353','#b4c69d'],
  zai:['#526e9d','#a2bbe4'],
 };
-export function providerTheme(family:string):CSSProperties {
+export function providerTheme(family:string):Record<`--${string}`,string> {
  const [light,dark]=colors[family]??['#526e9d','#a2bbe4'];
- return {'--provider-light':light,'--provider-dark':dark} as CSSProperties;
+ return {'--provider-light':light,'--provider-dark':dark};
 }

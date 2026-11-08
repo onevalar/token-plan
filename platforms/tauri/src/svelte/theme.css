@@ -1,0 +1,39 @@
+@import "tailwindcss";
+@import "@valar/svelte-ui/theme.css";
+
+/* Business layouts keep their semantic names; Valar owns their actual palette,
+   control geometry and interaction styles. No Arc foundation is loaded. */
+:root {
+ --font-sans:"Inter",sans-serif;
+ --font-body:var(--font-sans);
+ --font-display:"Geist",sans-serif;
+ --surface:var(--card);
+ --surface-raised:var(--popover);
+ --surface-muted:var(--muted);
+ --text-secondary:var(--muted-foreground);
+ --text-muted:var(--muted-foreground);
+ --border-subtle:color-mix(in oklab,var(--border) 65%,transparent);
+ --border-strong:var(--input);
+ --accent-strong:var(--primary);
+ --accent-subtle:var(--secondary);
+ --danger:var(--destructive);
+ --success:oklch(.49 .15 150);
+ --warning:oklch(.55 .13 75);
+ --series-1:var(--chart-1);--series-2:var(--chart-2);--series-3:var(--chart-3);--series-4:var(--chart-4);
+ --radius-control:var(--radius-lg);--radius-panel:var(--radius-xl);--radius-surface:var(--radius-2xl);--radius-pill:9999px;
+ --space-1:.25rem;--space-2:.5rem;--space-3:.75rem;--space-4:1rem;--space-5:1.25rem;--space-6:1.5rem;--space-8:2rem;
+ --leading-body:1.4;--leading-display:1.1;
+ --shadow-resting:0 1px 2px color-mix(in oklab,var(--foreground) 6%,transparent);
+ --shadow-raised:0 6px 18px color-mix(in oklab,var(--foreground) 10%,transparent);
+ --shadow-floating:0 20px 48px color-mix(in oklab,var(--foreground) 12%,transparent);
+ --duration-instant:var(--motion-duration-fast);--duration-fast:var(--motion-duration-fast);
+ --duration-standard:var(--motion-duration-normal);--duration-considered:var(--motion-duration-slow);
+ --ease-enter:var(--motion-ease-enter);--ease-standard:var(--motion-ease-standard);--ease-exit:var(--motion-ease-exit);
+ color-scheme:light;
+}
+:root.dark {color-scheme:dark;--success:oklch(.78 .15 150);--warning:oklch(.83 .13 80);}
+.header-menu {min-width:190px;}
+.setting-toggle [data-slot="field"] {min-height:36px;}
+.setting-toggle [data-slot="field-label"] {font-weight:400;font-size:13px;min-width:0;overflow-wrap:anywhere;}
+.setting-toggle [data-slot="switch"] {flex:none;}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:0s!important;transition-duration:0s!important;scroll-behavior:auto!important;}}

@@ -33,7 +33,9 @@ export default defineConfig({
  projects,
  use: {baseURL: 'http://127.0.0.1:1421', locale: 'zh-CN', trace: 'retain-on-failure'},
  webServer: {
-  command: 'npx vite --host 127.0.0.1 --port 1421 --strictPort',
+  // Acceptance must exercise the built product, not an HMR session that can
+  // remount mid-gesture when packaging regenerates translations or trace HTML.
+  command: 'npm run build && npx vite preview --host 127.0.0.1 --port 1421 --strictPort',
   url: 'http://127.0.0.1:1421', reuseExistingServer: false,
  },
 });

@@ -55,9 +55,9 @@
     "shortDescription": "AI subscription usage in your system tray",
     "category": "Utility",
     "resources": {
-      "../src/components/arc/LICENSE": "licenses/Arc-LICENSE",
-      "../src/components/arc/NOTICE.md": "licenses/Arc-NOTICE.md",
-      "../src/components/arc/tick-ring/LICENSE.md": "licenses/Arc-Pro-LICENSE.md",
+      "../vendor/Valar-LICENSE.md": "licenses/Valar-LICENSE.md",
+      "../vendor/Valar-NOTICE.md": "licenses/Valar-NOTICE.md",
+      "../vendor/Arc-MIT-LICENSE": "licenses/Arc-MIT-LICENSE",
       "../../../LICENSE": "licenses/TokenPlan-LICENSE"
     }
   },

@@ -1,6 +1,6 @@
 //! Arc Sparkline static point/line mapping, ported for the native menu-bar image.
 //! https://uiarc.dev/r/sparkline.json — Copyright (c) 2026 Elia Kuratli, MIT.
-//! See src/components/arc/LICENSE. Unlike upstream: dated slots, zero baseline,
+//! See vendor/Arc-MIT-LICENSE. Unlike upstream: dated slots, zero baseline,
 //! straight segments and missing-day gaps; no interpolation or synthetic samples.
 use crate::{i18n::translated,model::{Account,DesktopState},tray::visible};
 use chrono::{Days,NaiveDate};

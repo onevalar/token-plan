@@ -1,6 +1,5 @@
-/* Compact desktop layout. Controls and their interaction states use Arc. */
-:root { --font-geist:"Geist"; --font-inter:"Inter"; --usage-normal:#326fce; }
-:root[data-theme="dark"] { --usage-normal:#578fe6; }
+/* Compact desktop layout. Controls and interaction states come from Valar. */
+:root { --font-geist:"Geist"; --font-inter:"Inter"; --usage-normal:var(--primary); }
 * { box-sizing:border-box; }
 html,body { height:100%;overflow:hidden; }
 body { margin:0; background:transparent; color:var(--foreground); font:400 var(--text-sm)/var(--leading-body) var(--font-body); }
@@ -43,7 +42,7 @@ p { margin:8px 0; }
 .family-heading + .account-block .identity-line h2,.family-heading ~ .account-block .identity-line h2 { font-size:var(--text-sm); }
 .metric { display:grid;grid-template-columns:32px minmax(40px,1fr) 42px 84px;align-items:center;column-gap:10px;min-height:32px;font-variant-numeric:tabular-nums;--meter-fill:var(--texture-tint,var(--provider-color,var(--usage-normal))); }
 .metric[data-tone="critical"] { --meter-fill:var(--danger); }
-.metric[data-tone="critical"] .value { color:color-mix(in oklab,var(--danger) 90%,var(--background)); }
+.metric[data-tone="critical"] .value { color:color-mix(in oklab,var(--danger) 98%,var(--background)); }
 .metric-name { overflow-wrap:anywhere; }
 .metric:not(.text-metric) .metric-name { text-align:left; }
 .metric-meter { position:relative;display:flex;align-items:center;min-width:0; }
@@ -104,10 +103,6 @@ progress::-moz-progress-bar { background:var(--meter-fill); }
 .history-controls > span { font-size:var(--text-xs); }
 .history-day { border-bottom:1px solid var(--border); }
 .history-day-trigger,.history-entry-trigger { width:100%;padding-inline:0 !important; }
-/* Arc wraps animated labels; make the content fill the row without changing its controls. */
-.history-day-trigger > span,.history-entry-trigger > span,.service-identity > span { width:100% !important;min-width:0; }
-.history-day-trigger > span > span,.history-entry-trigger > span > span,.service-identity > span > span { display:flex;justify-content:space-between;align-items:center;width:100%;min-width:0;gap:8px; }
-.history-day-trigger > span > span > span,.history-entry-trigger > span > span > span,.service-identity > span > span > span { display:flex;justify-content:space-between;align-items:center;width:100%;min-width:0;gap:8px; }
 .service-identity .service-label { flex:1;min-width:0; }
 .history-entry-trigger { padding-block:8px !important; }
 .history-entry-trigger > span > span > span > span:first-child { min-width:0;flex:1; }

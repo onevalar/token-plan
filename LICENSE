@@ -21,13 +21,10 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-Third-party license exception
+Third-party notices
 
-The Arc Pro adaptations in
-platforms/tauri/src/components/arc/tick-ring/tick-ring.tsx and
-platforms/tauri/src/components/arc/tick-ring/tick-ring.module.css are NOT covered
-by the MIT license above. Copyright (c) 2026 Elia Kuratli. They are included only
-as part of the TokenPlan application under the Arc Pro license:
-https://uiarc.dev/license
-See platforms/tauri/src/components/arc/tick-ring/LICENSE.md for the applicable
-notice and terms. Do not redistribute them as a standalone component or library.
+The Svelte interface uses Valar components. Their license and retained upstream
+MIT notices are in platforms/tauri/vendor/Valar-LICENSE.md and Valar-NOTICE.md.
+The native tray sparkline retains the Arc MIT notice in
+platforms/tauri/vendor/Arc-MIT-LICENSE. The former Arc Pro interface adaptation
+is not included in this revision; historical revisions retain their own terms.

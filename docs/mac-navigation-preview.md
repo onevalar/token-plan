@@ -1,7 +1,9 @@
 # Shared desktop navigation
 
 The owner approved the Windows/Linux rollout on 2026-10-21. Normal Tauri builds
-now use the same React/Arc pages on all three systems. Native window, focus and
+use the same pages on all three systems. On the `valar-svelte` branch these are
+native Svelte/Valar pages; the former React/Arc interface runs only in the isolated
+[comparison baseline](svelte-migration.md). Native window, focus and
 tray integration remain platform-specific. This change does not publish a release.
 
 ## Behavior

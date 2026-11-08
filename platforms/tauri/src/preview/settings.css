@@ -15,10 +15,6 @@
 .mac-preview .usage-style-toggle:focus-visible { outline:none; }
 .mac-preview .usage-style-toggle:focus-visible .usage-style-trigger { outline:2px solid var(--foreground);outline-offset:2px; }
 .mac-preview .usage-style-card-content { display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0;max-width:100%; }
-/* Arc's animated label has a measured inline width and a nowrap phase. Bound every
-   label layer to its card before allowing localized names to wrap. */
-.mac-preview .usage-style-option > span { width:100% !important; }
-.mac-preview .usage-style-option > span > span,.mac-preview .usage-style-option > span > span > span { width:100%;min-width:0;white-space:normal; }
 .mac-preview .usage-style-card-content > span { max-width:100%;white-space:normal;overflow-wrap:anywhere; }
 .mac-preview .usage-style-options { display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;padding:2px 0 8px; }
 /* Variant and Forecast are dropdowns inside the picker, not rows in a settings table. */

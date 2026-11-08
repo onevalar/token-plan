@@ -69,4 +69,4 @@
 
 [构建说明](docs/tauri-migration.md#building-and-checking) · [开发约定](AGENTS.md) · [许可证](LICENSE)
 
-项目代码采用 MIT 许可，Arc Pro 等第三方组件按各自许可使用，详见[组件声明](platforms/tauri/src/components/arc/NOTICE.md)。
+项目代码采用 MIT 许可；本分支界面使用 Svelte 与 Valar，第三方免费 MIT 来源保留在[组件声明](platforms/tauri/vendor/Valar-NOTICE.md)中。原 Arc Pro 界面源码不包含在此版本内。

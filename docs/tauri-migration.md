@@ -4,8 +4,9 @@ The October 21 navigation redesign is enabled in normal builds on all three plat
 following the owner’s approval. See [mac-navigation-preview.md](mac-navigation-preview.md)
 for behavior, platform tray differences and the isolated design-review bundle.
 
-TokenPlan's new desktop interface lives in `platforms/tauri`. React and Arc
-components provide one interface for macOS, Windows and Linux. A fixed bundled helper
+TokenPlan's new desktop interface lives in `platforms/tauri`. On `valar-svelte`,
+Svelte and Valar replace the former React/Arc interface completely; see the
+[migration acceptance record](svelte-migration.md). A fixed bundled helper
 continues to use the existing Swift providers on Mac and .NET providers on Windows/Linux.
 The installed native app and stable update feeds are not replaced by development builds.
 
@@ -184,10 +185,11 @@ in addition to the regression that rejects a modified archive.
 The frontend never receives credentials. It cannot select helper paths or execute shell
 commands. Rust accepts a fixed command list and typed display data, caps response size, and
 terminates a stalled helper. API keys are only submitted for storage, never read back.
-The free Arc components retain their bundled MIT license. The optional Tick Ring adapts
-authorized Arc Pro Activity Rings source, embedded in this application under Arc's
-October 24, 2026 license. Its source notices, Pro terms and MIT exception are retained
-and bundled separately. It must not be distributed as a standalone component or library.
+Valar's components retain their bundled license and upstream free MIT notices in
+`platforms/tauri/vendor`. The native tray sparkline retains its separate Arc MIT
+notice. TickMeter is independently implemented from the quota-reading contract;
+the former Arc Pro source/CSS is absent from this revision and is not redistributed
+in Valar. Historical revisions retain their own applicable terms.
 
 A passing browser test does not prove platform tray behavior, notarization or installed
 updates. Keep native views until packaged acceptance and the first production upgrade have

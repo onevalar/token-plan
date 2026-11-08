@@ -1,14 +1,15 @@
 import {describe,expect,it} from 'vitest';
-import {glassColors} from './panelSurface';
+import {glassColors} from '../svelte/preferences.svelte';
 
 // WCAG 2 relative luminance and contrast, written out here independently of the module.
 const channel=(c:number)=>c<=.04045?c/12.92:((c+.055)/1.055)**2.4;
 const ratio=(a:number,b:number)=>{const [x,y]=[channel(a),channel(b)].sort((p,q)=>q-p);return (x+.05)/(y+.05);};
 // An achromatic OKLCH color has linear RGB channels L^3. Keep the foundation values exact.
 const neutral=(lightness:number)=>{const linear=lightness**3;return linear<=.0031308?12.92*linear:1.055*linear**(1/2.4)-.055;};
-// Arc foundation: light panel #fff with oklch(15%) text; dark panel oklch(19%) with oklch(96%) text.
+// Valar neutral theme: light panel #fff with oklch(14.5%) text;
+// dark panel oklch(14.5%) with oklch(98.5%) text. These are independent theme inputs.
 // Dark glass components add up to a 12% white layer under text (preview.css); light glass layers are white.
-const themes={light:{panel:1,text:neutral(.15),worst:0,lift:0},dark:{panel:neutral(.19),text:neutral(.96),worst:1,lift:.12}} as const;
+const themes={light:{panel:1,text:neutral(.145),worst:0,lift:0},dark:{panel:neutral(.145),text:neutral(.985),worst:1,lift:.12}} as const;
 
 describe('frosted glass legibility',()=>{
  for(const theme of ['light','dark'] as const)it(`keeps ${theme} secondary and muted text at AA over the worst backdrop`,()=>{

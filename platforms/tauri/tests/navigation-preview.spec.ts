@@ -235,15 +235,14 @@ for(const language of ['en','zh-Hans','zh-Hant','ja','ko'])test(`benefits keep e
  const plain=group.locator('.text-metric').filter({hasText:'Plain Balance'});
  await expect(plain).toContainText('$12.50');await expect(plain.getByRole('button')).toHaveCount(0);
  await expect(group.getByRole('button')).toHaveCount(5);
- // Arc keeps details mounted; test its collapsed, inert panel rather than DOM absence.
- await expect(group.locator('[inert]')).toHaveCount(5);
+ // Closed disclosures expose their summaries, but no expiry dates or list items.
+ await expect(group.getByRole('listitem')).toHaveCount(0);
+ await expect(group.locator('time:visible')).toHaveCount(0);
  const panel=page.locator(`[id="${await trigger.getAttribute('aria-controls')}"]`);
- await expect(panel).toHaveAttribute('inert','');
- expect(await panel.evaluate(e=>e.getBoundingClientRect().height)).toBe(0);
+ await expect(panel).not.toBeVisible();
  await trigger.focus();await page.keyboard.press('Enter');
  await expect(trigger).toHaveAttribute('aria-expanded','true');
- await expect(panel).not.toHaveAttribute('inert','');
- await expect.poll(()=>panel.evaluate(e=>e.getBoundingClientRect().height)).toBeGreaterThan(0);
+ await expect(panel).toBeVisible();
  await expect(trigger).toHaveText(name);
  const dates=panel.getByRole('listitem');
  // There are three dates, not seven: never infer an amount per date from the balance.
@@ -256,8 +255,8 @@ for(const language of ['en','zh-Hans','zh-Hant','ja','ko'])test(`benefits keep e
  await page.keyboard.press('Escape');
  await expect(trigger).toHaveAttribute('aria-expanded','false');await expect(trigger).toBeFocused();
  await expect(trigger).toHaveText(name);
- await expect(panel).toHaveAttribute('inert','');
- await expect.poll(()=>panel.evaluate(e=>e.getBoundingClientRect().height)).toBe(0);
+ await expect(panel).not.toBeVisible();
+ await expect(group.getByRole('listitem')).toHaveCount(0);
  expect(await page.evaluate(()=>(window as any).__panelHides??0)).toBe(0);
  await page.keyboard.press('Space');await expect(trigger).toHaveAttribute('aria-expanded','true');
  await trigger.click();await expect(trigger).toHaveAttribute('aria-expanded','false');

@@ -30,9 +30,13 @@ for(const language of ['en','zh-Hans','zh-Hant','ja','ko'])test(`native trend se
   await expect(choice).toHaveCount(0);await expect(page.locator('.menu-bar-preview')).toHaveCount(0);return;
  }
  await choice.focus();await page.keyboard.press('Enter');
- await expect(page.getByRole('option',{name:textFor(language).ring,exact:true})).toBeFocused();
+ // Valar keeps DOM focus on the combobox and exposes the active option through ARIA.
+ const ring=page.getByRole('option',{name:textFor(language).ring,exact:true});
+ await expect(ring).toHaveAttribute('aria-selected','true');await expect(choice).toBeFocused();
+ await expect(choice).toHaveAttribute('aria-activedescendant',(await ring.getAttribute('id'))!);
  await page.keyboard.press('End');
- await expect(page.getByRole('option',{name:tr('Token Trend + Values',language),exact:true})).toBeFocused();
+ const trend=page.getByRole('option',{name:tr('Token Trend + Values',language),exact:true});
+ await expect(choice).toHaveAttribute('aria-activedescendant',(await trend.getAttribute('id'))!);
  await page.keyboard.press('Enter');
  await expect(choice).toContainText(tr('Token Trend + Values',language));
  expect(await page.evaluate(()=>(window as any).__requests.filter((r:any)=>r.method==='settings'))).toContainEqual({method:'settings',value:{trayStyle:'sparkline'}});
