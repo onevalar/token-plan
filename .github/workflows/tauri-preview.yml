@@ -276,6 +276,7 @@ jobs:
             platforms/tauri/src-tauri/target/**/release/bundle/**/*.deb
             platforms/tauri/transition/appcast.xml
             platforms/tauri/src-tauri/tray-native-review.png
+          retention-days: 1
           if-no-files-found: warn
       # Verification artifacts only. Published feeds require an approved stable version.
 
